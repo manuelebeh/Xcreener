@@ -13,7 +13,26 @@
 - **Cérémonies** : Sprint Planning (lundi S1), Daily standup, Sprint Review + Retro (vendredi S2)
 - **Outil de suivi** : Linear (ou GitHub Projects)
 - **Branches** : `main` (production), `develop` (intégration), `feature/*`, `fix/*`
+- **Commits** : [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, …) — Husky + Commitlint en Sprint 0.1 ; **migration vers hooks mise** dès Sprint 0.2 (`apps/web`)
+- **Monorepo** : `mise` (porte d'entrée dev + pin toolchains) + **Turborepo** (cache/build packages TS) — pattern inspiré de [fullstack-starter](https://github.com/first-fluke/fullstack-starter), stack SnapGlow propre (Tauri, Expo, Fastify — pas Flutter/FastAPI/GCP)
 - **CI/CD** : Build + tests automatiques à chaque PR, release automatique sur merge dans `main`
+
+### Structure monorepo cible (évolution)
+
+```
+apps/
+├── desktop/     # Tauri v2 — macOS + Windows        (Phase 0–1)
+├── web/         # Landing marketing — Astro + Vercel (Sprint 0.2)
+├── mobile/      # React Native Expo — iOS + Android  (Phase 1b)
+└── api/         # Fastify + PostgreSQL + Redis       (Phase 2b)
+packages/
+├── design-tokens/   # SSOT couleurs, spacing (Sprint 0.2)
+├── biome-config/    # Biome partagé (Sprint 0.1)
+├── typescript-config/
+└── i18n/            # SSOT traductions (Phase 4)
+```
+
+**Commandes dev (via mise) :** `mise run dev:desktop` → `mise run dev:web` → `mise run dev:mobile` → `mise run dev:api` (ajoutées au fil des phases).
 
 ---
 
@@ -41,38 +60,60 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
-| P0-001 | Initialiser le repo monorepo (Turborepo ou Nx) | P0 | 2j | — |
+| P0-001 | Initialiser monorepo (Turborepo + pnpm) + `mise.toml` (toolchains + tasks racine `dev:*`, `lint`, `install`) | P0 | 2j | — |
 | P0-002 | Setup Tauri v2 — projet skeleton macOS + Windows | P0 | 3j | P0-001 |
-| P0-003 | Configurer TypeScript + ESLint + Prettier | P0 | 1j | P0-001 |
+| P0-003 | Configurer TypeScript + Biome (lint + format) | P0 | 1j | P0-001 |
 | P0-004 | Configurer CI/CD (GitHub Actions) : build, lint, tests | P0 | 2j | P0-001 |
 | P0-005 | Définir l'architecture des modules (capture, editor, export, settings) | P0 | 2j | P0-002 |
 | P0-006 | Setup du store de configuration local (SQLite via Tauri) | P1 | 1j | P0-002 |
+| P0-007 | Setup outillage dev : Hallmark + CodeGraph + Husky/Commitlint (temporaire) + `AGENTS.md` / `.agents/rules/` | P1 | 1j | P0-001 |
 
-**Livrable :** Projet Tauri fonctionnel avec CI/CD, build macOS + Windows validé.
+**Livrable :** Projet Tauri fonctionnel avec CI/CD, build macOS + Windows validé, `mise run dev:desktop` opérationnel, hooks git, index CodeGraph, conventions agent.
+
+> **Inspiration [fullstack-starter](https://github.com/first-fluke/fullstack-starter)** — patterns DX monorepo multi-apps, stack SnapGlow distincte.
+
+| Élément | Quand | Décision SnapGlow |
+|---|---|---|
+| Monorepo `apps/` + `packages/` | Sprint 0.1 | **Adopter** |
+| **mise tasks racine** (`dev:desktop`, `lint`, `install`…) | Sprint 0.1 | **Adopter** — porte d'entrée dev unique |
+| **Turborepo** (cache/build TS) | Sprint 0.1 | **Adopter** — sous-jacent à mise pour packages JS |
+| Biome + Commitlint | Sprint 0.1 | **Adopter** |
+| **Husky** git hooks | Sprint 0.1 | **Adopter** (temporaire) |
+| **Hooks mise conditionnels** (lint par app) | Sprint 0.2 | **Adopter** — remplace Husky (P0-025) |
+| `AGENTS.md` + `.agents/rules/` | Sprint 0.1 | **Adopter** |
+| CodeGraph MCP | Sprint 0.1 | **Adopter** (pas Serena) |
+| `packages/design-tokens` | Sprint 0.2 | **Adopter** (P0-009) |
+| `apps/web` landing **Astro** + Vercel | Sprint 0.2 | **Adopter** (P0-013) |
+| `apps/mobile` **Expo / React Native** | Phase 1b | **Adopter** (M1-001) |
+| `apps/api` **Fastify** + PostgreSQL | Phase 2b | **Adopter** (CL-001) |
+| Release Please + CHANGELOG | Sprint 0.4+ | **Reporter** |
+| Terraform GCP + Docker infra | Phase 2b+ | **Reporter** |
+| oh-my-agent | — | **Ne pas adopter** |
 
 ### Sprint 0.2 (Semaines 3–4) — Design System & Prototype
 
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
-| P0-007 | Créer le design system Figma (couleurs, typographie, composants) | P0 | 3j | — |
-| P0-008 | Implémenter les composants UI de base (React + Tailwind) : boutons, inputs, sliders, tooltips, dropdowns | P0 | 4j | P0-002 |
-| P0-009 | Créer le prototype interactif Figma du flux principal | P0 | 3j | P0-007 |
-| P0-010 | Configurer Storybook pour la bibliothèque de composants | P1 | 1j | P0-008 |
-| P0-011 | Implémenter le thème Light/Dark/System | P1 | 2j | P0-008 |
-| P0-012 | Créer la landing page (Next.js + Vercel) | P1 | 3j | P0-007 |
+| P0-008 | Créer le design system Figma (couleurs, typographie, composants) | P0 | 3j | — |
+| P0-009 | Implémenter les composants UI de base (React + Tailwind) : boutons, inputs, sliders, tooltips, dropdowns — `packages/design-tokens` (pattern fullstack-starter) | P0 | 4j | P0-002, P0-007 |
+| P0-010 | Créer le prototype interactif Figma du flux principal | P0 | 3j | P0-008 |
+| P0-011 | Configurer Storybook pour la bibliothèque de composants | P1 | 1j | P0-009 |
+| P0-012 | Implémenter le thème Light/Dark/System | P1 | 2j | P0-009 |
+| P0-013 | Créer la landing page (`apps/web` — **Astro** + Vercel, pas Next.js) | P1 | 3j | P0-008 |
+| P0-025 | Étendre `mise.toml` (`dev:web`, `tokens:build`) ; migrer Husky → **hooks git mise** (lint conditionnel par app) | P1 | 0.5j | P0-013 |
 
-**Livrable :** Design system Figma complet, composants React de base, landing page en ligne.
+**Livrable :** Design system Figma, composants React, landing Astro en ligne, orchestration mise étendue (`dev:web`), hooks git migrés vers mise.
 
 ### Sprint 0.3 (Semaines 5–6) — Infrastructure & Intégration système
 
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
-| P0-013 | Implémenter l'icône menu bar (macOS) / system tray (Windows) | P0 | 3j | P0-002 |
-| P0-014 | Implémenter le système de raccourcis clavier global | P0 | 3j | P0-013 |
-| P0-015 | Créer le système de settings/préférences persistant | P0 | 2j | P0-006 |
-| P0-016 | Implémenter le lancement au démarrage (auto-start) | P1 | 1j | P0-013 |
-| P0-017 | Setup des tests unitaires (Vitest) + tests e2e (Playwright) | P1 | 2j | P0-002 |
-| P0-018 | Setup analytics (PostHog) et crash reporting (Sentry) | P1 | 1j | P0-002 |
+| P0-014 | Implémenter l'icône menu bar (macOS) / system tray (Windows) | P0 | 3j | P0-002 |
+| P0-015 | Implémenter le système de raccourcis clavier global | P0 | 3j | P0-014 |
+| P0-016 | Créer le système de settings/préférences persistant | P0 | 2j | P0-006 |
+| P0-017 | Implémenter le lancement au démarrage (auto-start) | P1 | 1j | P0-014 |
+| P0-018 | Setup des tests unitaires (Vitest) + tests e2e (Playwright) | P1 | 2j | P0-002 |
+| P0-019 | Setup analytics (PostHog) et crash reporting (Sentry) | P1 | 1j | P0-002 |
 
 **Livrable :** Application Tauri avec menu bar, raccourcis clavier, settings, auto-start fonctionnel.
 
@@ -80,11 +121,11 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
-| P0-019 | Audit qualité du design system — ajustements accessibilité (WCAG AA) | P0 | 2j | P0-008 |
-| P0-020 | Documentation architecture (ADRs — Architecture Decision Records) | P1 | 2j | P0-005 |
-| P0-021 | Setup du système de mise à jour automatique (Tauri updater) | P1 | 2j | P0-002 |
-| P0-022 | Code signing macOS (Developer ID) + Windows (code signing cert) | P0 | 2j | P0-002 |
-| P0-023 | Tests d'intégration menu bar + raccourcis sur macOS et Windows | P0 | 2j | P0-013, P0-014 |
+| P0-020 | Audit qualité du design system — ajustements accessibilité (WCAG AA) | P0 | 2j | P0-009 |
+| P0-021 | Documentation architecture (ADRs — Architecture Decision Records) | P1 | 2j | P0-005 |
+| P0-022 | Setup du système de mise à jour automatique (Tauri updater) | P1 | 2j | P0-002 |
+| P0-023 | Code signing macOS (Developer ID) + Windows (code signing cert) | P0 | 2j | P0-002 |
+| P0-024 | Tests d'intégration menu bar + raccourcis sur macOS et Windows | P0 | 2j | P0-014, P0-015 |
 
 **Livrable :** Phase 0 complète. Architecture validée, CI/CD opérationnel, base solide pour le MVP.
 
@@ -102,8 +143,8 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
-| P1-001 | Implémenter la capture de zone (sélection libre) — macOS | P0 | 3j | P0-014 |
-| P1-002 | Implémenter la capture de zone — Windows (Graphics Capture API) | P0 | 3j | P0-014 |
+| P1-001 | Implémenter la capture de zone (sélection libre) — macOS | P0 | 3j | P0-015 |
+| P1-002 | Implémenter la capture de zone — Windows (Graphics Capture API) | P0 | 3j | P0-015 |
 | P1-003 | Implémenter la capture de fenêtre (détection auto des bords) — macOS | P0 | 2j | P1-001 |
 | P1-004 | Implémenter la capture de fenêtre — Windows | P0 | 2j | P1-002 |
 | P1-005 | Implémenter la capture plein écran — macOS + Windows | P0 | 1j | P1-001, P1-002 |
@@ -132,7 +173,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | P1-014 | Implémenter les presets standards (16:9, 4:3, 1:1, libre) | P0 | 1j | P1-013 |
 | P1-015 | Presets personnalisés : création, sauvegarde, suppression | P1 | 2j | P1-013 |
 | P1-016 | Redimensionnement et zoom de la capture dans le cadre (drag + scroll) | P0 | 2j | P1-007 |
-| P1-017 | UI de l'éditeur inline : barre de style (fond, padding, radius, shadow) | P0 | 3j | P1-007, P0-008 |
+| P1-017 | UI de l'éditeur inline : barre de style (fond, padding, radius, shadow) | P0 | 3j | P1-007, P0-009 |
 | P1-018 | UI de la barre de presets rapides (icônes réseaux sociaux) | P1 | 1j | P1-013 |
 
 **Livrable :** Éditeur inline complet avec presets et contrôles de style.
@@ -158,7 +199,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | P1-026 | Moteur de détection on-device : emails, téléphones, cartes bancaires | P0 | 3j | P1-007 |
 | P1-027 | Détection : clés API, URLs sensibles, mots de passe | P0 | 2j | P1-026 |
 | P1-028 | UI de redaction : highlight des zones détectées, masquage 1-clic | P0 | 2j | P1-026 |
-| P1-029 | Mode automatique : redaction globale activable dans les settings | P1 | 1j | P1-028, P0-015 |
+| P1-029 | Mode automatique : redaction globale activable dans les settings | P1 | 1j | P1-028, P0-016 |
 | P1-030 | Export PNG (qualité max) | P0 | 1j | P1-007 |
 | P1-031 | Export JPG (qualité configurable) + WebP | P0 | 1j | P1-030 |
 | P1-032 | Copier dans le presse-papier (Cmd+C / Ctrl+C) | P0 | 1j | P1-030 |
@@ -175,7 +216,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | P1-036 | Tests d'intégration end-to-end : flux complet capture → beautify → export | P0 | 3j | Tous P1-* |
 | P1-037 | Corrections de bugs et polish UX (feedback interne) | P0 | 3j | Tous P1-* |
 | P1-038 | Optimisation performances : profiling, memory leaks, temps de rendu | P1 | 2j | Tous P1-* |
-| P1-039 | Préparation des builds de release macOS (.dmg) + Windows (.msi/.exe) | P0 | 2j | P0-022 |
+| P1-039 | Préparation des builds de release macOS (.dmg) + Windows (.msi/.exe) | P0 | 2j | P0-023 |
 
 **Livrable :** MVP Desktop complet et testé, prêt pour la beta.
 
@@ -194,10 +235,10 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
-| M1-001 | Setup projet React Native (Expo) avec config iOS + Android | P0 | 2j | — |
+| M1-001 | Setup projet React Native (Expo) iOS + Android ; ajouter `dev:mobile` dans `mise.toml` | P0 | 2j | — |
 | M1-002 | Implémenter Share Extension iOS (import depuis Photos/apps) | P0 | 3j | M1-001 |
 | M1-003 | Implémenter Share Intent Android (import depuis Photos/apps) | P0 | 3j | M1-001 |
-| M1-004 | Réutiliser les composants UI du design system (adaptation mobile) | P0 | 2j | P0-008, M1-001 |
+| M1-004 | Réutiliser les composants UI du design system (adaptation mobile) | P0 | 2j | P0-009, M1-001 |
 
 ### Sprint 1b.2 (Semaines 17–18) — Beautification & Presets mobile
 
@@ -239,10 +280,10 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
 | L-001 | Déployer la beta fermée à 200 testeurs (waitlist) | P0 | 1j | P1-039, M1-016 |
-| L-002 | Setup système de feedback in-app (formulaire + analytics) | P0 | 2j | P0-018 |
+| L-002 | Setup système de feedback in-app (formulaire + analytics) | P0 | 2j | P0-019 |
 | L-003 | Triage et correction des bugs critiques remontés | P0 | 5j | L-001 |
 | L-004 | Ajustements UX basés sur le feedback beta | P0 | 3j | L-001 |
-| L-005 | Finaliser la landing page : vidéo démo, pricing, FAQ | P0 | 2j | P0-012 |
+| L-005 | Finaliser la landing page : vidéo démo, pricing, FAQ | P0 | 2j | P0-013 |
 
 ### Sprint 2.2 (Semaines 25–26) — Lancement public
 
@@ -310,7 +351,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|
-| CL-001 | Setup backend API (Node.js / Fastify) + PostgreSQL + Redis | P0 | 3j | — |
+| CL-001 | Setup backend API (Fastify) + PostgreSQL + Redis ; ajouter `dev:api` dans `mise.toml` | P0 | 3j | — |
 | CL-002 | Setup stockage fichiers (Cloudflare R2) | P0 | 2j | CL-001 |
 | CL-003 | Système d'authentification (Clerk/Auth0 — OAuth2) | P0 | 2j | CL-001 |
 | CL-004 | Upload automatique + génération de lien partageable | P0 | 2j | CL-002 |
@@ -419,7 +460,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 ## 10. Matrice des Dépendances
 
 ```
-P0-002 (Tauri setup) ──────┬─── P0-013 (menu bar) ──── P0-014 (raccourcis)
+P0-002 (Tauri setup) ──────┬─── P0-014 (menu bar) ──── P0-015 (raccourcis)
                             │
                             ├─── P1-001/P1-002 (capture) ──── P1-007 (beautification)
                             │                                        │
@@ -428,7 +469,7 @@ P0-002 (Tauri setup) ──────┬─── P0-013 (menu bar) ───�
                             │                                        ├── P1-026 (redaction)
                             │                                        └── P1-030 (export)
                             │
-                            └─── P0-006 (SQLite) ──── P0-015 (settings) ──── P1-034 (historique)
+                            └─── P0-006 (SQLite) ──── P0-016 (settings) ──── P1-034 (historique)
 
 M1-001 (React Native) ────── M1-005 (beautification mobile) ──── M1-009 (redaction mobile)
 
