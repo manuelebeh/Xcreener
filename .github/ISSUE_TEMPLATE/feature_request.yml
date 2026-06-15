@@ -1,0 +1,83 @@
+name: Feature Request
+description: Propose a new feature or improvement for SnapGlow
+title: "[Feature] "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Opportunity
+      description: What user or product problem are we solving?
+      placeholder: Describe the pain point or opportunity.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature and expected behavior.
+      placeholder: Describe the solution.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Primary Area
+      options:
+        - Desktop — capture
+        - Desktop — editor / beautify
+        - Desktop — export
+        - Desktop — settings / privacy
+        - Desktop — cross-cutting (shell, IPC, SQLite)
+        - Web landing (apps/web — Astro)
+        - Mobile (apps/mobile — Expo)
+        - API / cloud (apps/api — Fastify)
+        - Packages (design-tokens, i18n, shared config)
+        - Docs / DX / CI
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: architecture
+    attributes:
+      label: Architecture Alignment
+      description: Confirm where this fits in the current SnapGlow monorepo.
+      options:
+        - label: Desktop changes will live under `apps/desktop/src/modules/<name>/` (or `shared/`, `db/`, `tauri/`).
+        - label: New Rust logic will go in `src-tauri/src/commands/` with TS wrappers in `src/tauri/commands.ts`.
+        - label: Shared logic placement has been considered (workspace package vs module vs `shared/`).
+        - label: Privacy-first — no cloud upload or telemetry without explicit user action.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternatives were considered and why not chosen?
+      placeholder: Optional but recommended.
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: List concrete conditions for completion.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: sprint
+    attributes:
+      label: Sprint / Phase (optional)
+      description: If you know where this fits in the roadmap, reference a sprint ID (e.g. P1-007, P0-013).
+      placeholder: "Phase 1 — Sprint 1.2 (P1-007) or Phase 0.2 (P0-013)"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Links, mocks, Figma, or constraints.

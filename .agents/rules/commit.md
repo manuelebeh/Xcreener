@@ -1,0 +1,6 @@
+# Commit conventions
+
+- Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `ci:`, `test:`.
+- Scope optional: `feat(desktop):`, `chore(ci):`.
+- Husky runs Biome on staged TS/JSON and commitlint on the message.
+- Do not commit secrets (`.env`, API keys, credentials).

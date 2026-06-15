@@ -1,0 +1,11 @@
+[tools]
+node = "24"
+pnpm = "9"
+rust = "stable"
+
+[tasks]
+install = "pnpm install"
+lint = "pnpm turbo lint"
+typecheck = "pnpm turbo typecheck"
+format = "pnpm turbo format"
+"dev:desktop" = "pnpm --filter @snapglow/desktop tauri dev"

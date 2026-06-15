@@ -1,0 +1,4 @@
+{
+  "root": false,
+  "extends": ["@snapglow/biome-config/biome.json"]
+}

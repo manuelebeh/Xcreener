@@ -1,0 +1,15 @@
+---
+description: Do not implement when the user asks a question
+alwaysApply: true
+---
+
+# Questions without implementation
+
+When the user **asks a question** (to understand, explain, or verify), respond **without modifying the code**:
+
+- Questions like: "how …?", "why …?", "where …?", "what is …?", "is it …?", "why this error?"
+- Requests for explanation, clarification, or verification only
+
+**Do:** answer with explanations, code references, and read-only excerpts. Do not edit files or run commands that change the project state.
+
+**Implement only when** the user explicitly requests an action: "fix", "add", "modify", "create", "implement", "remove", etc.

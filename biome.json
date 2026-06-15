@@ -1,0 +1,13 @@
+{
+  "extends": ["@snapglow/biome-config/biome.json"],
+  "files": {
+    "includes": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.json",
+      "!apps/desktop/src-tauri",
+      "!**/dist",
+      "!**/target"
+    ]
+  }
+}
