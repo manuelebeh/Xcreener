@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.turbo/
+target/
+src-tauri/target/
+
+# Tauri
+src-tauri/WixTools/
+
+# CodeGraph index (local, regenerated)
+.codegraph/
+
+# SQLite / local data
+*.db
+snapglow.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
