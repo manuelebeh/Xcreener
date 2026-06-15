@@ -1,0 +1,102 @@
+name: Bug Report
+description: Report a bug in SnapGlow (desktop, tooling, or docs)
+title: "[Bug] "
+labels: ["bug", "triage"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Clear and concise description of the bug.
+      placeholder: What is broken?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Desktop — capture (apps/desktop)
+        - Desktop — editor / beautify (apps/desktop)
+        - Desktop — export (apps/desktop)
+        - Desktop — settings / SQLite (apps/desktop)
+        - Desktop — menu bar / system tray / shortcuts
+        - Desktop — Tauri / Rust (src-tauri)
+        - Monorepo / CI / tooling (mise, Biome, Husky)
+        - Documentation
+        - Web (apps/web) — not shipped yet
+        - Mobile (apps/mobile) — not shipped yet
+        - API (apps/api) — not shipped yet
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Required for desktop bugs.
+      options:
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Windows
+        - Linux
+        - N/A (not platform-specific)
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps To Reproduce
+      description: Provide exact steps to reproduce.
+      placeholder: |
+        1. Run `mise run dev:desktop`
+        2. Open ...
+        3. Click ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      placeholder: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      placeholder: What actually happens?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Error Output
+      description: Terminal output, Rust backtrace, browser/Tauri devtools console, or screenshots.
+      render: shell
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS version and toolchain (from `mise --version`, `node -v`, `rustc -V`).
+      placeholder: "macOS 15.x, mise 2026.x, Node 24.x, pnpm 9.x, Rust stable, SnapGlow 0.1.0"
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Verification
+      options:
+        - label: I checked existing issues to avoid duplicates.
+          required: true
+        - label: I can reproduce this issue consistently.
+          required: true
+        - label: I included enough details to investigate.
+          required: true

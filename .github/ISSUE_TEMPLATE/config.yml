@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Project README
+    url: https://github.com/manuelebeh/ScreenCut#readme
+    about: Setup, mise commands, and monorepo overview.
+  - name: Agent guide (AGENTS.md)
+    url: https://github.com/manuelebeh/ScreenCut/blob/main/AGENTS.md
+    about: Stack, architecture, and contribution conventions for agents and contributors.
