@@ -19,8 +19,9 @@ use shortcuts::{
     update_capture_shortcut,
 };
 use test_support::{
-    e2e_emit_capture_triggered, e2e_hide_main_window, e2e_is_capture_overlay_visible,
-    e2e_is_main_window_visible, e2e_show_main_window,
+    e2e_emit_capture_triggered, e2e_file_metadata, e2e_hide_main_window,
+    e2e_inject_screenshot, e2e_is_capture_overlay_visible, e2e_is_main_window_visible,
+    e2e_show_main_window, e2e_temp_export_path,
 };
 use tauri::{Manager, WindowEvent};
 
@@ -80,6 +81,9 @@ pub fn run() {
             update_capture_shortcut,
             e2e_show_main_window,
             e2e_emit_capture_triggered,
+            e2e_inject_screenshot,
+            e2e_temp_export_path,
+            e2e_file_metadata,
             e2e_hide_main_window,
             e2e_is_main_window_visible,
             e2e_is_capture_overlay_visible,

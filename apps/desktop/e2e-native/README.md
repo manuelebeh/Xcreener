@@ -54,7 +54,11 @@ Used by WebDriver tests on Linux/Windows:
 | `e2e_show_main_window` | Show/focus main window before WebDriver steps |
 | `e2e_emit_capture_triggered` | Simulate global shortcut without OS key injection |
 | `e2e_hide_main_window` | Hide window (close-button behaviour) |
-| `e2e_is_main_window_visible` | Assert visibility state |
+| `e2e_inject_screenshot` | Inject PNG bytes into editor via `capture-image` event |
+| `e2e_temp_export_path` | Temp file path for export assertions |
+| `e2e_file_metadata` | Check exported file exists + size |
+
+Spec `e2e-native/specs/capture-beautify-export.spec.ts` : inject PNG → editor → export PNG (full beautify pipeline without OS capture).
 
 ## CI
 

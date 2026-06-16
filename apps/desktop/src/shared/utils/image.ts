@@ -1,13 +1,15 @@
-export function bytesToObjectUrl(bytes: number[], mimeType = 'image/png'): string {
-  const uint8 = new Uint8Array(bytes);
-  const blob = new Blob([uint8], { type: mimeType });
-  return URL.createObjectURL(blob);
+export function bytesToBlob(bytes: Uint8Array | number[], mimeType = 'image/png'): Blob {
+  const uint8 = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  return new Blob([uint8], { type: mimeType });
 }
 
-export async function bytesToImageBitmap(bytes: number[]): Promise<ImageBitmap> {
-  const uint8 = new Uint8Array(bytes);
-  const blob = new Blob([uint8], { type: 'image/png' });
-  return createImageBitmap(blob);
+export function bytesToObjectUrl(bytes: Uint8Array | number[], mimeType = 'image/png'): string {
+  return URL.createObjectURL(bytesToBlob(bytes, mimeType));
+}
+
+/** Fast path for live capture IPC bytes — works reliably with canvas drawImage in Tauri. */
+export async function bytesToImageBitmap(bytes: Uint8Array | number[]): Promise<ImageBitmap> {
+  return createImageBitmap(bytesToBlob(bytes, 'image/png'));
 }
 
 function loadImage(objectUrl: string): Promise<HTMLImageElement> {
@@ -17,6 +19,43 @@ function loadImage(objectUrl: string): Promise<HTMLImageElement> {
     image.onerror = () => reject(new Error('Failed to load preview image'));
     image.src = objectUrl;
   });
+}
+
+/**
+ * Decode PNG bytes via an intermediate canvas.
+ * Required when reopening from disk — direct createImageBitmap(blob) can yield
+ * empty bitmaps in WKWebView while still reporting correct dimensions.
+ */
+export async function decodePngBytesToBitmap(bytes: Uint8Array | number[]): Promise<ImageBitmap> {
+  const blob = bytesToBlob(bytes, 'image/png');
+
+  try {
+    const direct = await createImageBitmap(blob);
+    if (direct.width > 0 && direct.height > 0) {
+      return direct;
+    }
+    direct.close();
+  } catch {
+    // Fall through to canvas decode.
+  }
+
+  const url = URL.createObjectURL(blob);
+  try {
+    const image = await loadImage(url);
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+
+    const context = canvas.getContext('2d');
+    if (!context) {
+      throw new Error('Canvas is not supported');
+    }
+
+    context.drawImage(image, 0, 0);
+    return await createImageBitmap(canvas);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 export async function cropObjectUrlToPngBytes(

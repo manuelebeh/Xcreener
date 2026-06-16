@@ -39,6 +39,7 @@ Feature boundaries live under `apps/desktop/src/modules/`:
 - **capture** — screen capture orchestration (Zustand store + hooks)
 - **editor** — canvas / beautify UI
 - **export** — WYSIWYG export (offscreen `renderFrame`, PNG/JPG/WebP, clipboard, drag-out)
+- **history** — capture history grid, preview, reopen in editor (Sprint 1.6)
 - **redaction** — sensitive-data scan UI, overlay, auto-redaction setting
 - **settings** — user preferences UI
 
@@ -47,13 +48,13 @@ Cross-cutting:
 - `src/app/` — routing, providers, shell
 - `src/shared/types/` — shared TS types (IPC payloads, settings)
 - `src/tauri/` — typed wrappers for `invoke` and event listeners
-- `src/db/` — SQLite via `@tauri-apps/plugin-sql` (local-first, no cloud sync in MVP)
+- `src/db/` — SQLite via `@tauri-apps/plugin-sql` (settings, custom presets, capture history)
 
 Modules expose a public API through `index.ts`; internal files stay colocated (`store.ts`, `components/`, `hooks/`).
 
 ### Rust command surface
 
-Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`, `redaction`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only — no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Sprint 1.5** adds on-device redaction (`src-tauri/src/redaction/`, IPC `detect_sensitive_data`) and frontend export (`modules/export/` via offscreen canvas + Tauri dialog/fs/clipboard; Rust `export_image` remains an unused stub). **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
+Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`, `redaction`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only — no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Sprint 1.5** adds on-device redaction (`src-tauri/src/redaction/`, IPC `detect_sensitive_data`) and frontend export (`modules/export/` via offscreen canvas + Tauri dialog/fs/clipboard; Rust `export_image` remains an unused stub). **Sprint 1.6** adds capture history (`modules/history/`, `db/captures.ts`, filesystem under `$APPDATA/captures/` + `$APPDATA/thumbnails/` — frontend-only, no Rust IPC). **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/` (`migrate.ts` splits multi-statement SQL); Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
 
 ### Code intelligence
 

@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). See [ADR-006](./006-native-capture-overlay.md).
+SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). **Sprint 1.6** adds capture history (frontend `db/captures.ts` + filesystem, no Rust IPC) and debug-only E2E hooks in `test_support.rs`. See [ADR-006](./006-native-capture-overlay.md).
 
 ## Decision
 
@@ -31,6 +31,16 @@ Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls 
 | `get_setting` / `set_setting` | `commands/storage.rs` | Placeholder | Prefer `@/db` on frontend |
 | `update_capture_shortcut` | `shortcuts.rs` | Live | `{ shortcut }` — Tauri global-shortcut format |
 
+**Debug-only (E2E, `#[cfg(debug_assertions)]`)** — registered in `test_support.rs`:
+
+| Command | Purpose |
+|---------|---------|
+| `e2e_show_main_window` / `e2e_hide_main_window` | Window visibility for WebDriver |
+| `e2e_emit_capture_triggered` | Simulate global shortcut |
+| `e2e_inject_screenshot` | Inject PNG bytes → editor via `capture-image` event |
+| `e2e_temp_export_path` / `e2e_file_metadata` | Export path assertions |
+| `e2e_is_main_window_visible` / `e2e_is_capture_overlay_visible` | Visibility checks |
+
 Handler registration: `lib.rs` → `invoke_handler!`.
 
 ### Events (Rust → frontend, push)
@@ -48,7 +58,16 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 
 ### Settings persistence
 
-**Phase 0:** SQLite via `@tauri-apps/plugin-sql` in `apps/desktop/src/db/`. Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is required (e.g. autostart read at boot without webview).
+**Phase 0:** SQLite via `@tauri-apps/plugin-sql` in `apps/desktop/src/db/`. Migrations in `migrations/001_init.sql`; `migrate.ts` applies statements one-by-one (`sql:allow-execute`). Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is required (e.g. autostart read at boot without webview).
+
+### Capture history (Sprint 1.6)
+
+Frontend-only — no Rust IPC:
+
+- **SQLite:** `db/captures.ts` — insert/list/prune/delete on `captures` table (retention 30)
+- **Filesystem:** `$APPDATA/captures/YYYY-MM/capture_*.png` + `$APPDATA/thumbnails/thumb_*.webp`
+- **Hook:** `useCaptureSession` → `persistCapture` (sequential queue after capture)
+- **Thumbnails:** `convertFileSrc` via Tauri asset protocol (`assetProtocol.enable` in `tauri.conf.json`)
 
 ### Validation
 

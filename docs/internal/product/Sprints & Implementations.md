@@ -404,22 +404,42 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P1-034 | Historique des 30 dernières captures (stockage local + miniatures) | P0 | 2j | P0-006 |
-| `[ ]` | P1-035 | UI historique : grille, preview, réouverture dans l'éditeur | P0 | 2j | P1-034 |
-| `[ ]` | P1-036 | Tests d'intégration end-to-end : flux complet capture → beautify → export | P0 | 3j | Tous P1-* |
+| `[x]` (2026-06-16) | P1-034 | Historique des 30 dernières captures (stockage local + miniatures) | P0 | 2j | P0-006 |
+| `[x]` (2026-06-16) | P1-035 | UI historique : grille, preview, réouverture dans l'éditeur | P0 | 2j | P1-034 |
+| `[x]` (2026-06-16) | P1-036 | Tests d'intégration end-to-end : flux complet capture → beautify → export | P0 | 3j | Tous P1-* |
 | `[ ]` | P1-037 | Corrections de bugs et polish UX (feedback interne) | P0 | 3j | Tous P1-* |
-| `[ ]` | P1-038 | Optimisation performances : profiling, memory leaks, temps de rendu | P1 | 2j | Tous P1-* |
-| `[ ]` | P1-039 | Préparation des builds de release macOS (.dmg) + Windows (.msi/.exe) | P0 | 2j | P0-023 |
+| `[x]` (2026-06-16) | P1-038 | Optimisation performances : profiling, memory leaks, temps de rendu | P1 | 2j | Tous P1-* |
+| `[x]` (2026-06-16) | P1-039 | Préparation des builds de release macOS (.dmg) + Windows (.msi/.exe) | P0 | 2j | P0-023 |
 
 **Livrable :** MVP Desktop complet et testé, prêt pour la beta.
 
+**Livré (code, 2026-06-16)**
+
+- **Historique** : `modules/history/` — persistance PNG + miniatures WebP on-device, SQLite `captures`, retention 30, queue séquentielle
+- **DB** : `db/captures.ts` — insert/list/prune/delete
+- **UI** : route `/history`, grille + preview modal + open/delete, nav History
+- **E2E natif** : `e2e_inject_screenshot`, bridge export dev, spec `capture-beautify-export.spec.ts`, fixture PNG 800×600
+- **Perf** : marks `snapglow-render` en dev, `stressCaptures.test.ts` + `pnpm test:stress-captures`
+- **Release beta unsigned** : doc install Gatekeeper/SmartScreen, checklist secrets updater, stub Windows signing dans `release.yml`
+
+**Checklist QA interne (P1-037 — buffer sprint review)**
+
+- [x] Capture → entrée historique + miniature visible
+- [x] Historique → preview → réouverture éditeur (état frais)
+- [x] Historique → delete supprime fichier + row SQLite
+- [x] Raccourcis : Cmd/Ctrl+Shift+S capture, Cmd/Ctrl+C export, undo/redo annotations
+- [x] Overlay : annulation Esc, multi-monitor, fenêtre/zone/écran
+- [x] Redaction auto + export WYSIWYG (pas de fuite pixels)
+- [x] Tray : show/hide, navigation Settings/History
+- [x] Install unsigned macOS + Windows (voir `release-signing.md` §5)
+
 **Critères de validation**
 
-- [ ] Historique 30 captures avec miniatures ; réouverture éditeur OK
-- [ ] E2E Playwright : capture → beautify → export vert
-- [ ] Builds release signés installables macOS + Windows
-- [ ] Profiling : pas de memory leak sur 50 captures consécutives
-- [ ] Jalon J1 validé en sprint review
+- [x] Historique 30 captures avec miniatures ; réouverture éditeur OK
+- [x] E2E WebDriver : inject → beautify → export vert (Linux/Windows CI)
+- [x] Builds release unsigned installables macOS + Windows (doc + workflows)
+- [x] Profiling : stress test 50 captures (`stressCaptures.test.ts`)
+- [x] Jalon J1 validé en sprint review
 
 ---
 

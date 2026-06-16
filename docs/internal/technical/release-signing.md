@@ -54,7 +54,47 @@ Without a cert, Windows SmartScreen will warn on first install.
 
 Releases are created as **drafts** until manually published.
 
-## 5. Local release test
+## 5. Beta unsigned installs (Sprint 1.6)
+
+Until Apple Developer ID and Windows Authenticode certificates are provisioned, beta builds are **unsigned** but installable with manual override.
+
+### macOS (`.dmg`)
+
+1. Download the `.dmg` from the draft GitHub Release (tag `v0.1.0-beta.*` or later).
+2. Open the DMG and drag SnapGlow to Applications.
+3. On first launch, Gatekeeper may block the app. Right-click SnapGlow → **Open** → confirm **Open** again.
+4. Alternatively: **System Settings → Privacy & Security → Open Anyway** after the first blocked launch.
+
+### Windows (`.msi` / `.exe`)
+
+1. Download the installer from the draft release.
+2. If SmartScreen shows “Windows protected your PC”, click **More info** → **Run anyway**.
+3. Complete the installer; launch SnapGlow from the Start menu.
+
+### Updater secrets checklist (GitHub → Settings → Secrets)
+
+| Secret | Required for beta updater | Notes |
+|--------|---------------------------|-------|
+| `TAURI_SIGNING_PRIVATE_KEY` | Yes (recommended) | Signs `latest.json` + update bundles |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | If key encrypted | — |
+| `APPLE_*` | No (unsigned macOS) | Add when Developer ID cert is ready |
+| Windows `.pfx` / Authenticode | No (unsigned Windows) | See section 3 + commented block in `release.yml` |
+
+### Trigger a beta release
+
+```bash
+git tag v0.1.0-beta.1
+git push origin v0.1.0-beta.1
+```
+
+CI runs `.github/workflows/release.yml` → draft release with macOS (aarch64 + x86_64) + Windows artifacts.
+
+### Post-build smoke (manual)
+
+- [ ] Fresh install → capture → history shows entry → reopen in editor → export PNG
+- [ ] Updater dialog loads (if `TAURI_SIGNING_PRIVATE_KEY` is set)
+
+## 6. Local release test
 
 ```bash
 # Set private key for local bundle

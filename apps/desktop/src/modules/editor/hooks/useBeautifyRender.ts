@@ -5,12 +5,13 @@ import type { RenderInput } from '../types';
 
 export function useBeautifyRender(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
-  input: RenderInput | null
+  input: RenderInput | null,
+  enabled = true
 ) {
   const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!input || !canvasRef.current) {
+    if (!enabled || !input || !canvasRef.current) {
       return;
     }
 
@@ -25,12 +26,21 @@ export function useBeautifyRender(
       const pixelRatio = window.devicePixelRatio || 1;
       const layout = computeLayout(input);
 
+      if (import.meta.env.DEV) {
+        performance.mark('snapglow-render-start');
+      }
+
       canvas.width = Math.round(layout.canvasWidth * pixelRatio);
       canvas.height = Math.round(layout.canvasHeight * pixelRatio);
       canvas.style.width = '100%';
       canvas.style.height = '100%';
 
       renderFrame(context, input, pixelRatio, canvas);
+
+      if (import.meta.env.DEV) {
+        performance.mark('snapglow-render-end');
+        performance.measure('snapglow-render', 'snapglow-render-start', 'snapglow-render-end');
+      }
     };
 
     if (frameRef.current !== null) {
@@ -47,5 +57,5 @@ export function useBeautifyRender(
         cancelAnimationFrame(frameRef.current);
       }
     };
-  }, [input, canvasRef]);
+  }, [enabled, input, canvasRef]);
 }

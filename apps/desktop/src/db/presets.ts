@@ -1,6 +1,7 @@
-import Database from '@tauri-apps/plugin-sql';
 import type { CustomPresetStyle } from '@/modules/editor/store';
 import type { AspectRatio, BackgroundConfig, FramePreset } from '@/modules/editor/types';
+import { getDb } from './connection';
+import { ensureMigrationsApplied } from './migrate';
 import {
   createCustomPresetInputSchema,
   parseStoredAspectRatio,
@@ -13,15 +14,9 @@ import {
 
 const DEFAULT_BORDER_RADIUS = 12;
 
-const DB_URL = 'sqlite:snapglow.db';
-
-let dbPromise: Promise<Database> | null = null;
-
-async function getDb(): Promise<Database> {
-  if (!dbPromise) {
-    dbPromise = Database.load(DB_URL);
-  }
-  return dbPromise;
+async function getReadyDb() {
+  await ensureMigrationsApplied();
+  return getDb();
 }
 
 interface CustomPresetRow {
@@ -91,7 +86,7 @@ export function storedToFramePreset(
 }
 
 export async function listCustomPresets(): Promise<StoredCustomPreset[]> {
-  const db = await getDb();
+  const db = await getReadyDb();
   const rows = await db.select<CustomPresetRow[]>(
     `SELECT id, name, width, height, aspect_ratio, background, padding, border_radius, shadow
      FROM custom_presets ORDER BY created_at DESC`
@@ -119,7 +114,7 @@ export async function createCustomPreset(
     },
   });
 
-  const db = await getDb();
+  const db = await getReadyDb();
   const background = serializeStoredBackground(parsed.style.background);
   const shadow = serializeStoredShadow(parsed.style.shadow);
 
@@ -158,7 +153,7 @@ export async function createCustomPreset(
 }
 
 export async function deleteCustomPreset(id: number): Promise<void> {
-  const db = await getDb();
+  const db = await getReadyDb();
   await db.execute('DELETE FROM custom_presets WHERE id = ?', [id]);
 }
 

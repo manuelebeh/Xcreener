@@ -190,8 +190,10 @@ src/
 │   │   ├── hooks/useRedactionScan.ts, useAutoRedaction.ts
 │   │   ├── utils/mapToLayout.ts, screenshotToPngBytes.ts
 │   │   └── store.ts
-│   ├── history/            # Historique des captures
-│   │   ├── components/
+│   ├── history/            # Historique des captures (Sprint 1.6)
+│   │   ├── components/     # HistoryGrid, HistoryCard, HistoryPreview, HistoryView
+│   │   ├── hooks/          # useHistoryLoader, useOpenCapture, useLocalFileSrc
+│   │   ├── utils/          # persistCapture, captureFiles, thumbnail, removeCapture
 │   │   └── store.ts
 │   └── settings/           # Préférences utilisateur
 │       ├── components/
@@ -272,7 +274,7 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 
 ### 4.3 Commandes Tauri (IPC)
 
-> **État Sprint 1.5 :** capture native (Sprint 1.1), redaction on-device (`detect_sensitive_data`), export fichier côté frontend (offscreen canvas + plugins dialog/fs/clipboard). Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
+> **État Sprint 1.6 :** capture native (Sprint 1.1), redaction on-device (`detect_sensitive_data`), export fichier côté frontend (offscreen canvas + plugins dialog/fs/clipboard), historique captures côté frontend (`db/captures.ts` + fs). Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
 
 ```rust
 // Capture — commandes Rust (xcap) ; l'overlay confirme via découpe preview côté React
@@ -297,10 +299,7 @@ async fn detect_sensitive_data(image_data: Vec<u8>) -> Result<Vec<SensitiveRegio
     // Vision (macOS) / Windows.Media.Ocr → détecteurs email, phone, card, api_key, url, password
 }
 
-#[tauri::command]
-async fn save_to_history(metadata: CaptureMetadata) -> Result<i64, String> {
-    // Sauvegarde les métadonnées dans SQLite (stub — Sprint 1.6)
-}
+// Historique — Sprint 1.6 : frontend-only (db/captures.ts + fs plugin, pas de commande Rust)
 ```
 
 ### 4.4 APIs natives par plateforme
@@ -331,7 +330,7 @@ async fn save_to_history(metadata: CaptureMetadata) -> Result<i64, String> {
 
 ## 5. Moteur de Rendu (Canvas)
 
-> **État Sprint 1.5 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF). UI : `StyleBar`, `PresetBar`, `AnnotationToolbar`, `RedactionBar`, `ExportBar`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`).
+> **État Sprint 1.6 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem — le canvas est monté conditionnellement après `displaySize`). UI : `StyleBar`, `PresetBar`, `AnnotationToolbar`, `RedactionBar`, `ExportBar`, `HistoryView`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`). Clipboard : `Image.fromBytes` + feature Cargo `image-png`.
 
 ### 5.1 Architecture du moteur
 
@@ -373,7 +372,7 @@ Composition Canvas :
 Preview temps réel (< 50ms par frame)
   │
   ▼
-Export WYSIWYG (`renderToExportCanvas` → `canvasToBlob` → PNG/JPG/WebP, clipboard, drag-out)
+Export WYSIWYG (`renderToExportCanvas` → `canvasToBlob` → PNG/JPG/WebP ; clipboard via `Image.fromBytes` ; drag-out)
 ```
 
 ### 5.3 Optimisation du rendu
@@ -437,6 +436,8 @@ CREATE INDEX idx_captures_tags ON captures(tags);
 ```
 
 ### 6.2 Filesystem
+
+> **Historique (Sprint 1.6) :** persistance via `@tauri-apps/plugin-fs` (`fs:scope-appdata-recursive`). Miniatures servies via asset protocol (`convertFileSrc`).
 
 ```
 ~/Library/Application Support/SnapGlow/    (macOS)
@@ -588,7 +589,7 @@ jobs:
 | **Tests unitaires** (frontend) | Vitest | ≥ 80% des fonctions utilitaires et hooks |
 | **Tests unitaires** (Rust) | `cargo test` | ≥ 80% des commandes Tauri |
 | **Tests de composants** | React Testing Library | Composants critiques (Editor, StyleBar) |
-| **Tests d'intégration** | Playwright + Tauri Driver | Flux complets (capture → export) |
+| **Tests d'intégration** | Playwright + Tauri Driver | Flux complets (capture → export) ; spec `capture-beautify-export.spec.ts` (inject → beautify → export) |
 | **Tests visuels** | Storybook + Chromatic | Régression visuelle des composants |
 | **Tests de performance** | Lighthouse CI + custom benchmarks | Temps de rendu < 50ms, export < 500ms |
 
@@ -644,17 +645,25 @@ jobs:
     "core:default",
     "global-shortcut:default",
     "clipboard-manager:default",
-    "notification:default",
+    "clipboard-manager:allow-write-image",
     "sql:default",
+    "sql:allow-execute",
     "fs:default",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-exists",
+    "fs:scope-appdata-recursive",
     "dialog:default",
-    "shell:allow-open",
     "autostart:default",
-    "os:default",
-    "updater:default"
+    "updater:default",
+    "process:default"
   ]
 }
 ```
+
+> Voir `apps/desktop/src-tauri/capabilities/default.json` pour la liste exacte. Cargo feature `image-png` requise pour le clipboard image (`Image.fromBytes`).
 
 ---
 
