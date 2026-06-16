@@ -9,20 +9,23 @@ export function AppRoutes() {
       <Route
         path="/"
         element={
-          <main className="box-border min-h-screen p-4">
-            <header className="mb-4">
-              <h1 className="m-0 text-xl font-semibold">SnapGlow</h1>
-              <p className="mt-1 text-sm text-muted">Capture · Beautify · Share</p>
-            </header>
+          <main className="box-border min-h-0 w-full flex-1 p-4">
             <EditorView />
           </main>
         }
       />
-      <Route path="/settings" element={<SettingsPanel />} />
+      <Route
+        path="/settings"
+        element={
+          <main className="box-border min-h-0 w-full flex-1 p-4">
+            <SettingsPanel />
+          </main>
+        }
+      />
       <Route
         path="/history"
         element={
-          <main className="box-border min-h-screen p-4">
+          <main className="box-border min-h-0 w-full flex-1 p-4">
             <HistoryView />
           </main>
         }

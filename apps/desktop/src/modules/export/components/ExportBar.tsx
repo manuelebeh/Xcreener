@@ -8,7 +8,7 @@ import { copyExportToClipboard } from '../utils/copyExport';
 import { EXPORT_FORMATS, type ExportFormat, formatLabel } from '../utils/formats';
 import { saveExportBlob } from '../utils/saveExport';
 
-export function ExportBar() {
+export function ExportBar({ embedded = false }: { embedded?: boolean }) {
   const screenshot = useEditorStore((s) => s.screenshot);
   const format = useExportStore((s) => s.format);
   const quality = useExportStore((s) => s.quality);
@@ -67,7 +67,7 @@ export function ExportBar() {
   );
 
   const handleDragStart = useCallback(
-    async (event: React.DragEvent<HTMLDivElement>) => {
+    (event: React.DragEvent<HTMLElement>) => {
       if (!dragBlobRef.current) {
         event.preventDefault();
         return;
@@ -87,16 +87,47 @@ export function ExportBar() {
     return null;
   }
 
-  return (
-    <div
-      className="w-full space-y-3 rounded-xl border border-border bg-surface p-4"
-      data-testid="export-bar"
-    >
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-sm font-medium text-foreground">Export</p>
-          <p className="text-xs text-muted">PNG, JPG, WebP · copy · drag-out</p>
+  const content = (
+    <div className="w-full space-y-3" data-testid="export-bar">
+      {!embedded ? (
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-medium text-foreground">Export</p>
+            <p className="text-xs text-muted">PNG, JPG, WebP · copy · drag-out</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => runExport('save')}
+              disabled={isExporting}
+              data-testid="export-save-button"
+            >
+              {isExporting ? 'Exporting…' : 'Export'}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => runExport('copy')}
+              disabled={isExporting}
+              data-testid="export-copy-button"
+            >
+              Copy
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => runExport('drag')}
+              disabled={isExporting}
+              data-testid="export-drag-button"
+            >
+              Prepare drag
+            </Button>
+          </div>
         </div>
+      ) : (
         <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
@@ -128,7 +159,7 @@ export function ExportBar() {
             Prepare drag
           </Button>
         </div>
-      </div>
+      )}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
@@ -167,7 +198,7 @@ export function ExportBar() {
           type="button"
           draggable
           onDragStart={handleDragStart}
-          className="flex w-full cursor-grab items-center justify-center rounded-lg border border-dashed border-primary/40 bg-primary/5 px-3 py-2 text-xs text-foreground active:cursor-grabbing"
+          className="sg-focus-ring flex w-full cursor-grab items-center justify-center rounded-md border border-dashed border-primary/40 bg-primary/5 px-3 py-2 text-xs text-foreground active:cursor-grabbing"
           data-testid="export-drag-handle"
         >
           Drag this image into Slack, Mail, Finder…
@@ -181,4 +212,10 @@ export function ExportBar() {
       ) : null}
     </div>
   );
+
+  if (embedded) {
+    return content;
+  }
+
+  return <div className="rounded-lg border border-border bg-surface p-4">{content}</div>;
 }

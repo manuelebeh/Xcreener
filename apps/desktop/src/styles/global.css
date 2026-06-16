@@ -1,13 +1,25 @@
+/* Hallmark · macrostructure: Feature Stack · tone: utilitarian · anchor hue: warm-amber
+ * nav: N1b canonical inline · theme: custom (warm neutrals · amber primary · Plex Sans + Mono display)
+ * system: design.md locked · conformance pass 5
+ */
+
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+
 @import '@snapglow/ui/styles.css';
 
 html,
 body,
 #root {
   min-height: 100%;
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
+  font-family: var(--sg-font-family-sans);
 }
 
 a {
@@ -17,4 +29,37 @@ a {
 
 a:hover {
   color: var(--sg-color-primary);
+}
+
+.sg-focus-ring {
+  outline: none;
+}
+
+.sg-focus-ring:focus-visible {
+  outline: 2px solid var(--sg-color-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Capture overlay HUD — semantic tokens, not raw neutral scale */
+.capture-hud {
+  background: color-mix(in oklch, var(--sg-color-neutral-950) 92%, transparent);
+  color: var(--sg-color-neutral-50);
+  border-color: color-mix(in oklch, var(--sg-color-neutral-50) 18%, transparent);
+}
+
+.capture-hud-btn {
+  color: color-mix(in oklch, var(--sg-color-neutral-50) 82%, transparent);
+}
+
+.capture-hud-btn:hover {
+  background: color-mix(in oklch, var(--sg-color-neutral-50) 10%, transparent);
+}
+
+.capture-hud-btn-active {
+  background: var(--sg-color-neutral-50);
+  color: var(--sg-color-neutral-950);
+}
+
+.capture-hud-divider {
+  background: color-mix(in oklch, var(--sg-color-neutral-50) 18%, transparent);
 }

@@ -1,8 +1,9 @@
 import { useCallback, useMemo } from 'react';
+import { useDeferredDelete } from '../hooks/useDeferredDelete';
 import { useHistoryLoader } from '../hooks/useHistoryLoader';
 import { useOpenCapture } from '../hooks/useOpenCapture';
 import { useHistoryStore } from '../store';
-import { removeCapture } from '../utils/removeCapture';
+import { DeleteUndoToast } from './DeleteUndoToast';
 import { HistoryGrid } from './HistoryGrid';
 import { HistoryPreview } from './HistoryPreview';
 
@@ -14,9 +15,9 @@ export function HistoryView() {
   const error = useHistoryStore((s) => s.error);
   const selectedId = useHistoryStore((s) => s.selectedId);
   const setSelectedId = useHistoryStore((s) => s.setSelectedId);
-  const removeCaptureFromList = useHistoryStore((s) => s.removeCaptureFromList);
 
   const { openCapture, openingId, error: openError } = useOpenCapture();
+  const { requestDelete, undoDelete, pendingCapture } = useDeferredDelete();
 
   const selectedCapture = useMemo(
     () => captures.find((capture) => capture.id === selectedId) ?? null,
@@ -37,24 +38,15 @@ export function HistoryView() {
         return;
       }
 
-      const confirmed = window.confirm(`Delete ${capture.filename}?`);
-      if (!confirmed) {
-        return;
-      }
-
-      void removeCapture(id).then((removed) => {
-        if (removed) {
-          removeCaptureFromList(id);
-        }
-      });
+      requestDelete(capture);
     },
-    [captures, removeCaptureFromList]
+    [captures, requestDelete]
   );
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-4">
+    <div className="mx-auto w-full max-w-5xl space-y-4">
       <header className="space-y-1">
-        <h2 className="text-lg font-semibold text-foreground">Capture history</h2>
+        <h1 className="font-display text-lg font-semibold text-foreground">History</h1>
         <p className="text-sm text-muted">Last 30 captures stored locally on this device.</p>
       </header>
 
@@ -72,7 +64,7 @@ export function HistoryView() {
 
       {!loading && captures.length === 0 ? (
         <div
-          className="rounded-xl border border-dashed border-border bg-muted/20 px-6 py-12 text-center"
+          className="rounded-lg border border-dashed border-border bg-muted/20 px-6 py-12 text-center"
           data-testid="history-empty"
         >
           <p className="text-sm font-medium text-foreground">No captures yet</p>
@@ -103,6 +95,8 @@ export function HistoryView() {
         }}
         isOpening={selectedCapture ? openingId === selectedCapture.id : false}
       />
-    </main>
+
+      <DeleteUndoToast capture={pendingCapture} onUndo={undoDelete} />
+    </div>
   );
 }

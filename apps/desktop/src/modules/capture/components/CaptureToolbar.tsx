@@ -24,15 +24,15 @@ export function CaptureToolbar({
   return (
     <div
       data-testid="capture-toolbar"
-      className="pointer-events-auto flex cursor-default items-center gap-1 rounded-full border border-white/20 bg-black/80 px-2 py-2 text-sm text-white shadow-lg backdrop-blur"
+      className="capture-hud pointer-events-auto flex cursor-default items-center gap-1 rounded-full border px-2 py-2 text-sm shadow-lg"
     >
       {MODES.map((mode) => (
         <button
           key={mode.id}
           type="button"
           data-testid={`capture-mode-${mode.id}`}
-          className={`cursor-pointer rounded-full px-3 py-1.5 transition ${
-            activeMode === mode.id ? 'bg-white text-black' : 'text-white/80 hover:bg-white/10'
+          className={`sg-focus-ring cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap transition-colors ${
+            activeMode === mode.id ? 'capture-hud-btn-active' : 'capture-hud-btn'
           }`}
           onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
@@ -45,11 +45,11 @@ export function CaptureToolbar({
       ))}
       {onConfirm ? (
         <>
-          <span className="mx-1 h-5 w-px bg-white/20" />
+          <span className="capture-hud-divider mx-1 h-5 w-px" aria-hidden="true" />
           <button
             type="button"
             data-testid="capture-confirm"
-            className="cursor-pointer rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+            className="sg-focus-ring cursor-pointer rounded-full bg-primary px-3 py-1.5 text-sm font-medium whitespace-nowrap text-primary-foreground transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={confirmDisabled}
             onPointerDown={(event) => event.stopPropagation()}
             onClick={(event) => {
@@ -61,11 +61,11 @@ export function CaptureToolbar({
           </button>
         </>
       ) : null}
-      <span className="mx-1 h-5 w-px bg-white/20" />
+      <span className="capture-hud-divider mx-1 h-5 w-px" aria-hidden="true" />
       <button
         type="button"
         data-testid="capture-cancel"
-        className="cursor-pointer rounded-full px-3 py-1.5 text-white/80 transition hover:bg-white/10"
+        className="sg-focus-ring capture-hud-btn cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap transition-colors"
         onPointerDown={(event) => event.stopPropagation()}
         onClick={(event) => {
           event.stopPropagation();

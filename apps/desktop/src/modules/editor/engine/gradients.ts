@@ -2,13 +2,15 @@ import type { GradientPreset } from '../types';
 
 export const DEFAULT_GRADIENT_PRESET_ID = 'snapglow-brand';
 
+export const DEFAULT_SOLID_COLOR = '#ede8e0';
+
 const FALLBACK_PRESET: GradientPreset = {
   id: DEFAULT_GRADIENT_PRESET_ID,
   name: 'SnapGlow',
-  angle: 135,
+  angle: 160,
   stops: [
-    { offset: 0, color: '#667eea' },
-    { offset: 1, color: '#764ba2' },
+    { offset: 0, color: '#f2ece4' },
+    { offset: 1, color: '#ddd4c8' },
   ],
 };
 
@@ -19,8 +21,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Sunset',
     angle: 135,
     stops: [
-      { offset: 0, color: '#f093fb' },
-      { offset: 1, color: '#f5576c' },
+      { offset: 0, color: '#f7e8d8' },
+      { offset: 1, color: '#e8c4a8' },
     ],
   },
   {
@@ -28,8 +30,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Ocean',
     angle: 135,
     stops: [
-      { offset: 0, color: '#4facfe' },
-      { offset: 1, color: '#00f2fe' },
+      { offset: 0, color: '#dce4ea' },
+      { offset: 1, color: '#b8c9d4' },
     ],
   },
   {
@@ -37,8 +39,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Forest',
     angle: 135,
     stops: [
-      { offset: 0, color: '#11998e' },
-      { offset: 1, color: '#38ef7d' },
+      { offset: 0, color: '#dce8df' },
+      { offset: 1, color: '#b8cdbf' },
     ],
   },
   {
@@ -46,9 +48,9 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Midnight',
     angle: 135,
     stops: [
-      { offset: 0, color: '#0f0c29' },
-      { offset: 0.5, color: '#302b63' },
-      { offset: 1, color: '#24243e' },
+      { offset: 0, color: '#2a2218' },
+      { offset: 0.5, color: '#3d3428' },
+      { offset: 1, color: '#2e2820' },
     ],
   },
   {
@@ -56,8 +58,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Peach',
     angle: 120,
     stops: [
-      { offset: 0, color: '#ffecd2' },
-      { offset: 1, color: '#fcb69f' },
+      { offset: 0, color: '#f5ead8' },
+      { offset: 1, color: '#e8c8a8' },
     ],
   },
   {
@@ -65,8 +67,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Lavender',
     angle: 135,
     stops: [
-      { offset: 0, color: '#e0c3fc' },
-      { offset: 1, color: '#8ec5fc' },
+      { offset: 0, color: '#ebe6df' },
+      { offset: 1, color: '#d4ccc2' },
     ],
   },
   {
@@ -74,8 +76,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Rose Gold',
     angle: 135,
     stops: [
-      { offset: 0, color: '#f6d365' },
-      { offset: 1, color: '#fda085' },
+      { offset: 0, color: '#f0dcc0' },
+      { offset: 1, color: '#e8b898' },
     ],
   },
   {
@@ -92,8 +94,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Ember',
     angle: 45,
     stops: [
-      { offset: 0, color: '#ff416c' },
-      { offset: 1, color: '#ff4b2b' },
+      { offset: 0, color: '#e8c4a8' },
+      { offset: 1, color: '#c9956f' },
     ],
   },
   {
@@ -101,8 +103,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Aurora',
     angle: 160,
     stops: [
-      { offset: 0, color: '#00c6ff' },
-      { offset: 1, color: '#0072ff' },
+      { offset: 0, color: '#e8eef2' },
+      { offset: 1, color: '#c5d4de' },
     ],
   },
   {
@@ -110,8 +112,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Moss',
     angle: 90,
     stops: [
-      { offset: 0, color: '#134e5e' },
-      { offset: 1, color: '#71b280' },
+      { offset: 0, color: '#4a6258' },
+      { offset: 1, color: '#7a9480' },
     ],
   },
   {
@@ -119,8 +121,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Candy',
     angle: 135,
     stops: [
-      { offset: 0, color: '#ff9a9e' },
-      { offset: 1, color: '#fecfef' },
+      { offset: 0, color: '#f2ddd8' },
+      { offset: 1, color: '#e4c4bc' },
     ],
   },
   {
@@ -128,8 +130,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Slate',
     angle: 135,
     stops: [
-      { offset: 0, color: '#434343' },
-      { offset: 1, color: '#000000' },
+      { offset: 0, color: '#5a5a5a' },
+      { offset: 1, color: '#3a3a3a' },
     ],
   },
   {
@@ -137,8 +139,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Sky',
     angle: 180,
     stops: [
-      { offset: 0, color: '#a1c4fd' },
-      { offset: 1, color: '#c2e9fb' },
+      { offset: 0, color: '#dce4ea' },
+      { offset: 1, color: '#c5d4de' },
     ],
   },
   {
@@ -146,8 +148,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Lime',
     angle: 90,
     stops: [
-      { offset: 0, color: '#d4fc79' },
-      { offset: 1, color: '#96e6a1' },
+      { offset: 0, color: '#e4ead8' },
+      { offset: 1, color: '#c8d4b8' },
     ],
   },
   {
@@ -155,8 +157,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Berry',
     angle: 135,
     stops: [
-      { offset: 0, color: '#8e2de2' },
-      { offset: 1, color: '#4a00e0' },
+      { offset: 0, color: '#8a6a62' },
+      { offset: 1, color: '#6f524b' },
     ],
   },
   {
@@ -182,9 +184,9 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Neon',
     angle: 135,
     stops: [
-      { offset: 0, color: '#12c2e9' },
-      { offset: 0.5, color: '#c471ed' },
-      { offset: 1, color: '#f64f59' },
+      { offset: 0, color: '#e6ddd2' },
+      { offset: 0.5, color: '#d8cfc4' },
+      { offset: 1, color: '#c9bfb4' },
     ],
   },
   {
@@ -201,8 +203,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Mango',
     angle: 135,
     stops: [
-      { offset: 0, color: '#ffe259' },
-      { offset: 1, color: '#ffa751' },
+      { offset: 0, color: '#f5e6c8' },
+      { offset: 1, color: '#e8cfa0' },
     ],
   },
   {
@@ -210,8 +212,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Plum',
     angle: 135,
     stops: [
-      { offset: 0, color: '#cc2b5e' },
-      { offset: 1, color: '#753a88' },
+      { offset: 0, color: '#d4c0c8' },
+      { offset: 1, color: '#b8a0aa' },
     ],
   },
   {
@@ -219,8 +221,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Mint',
     angle: 90,
     stops: [
-      { offset: 0, color: '#a8edea' },
-      { offset: 1, color: '#fed6e3' },
+      { offset: 0, color: '#dce8e4' },
+      { offset: 1, color: '#c4d8d0' },
     ],
   },
   {
@@ -237,8 +239,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Coral',
     angle: 135,
     stops: [
-      { offset: 0, color: '#ff6b6b' },
-      { offset: 1, color: '#feca57' },
+      { offset: 0, color: '#f0d4c8' },
+      { offset: 1, color: '#e4b8a8' },
     ],
   },
   {
@@ -246,8 +248,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Indigo',
     angle: 135,
     stops: [
-      { offset: 0, color: '#3a1c71' },
-      { offset: 1, color: '#d76d77' },
+      { offset: 0, color: '#c8ccd8' },
+      { offset: 1, color: '#a8b0c0' },
     ],
   },
   {
@@ -255,8 +257,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Teal',
     angle: 90,
     stops: [
-      { offset: 0, color: '#136a8a' },
-      { offset: 1, color: '#267871' },
+      { offset: 0, color: '#3a6878' },
+      { offset: 1, color: '#588880' },
     ],
   },
   {
@@ -264,8 +266,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Blush',
     angle: 120,
     stops: [
-      { offset: 0, color: '#ffafbd' },
-      { offset: 1, color: '#ffc3a0' },
+      { offset: 0, color: '#f0d0d8' },
+      { offset: 1, color: '#e8c0b0' },
     ],
   },
   {
@@ -273,8 +275,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Graphite',
     angle: 180,
     stops: [
-      { offset: 0, color: '#2c3e50' },
-      { offset: 1, color: '#4ca1af' },
+      { offset: 0, color: '#3a3834' },
+      { offset: 1, color: '#5a5850' },
     ],
   },
   {
@@ -282,8 +284,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Honey',
     angle: 45,
     stops: [
-      { offset: 0, color: '#f7971e' },
-      { offset: 1, color: '#ffd200' },
+      { offset: 0, color: '#f0dcc0' },
+      { offset: 1, color: '#e8c898' },
     ],
   },
   {
@@ -291,8 +293,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Violet',
     angle: 135,
     stops: [
-      { offset: 0, color: '#654ea3' },
-      { offset: 1, color: '#eaafc8' },
+      { offset: 0, color: '#d0c8d8' },
+      { offset: 1, color: '#b8aec8' },
     ],
   },
   {
@@ -300,8 +302,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Seafoam',
     angle: 90,
     stops: [
-      { offset: 0, color: '#1cd8d2' },
-      { offset: 1, color: '#93edc7' },
+      { offset: 0, color: '#d0e4e0' },
+      { offset: 1, color: '#b8d4cc' },
     ],
   },
   {
@@ -309,8 +311,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Wine',
     angle: 135,
     stops: [
-      { offset: 0, color: '#200122' },
-      { offset: 1, color: '#6f0000' },
+      { offset: 0, color: '#3d2420' },
+      { offset: 1, color: '#6b4038' },
     ],
   },
   {
@@ -318,8 +320,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Cloud',
     angle: 180,
     stops: [
-      { offset: 0, color: '#ffffff' },
-      { offset: 1, color: '#e6e6e6' },
+      { offset: 0, color: '#f9f7f4' },
+      { offset: 1, color: '#e8e4de' },
     ],
   },
   {
@@ -327,8 +329,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Tropical',
     angle: 135,
     stops: [
-      { offset: 0, color: '#f83600' },
-      { offset: 1, color: '#f9d423' },
+      { offset: 0, color: '#f0dcc8' },
+      { offset: 1, color: '#e8d0a8' },
     ],
   },
   {
@@ -345,8 +347,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Bubblegum',
     angle: 120,
     stops: [
-      { offset: 0, color: '#ff9a9e' },
-      { offset: 1, color: '#fad0c4' },
+      { offset: 0, color: '#f0d8d8' },
+      { offset: 1, color: '#e8c8c0' },
     ],
   },
   {
@@ -354,8 +356,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Sage',
     angle: 90,
     stops: [
-      { offset: 0, color: '#c9d6ff' },
-      { offset: 1, color: '#e2e2e2' },
+      { offset: 0, color: '#dce0d8' },
+      { offset: 1, color: '#c8d0c0' },
     ],
   },
   {
@@ -363,8 +365,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Crimson',
     angle: 45,
     stops: [
-      { offset: 0, color: '#eb3349' },
-      { offset: 1, color: '#f45c43' },
+      { offset: 0, color: '#d8a8a8' },
+      { offset: 1, color: '#c08888' },
     ],
   },
   {
@@ -372,8 +374,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Denim',
     angle: 135,
     stops: [
-      { offset: 0, color: '#1e3c72' },
-      { offset: 1, color: '#2a5298' },
+      { offset: 0, color: '#4a5568' },
+      { offset: 1, color: '#6a7588' },
     ],
   },
   {
@@ -381,8 +383,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Lemon',
     angle: 90,
     stops: [
-      { offset: 0, color: '#f7ff00' },
-      { offset: 1, color: '#db36a4' },
+      { offset: 0, color: '#f5f0d8' },
+      { offset: 1, color: '#e8dbb8' },
     ],
   },
   {
@@ -390,8 +392,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Obsidian',
     angle: 180,
     stops: [
-      { offset: 0, color: '#000000' },
-      { offset: 1, color: '#434343' },
+      { offset: 0, color: '#2a2a2a' },
+      { offset: 1, color: '#4a4a4a' },
     ],
   },
   {
@@ -408,8 +410,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Fire',
     angle: 45,
     stops: [
-      { offset: 0, color: '#f12711' },
-      { offset: 1, color: '#f5af19' },
+      { offset: 0, color: '#e8b898' },
+      { offset: 1, color: '#d89868' },
     ],
   },
   {
@@ -417,8 +419,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Jade',
     angle: 135,
     stops: [
-      { offset: 0, color: '#56ab2f' },
-      { offset: 1, color: '#a8e063' },
+      { offset: 0, color: '#c8d8b8' },
+      { offset: 1, color: '#a8c098' },
     ],
   },
   {
@@ -426,8 +428,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Orchid',
     angle: 135,
     stops: [
-      { offset: 0, color: '#da22ff' },
-      { offset: 1, color: '#9733ee' },
+      { offset: 0, color: '#ddd0c8' },
+      { offset: 1, color: '#c4b5ab' },
     ],
   },
   {
@@ -435,8 +437,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Dusk',
     angle: 160,
     stops: [
-      { offset: 0, color: '#2b5876' },
-      { offset: 1, color: '#4e4376' },
+      { offset: 0, color: '#5a5048' },
+      { offset: 1, color: '#6a5a68' },
     ],
   },
   {
@@ -445,7 +447,7 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     angle: 90,
     stops: [
       { offset: 0, color: '#fff1eb' },
-      { offset: 1, color: '#ace0f9' },
+      { offset: 1, color: '#e8ddd0' },
     ],
   },
   {
@@ -453,8 +455,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Ruby',
     angle: 135,
     stops: [
-      { offset: 0, color: '#e52d27' },
-      { offset: 1, color: '#b31217' },
+      { offset: 0, color: '#d8a0a0' },
+      { offset: 1, color: '#b88080' },
     ],
   },
   {
@@ -462,8 +464,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Azure',
     angle: 180,
     stops: [
-      { offset: 0, color: '#2193b0' },
-      { offset: 1, color: '#6dd5ed' },
+      { offset: 0, color: '#c8d8e0' },
+      { offset: 1, color: '#a8c0d0' },
     ],
   },
   {
@@ -471,8 +473,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Olive',
     angle: 90,
     stops: [
-      { offset: 0, color: '#808080' },
-      { offset: 1, color: '#3fada8' },
+      { offset: 0, color: '#c8c8b8' },
+      { offset: 1, color: '#a8a898' },
     ],
   },
   {
@@ -480,8 +482,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Mauve',
     angle: 135,
     stops: [
-      { offset: 0, color: '#c471f5' },
-      { offset: 1, color: '#fa71cd' },
+      { offset: 0, color: '#dcd0d8' },
+      { offset: 1, color: '#c4b4c0' },
     ],
   },
   {
@@ -489,9 +491,9 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Pine',
     angle: 180,
     stops: [
-      { offset: 0, color: '#0f2027' },
-      { offset: 0.5, color: '#203a43' },
-      { offset: 1, color: '#2c5364' },
+      { offset: 0, color: '#2a2820' },
+      { offset: 0.5, color: '#3a3830' },
+      { offset: 1, color: '#4a4840' },
     ],
   },
   {
@@ -499,8 +501,8 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     name: 'Apricot',
     angle: 120,
     stops: [
-      { offset: 0, color: '#ff9a56' },
-      { offset: 1, color: '#ff6a88' },
+      { offset: 0, color: '#f0dcc8' },
+      { offset: 1, color: '#e8c4a8' },
     ],
   },
   {

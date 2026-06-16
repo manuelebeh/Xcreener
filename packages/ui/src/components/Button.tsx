@@ -30,9 +30,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       type={type}
       disabled={disabled}
       className={clsx(
-        'inline-flex items-center justify-center font-medium transition-opacity',
+        'inline-flex items-center justify-center font-medium whitespace-nowrap transition-opacity',
         focusRingClasses,
         'disabled:opacity-50 disabled:pointer-events-none cursor-pointer',
+        'active:opacity-80',
+        'data-[state=error]:border-destructive data-[state=error]:text-destructive',
+        'data-[state=success]:border-success data-[state=success]:text-success',
         variantClasses[variant],
         sizeClasses[size],
         className

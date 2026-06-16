@@ -1,6 +1,6 @@
 import { Label, Slider } from '@snapglow/ui';
 import { useEffect, useRef, useState } from 'react';
-import { GRADIENT_PRESETS } from '../engine/gradients';
+import { DEFAULT_SOLID_COLOR, GRADIENT_PRESETS } from '../engine/gradients';
 import { useEditorStore } from '../store';
 import type { BackgroundConfig } from '../types';
 
@@ -10,7 +10,7 @@ function backgroundTabFromConfig(background: BackgroundConfig): BackgroundTab {
   return background.type;
 }
 
-export function StyleBar() {
+export function StyleBar({ embedded = false }: { embedded?: boolean }) {
   const background = useEditorStore((s) => s.background);
   const padding = useEditorStore((s) => s.padding);
   const borderRadius = useEditorStore((s) => s.borderRadius);
@@ -28,7 +28,7 @@ export function StyleBar() {
     setActiveTab(backgroundTabFromConfig(background));
   }, [background]);
 
-  const solidColor = background.type === 'solid' ? background.color : '#667eea';
+  const solidColor = background.type === 'solid' ? background.color : DEFAULT_SOLID_COLOR;
   const imageSource = background.type === 'image' ? background.source : null;
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,11 +53,8 @@ export function StyleBar() {
     fileInputRef.current?.click();
   };
 
-  return (
-    <div
-      className="w-full space-y-4 rounded-xl border border-border bg-surface p-4"
-      data-testid="style-bar"
-    >
+  const content = (
+    <div className="w-full space-y-4" data-testid="style-bar">
       <input
         ref={fileInputRef}
         type="file"
@@ -74,7 +71,7 @@ export function StyleBar() {
               <button
                 key={tab}
                 type="button"
-                className={`rounded-md px-2.5 py-1 text-xs capitalize ${
+                className={`sg-focus-ring rounded-md px-2.5 py-1 text-xs capitalize whitespace-nowrap ${
                   activeTab === tab
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted/30 text-muted hover:text-foreground'
@@ -97,7 +94,7 @@ export function StyleBar() {
           </div>
 
           {activeTab === 'gradient' ? (
-            <div className="flex gap-1.5 overflow-x-auto pb-1">
+            <div className="grid max-h-24 grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-1.5 overflow-y-auto pr-1">
               {GRADIENT_PRESETS.map((preset) => {
                 const isSelected =
                   background.type === 'gradient' && background.presetId === preset.id;
@@ -128,7 +125,7 @@ export function StyleBar() {
                 type="color"
                 value={solidColor}
                 onChange={(event) => updateBackground({ type: 'solid', color: event.target.value })}
-                className="h-8 w-12 cursor-pointer rounded border border-border bg-transparent"
+                className="sg-focus-ring h-8 w-12 cursor-pointer rounded border border-border bg-transparent"
               />
               <span className="text-xs text-muted">{solidColor}</span>
             </div>
@@ -138,7 +135,7 @@ export function StyleBar() {
             <div className="space-y-1">
               <button
                 type="button"
-                className="rounded-md border border-border px-3 py-1.5 text-xs hover:bg-muted/20"
+                className="sg-focus-ring rounded-md border border-border px-3 py-1.5 text-xs hover:bg-muted/20"
                 onClick={openImagePicker}
               >
                 {imageSource ? 'Change image' : 'Upload image'}
@@ -250,11 +247,17 @@ export function StyleBar() {
               type="color"
               value={shadow.color}
               onChange={(event) => updateShadow({ color: event.target.value })}
-              className="h-7 w-10 cursor-pointer rounded border border-border bg-transparent"
+              className="sg-focus-ring h-7 w-10 cursor-pointer rounded border border-border bg-transparent"
             />
           </div>
         </div>
       </div>
     </div>
   );
+
+  if (embedded) {
+    return content;
+  }
+
+  return <div className="rounded-lg border border-border bg-surface p-4">{content}</div>;
 }
