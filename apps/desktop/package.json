@@ -14,8 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:native": "wdio run wdio.conf.ts",
-    "test:e2e:native:ci": "pnpm tauri build --debug && node scripts/run-native-e2e.mjs"
+    "test:e2e:native": "node scripts/run-native-e2e.mjs",
+    "test:e2e:native:ci": "pnpm tauri build --debug && pnpm test:e2e:native"
   },
   "dependencies": {
     "@posthog/react": "^1.7.0",
@@ -45,6 +45,7 @@
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "@wdio/cli": "^9",
+    "@wdio/globals": "^9",
     "@wdio/local-runner": "^9",
     "@wdio/mocha-framework": "^9",
     "@wdio/spec-reporter": "^9",

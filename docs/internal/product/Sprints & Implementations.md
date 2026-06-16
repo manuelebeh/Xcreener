@@ -229,7 +229,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] ADRs complémentaires rédigés (capture, IPC, updater…)
 - [x] Tauri updater configuré (canal de release test via GitHub Releases)
 - [~] Builds signés macOS + Windows — **scaffolding CI** ; artefacts non signés OK (certs à provisionner)
-- [x] Tests menu bar + raccourcis (Rust + native e2e macOS/Windows CI ; tray clic = QA manuelle)
+- [x] Tests menu bar + raccourcis (Rust + native e2e Linux/Windows CI ; macOS = Rust tests + QA manuelle tray)
 - [x] Jalon J0 validé en sprint review
 
 ---

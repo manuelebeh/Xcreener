@@ -2,15 +2,28 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const desktopDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ext = os.platform() === 'win32' ? '.exe' : '';
-const defaultAppPath = path.join(
-  desktopDir,
-  'src-tauri',
-  'target',
-  'debug',
-  `snapglow-desktop${ext}`
-);
+const desktopDir = path.dirname(fileURLToPath(import.meta.url));
+
+function resolveDebugAppPath() {
+  if (process.env.TAURI_APP_PATH) {
+    return process.env.TAURI_APP_PATH;
+  }
+
+  if (os.platform() === 'darwin') {
+    return path.join(
+      desktopDir,
+      'src-tauri',
+      'target',
+      'debug',
+      'bundle',
+      'macos',
+      'SnapGlow.app'
+    );
+  }
+
+  const ext = os.platform() === 'win32' ? '.exe' : '';
+  return path.join(desktopDir, 'src-tauri', 'target', 'debug', `snapglow-desktop${ext}`);
+}
 
 export const config = {
   runner: 'local',
@@ -23,7 +36,7 @@ export const config = {
     {
       browserName: 'wry',
       'tauri:options': {
-        application: process.env.TAURI_APP_PATH ?? defaultAppPath,
+        application: resolveDebugAppPath(),
       },
     },
   ],
@@ -37,3 +50,5 @@ export const config = {
   connectionRetryTimeout: 180_000,
   connectionRetryCount: 3,
 };
+
+export default config;

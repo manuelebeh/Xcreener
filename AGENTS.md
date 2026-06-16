@@ -43,7 +43,7 @@ mise run test
 
 Desktop e2e:
 - Playwright smoke UI: `pnpm --filter @snapglow/desktop test:e2e`
-- Native integration (tray/shortcuts): `mise run test:e2e:native`
+- Native integration: `mise run test:e2e:native` (WebDriver on Linux/Windows; `cargo test` fallback on macOS — [Tauri limitation](https://v2.tauri.app/develop/tests/webdriver/))
 
 Rust: `cd apps/desktop/src-tauri && cargo test`
 

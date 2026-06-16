@@ -38,14 +38,16 @@ Frontend: `useGlobalShortcut` listens for the event; Settings persists shortcut 
 
 ### Testing (Sprint 0.4)
 
-| Surface | Automated | Manual |
-|---------|-----------|--------|
-| Shortcut register/unregister | Rust `cargo test`, IPC round-trip | — |
-| `capture-triggered` UI | Debug command + native e2e | — |
-| Window hide on close | Native e2e WebDriver | — |
-| Tray icon click / OS menu | — | QA checklist |
+| Surface | Linux/Windows CI | macOS |
+|---------|------------------|-------|
+| Shortcut register/unregister | Rust `cargo test` + WebDriver | Rust `cargo test` only |
+| `capture-triggered` UI | WebDriver + `e2e_emit_capture_triggered` | IPC hooks (manual / future plugin) |
+| Window hide on close | WebDriver | Manual QA |
+| Tray icon click / OS menu | Manual QA | Manual QA |
 
-Global key injection in CI is unreliable (macOS accessibility permissions) — covered by IPC test hooks instead.
+**macOS:** `tauri-driver` does not support WKWebView ([Tauri WebDriver docs](https://v2.tauri.app/develop/tests/webdriver/)). Native WebDriver e2e runs on Linux + Windows in CI; macOS uses Rust tests + manual tray checklist.
+
+Global key injection in CI is unreliable — covered by IPC test hooks + Rust tests, not key simulation.
 
 ## Consequences
 
