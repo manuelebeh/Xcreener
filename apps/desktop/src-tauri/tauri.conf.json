@@ -24,7 +24,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.posthog.com https://*.i.posthog.com https://*.sentry.io https://*.ingest.sentry.io"
+      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.posthog.com https://*.i.posthog.com https://*.sentry.io https://*.ingest.sentry.io https://github.com https://api.github.com https://objects.githubusercontent.com"
     }
   },
   "plugins": {
@@ -32,7 +32,15 @@
       "preload": ["sqlite:snapglow.db"]
     },
     "global-shortcut": {},
-    "autostart": {}
+    "autostart": {},
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/manuelebeh/ScreenCut/releases/latest/download/latest.json"
+      ],
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENCMjIzNUMwQjJBRUVDRjYKUldUMjdLNnl3RFVpeTZvc3lFRWo4ZXpRL080ZUlMZVFpaHgrTkcvWVlONXRWWUhvY2tpU1d3QTUK"
+    }
   },
   "bundle": {
     "active": true,

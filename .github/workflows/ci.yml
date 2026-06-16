@@ -35,6 +35,14 @@ jobs:
       - name: Unit tests
         run: mise run test
 
+      - name: Playwright smoke (web UI)
+        working-directory: apps/desktop
+        run: pnpm exec playwright install chromium && pnpm test:e2e
+
+      - name: Rust tests
+        working-directory: apps/desktop/src-tauri
+        run: cargo test --locked
+
       - name: Build web
         run: mise exec -- pnpm --filter @snapglow/web build
 

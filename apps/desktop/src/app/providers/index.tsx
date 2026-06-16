@@ -4,6 +4,7 @@ import { initDatabase, loadAppSettings } from '@/db';
 import { initObservability } from '@/integrations/observability';
 import { captureAppStarted } from '@/integrations/posthog/events';
 import { PostHogProvider } from '@/integrations/posthog/provider';
+import { checkForAppUpdate } from '@/integrations/updater';
 import {
   updateCaptureShortcut,
   useGlobalShortcut,
@@ -48,6 +49,10 @@ export function AppProviders({ children }: AppProvidersProps) {
         } catch (error) {
           console.error('[SnapGlow] Failed to sync autostart', error);
         }
+
+        checkForAppUpdate({ silent: true }).catch((error) => {
+          console.debug('[SnapGlow] Startup update check skipped', error);
+        });
       }
 
       if (!cancelled) {

@@ -1,6 +1,7 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import { clsx } from 'clsx';
 import type { ReactNode } from 'react';
+import { focusRingClasses } from '../lib/focusRing';
 
 export interface DropdownItem {
   label: string;
@@ -32,7 +33,8 @@ export function Dropdown({ trigger, items, onSelect, className }: DropdownProps)
               key={item.value}
               disabled={item.disabled}
               className={clsx(
-                'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none',
+                'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm',
+                focusRingClasses,
                 'focus:bg-brand-100 data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
               )}
               onSelect={() => onSelect?.(item.value)}

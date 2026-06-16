@@ -8,6 +8,8 @@
     "core:tray:default",
     "sql:default",
     "global-shortcut:default",
-    "autostart:default"
+    "autostart:default",
+    "updater:default",
+    "process:default"
   ]
 }

@@ -1,0 +1,43 @@
+name: Native E2E
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-e2e:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: jdx/mise-action@v2
+        with:
+          install: true
+
+      - name: Install dependencies
+        run: mise run install
+
+      - name: Build design tokens
+        run: mise run tokens:build
+
+      - name: Install tauri-driver
+        run: cargo install tauri-driver --locked
+
+      - name: Rust unit tests
+        working-directory: apps/desktop/src-tauri
+        run: cargo test --locked
+
+      - name: Native integration tests
+        run: mise run test:e2e:native

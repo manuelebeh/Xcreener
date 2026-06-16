@@ -23,7 +23,7 @@ export function Tooltip({ content, children, side = 'top', className }: TooltipP
           sideOffset={6}
           className={clsx(
             'z-50 rounded-md bg-foreground px-3 py-1.5 text-xs text-background shadow-md',
-            'animate-in fade-in-0 zoom-in-95',
+            'motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95',
             className
           )}
         >

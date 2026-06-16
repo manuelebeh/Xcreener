@@ -16,7 +16,7 @@ fn toggle_main_window(app: &AppHandle) {
     }
 }
 
-fn show_main_window(app: &AppHandle) {
+pub fn show_main_window(app: &AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.unminimize();
         let _ = window.show();

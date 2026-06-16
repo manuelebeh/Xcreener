@@ -41,17 +41,24 @@ mise run typecheck
 mise run test
 ```
 
-Desktop e2e (Playwright, smoke UI) : `pnpm --filter @snapglow/desktop test:e2e`
+Desktop e2e:
+- Playwright smoke UI: `pnpm --filter @snapglow/desktop test:e2e`
+- Native integration (tray/shortcuts): `mise run test:e2e:native`
 
-Rust checks: `cd apps/desktop/src-tauri && cargo check`
+Rust: `cd apps/desktop/src-tauri && cargo test`
+
+Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Release + updater). See `docs/internal/technical/release-signing.md`.
 
 ## Architecture
 
 - **Modules:** `apps/desktop/src/modules/{capture,editor,export,settings}/`
-- **ADR-001:** `docs/internal/technical/adr/001-monorepo-and-module-architecture.md`
-- **ADR-002:** `docs/internal/technical/adr/002-design-tokens-ui-and-web.md`
+- **ADR-001:** monorepo + modules
+- **ADR-002:** design tokens + UI + web
+- **ADR-003:** IPC commands/events
+- **ADR-004:** tray, shortcuts, autostart
+- **ADR-005:** updater, releases, signing roadmap
 - Invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite settings
-- **Sprint 0.3** : tray (`src-tauri/src/tray.rs`), global shortcuts (`shortcuts.rs`), autostart plugin ; capture/export IPC still stubs until Phase 1
+- **Sprint 0.3–0.4** : tray, shortcuts, autostart, updater, native e2e ; capture/export IPC still stubs until Phase 1
 
 ## Agent conventions
 
