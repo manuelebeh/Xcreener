@@ -54,6 +54,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Modules:** `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings}/`
 - **ADR-001:** monorepo + modules
 - **ADR-002:** design tokens + UI + web
+- **Design system (desktop):** `design.md` — layout, typography, tokens mapping (Hallmark locked, Sprint 1.6)
 - **ADR-003:** IPC commands/events
 - **ADR-004:** tray, shortcuts, autostart
 - **ADR-005:** updater, releases, signing roadmap
@@ -64,12 +65,12 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 1.3** : presets format (sociaux + ratios), drag/zoom (outil Move), `PresetBar` + `StyleBar`, presets custom SQLite
 - **Sprint 1.4** : annotations (texte, formes, highlight, flou manuel), `AnnotationToolbar`, layers 4–5, undo/redo (20 niveaux)
 - **Sprint 1.5** : redaction on-device (OCR macOS/Windows + détecteurs regex), `RedactionBar`, masquage → `BlurAnnotation` ; export WYSIWYG PNG/JPG/WebP, clipboard (`Image.fromBytes` + `image-png`), drag-out (`ExportBar`)
-- **Sprint 1.6** : historique 30 captures (`modules/history/`, `db/captures.ts`, PNG + miniatures WebP), route `/history`, E2E natif `capture-beautify-export`, perf/stress tests, builds beta unsigned (voir `release-signing.md` §5)
+- **Sprint 1.6** : historique 30 captures (`modules/history/`, `db/captures.ts`, PNG + miniatures WebP), route `/history`, E2E natif `capture-beautify-export`, perf/stress tests, builds beta unsigned (voir `release-signing.md` §5) ; polish UX P1-037 (`design.md`, Feature Stack editor, warm tokens, `AppTopNav`)
 
 ## Agent conventions
 
 1. **CodeGraph > grep** for exploring structure across TS and Rust.
-2. **Hallmark** (`.cursor/skills/hallmark/`) for UI/UX polish on frontend work.
+2. **Hallmark** (`.cursor/skills/hallmark/`) for UI/UX polish — read `design.md` first (locked system; conformance, not macrostructure rotation).
 3. **Privacy-first:** no telemetry, no cloud upload without explicit user action.
 4. **Minimal diffs:** match existing patterns; don't add ESLint/Prettier.
 5. **mise** is the dev entry point — add new apps as `dev:*` tasks, not ad-hoc root scripts.

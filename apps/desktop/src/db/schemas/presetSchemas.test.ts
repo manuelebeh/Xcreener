@@ -86,7 +86,7 @@ describe('presetSchemas', () => {
       height: 1080,
       aspectRatio: '1:1',
       style: {
-        background: { type: 'solid', color: '#667eea' },
+        background: { type: 'solid', color: '#c4956a' },
         padding: 40,
         borderRadius: 12,
         shadow: {

@@ -2,16 +2,16 @@ import { Button, Label, Slider, Tooltip, TooltipProvider } from '@snapglow/ui';
 import type { Annotation, BlurMode, EditorTool } from '../annotations/types';
 import { useEditorStore } from '../store';
 
-const TOOLS: { id: EditorTool; label: string }[] = [
-  { id: 'select', label: 'Select' },
-  { id: 'move', label: 'Move capture' },
-  { id: 'text', label: 'Text' },
-  { id: 'rect', label: 'Rectangle' },
-  { id: 'ellipse', label: 'Ellipse' },
-  { id: 'arrow', label: 'Arrow' },
-  { id: 'line', label: 'Line' },
-  { id: 'highlight', label: 'Highlight' },
-  { id: 'blur', label: 'Blur' },
+const TOOLS: { id: EditorTool; label: string; short: string }[] = [
+  { id: 'select', label: 'Select', short: 'Select' },
+  { id: 'move', label: 'Move capture', short: 'Move' },
+  { id: 'text', label: 'Text', short: 'Text' },
+  { id: 'rect', label: 'Rectangle', short: 'Rect' },
+  { id: 'ellipse', label: 'Ellipse', short: 'Oval' },
+  { id: 'arrow', label: 'Arrow', short: 'Arrow' },
+  { id: 'line', label: 'Line', short: 'Line' },
+  { id: 'highlight', label: 'Highlight', short: 'Mark' },
+  { id: 'blur', label: 'Blur', short: 'Blur' },
 ];
 
 function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
@@ -33,7 +33,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
             onChange={(event) => {
               updateAnnotation(annotation.id, { fontSize: Number(event.target.value) });
             }}
-            className="block h-8 w-20 rounded-md border border-border bg-background px-2 text-sm"
+            className="sg-focus-ring block h-8 w-20 rounded-md border border-border bg-background px-2 text-sm"
           />
         </label>
         <label className="space-y-1 text-xs">
@@ -46,7 +46,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
               updateAnnotation(annotation.id, { color: event.target.value });
               updateToolDefaults({ textColor: event.target.value });
             }}
-            className="block h-8 w-12 cursor-pointer rounded-md border border-border"
+            className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
           />
         </label>
         <label className="space-y-1 text-xs">
@@ -59,7 +59,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
               updateAnnotation(annotation.id, { backgroundColor: event.target.value });
               updateToolDefaults({ textBackgroundColor: event.target.value });
             }}
-            className="block h-8 w-12 cursor-pointer rounded-md border border-border"
+            className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
           />
         </label>
       </div>
@@ -79,7 +79,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
               updateAnnotation(annotation.id, { color: event.target.value });
               updateToolDefaults({ highlightColor: event.target.value });
             }}
-            className="block h-8 w-12 cursor-pointer rounded-md border border-border"
+            className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
           />
         </label>
         <div className="min-w-[160px] flex-1 space-y-1" onPointerDown={pushHistory}>
@@ -149,7 +149,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
               updateAnnotation(annotation.id, { stroke: event.target.value });
               updateToolDefaults({ stroke: event.target.value });
             }}
-            className="block h-8 w-12 cursor-pointer rounded-md border border-border"
+            className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
           />
         </label>
         <div className="min-w-[160px] flex-1 space-y-1" onPointerDown={pushHistory}>
@@ -171,7 +171,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
   return null;
 }
 
-export function AnnotationToolbar() {
+export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) {
   const screenshot = useEditorStore((s) => s.screenshot);
   const activeTool = useEditorStore((s) => s.activeTool);
   const setActiveTool = useEditorStore((s) => s.setActiveTool);
@@ -191,68 +191,74 @@ export function AnnotationToolbar() {
     return null;
   }
 
-  return (
-    <TooltipProvider>
-      <div
-        className="w-full space-y-3 rounded-xl border border-border bg-surface p-4"
-        data-testid="annotation-toolbar"
-      >
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="mr-2 text-xs font-medium text-foreground">Annotations</p>
-          {TOOLS.map((tool) => (
-            <Tooltip key={tool.id} content={tool.label}>
+  const toolbar = (
+    <div className="w-full space-y-3" data-testid="annotation-toolbar">
+      <div className="flex flex-wrap items-center gap-1.5">
+        {!embedded ? <p className="mr-2 text-xs font-medium text-foreground">Annotations</p> : null}
+        {TOOLS.map((tool) => (
+          <Tooltip key={tool.id} content={tool.label}>
+            <Button
+              size="sm"
+              variant={activeTool === tool.id ? 'primary' : 'secondary'}
+              onClick={() => setActiveTool(tool.id)}
+              aria-label={tool.label}
+              className="whitespace-nowrap"
+              data-testid={`annotation-tool-${tool.id}`}
+            >
+              {embedded ? tool.short : tool.label}
+            </Button>
+          </Tooltip>
+        ))}
+        <div className="ml-auto flex gap-2">
+          <Button size="sm" variant="ghost" onClick={undo} disabled={history.past.length === 0}>
+            Undo
+          </Button>
+          <Button size="sm" variant="ghost" onClick={redo} disabled={history.future.length === 0}>
+            Redo
+          </Button>
+        </div>
+      </div>
+
+      {activeTool === 'blur' && !selectedAnnotation ? (
+        <div className="flex flex-wrap items-end gap-3 border-t border-border pt-3">
+          <div className="flex gap-1">
+            {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
               <Button
+                key={mode}
                 size="sm"
-                variant={activeTool === tool.id ? 'primary' : 'secondary'}
-                onClick={() => setActiveTool(tool.id)}
-                aria-label={tool.label}
-                data-testid={`annotation-tool-${tool.id}`}
+                variant={toolDefaults.blurMode === mode ? 'primary' : 'secondary'}
+                onClick={() => updateToolDefaults({ blurMode: mode })}
               >
-                {tool.label}
+                {mode === 'gaussian' ? 'Gaussian' : 'Pixelate'}
               </Button>
-            </Tooltip>
-          ))}
-          <div className="ml-auto flex gap-2">
-            <Button size="sm" variant="ghost" onClick={undo} disabled={history.past.length === 0}>
-              Undo
-            </Button>
-            <Button size="sm" variant="ghost" onClick={redo} disabled={history.future.length === 0}>
-              Redo
-            </Button>
+            ))}
+          </div>
+          <div className="min-w-[160px] flex-1 space-y-1">
+            <Label>Intensity</Label>
+            <Slider
+              min={2}
+              max={40}
+              step={1}
+              value={[toolDefaults.blurIntensity]}
+              onValueChange={(value) =>
+                updateToolDefaults({ blurIntensity: value[0] ?? toolDefaults.blurIntensity })
+              }
+            />
           </div>
         </div>
+      ) : null}
 
-        {activeTool === 'blur' && !selectedAnnotation ? (
-          <div className="flex flex-wrap items-end gap-3 border-t border-border pt-3">
-            <div className="flex gap-1">
-              {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
-                <Button
-                  key={mode}
-                  size="sm"
-                  variant={toolDefaults.blurMode === mode ? 'primary' : 'secondary'}
-                  onClick={() => updateToolDefaults({ blurMode: mode })}
-                >
-                  {mode === 'gaussian' ? 'Gaussian' : 'Pixelate'}
-                </Button>
-              ))}
-            </div>
-            <div className="min-w-[160px] flex-1 space-y-1">
-              <Label>Intensity</Label>
-              <Slider
-                min={2}
-                max={40}
-                step={1}
-                value={[toolDefaults.blurIntensity]}
-                onValueChange={(value) =>
-                  updateToolDefaults({ blurIntensity: value[0] ?? toolDefaults.blurIntensity })
-                }
-              />
-            </div>
-          </div>
-        ) : null}
+      {selectedAnnotation ? <SelectedAnnotationPanel annotation={selectedAnnotation} /> : null}
+    </div>
+  );
 
-        {selectedAnnotation ? <SelectedAnnotationPanel annotation={selectedAnnotation} /> : null}
-      </div>
+  if (embedded) {
+    return <TooltipProvider>{toolbar}</TooltipProvider>;
+  }
+
+  return (
+    <TooltipProvider>
+      <div className="rounded-lg border border-border bg-surface p-4">{toolbar}</div>
     </TooltipProvider>
   );
 }

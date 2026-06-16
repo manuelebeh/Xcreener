@@ -1,5 +1,5 @@
 import { Button, Input, Label, Select } from '@snapglow/ui';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   createCustomPreset,
   defaultCreateInputFromStyle,
@@ -8,8 +8,10 @@ import {
 } from '@/db/presets';
 import { isTauriRuntime } from '@/shared/lib/tauri';
 import { getPresetById } from '../engine/presets';
+import { useDeferredPresetDelete } from '../hooks/useDeferredPresetDelete';
 import { useEditorStore } from '../store';
 import type { AspectRatio } from '../types';
+import { PresetUndoToast } from './PresetUndoToast';
 
 const ASPECT_RATIO_OPTIONS: { value: AspectRatio; label: string; width: number; height: number }[] =
   [
@@ -39,6 +41,23 @@ export function PresetPicker() {
   const [name, setName] = useState('');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('16:9');
   const [saving, setSaving] = useState(false);
+
+  const flushPresetDelete = useCallback(async (id: string) => {
+    const dbId = parseCustomDbId(id);
+    if (dbId !== null && isTauriRuntime()) {
+      try {
+        await deleteCustomPreset(dbId);
+      } catch (error) {
+        console.error('[SnapGlow] Failed to delete custom preset', error);
+      }
+    }
+  }, []);
+
+  const { requestDelete, undoDelete, pendingPreset } = useDeferredPresetDelete({
+    onRemove: removeCustomPreset,
+    onRestore: addCustomPreset,
+    onFlush: (preset) => flushPresetDelete(preset.id),
+  });
 
   const handleSave = async () => {
     if (!name.trim() || !isTauriRuntime()) {
@@ -80,19 +99,6 @@ export function PresetPicker() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const dbId = parseCustomDbId(id);
-    removeCustomPreset(id);
-
-    if (dbId !== null && isTauriRuntime()) {
-      try {
-        await deleteCustomPreset(dbId);
-      } catch (error) {
-        console.error('[SnapGlow] Failed to delete custom preset', error);
-      }
-    }
-  };
-
   return (
     <div className="relative">
       <Button
@@ -100,9 +106,10 @@ export function PresetPicker() {
         variant="ghost"
         size="sm"
         aria-expanded={open}
+        className="whitespace-nowrap"
         onClick={() => setOpen((value) => !value)}
       >
-        ⋯
+        Presets
       </Button>
 
       {open ? (
@@ -154,7 +161,7 @@ export function PresetPicker() {
                     >
                       <button
                         type="button"
-                        className="flex-1 truncate text-left text-sm"
+                        className="sg-focus-ring flex-1 truncate rounded-sm text-left text-sm"
                         onClick={() => {
                           applyCustomPresetStyle(preset);
                           setOpen(false);
@@ -164,9 +171,9 @@ export function PresetPicker() {
                       </button>
                       <button
                         type="button"
-                        className="text-xs text-muted hover:text-destructive"
+                        className="sg-focus-ring rounded-sm px-1 text-xs text-muted hover:text-destructive"
                         aria-label={`Delete ${preset.name}`}
-                        onClick={() => handleDelete(preset.id)}
+                        onClick={() => requestDelete(preset)}
                       >
                         Delete
                       </button>
@@ -178,6 +185,8 @@ export function PresetPicker() {
           </div>
         </div>
       ) : null}
+
+      <PresetUndoToast preset={pendingPreset} onUndo={undoDelete} />
     </div>
   );
 }

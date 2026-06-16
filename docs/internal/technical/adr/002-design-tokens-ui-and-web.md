@@ -23,6 +23,12 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 - `ThemeProvider` / `useTheme` for `data-theme` light/dark/system
 - Storybook in-package: `mise run storybook` (includes `@storybook/addon-a11y`)
 
+### Desktop product design (`design.md`)
+
+- Sprint 1.6 (P1-037): locked UX/layout doc at repo root — complements tokens/UI packages
+- Covers macrostructure (Feature Stack), nav (N1b), typography (IBM Plex), semantic token mapping, editor tool order
+- Code SSOT remains `packages/design-tokens/tokens.json`; `design.md` is the product-level rule set for desktop surfaces
+
 ### Web landing (`apps/web`)
 
 - **TanStack Start** + Nitro + Vite 8
@@ -45,6 +51,7 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 
 ## References
 
+- [design.md](../../../../design.md) — desktop product design system (Sprint 1.6)
 - [ADR-001](./001-monorepo-and-module-architecture.md)
 - [accessibility-audit.md](../accessibility-audit.md)
 - [Sprints & Implementations.md](../../product/Sprints%20%26%20Implementations.md)

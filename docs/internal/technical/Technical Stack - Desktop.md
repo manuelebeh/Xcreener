@@ -147,7 +147,6 @@
 | **Zustand** | 5.x | State management léger (< 1KB), pas de boilerplate |
 | **React Router** | 7.x | Navigation entre vues (éditeur, historique, settings) |
 | **Radix UI** | Latest | Composants accessibles headless (dialog, dropdown, slider, tooltip) |
-| **Framer Motion** | 12.x | Animations fluides (transitions, micro-interactions) |
 | **Vite** | 6.x | Build tool ultra-rapide (HMR < 50ms) |
 
 ### 3.2 Structure des modules frontend
@@ -157,6 +156,7 @@ src/
 ├── app/                    # Point d'entrée, routing, providers
 │   ├── App.tsx
 │   ├── routes.tsx
+│   ├── components/         # AppTopNav (nav N1b — Sprint 1.6 polish)
 │   └── providers/
 ├── modules/
 │   ├── capture/            # Overlay capture (sélection zone / fenêtre / écran)
@@ -167,10 +167,12 @@ src/
 │   │   ├── annotations/    # Types, create, resize, utils (Sprint 1.4)
 │   │   ├── components/
 │   │   │   ├── Canvas.tsx
-│   │   │   ├── EditorView.tsx
+│   │   │   ├── EditorView.tsx         # Feature Stack (canvas + tools rail)
+│   │   │   ├── EditorSection.tsx      # EditorToolsPanel + section labels (Sprint 1.6)
 │   │   │   ├── StyleBar.tsx           # Sprint 1.3
 │   │   │   ├── PresetBar.tsx          # Sprint 1.3
 │   │   │   ├── PresetPicker.tsx       # Sprint 1.3
+│   │   │   ├── PresetUndoToast.tsx    # Sprint 1.6
 │   │   │   ├── AnnotationToolbar.tsx  # Sprint 1.4
 │   │   │   └── TextEditorOverlay.tsx  # Sprint 1.4
 │   │   ├── hooks/
@@ -199,11 +201,10 @@ src/
 │       ├── components/
 │       └── store.ts
 ├── shared/
-│   ├── components/         # Composants UI réutilisables (Button, Slider, etc.)
-│   ├── hooks/              # Hooks partagés (useShortcut, useTheme, etc.)
-│   ├── styles/             # Tokens Tailwind, variables CSS
-│   ├── types/              # Types TypeScript partagés
-│   └── utils/              # Utilitaires communs
+│   ├── lib/                # tauri, shortcut helpers
+│   ├── types/              # Types TypeScript partagés (ipc, settings)
+│   └── utils/              # Utilitaires communs (image)
+├── styles/                 # global.css — tokens import + design system stamp
 └── tauri/
     ├── commands.ts         # Wrappers typés pour les commandes Tauri (invoke)
     └── events.ts           # Wrappers typés pour les événements Tauri (listen/emit)
@@ -330,7 +331,7 @@ async fn detect_sensitive_data(image_data: Vec<u8>) -> Result<Vec<SensitiveRegio
 
 ## 5. Moteur de Rendu (Canvas)
 
-> **État Sprint 1.6 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem — le canvas est monté conditionnellement après `displaySize`). UI : `StyleBar`, `PresetBar`, `AnnotationToolbar`, `RedactionBar`, `ExportBar`, `HistoryView`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`). Clipboard : `Image.fromBytes` + feature Cargo `image-png`.
+> **État Sprint 1.6 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem — le canvas est monté conditionnellement après `displaySize`). **Shell UI** : `AppTopNav` (N1b) + routes ; **éditeur** Feature Stack (`EditorView` — canvas sticky + `EditorToolsPanel` scrollable, ordre Format → Style → Annotations → Sensitive data → Export). **Design system** : `design.md` (verrouillé) + `@snapglow/design-tokens` + `@snapglow/ui`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`). Clipboard : `Image.fromBytes` + feature Cargo `image-png`.
 
 ### 5.1 Architecture du moteur
 

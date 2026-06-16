@@ -25,7 +25,7 @@ export function HistoryCard({
   return (
     <article
       className={clsx(
-        'group relative overflow-hidden rounded-xl border bg-surface transition-colors',
+        'group relative overflow-hidden rounded-lg border bg-surface transition-colors',
         isSelected
           ? 'border-primary ring-1 ring-primary/40'
           : 'border-border hover:border-primary/40'
@@ -60,7 +60,7 @@ export function HistoryCard({
       <div className="flex gap-2 border-t border-border px-3 py-2">
         <button
           type="button"
-          className="flex-1 rounded-md border border-border px-2 py-1 text-xs font-medium hover:bg-muted/40 disabled:opacity-50"
+          className="sg-focus-ring flex-1 rounded-md border border-border px-2 py-1 text-xs font-medium whitespace-nowrap hover:bg-muted/40 disabled:opacity-50"
           data-testid="history-open-button"
           disabled={isOpening}
           onClick={onOpen}
@@ -69,7 +69,7 @@ export function HistoryCard({
         </button>
         <button
           type="button"
-          className="rounded-md border border-border px-2 py-1 text-xs text-destructive hover:bg-destructive/10"
+          className="sg-focus-ring rounded-md border border-border px-2 py-1 text-xs whitespace-nowrap text-destructive hover:bg-destructive/10"
           data-testid="history-delete-button"
           onClick={onDelete}
         >

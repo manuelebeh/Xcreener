@@ -293,7 +293,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 - **Moteur Canvas 2D** : `modules/editor/engine/` — `computeLayout`, `drawBackground`, `drawShadow`, `drawScreenshot`, `renderFrame` ; composition 3 couches (fond → ombre → capture clipée) ; HiDPI via `devicePixelRatio`
 - **Store éditeur** : `background`, `padding`, `borderRadius`, `shadow` ; defaults auto à chaque `setScreenshot` (dégradé SnapGlow, padding ~12 %, radius 12 px, ombre douce)
-- **56 presets dégradés** : `engine/gradients.ts` (dont brand `#667eea` → `#764ba2`)
+- **56 presets dégradés** : `engine/gradients.ts` (dont brand warm linen `#f2ece4` → `#ddd4c8`, id `snapglow-brand`)
 - **UI minimale** : `BeautifyPanel` — onglets Gradient / Solid / Image, grille presets, sliders padding / radius / shadow, color pickers, upload image (`<input type="file">`)
 - **Canvas WYSIWYG** : `useBeautifyRender` (rAF) ; preview composée = source de vérité pour l’export (Sprint 1.5 — `renderToExportCanvas`)
 - **Tests** : Vitest — `computeLayout`, `gradients` (≥ 50), `drawBackground`, `renderFrame`, `store`
@@ -328,7 +328,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **Moteur cadre** : `engine/presets.ts` — 5 presets sociaux + ratios 16:9 / 4:3 / 1:1 / libre ; `computeLayout` v2 (mode libre inchangé + dimensions export fixes) ; `ScreenshotTransform` (scale + offset)
 - **Interaction** : `useScreenshotTransform` — drag pointeur + molette zoom (0.5×–3×) sur le canvas
 - **Presets custom SQLite** : `db/presets.ts` CRUD sur `custom_presets` ; hydratation via `useCustomPresetsLoader`
-- **UI inline** : `EditorView` — `Canvas` → `PresetBar` (icônes X/LI/FB/IG/YT + ratios) → `StyleBar` (ex-`BeautifyPanel`, carrousel dégradés, shadow offsetX)
+- **UI inline** : `EditorView` — Feature Stack (`Canvas` sticky gauche + `EditorToolsPanel` droite) ; sections Format (`PresetBar`) puis Style (`StyleBar`, ex-`BeautifyPanel`, carrousel dégradés, shadow offsetX)
 - **Export prep** : `export/utils/canvasExport.ts` — `canvasToPngBlob` + dimensions bitmap
 - **Tests** : Vitest — `presets`, `computeLayout` (cadre), `store` (preset), `canvasExport`, `renderFrame` (9-arg drawImage)
 
@@ -359,7 +359,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **Moteur** : `drawBlurMasks` (layer 4), `drawAnnotations` (layer 5), `drawSelectionHandles`, `hitTest` ; `renderFrame` étendu
 - **Store** : `annotations`, `activeTool`, `toolDefaults`, `pushHistory` / `undo` / `redo` (20 niveaux) ; reset à chaque capture
 - **Interaction** : `useAnnotationInteraction` (drag-to-draw, select/move/resize), `useScreenshotTransformEnabled` (outil Move), `useEditorShortcuts` (Cmd+Z, Delete)
-- **UI** : `AnnotationToolbar` + `TextEditorOverlay` ; intégré dans `EditorView` entre Canvas et PresetBar
+- **UI** : `AnnotationToolbar` + `TextEditorOverlay` ; section Annotations dans `EditorToolsPanel` (Feature Stack)
 - **Tests** : Vitest — `drawAnnotations`, `drawBlurMasks`, `hitTest`, `history`, `renderFrame` (annotations)
 
 **Critères de validation**
@@ -407,7 +407,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | `[x]` (2026-06-16) | P1-034 | Historique des 30 dernières captures (stockage local + miniatures) | P0 | 2j | P0-006 |
 | `[x]` (2026-06-16) | P1-035 | UI historique : grille, preview, réouverture dans l'éditeur | P0 | 2j | P1-034 |
 | `[x]` (2026-06-16) | P1-036 | Tests d'intégration end-to-end : flux complet capture → beautify → export | P0 | 3j | Tous P1-* |
-| `[ ]` | P1-037 | Corrections de bugs et polish UX (feedback interne) | P0 | 3j | Tous P1-* |
+| `[x]` (2026-06-16) | P1-037 | Corrections de bugs et polish UX (feedback interne) | P0 | 3j | Tous P1-* |
 | `[x]` (2026-06-16) | P1-038 | Optimisation performances : profiling, memory leaks, temps de rendu | P1 | 2j | Tous P1-* |
 | `[x]` (2026-06-16) | P1-039 | Préparation des builds de release macOS (.dmg) + Windows (.msi/.exe) | P0 | 2j | P0-023 |
 
@@ -421,6 +421,10 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **E2E natif** : `e2e_inject_screenshot`, bridge export dev, spec `capture-beautify-export.spec.ts`, fixture PNG 800×600
 - **Perf** : marks `snapglow-render` en dev, `stressCaptures.test.ts` + `pnpm test:stress-captures`
 - **Release beta unsigned** : doc install Gatekeeper/SmartScreen, checklist secrets updater, stub Windows signing dans `release.yml`
+- **Polish UX (P1-037, Hallmark)** : `design.md` verrouillé (Feature Stack, nav N1b, thème warm amber OKLCH, IBM Plex Sans/Mono) ; passes audit 0 critical / ship-ready ; conformité pass 5
+- **Shell** : `AppTopNav` (wordmark + liens Editor / History / Settings), routes `min-h-0 flex-1` (scroll unique)
+- **Éditeur** : `EditorSection` + `EditorToolsPanel` — ordre Format → Style → Annotations → Sensitive data → Export ; gradients adoucis ; focus rings, tooltip 800 ms, boutons `:active`
+- **Historique / Settings** : parité layout `max-w-5xl`, titres `font-display`
 
 **Checklist QA interne (P1-037 — buffer sprint review)**
 
