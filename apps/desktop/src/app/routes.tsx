@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { EditorView } from '@/modules/editor';
+import { HistoryView } from '@/modules/history';
 import { SettingsPanel } from '@/modules/settings';
 
 export function AppRoutes() {
@@ -18,6 +19,14 @@ export function AppRoutes() {
         }
       />
       <Route path="/settings" element={<SettingsPanel />} />
+      <Route
+        path="/history"
+        element={
+          <main className="box-border min-h-screen p-4">
+            <HistoryView />
+          </main>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

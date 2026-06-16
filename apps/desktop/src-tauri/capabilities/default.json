@@ -15,13 +15,23 @@
     "core:window:allow-is-visible",
     "core:window:allow-get-all-windows",
     "sql:default",
+    "sql:allow-execute",
     "global-shortcut:default",
     "autostart:default",
     "updater:default",
     "process:default",
     "clipboard-manager:default",
+    "clipboard-manager:allow-write-image",
     "dialog:default",
     "fs:default",
-    "fs:allow-write-file"
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-exists",
+    {
+      "identifier": "fs:scope-appdata-recursive",
+      "allow": [{ "path": "$APPDATA/**" }, { "path": "$TEMP/**" }, { "path": "$TMP/**" }]
+    }
   ]
 }

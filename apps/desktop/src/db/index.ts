@@ -1,51 +1,20 @@
-import Database from '@tauri-apps/plugin-sql';
 import {
   type AppSettings,
   DEFAULT_APP_SETTINGS,
   SETTING_KEYS,
   type ThemePreference,
 } from '@/shared/types/settings';
-import migrationSql from './migrations/001_init.sql?raw';
+import { DB_URL, getDb } from './connection';
+import { ensureMigrationsApplied } from './migrate';
 
-const DB_URL = 'sqlite:snapglow.db';
-
-const DEFAULT_SETTING_ENTRIES: Record<string, string> = {
-  [SETTING_KEYS.theme]: DEFAULT_APP_SETTINGS.theme,
-  [SETTING_KEYS.captureShortcut]: DEFAULT_APP_SETTINGS.captureShortcut,
-  [SETTING_KEYS.launchAtLogin]: String(DEFAULT_APP_SETTINGS.launchAtLogin),
-  [SETTING_KEYS.analyticsEnabled]: String(DEFAULT_APP_SETTINGS.analyticsEnabled),
-  [SETTING_KEYS.autoRedaction]: String(DEFAULT_APP_SETTINGS.autoRedaction),
-};
-
-let dbPromise: Promise<Database> | null = null;
-
-async function getDb(): Promise<Database> {
-  if (!dbPromise) {
-    dbPromise = Database.load(DB_URL);
-  }
-  return dbPromise;
-}
+export { DB_URL, getDb };
 
 export async function initDatabase(): Promise<void> {
-  const db = await getDb();
-  await db.execute(migrationSql);
-
-  for (const [key, value] of Object.entries(DEFAULT_SETTING_ENTRIES)) {
-    const existing = await db.select<{ value: string }[]>(
-      'SELECT value FROM settings WHERE key = ?',
-      [key]
-    );
-
-    if (existing.length === 0) {
-      await db.execute('INSERT INTO settings (key, value) VALUES (?, ?)', [key, value]);
-      if (import.meta.env.DEV) {
-        console.info(`[SnapGlow] Initialized setting ${key}=${value}`);
-      }
-    }
-  }
+  await ensureMigrationsApplied();
 }
 
 export async function getSetting(key: string): Promise<string | null> {
+  await ensureMigrationsApplied();
   const db = await getDb();
   const rows = await db.select<{ value: string }[]>('SELECT value FROM settings WHERE key = ?', [
     key,
@@ -54,6 +23,7 @@ export async function getSetting(key: string): Promise<string | null> {
 }
 
 export async function setSetting(key: string, value: string): Promise<void> {
+  await ensureMigrationsApplied();
   const db = await getDb();
   await db.execute(
     'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',

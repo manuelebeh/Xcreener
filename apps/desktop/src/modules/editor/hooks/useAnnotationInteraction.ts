@@ -30,6 +30,7 @@ interface UseAnnotationInteractionOptions {
   layoutWidth: number;
   layoutHeight: number;
   onTextEdit: (request: TextEditRequest) => void;
+  enabled?: boolean;
 }
 
 export function useAnnotationInteraction({
@@ -37,6 +38,7 @@ export function useAnnotationInteraction({
   layoutWidth,
   layoutHeight,
   onTextEdit,
+  enabled = true,
 }: UseAnnotationInteractionOptions): void {
   const modeRef = useRef<InteractionMode>('idle');
   const draftRef = useRef<DraftState | null>(null);
@@ -46,6 +48,10 @@ export function useAnnotationInteraction({
   const selectedIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas || layoutWidth <= 0 || layoutHeight <= 0) {
       return;
@@ -277,7 +283,7 @@ export function useAnnotationInteraction({
       canvas.removeEventListener('pointerup', endInteraction);
       canvas.removeEventListener('pointercancel', endInteraction);
     };
-  }, [canvasRef, layoutWidth, layoutHeight, onTextEdit]);
+  }, [canvasRef, enabled, layoutWidth, layoutHeight, onTextEdit]);
 }
 
 const MIN_SCALE = 0.5;
