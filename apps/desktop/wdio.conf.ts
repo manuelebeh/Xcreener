@@ -10,15 +10,7 @@ function resolveDebugAppPath() {
   }
 
   if (os.platform() === 'darwin') {
-    return path.join(
-      desktopDir,
-      'src-tauri',
-      'target',
-      'debug',
-      'bundle',
-      'macos',
-      'SnapGlow.app'
-    );
+    return path.join(desktopDir, 'src-tauri', 'target', 'debug', 'bundle', 'macos', 'SnapGlow.app');
   }
 
   const ext = os.platform() === 'win32' ? '.exe' : '';

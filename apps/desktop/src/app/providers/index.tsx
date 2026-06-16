@@ -5,10 +5,7 @@ import { initObservability } from '@/integrations/observability';
 import { captureAppStarted } from '@/integrations/posthog/events';
 import { PostHogProvider } from '@/integrations/posthog/provider';
 import { checkForAppUpdate } from '@/integrations/updater';
-import {
-  updateCaptureShortcut,
-  useGlobalShortcut,
-} from '@/modules/capture/hooks/useGlobalShortcut';
+import { updateCaptureShortcut } from '@/modules/capture/hooks/updateCaptureShortcut';
 import { syncAutostart } from '@/modules/settings/autostart';
 import { useSettingsStore } from '@/modules/settings/store';
 import { isTauriRuntime } from '@/shared/lib/tauri';
@@ -24,8 +21,6 @@ export function AppProviders({ children }: AppProvidersProps) {
   const analyticsEnabled = useSettingsStore((s) => s.analyticsEnabled);
   const setTheme = useSettingsStore((s) => s.setTheme);
   const hydrate = useSettingsStore((s) => s.hydrate);
-
-  useGlobalShortcut();
 
   useEffect(() => {
     let cancelled = false;
@@ -88,7 +83,11 @@ export function AppProviders({ children }: AppProvidersProps) {
   );
 
   if (!ready) {
-    return <div className="p-6 font-sans text-foreground">Loading SnapGlow…</div>;
+    return (
+      <div className="min-h-screen bg-background p-6 font-sans text-foreground">
+        Loading SnapGlow…
+      </div>
+    );
   }
 
   return (

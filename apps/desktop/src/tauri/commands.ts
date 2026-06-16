@@ -1,8 +1,18 @@
 import { invoke } from '@tauri-apps/api/core';
-import type { CaptureMetadata } from '@/shared/types/ipc';
+import type {
+  CaptureMetadata,
+  CaptureOverlayBounds,
+  MonitorInfo,
+  WindowInfo,
+} from '@/shared/types/ipc';
 
 export function captureRegion(x: number, y: number, width: number, height: number) {
-  return invoke<number[]>('capture_region', { x, y, width, height });
+  return invoke<number[]>('capture_region', {
+    x: Math.round(x),
+    y: Math.round(y),
+    width: Math.round(width),
+    height: Math.round(height),
+  });
 }
 
 export function captureWindow(windowId: number) {
@@ -11,6 +21,37 @@ export function captureWindow(windowId: number) {
 
 export function captureFullscreen(displayId: number) {
   return invoke<number[]>('capture_fullscreen', { displayId });
+}
+
+export function listMonitors() {
+  return invoke<MonitorInfo[]>('list_monitors_command');
+}
+
+export function listWindows() {
+  return invoke<WindowInfo[]>('list_windows_command');
+}
+
+export function getWindowAtPoint(x: number, y: number) {
+  return invoke<WindowInfo | null>('get_window_at_point_command', {
+    x: Math.round(x),
+    y: Math.round(y),
+  });
+}
+
+export function getCaptureOverlayBounds() {
+  return invoke<CaptureOverlayBounds>('get_capture_overlay_bounds');
+}
+
+export function showCaptureOverlay() {
+  return invoke<CaptureOverlayBounds>('show_capture_overlay');
+}
+
+export function hideCaptureOverlay() {
+  return invoke<void>('hide_capture_overlay');
+}
+
+export function cancelCaptureOverlay() {
+  return invoke<void>('cancel_capture_overlay');
 }
 
 export function exportImage(imageData: number[], format: string, quality: number, path: string) {

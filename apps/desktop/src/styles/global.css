@@ -1,8 +1,13 @@
 @import '@snapglow/ui/styles.css';
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body {
-  min-height: 100vh;
-  background: transparent;
+  margin: 0;
 }
 
 a {
