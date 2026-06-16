@@ -180,13 +180,15 @@ src/
 │   │   │   └── useCanvasCoordinates.ts      # Sprint 1.4
 │   │   ├── engine/         # renderFrame, draw*, hitTest, computeLayout
 │   │   └── store.ts
-│   ├── export/             # Export PNG/JPG/WebP, copier, drag & drop
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   └── utils/
-│   ├── redaction/          # Détection et masquage de données sensibles
-│   │   ├── detectors/
-│   │   ├── components/
+│   ├── export/             # Export PNG/JPG/WebP, copier, drag & drop (Sprint 1.5)
+│   │   ├── components/ExportBar.tsx
+│   │   ├── hooks/useExportRender.ts
+│   │   ├── utils/canvasExport.ts, saveExport.ts, copyExport.ts, formats.ts
+│   │   └── store.ts
+│   ├── redaction/          # Détection et masquage de données sensibles (Sprint 1.5)
+│   │   ├── components/RedactionBar.tsx, RedactionOverlay.tsx
+│   │   ├── hooks/useRedactionScan.ts, useAutoRedaction.ts
+│   │   ├── utils/mapToLayout.ts, screenshotToPngBytes.ts
 │   │   └── store.ts
 │   ├── history/            # Historique des captures
 │   │   ├── components/
@@ -270,7 +272,7 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 
 ### 4.3 Commandes Tauri (IPC)
 
-> **État Sprint 1.1 :** capture native implémentée (`src-tauri/src/capture/`, `overlay.rs`). Flux overlay : snapshot preview → sélection UI → découpe client → event `capture-image`. Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
+> **État Sprint 1.5 :** capture native (Sprint 1.1), redaction on-device (`detect_sensitive_data`), export fichier côté frontend (offscreen canvas + plugins dialog/fs/clipboard). Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
 
 ```rust
 // Capture — commandes Rust (xcap) ; l'overlay confirme via découpe preview côté React
@@ -280,24 +282,24 @@ async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u
 #[tauri::command]
 async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> { ... }
 
+// Export — stub Rust non utilisé ; l'UI exporte via renderFrame offscreen → blob → dialog/fs
 #[tauri::command]
 async fn export_image(
     image_data: Vec<u8>,
     format: String,       // "png" | "jpg" | "webp"
     quality: u8,          // 1-100 pour JPG
     path: String
-) -> Result<(), String> {
-    // Encode et sauvegarde l'image (stub Phase 1)
-}
+) -> Result<(), String> { ... }  // stub
 
+// Redaction — Sprint 1.5 : OCR + regex on-device (src-tauri/src/redaction/)
 #[tauri::command]
 async fn detect_sensitive_data(image_data: Vec<u8>) -> Result<Vec<SensitiveRegion>, String> {
-    // Détection on-device des données sensibles
+    // Vision (macOS) / Windows.Media.Ocr → détecteurs email, phone, card, api_key, url, password
 }
 
 #[tauri::command]
 async fn save_to_history(metadata: CaptureMetadata) -> Result<i64, String> {
-    // Sauvegarde les métadonnées dans SQLite
+    // Sauvegarde les métadonnées dans SQLite (stub — Sprint 1.6)
 }
 ```
 
@@ -329,7 +331,7 @@ async fn save_to_history(metadata: CaptureMetadata) -> Result<i64, String> {
 
 ## 5. Moteur de Rendu (Canvas)
 
-> **État Sprint 1.4 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel, annotations). Rendu via `useBeautifyRender` (rAF). UI : `StyleBar`, `PresetBar`, `AnnotationToolbar`. Undo/redo (20 niveaux). **Redaction automatique** (OCR) et **export fichier** : Sprint 1.5.
+> **État Sprint 1.5 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF). UI : `StyleBar`, `PresetBar`, `AnnotationToolbar`, `RedactionBar`, `ExportBar`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`).
 
 ### 5.1 Architecture du moteur
 
@@ -339,14 +341,14 @@ Le moteur de rendu utilise le **Canvas 2D API** du WebView pour composer le rés
 Layers (bas → haut) :
 ┌──────────────────────────────────┐
 │  Layer 5 : Annotations           │  Texte, formes, flèches, highlight
-│  Layer 4 : Blur manuel           │  Zones flou gaussien / pixelate (Sprint 1.4)
+│  Layer 4 : Blur                    │  Flou manuel + masques redaction auto (`BlurAnnotation`)
 │  Layer 3 : Screenshot            │  L'image capturée (avec border-radius)
 │  Layer 2 : Shadow                │  Ombre portée sous le screenshot
 │  Layer 1 : Background            │  Dégradé, couleur unie, ou image
 └──────────────────────────────────┘
 ```
 
-> **Sprint 1.5 (prévu) :** redaction automatique (OCR on-device) — masques sensibles détectés, distincts du flou manuel layer 4.
+> **Redaction (Sprint 1.5) :** le scan OCR crée des `BlurAnnotation` sur la layer 4 — pas de couche de rendu séparée. L’overlay `RedactionOverlay` sert uniquement à la prévisualisation avant masquage.
 
 ### 5.2 Pipeline de rendu
 
@@ -364,15 +366,14 @@ Composition Canvas :
   1. Dessiner le fond (gradient/color/image)
   2. Appliquer l'ombre portée (shadow)
   3. Dessiner le screenshot (avec border-radius via clip)
-  4. Appliquer les masques de flou manuel (gaussian / pixelate) — `drawBlurMasks`
+  4. Appliquer les masques de flou (gaussian / pixelate) — `drawBlurMasks` (manuel + redaction)
   5. Dessiner les annotations (texte, formes, highlight) — `drawAnnotations`
-  6. [Sprint 1.5] Redaction automatique (OCR)
   │
   ▼
 Preview temps réel (< 50ms par frame)
   │
   ▼
-Export (toBlob → PNG/JPG/WebP)
+Export WYSIWYG (`renderToExportCanvas` → `canvasToBlob` → PNG/JPG/WebP, clipboard, drag-out)
 ```
 
 ### 5.3 Optimisation du rendu
@@ -456,30 +457,32 @@ CREATE INDEX idx_captures_tags ON captures(tags);
 
 ## 7. Détection de données sensibles (On-device)
 
+> **Livré Sprint 1.5** — module Rust `src-tauri/src/redaction/` + UI `modules/redaction/`.
+
 ### 7.1 Architecture du moteur de redaction
 
 ```
-Image capturée
+Image capturée (PNG bytes bruts, pas le canvas beautifié)
   │
   ▼
 OCR (extraction du texte + positions)
-  ├── macOS : Apple Vision Framework
-  └── Windows : Windows.Media.Ocr / Tesseract
+  ├── macOS : Apple Vision Framework (objc2-vision)
+  └── Windows : Windows.Media.Ocr
   │
   ▼
 Pattern matching (regex sur le texte extrait)
   ├── Emails       : /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/
   ├── Téléphones   : /(\+?[0-9]{1,4}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?\d{3,4}[-.\s]?\d{3,4}/
-  ├── Cartes       : /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/
+  ├── Cartes       : /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/ (+ validation Luhn)
   ├── Clés API     : /(?:sk|pk|api|key|token|secret|password)[-_]?[a-zA-Z0-9]{16,}/i
   ├── URLs sens.   : /https?:\/\/[^\s]*(?:token|key|secret|password|auth)[^\s]*/i
   └── Mots de passe: détection contextuelle (champs "password", "secret", etc.)
   │
   ▼
-Bounding boxes des régions sensibles
+Bounding boxes des régions sensibles → `SensitiveRegion[]` (IPC)
   │
   ▼
-Masquage : blur gaussien (σ=10) ou pixelisation (block 8x8)
+UI : highlight (`RedactionOverlay`) puis masquage → `BlurAnnotation` (layer 4, blur gaussien)
 ```
 
 ### 7.2 Garantie de confidentialité
@@ -667,7 +670,7 @@ jobs:
 | `framer-motion` | Animations fluides |
 | `@tauri-apps/api` | API Tauri côté frontend |
 | `@tauri-apps/plugin-*` | Plugins Tauri (voir section 2.3) |
-| `tesseract.js` | OCR cross-platform (Phase 2) |
+| `tesseract.js` | OCR cross-platform pour extraction de texte (Phase 2b — distinct de la redaction Sprint 1.5) |
 | `@phosphor-icons/react` | Icônes cohérentes |
 | `date-fns` | Manipulation de dates (historique) |
 | `zod` | Validation de schémas (settings, presets) |

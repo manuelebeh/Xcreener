@@ -42,3 +42,35 @@ export function captureUpdateChecked(
     ...properties,
   });
 }
+
+export function captureExportCompleted(properties: {
+  format: string;
+  file_size: number;
+  duration_ms: number;
+}): void {
+  const analyticsEnabled = useSettingsStore.getState().analyticsEnabled;
+  if (!isAnalyticsActive(analyticsEnabled) || !posthog.__loaded) {
+    return;
+  }
+
+  posthog.capture('export_completed', {
+    surface: 'desktop',
+    ...properties,
+  });
+}
+
+export function captureRedactionTriggered(properties: {
+  auto_or_manual: 'auto' | 'manual';
+  types_detected: string[];
+  count: number;
+}): void {
+  const analyticsEnabled = useSettingsStore.getState().analyticsEnabled;
+  if (!isAnalyticsActive(analyticsEnabled) || !posthog.__loaded) {
+    return;
+  }
+
+  posthog.capture('redaction_triggered', {
+    surface: 'desktop',
+    ...properties,
+  });
+}

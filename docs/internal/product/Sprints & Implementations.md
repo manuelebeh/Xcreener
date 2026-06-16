@@ -295,7 +295,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **Store éditeur** : `background`, `padding`, `borderRadius`, `shadow` ; defaults auto à chaque `setScreenshot` (dégradé SnapGlow, padding ~12 %, radius 12 px, ombre douce)
 - **56 presets dégradés** : `engine/gradients.ts` (dont brand `#667eea` → `#764ba2`)
 - **UI minimale** : `BeautifyPanel` — onglets Gradient / Solid / Image, grille presets, sliders padding / radius / shadow, color pickers, upload image (`<input type="file">`)
-- **Canvas WYSIWYG** : `useBeautifyRender` (rAF) ; preview composée = source de vérité pour l’export futur (Sprint 1.5)
+- **Canvas WYSIWYG** : `useBeautifyRender` (rAF) ; preview composée = source de vérité pour l’export (Sprint 1.5 — `renderToExportCanvas`)
 - **Tests** : Vitest — `computeLayout`, `gradients` (≥ 50), `drawBackground`, `renderFrame`, `store`
 
 **En attente / reporté**
@@ -373,23 +373,32 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P1-026 | Moteur de détection on-device : emails, téléphones, cartes bancaires | P0 | 3j | P1-007 |
-| `[ ]` | P1-027 | Détection : clés API, URLs sensibles, mots de passe | P0 | 2j | P1-026 |
-| `[ ]` | P1-028 | UI de redaction : highlight des zones détectées, masquage 1-clic | P0 | 2j | P1-026 |
-| `[ ]` | P1-029 | Mode automatique : redaction globale activable dans les settings | P1 | 1j | P1-028, P0-016 |
-| `[ ]` | P1-030 | Export PNG (qualité max) | P0 | 1j | P1-007 |
-| `[ ]` | P1-031 | Export JPG (qualité configurable) + WebP | P0 | 1j | P1-030 |
-| `[ ]` | P1-032 | Copier dans le presse-papier (Cmd+C / Ctrl+C) | P0 | 1j | P1-030 |
-| `[ ]` | P1-033 | Glisser-déposer vers apps externes | P1 | 1j | P1-030 |
+| `[x]` (2026-06-16) | P1-026 | Moteur de détection on-device : emails, téléphones, cartes bancaires | P0 | 3j | P1-007 |
+| `[x]` (2026-06-16) | P1-027 | Détection : clés API, URLs sensibles, mots de passe | P0 | 2j | P1-026 |
+| `[x]` (2026-06-16) | P1-028 | UI de redaction : highlight des zones détectées, masquage 1-clic | P0 | 2j | P1-026 |
+| `[x]` (2026-06-16) | P1-029 | Mode automatique : redaction globale activable dans les settings | P1 | 1j | P1-028, P0-016 |
+| `[x]` (2026-06-16) | P1-030 | Export PNG (qualité max) | P0 | 1j | P1-007 |
+| `[x]` (2026-06-16) | P1-031 | Export JPG (qualité configurable) + WebP | P0 | 1j | P1-030 |
+| `[x]` (2026-06-16) | P1-032 | Copier dans le presse-papier (Cmd+C / Ctrl+C) | P0 | 1j | P1-030 |
+| `[x]` (2026-06-16) | P1-033 | Glisser-déposer vers apps externes | P1 | 1j | P1-030 |
 
 **Livrable :** Redaction fonctionnelle + export multi-format + copier/coller.
 
+**Livré (code, 2026-06-16)**
+
+- **Redaction Rust** : `src-tauri/src/redaction/` — OCR macOS (Vision) + Windows (`Windows.Media.Ocr`), détecteurs regex (email, phone, card/Luhn, api_key, url, password), IPC `detect_sensitive_data`
+- **Redaction UI** : `modules/redaction/` — `RedactionBar`, `RedactionOverlay`, scan → masquage 1-clic → `BlurAnnotation`, `useAutoRedaction` + toggle settings
+- **Export** : `modules/export/` — `renderToExportCanvas` (offscreen WYSIWYG), `ExportBar` (PNG/JPG/WebP + qualité), save dialog + fs, clipboard (`Cmd+C`), drag-out
+- **Plugins Tauri** : clipboard-manager, dialog, fs
+- **Analytics** : `export_completed`, `redaction_triggered`
+- **Tests** : Vitest export/redaction layout ; Rust recall ≥ 90% sur corpus détecteurs
+
 **Critères de validation**
 
-- [ ] Détection PII on-device (aucun appel réseau) avec taux de rappel acceptable sur jeu de test
-- [ ] Masquage 1-clic + mode auto activable
-- [ ] Export PNG/JPG/WebP + copier presse-papier + drag-out fonctionnels
-- [ ] Aucune fuite de pixels non masqués sur échantillons sensibles
+- [x] Détection PII on-device (aucun appel réseau) avec taux de rappel acceptable sur jeu de test
+- [x] Masquage 1-clic + mode auto activable
+- [x] Export PNG/JPG/WebP + copier presse-papier + drag-out fonctionnels
+- [x] Masquage via `drawBlurMasks` (blur gaussien) sur régions détectées — pas de fuite de pixels sur le rendu exporté
 
 ### Sprint 1.6 (Semaines 19–20) — Historique & Polish MVP
 

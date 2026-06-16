@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). See [ADR-006](./006-native-capture-overlay.md).
+SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). See [ADR-006](./006-native-capture-overlay.md).
 
 ## Decision
 
@@ -26,7 +26,8 @@ Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls 
 | `hide_capture_overlay` | `commands/capture.rs` | Live | `()` |
 | `cancel_capture_overlay` | `commands/capture.rs` | Live | `()` |
 | `get_capture_overlay_bounds` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
-| `export_image` | `commands/export.rs` | Stub | `{ imageData, format, quality, path }` |
+| `detect_sensitive_data` | `commands/redaction.rs` | Live | `imageData: number[]` → `SensitiveRegion[]` |
+| `export_image` | `commands/export.rs` | Stub (unused) | `{ imageData, format, quality, path }` — export UI uses frontend `renderToExportCanvas` + dialog/fs |
 | `get_setting` / `set_setting` | `commands/storage.rs` | Placeholder | Prefer `@/db` on frontend |
 | `update_capture_shortcut` | `shortcuts.rs` | Live | `{ shortcut }` — Tauri global-shortcut format |
 

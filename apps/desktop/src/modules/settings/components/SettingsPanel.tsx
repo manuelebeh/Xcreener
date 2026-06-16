@@ -16,10 +16,12 @@ export function SettingsPanel() {
   const captureShortcut = useSettingsStore((s) => s.captureShortcut);
   const launchAtLogin = useSettingsStore((s) => s.launchAtLogin);
   const analyticsEnabled = useSettingsStore((s) => s.analyticsEnabled);
+  const autoRedaction = useSettingsStore((s) => s.autoRedaction);
   const setTheme = useSettingsStore((s) => s.setTheme);
   const setCaptureShortcut = useSettingsStore((s) => s.setCaptureShortcut);
   const setLaunchAtLogin = useSettingsStore((s) => s.setLaunchAtLogin);
   const setAnalyticsEnabled = useSettingsStore((s) => s.setAnalyticsEnabled);
+  const setAutoRedaction = useSettingsStore((s) => s.setAutoRedaction);
 
   const [shortcutDraft, setShortcutDraft] = useState(captureShortcut);
   const [shortcutError, setShortcutError] = useState<string | null>(null);
@@ -62,6 +64,11 @@ export function SettingsPanel() {
   async function handleAnalyticsChange(enabled: boolean) {
     setAnalyticsEnabled(enabled);
     await setSetting(SETTING_KEYS.analyticsEnabled, String(enabled));
+  }
+
+  async function handleAutoRedactionChange(enabled: boolean) {
+    setAutoRedaction(enabled);
+    await setSetting(SETTING_KEYS.autoRedaction, String(enabled));
   }
 
   async function handleCheckForUpdates() {
@@ -169,6 +176,20 @@ export function SettingsPanel() {
         />
         Share anonymous usage data
       </label>
+
+      <label className="flex items-center gap-2 text-sm font-medium">
+        <input
+          type="checkbox"
+          checked={autoRedaction}
+          onChange={(e) => handleAutoRedactionChange(e.target.checked)}
+          className="size-4 rounded border-border"
+          data-testid="auto-redaction-toggle"
+        />
+        Automatically mask sensitive data after capture
+      </label>
+      <p className="text-xs text-muted">
+        On-device OCR scan runs when a screenshot opens in the editor.
+      </p>
       {!import.meta.env.DEV ? (
         <p className="text-xs text-muted">Analytics are opt-in in production builds.</p>
       ) : null}

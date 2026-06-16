@@ -18,7 +18,8 @@ src/
 ├── modules/                # Domain modules
 │   ├── capture/            # Screen capture orchestration
 │   ├── editor/             # Canvas / beautify UI
-│   ├── export/             # Export formats & flow
+│   ├── export/             # Export formats & flow (Sprint 1.5)
+│   ├── redaction/          # Sensitive-data scan & masking (Sprint 1.5)
 │   └── settings/           # User preferences UI
 ├── shared/                 # Cross-cutting TypeScript only
 │   └── types/              # IPC payloads, settings types
@@ -33,7 +34,7 @@ src/
 └── main.tsx                # Entry point
 ```
 
-Rust commands live in `src-tauri/src/commands/` (`capture`, `export`, `storage`).
+Rust commands live in `src-tauri/src/commands/` (`capture`, `redaction`, `export`, `storage`). Export file I/O is frontend-only (Sprint 1.5); `export_image` remains a stub.
 
 ## Rules
 

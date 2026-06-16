@@ -38,7 +38,8 @@ Feature boundaries live under `apps/desktop/src/modules/`:
 
 - **capture** — screen capture orchestration (Zustand store + hooks)
 - **editor** — canvas / beautify UI
-- **export** — format helpers and export flow
+- **export** — WYSIWYG export (offscreen `renderFrame`, PNG/JPG/WebP, clipboard, drag-out)
+- **redaction** — sensitive-data scan UI, overlay, auto-redaction setting
 - **settings** — user preferences UI
 
 Cross-cutting:
@@ -52,7 +53,7 @@ Modules expose a public API through `index.ts`; internal files stay colocated (`
 
 ### Rust command surface
 
-Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only — no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Export** remains a stub until Sprint 1.5. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
+Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`, `redaction`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only — no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Sprint 1.5** adds on-device redaction (`src-tauri/src/redaction/`, IPC `detect_sensitive_data`) and frontend export (`modules/export/` via offscreen canvas + Tauri dialog/fs/clipboard; Rust `export_image` remains an unused stub). **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
 
 ### Code intelligence
 

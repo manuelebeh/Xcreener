@@ -1,0 +1,8 @@
+[
+  { "text": "Contact user@example.com", "kinds": ["email"] },
+  { "text": "Phone 06 12 34 56 78", "kinds": ["phone"] },
+  { "text": "Card 4111 1111 1111 1111", "kinds": ["card"] },
+  { "text": "sk_live_abcdefghijklmnopqrstuvwxyz", "kinds": ["api_key"] },
+  { "text": "https://api.example.com?token=secret123", "kinds": ["url"] },
+  { "text": "password: hunter2", "kinds": ["password"] }
+]
