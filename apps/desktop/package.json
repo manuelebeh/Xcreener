@@ -19,6 +19,8 @@
     "test:stress-captures": "node scripts/stress-captures.mjs"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.5",
+    "@fontsource/ibm-plex-sans": "^5.2.5",
     "@posthog/react": "^1.7.0",
     "@sentry/react": "^10.42.0",
     "@snapglow/design-tokens": "workspace:*",

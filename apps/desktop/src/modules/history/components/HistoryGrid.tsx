@@ -20,7 +20,7 @@ export function HistoryGrid({
 }: HistoryGridProps) {
   return (
     <div
-      className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+      className="grid grid-cols-1 gap-3 sm:grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))]"
       data-testid="history-grid"
     >
       {captures.map((capture) => (

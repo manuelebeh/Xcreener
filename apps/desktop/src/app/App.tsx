@@ -1,6 +1,7 @@
-import { BrowserRouter, Link } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { registerE2EBridge } from '@/e2e/bridge';
 import { useCaptureSession } from '@/modules/capture/hooks/useCaptureSession';
+import { AppTopNav } from './components/AppTopNav';
 import { useTrayNavigation } from './hooks/useTrayNavigation';
 import { AppProviders } from './providers';
 import { AppRoutes } from './routes';
@@ -12,13 +13,11 @@ function AppShell() {
   useCaptureSession();
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <nav className="flex gap-3 border-b border-border px-4 py-2 text-sm">
-        <Link to="/">Editor</Link>
-        <Link to="/history">History</Link>
-        <Link to="/settings">Settings</Link>
-      </nav>
-      <AppRoutes />
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <AppTopNav />
+      <div className="min-h-0 min-w-0 flex-1 overflow-x-clip">
+        <AppRoutes />
+      </div>
     </div>
   );
 }

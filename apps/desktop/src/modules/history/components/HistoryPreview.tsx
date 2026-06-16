@@ -42,7 +42,7 @@ export function HistoryPreview({ capture, onClose, onOpen, isOpening }: HistoryP
       aria-label="Capture preview"
       data-testid="history-preview"
     >
-      <div className="max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-xl border border-border bg-surface shadow-xl">
+      <div className="max-h-[90vh] w-full max-w-4xl overflow-hidden rounded-lg border border-border bg-surface shadow-xl">
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div>
             <p className="text-sm font-medium text-foreground">{capture.filename}</p>
@@ -53,7 +53,7 @@ export function HistoryPreview({ capture, onClose, onOpen, isOpening }: HistoryP
           </div>
           <button
             type="button"
-            className="rounded-md border border-border px-2 py-1 text-xs hover:bg-muted/40"
+            className="sg-focus-ring rounded-md border border-border px-2 py-1 text-xs whitespace-nowrap hover:bg-muted/40"
             onClick={onClose}
           >
             Close
@@ -61,24 +61,28 @@ export function HistoryPreview({ capture, onClose, onOpen, isOpening }: HistoryP
         </div>
 
         <div className="max-h-[70vh] overflow-auto bg-muted/20 p-4">
-          <img
-            src={previewSrc}
-            alt={capture.filename}
-            className="mx-auto max-h-[65vh] w-auto rounded-md"
-          />
+          {previewSrc ? (
+            <img
+              src={previewSrc}
+              alt={capture.filename}
+              className="mx-auto max-h-[65vh] w-auto rounded-md"
+            />
+          ) : (
+            <p className="text-center text-sm text-muted">Loading preview…</p>
+          )}
         </div>
 
         <div className="flex justify-end gap-2 border-t border-border px-4 py-3">
           <button
             type="button"
-            className="rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted/40"
+            className="sg-focus-ring rounded-md border border-border px-3 py-1.5 text-sm whitespace-nowrap hover:bg-muted/40"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
+            className="sg-focus-ring rounded-md bg-primary px-3 py-1.5 text-sm font-medium whitespace-nowrap text-primary-foreground disabled:opacity-50"
             data-testid="history-preview-open-button"
             disabled={isOpening}
             onClick={onOpen}

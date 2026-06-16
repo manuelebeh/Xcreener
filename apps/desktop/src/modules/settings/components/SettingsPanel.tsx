@@ -96,11 +96,11 @@ export function SettingsPanel() {
   }
 
   return (
-    <div className="space-y-6 p-4">
-      <div>
-        <h2 className="mt-0 text-lg font-semibold">Settings</h2>
+    <div className="mx-auto w-full max-w-5xl space-y-6">
+      <header className="space-y-1">
+        <h1 className="font-display text-lg font-semibold text-foreground">Settings</h1>
         <p className="text-sm text-muted">System integration and preferences</p>
-      </div>
+      </header>
 
       <label htmlFor="theme-select" className="block text-sm font-medium">
         Theme
@@ -148,7 +148,7 @@ export function SettingsPanel() {
           </p>
         ) : null}
         {shortcutSaved ? (
-          <p id="capture-shortcut-success" className="mt-2 text-xs text-green-700">
+          <p id="capture-shortcut-success" className="mt-2 text-xs text-success" role="status">
             Shortcut saved and registered.
           </p>
         ) : null}
@@ -162,7 +162,7 @@ export function SettingsPanel() {
           type="checkbox"
           checked={launchAtLogin}
           onChange={(e) => handleLaunchAtLoginChange(e.target.checked)}
-          className="size-4 rounded border-border"
+          className="sg-focus-ring size-4 rounded border-border"
         />
         Launch at login
       </label>
@@ -172,7 +172,7 @@ export function SettingsPanel() {
           type="checkbox"
           checked={analyticsEnabled}
           onChange={(e) => handleAnalyticsChange(e.target.checked)}
-          className="size-4 rounded border-border"
+          className="sg-focus-ring size-4 rounded border-border"
         />
         Share anonymous usage data
       </label>
@@ -182,7 +182,7 @@ export function SettingsPanel() {
           type="checkbox"
           checked={autoRedaction}
           onChange={(e) => handleAutoRedactionChange(e.target.checked)}
-          className="size-4 rounded border-border"
+          className="sg-focus-ring size-4 rounded border-border"
           data-testid="auto-redaction-toggle"
         />
         Automatically mask sensitive data after capture

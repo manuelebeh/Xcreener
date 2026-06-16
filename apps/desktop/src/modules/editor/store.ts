@@ -3,7 +3,7 @@ import type { Annotation, EditorTool, ToolDefaults } from './annotations/types';
 import { DEFAULT_TOOL_DEFAULTS, HISTORY_MAX } from './annotations/types';
 import { cloneAnnotations } from './annotations/utils';
 import { autoPadding, computeLayout } from './engine/computeLayout';
-import { DEFAULT_GRADIENT_PRESET_ID } from './engine/gradients';
+import { DEFAULT_GRADIENT_PRESET_ID, DEFAULT_SOLID_COLOR } from './engine/gradients';
 import {
   FREE_PRESET_ID,
   fitTransform,
@@ -198,7 +198,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       set({
         background: {
           type: 'solid',
-          color: background.color ?? '#667eea',
+          color: background.color ?? DEFAULT_SOLID_COLOR,
         },
       });
       return;

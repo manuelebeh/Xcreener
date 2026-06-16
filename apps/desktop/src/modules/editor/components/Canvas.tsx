@@ -133,15 +133,15 @@ export function Canvas() {
   useEditorShortcuts();
 
   const exportLabel = layout
-    ? `${layout.canvasWidth} × ${layout.canvasHeight}px · rendu final`
+    ? `${layout.canvasWidth} × ${layout.canvasHeight}px · final render`
     : null;
 
-  const presetLabel = frame?.name ?? 'Libre';
+  const presetLabel = frame?.name ?? 'Free';
 
   return (
-    <section className="w-full space-y-2" aria-label="Aperçu export">
+    <section className="w-full space-y-2" aria-label="Export preview">
       <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-xs font-medium text-foreground">Aperçu export</p>
+        <p className="text-xs font-medium text-foreground">Export preview</p>
         {layout ? (
           <p className="text-xs text-muted" data-testid="canvas-export-meta">
             {presetLabel} · {exportLabel}
@@ -151,7 +151,7 @@ export function Canvas() {
 
       <div
         ref={containerRef}
-        className="flex w-full items-center justify-center rounded-xl border border-dashed border-border bg-muted/20 p-4"
+        className="flex w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/20 p-4"
         style={{ height: PREVIEW_MAX_HEIGHT, minHeight: 220 }}
         data-testid="canvas-preview-stage"
       >

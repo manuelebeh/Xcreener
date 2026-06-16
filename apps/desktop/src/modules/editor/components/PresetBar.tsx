@@ -35,7 +35,7 @@ function PresetButton({
         aria-label={preset.name}
         aria-pressed={isActive}
         className={clsx(
-          'flex h-9 min-w-9 items-center justify-center rounded-md border px-2 text-xs font-medium transition-colors',
+          'sg-focus-ring flex h-8 min-w-8 items-center justify-center whitespace-nowrap rounded-md border px-2 text-xs font-medium transition-colors',
           isActive
             ? 'border-primary bg-primary text-primary-foreground'
             : 'border-border bg-surface text-foreground hover:bg-muted/30'
@@ -48,7 +48,7 @@ function PresetButton({
   );
 }
 
-export function PresetBar() {
+export function PresetBar({ embedded = false }: { embedded?: boolean }) {
   const selectedPresetId = useEditorStore((s) => s.selectedPresetId);
   const setPreset = useEditorStore((s) => s.setPreset);
 
@@ -56,47 +56,52 @@ export function PresetBar() {
   const freePreset = STANDARD_PRESETS.find((p) => p.id === FREE_PRESET_ID);
   const isFree = selectedPresetId === null;
 
+  const content = (
+    <div className="flex w-full flex-wrap items-center gap-2" data-testid="preset-bar">
+      {!embedded ? <span className="mr-1 text-xs font-medium text-muted">Format</span> : null}
+
+      {SOCIAL_PRESETS.map((preset) => (
+        <PresetButton
+          key={preset.id}
+          preset={preset}
+          isActive={selectedPresetId === preset.id}
+          onSelect={() => setPreset(preset.id)}
+          label={SOCIAL_LABELS[preset.id]}
+        />
+      ))}
+
+      <div className="mx-1 h-6 w-px bg-border" aria-hidden="true" />
+
+      {standardWithoutFree.map((preset) => (
+        <PresetButton
+          key={preset.id}
+          preset={preset}
+          isActive={selectedPresetId === preset.id}
+          onSelect={() => setPreset(preset.id)}
+        />
+      ))}
+
+      {freePreset ? (
+        <PresetButton
+          preset={freePreset}
+          isActive={isFree}
+          onSelect={() => setPreset(FREE_PRESET_ID)}
+        />
+      ) : null}
+
+      <div className="ml-auto">
+        <PresetPicker />
+      </div>
+    </div>
+  );
+
+  if (embedded) {
+    return <TooltipProvider>{content}</TooltipProvider>;
+  }
+
   return (
     <TooltipProvider>
-      <div
-        className="flex w-full flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2"
-        data-testid="preset-bar"
-      >
-        <span className="mr-1 text-xs font-medium text-muted">Format</span>
-
-        {SOCIAL_PRESETS.map((preset) => (
-          <PresetButton
-            key={preset.id}
-            preset={preset}
-            isActive={selectedPresetId === preset.id}
-            onSelect={() => setPreset(preset.id)}
-            label={SOCIAL_LABELS[preset.id]}
-          />
-        ))}
-
-        <div className="mx-1 h-6 w-px bg-border" aria-hidden="true" />
-
-        {standardWithoutFree.map((preset) => (
-          <PresetButton
-            key={preset.id}
-            preset={preset}
-            isActive={selectedPresetId === preset.id}
-            onSelect={() => setPreset(preset.id)}
-          />
-        ))}
-
-        {freePreset ? (
-          <PresetButton
-            preset={freePreset}
-            isActive={isFree}
-            onSelect={() => setPreset(FREE_PRESET_ID)}
-          />
-        ) : null}
-
-        <div className="ml-auto">
-          <PresetPicker />
-        </div>
-      </div>
+      <div className="rounded-lg border border-border bg-surface px-3 py-2">{content}</div>
     </TooltipProvider>
   );
 }

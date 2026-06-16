@@ -2,6 +2,7 @@
 
 ## Shared design system
 
+- **Product UX (desktop):** `design.md` at repo root — locked layout, typography, token mapping (Hallmark Sprint 1.6). Amend intentionally.
 - **Tokens:** `packages/design-tokens` — DTCG `tokens.json`, build via `mise run tokens:build`
 - **Components:** `packages/ui` — Button, Input, Select, Slider, Tooltip, Dropdown, ThemeProvider
 - **Storybook:** `mise run storybook` (port 6006)
@@ -27,4 +28,4 @@ Biome only — root `biome.json` extends `@snapglow/biome-config`. No ESLint or 
 
 ## UI polish
 
-Use the Hallmark skill (`.cursor/skills/hallmark/`) for visual QA on new UI.
+Use the Hallmark skill (`.cursor/skills/hallmark/`) for visual QA on new UI. Read `design.md` before changes — desktop editor uses Feature Stack (canvas left, tools rail right) and nav N1b.

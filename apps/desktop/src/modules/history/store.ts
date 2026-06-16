@@ -11,6 +11,7 @@ interface HistoryState {
   setError: (error: string | null) => void;
   setSelectedId: (id: number | null) => void;
   removeCaptureFromList: (id: number) => void;
+  restoreCapture: (capture: StoredCapture) => void;
 }
 
 export const useHistoryStore = create<HistoryState>((set) => ({
@@ -26,5 +27,9 @@ export const useHistoryStore = create<HistoryState>((set) => ({
     set((state) => ({
       captures: state.captures.filter((capture) => capture.id !== id),
       selectedId: state.selectedId === id ? null : state.selectedId,
+    })),
+  restoreCapture: (capture) =>
+    set((state) => ({
+      captures: [capture, ...state.captures.filter((item) => item.id !== capture.id)],
     })),
 }));
