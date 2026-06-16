@@ -1,6 +1,8 @@
-import { type ReactNode, useEffect, useState } from 'react';
+import { ThemeProvider } from '@snapglow/ui';
+import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { getSetting, initDatabase } from '@/db';
 import { useSettingsStore } from '@/modules/settings/store';
+import type { ThemePreference } from '@/shared/types/settings';
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -8,6 +10,7 @@ interface AppProvidersProps {
 
 export function AppProviders({ children }: AppProvidersProps) {
   const [ready, setReady] = useState(false);
+  const theme = useSettingsStore((s) => s.theme);
   const setTheme = useSettingsStore((s) => s.setTheme);
 
   useEffect(() => {
@@ -15,9 +18,9 @@ export function AppProviders({ children }: AppProvidersProps) {
 
     async function bootstrap() {
       await initDatabase();
-      const theme = await getSetting('theme');
-      if (!cancelled && theme && ['light', 'dark', 'system'].includes(theme)) {
-        setTheme(theme as 'light' | 'dark' | 'system');
+      const storedTheme = await getSetting('theme');
+      if (!cancelled && storedTheme && ['light', 'dark', 'system'].includes(storedTheme)) {
+        setTheme(storedTheme as ThemePreference);
       }
       if (!cancelled) {
         setReady(true);
@@ -36,11 +39,20 @@ export function AppProviders({ children }: AppProvidersProps) {
     };
   }, [setTheme]);
 
+  const handleThemeChange = useCallback(
+    (next: ThemePreference) => {
+      setTheme(next);
+    },
+    [setTheme]
+  );
+
   if (!ready) {
-    return (
-      <div style={{ padding: 24, fontFamily: 'system-ui, sans-serif' }}>Loading SnapGlow…</div>
-    );
+    return <div className="p-6 font-sans text-foreground">Loading SnapGlow…</div>;
   }
 
-  return children;
+  return (
+    <ThemeProvider theme={theme} onThemeChange={handleThemeChange}>
+      {children}
+    </ThemeProvider>
+  );
 }

@@ -1,0 +1,14 @@
+@import '@snapglow/ui/styles.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+}

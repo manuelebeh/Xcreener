@@ -1,0 +1,17 @@
+@import '@snapglow/design-tokens/tokens.css';
+@import '@snapglow/design-tokens/tailwind-theme.css';
+@import 'tailwindcss';
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--sg-color-background);
+    color: var(--sg-color-foreground);
+    line-height: 1.5;
+  }
+}

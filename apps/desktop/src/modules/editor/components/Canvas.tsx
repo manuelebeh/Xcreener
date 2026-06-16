@@ -5,16 +5,10 @@ export function Canvas() {
 
   return (
     <div
+      className="flex min-h-[200px] flex-1 items-center justify-center rounded-xl text-primary-foreground"
       style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         padding,
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: 12,
-        minHeight: 200,
-        color: '#fff',
+        background: 'var(--sg-gradient-brand)',
       }}
     >
       Editor canvas placeholder

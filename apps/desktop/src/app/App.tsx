@@ -7,15 +7,7 @@ export function App() {
   return (
     <AppProviders>
       <BrowserRouter>
-        <nav
-          style={{
-            display: 'flex',
-            gap: 12,
-            padding: '8px 16px',
-            borderBottom: '1px solid rgba(0,0,0,0.08)',
-            fontSize: 14,
-          }}
-        >
+        <nav className="flex gap-3 border-b border-border px-4 py-2 text-sm">
           <Link to="/">Editor</Link>
           <Link to="/settings">Settings</Link>
         </nav>

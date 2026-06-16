@@ -7,13 +7,12 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "format": "turbo format",
-    "prepare": "husky"
+    "postinstall": "pnpm --filter @snapglow/design-tokens build"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.6",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "turbo": "^2.5.4"
   },

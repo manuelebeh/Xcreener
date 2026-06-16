@@ -1,0 +1,8 @@
+{
+  "extends": "@snapglow/typescript-config/react.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "noEmit": true
+  },
+  "include": ["src", ".storybook"]
+}
