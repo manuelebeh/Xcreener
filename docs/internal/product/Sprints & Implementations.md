@@ -314,21 +314,30 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P1-013 | Implémenter les presets réseaux sociaux (Twitter/X, LinkedIn, FB, IG, YT) | P0 | 2j | P1-007 |
-| `[ ]` | P1-014 | Implémenter les presets standards (16:9, 4:3, 1:1, libre) | P0 | 1j | P1-013 |
-| `[ ]` | P1-015 | Presets personnalisés : création, sauvegarde, suppression | P1 | 2j | P1-013 |
-| `[ ]` | P1-016 | Redimensionnement et zoom de la capture dans le cadre (drag + scroll) | P0 | 2j | P1-007 |
-| `[ ]` | P1-017 | UI de l'éditeur inline : barre de style (fond, padding, radius, shadow) | P0 | 3j | P1-007, P0-009 |
-| `[ ]` | P1-018 | UI de la barre de presets rapides (icônes réseaux sociaux) | P1 | 1j | P1-013 |
+| `[x]` (2026-06-16) | P1-013 | Implémenter les presets réseaux sociaux (Twitter/X, LinkedIn, FB, IG, YT) | P0 | 2j | P1-007 |
+| `[x]` (2026-06-16) | P1-014 | Implémenter les presets standards (16:9, 4:3, 1:1, libre) | P0 | 1j | P1-013 |
+| `[x]` (2026-06-16) | P1-015 | Presets personnalisés : création, sauvegarde, suppression | P1 | 2j | P1-013 |
+| `[x]` (2026-06-16) | P1-016 | Redimensionnement et zoom de la capture dans le cadre (drag + scroll) | P0 | 2j | P1-007 |
+| `[x]` (2026-06-16) | P1-017 | UI de l'éditeur inline : barre de style (fond, padding, radius, shadow) | P0 | 3j | P1-007, P0-009 |
+| `[x]` (2026-06-16) | P1-018 | UI de la barre de presets rapides (icônes réseaux sociaux) | P1 | 1j | P1-013 |
 
 **Livrable :** Éditeur inline complet avec presets et contrôles de style.
 
+**Livré (code, 2026-06-16)**
+
+- **Moteur cadre** : `engine/presets.ts` — 5 presets sociaux + ratios 16:9 / 4:3 / 1:1 / libre ; `computeLayout` v2 (mode libre inchangé + dimensions export fixes) ; `ScreenshotTransform` (scale + offset)
+- **Interaction** : `useScreenshotTransform` — drag pointeur + molette zoom (0.5×–3×) sur le canvas
+- **Presets custom SQLite** : `db/presets.ts` CRUD sur `custom_presets` ; hydratation via `useCustomPresetsLoader`
+- **UI inline** : `EditorView` — `Canvas` → `PresetBar` (icônes X/LI/FB/IG/YT + ratios) → `StyleBar` (ex-`BeautifyPanel`, carrousel dégradés, shadow offsetX)
+- **Export prep** : `export/utils/canvasExport.ts` — `canvasToPngBlob` + dimensions bitmap
+- **Tests** : Vitest — `presets`, `computeLayout` (cadre), `store` (preset), `canvasExport`, `renderFrame` (9-arg drawImage)
+
 **Critères de validation**
 
-- [ ] Presets réseaux sociaux appliquent le bon ratio et export
-- [ ] Presets custom persistés en SQLite
-- [ ] Drag/zoom capture dans le cadre fluide
-- [ ] Barre de style et barre de presets utilisables sans régression perf
+- [x] Presets réseaux sociaux appliquent le bon ratio et export (dimensions canvas = export ; `canvasToPngBlob`)
+- [x] Presets custom persistés en SQLite
+- [x] Drag/zoom capture dans le cadre fluide
+- [x] Barre de style et barre de presets utilisables sans régression perf (rAF inchangé)
 
 ### Sprint 1.4 (Semaines 15–16) — Annotations
 

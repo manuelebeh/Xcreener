@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { captureOverlayCursor, CAPTURE_CAMERA_CURSOR } from './captureCursors';
+import { CAPTURE_CAMERA_CURSOR, captureOverlayCursor } from './captureCursors';
 
 describe('captureOverlayCursor', () => {
   it('uses camera cursor for window and fullscreen modes', () => {
