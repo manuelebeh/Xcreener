@@ -81,6 +81,7 @@ function buildTokensCss(tokens) {
     'color.semantic.primary-foreground',
     'color.semantic.surface',
     'color.semantic.destructive',
+    'color.semantic.focus-ring',
   ];
 
   const staticVars = [...tokens.entries()]
@@ -144,6 +145,7 @@ function buildTailwindTheme(tokens) {
     '--color-primary-foreground': 'color.semantic.primary-foreground.light',
     '--color-surface': 'color.semantic.surface.light',
     '--color-destructive': 'color.semantic.destructive.light',
+    '--color-focus-ring': 'color.semantic.focus-ring.light',
     '--font-sans': 'font.family.sans',
     '--font-mono': 'font.family.mono',
     '--radius-sm': 'radius.sm',

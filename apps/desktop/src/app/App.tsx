@@ -12,7 +12,10 @@ function AppShell() {
   return (
     <>
       {isCapturing ? (
-        <div className="bg-primary px-4 py-2 text-center text-sm text-primary-foreground">
+        <div
+          data-testid="capture-banner"
+          className="bg-primary px-4 py-2 text-center text-sm text-primary-foreground"
+        >
           Capture shortcut triggered (stub)
         </div>
       ) : null}

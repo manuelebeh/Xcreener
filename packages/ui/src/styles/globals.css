@@ -13,5 +13,16 @@
     background: var(--sg-color-background);
     color: var(--sg-color-foreground);
     line-height: 1.5;
+    color-scheme: light dark;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

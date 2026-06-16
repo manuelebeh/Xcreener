@@ -6,7 +6,7 @@ const desktopDir = path.dirname(fileURLToPath(import.meta.url));
 
 /**
  * Smoke tests run against the Vite preview server (web UI only).
- * Native tray/shortcut integration tests are planned for Sprint 0.4 (P0-024).
+ * Native tray/shortcut integration tests: `mise run test:e2e:native`
  */
 export default defineConfig({
   testDir: './e2e',

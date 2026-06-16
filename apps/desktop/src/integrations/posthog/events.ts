@@ -28,3 +28,17 @@ export function captureTestEvent(): void {
     source: 'settings_dev_button',
   });
 }
+
+export function captureUpdateChecked(
+  analyticsEnabled: boolean,
+  properties: { result: string; version?: string; message?: string }
+): void {
+  if (!isAnalyticsActive(analyticsEnabled) || !posthog.__loaded) {
+    return;
+  }
+
+  posthog.capture('update_checked', {
+    surface: 'desktop',
+    ...properties,
+  });
+}
