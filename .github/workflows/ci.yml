@@ -32,6 +32,9 @@ jobs:
       - name: Typecheck
         run: mise run typecheck
 
+      - name: Unit tests
+        run: mise run test
+
       - name: Build web
         run: mise exec -- pnpm --filter @snapglow/web build
 

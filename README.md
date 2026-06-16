@@ -41,9 +41,12 @@ mise run dev:desktop   # or: mise run dev:web
 | `mise run tokens:build` | Build design token CSS |
 | `mise run lint` | Biome check (Turbo) |
 | `mise run typecheck` | TypeScript (Turbo) |
+| `mise run test` | Unit tests Vitest (Turbo) |
 | `mise run format` | Biome write (Turbo) |
 
 Rust: `cd apps/desktop/src-tauri && cargo check`
+
+Desktop e2e: `pnpm --filter @snapglow/desktop test:e2e` (Playwright smoke ; tray/shortcuts natifs en Sprint 0.4)
 
 ## Architecture
 

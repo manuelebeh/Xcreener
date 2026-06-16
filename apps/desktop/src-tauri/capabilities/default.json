@@ -3,5 +3,11 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": ["main"],
-  "permissions": ["core:default", "sql:default"]
+  "permissions": [
+    "core:default",
+    "core:tray:default",
+    "sql:default",
+    "global-shortcut:default",
+    "autostart:default"
+  ]
 }
