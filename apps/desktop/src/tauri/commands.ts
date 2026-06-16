@@ -54,6 +54,12 @@ export function cancelCaptureOverlay() {
   return invoke<void>('cancel_capture_overlay');
 }
 
+export function detectSensitiveData(imageData: number[]) {
+  return invoke<import('@/shared/types/ipc').SensitiveRegion[]>('detect_sensitive_data', {
+    imageData,
+  });
+}
+
 export function exportImage(imageData: number[], format: string, quality: number, path: string) {
   return invoke<void>('export_image', { imageData, format, quality, path });
 }

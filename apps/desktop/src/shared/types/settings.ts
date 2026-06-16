@@ -7,6 +7,7 @@ export interface AppSettings {
   captureShortcut: string;
   launchAtLogin: boolean;
   analyticsEnabled: boolean;
+  autoRedaction: boolean;
 }
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
@@ -14,6 +15,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   captureShortcut: DEFAULT_CAPTURE_SHORTCUT,
   launchAtLogin: false,
   analyticsEnabled: false,
+  autoRedaction: false,
 };
 
 export const SETTING_KEYS = {
@@ -21,4 +23,5 @@ export const SETTING_KEYS = {
   captureShortcut: 'captureShortcut',
   launchAtLogin: 'launchAtLogin',
   analyticsEnabled: 'analyticsEnabled',
+  autoRedaction: 'autoRedaction',
 } as const;

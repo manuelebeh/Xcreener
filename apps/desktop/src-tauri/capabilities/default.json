@@ -18,6 +18,10 @@
     "global-shortcut:default",
     "autostart:default",
     "updater:default",
-    "process:default"
+    "process:default",
+    "clipboard-manager:default",
+    "dialog:default",
+    "fs:default",
+    "fs:allow-write-file"
   ]
 }

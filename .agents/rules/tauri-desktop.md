@@ -14,9 +14,12 @@ Menu-bar style: 480×640, native decorations on `main`, frameless `capture-overl
 
 Rust modules in `src-tauri/src/commands/`:
 
-- `capture` — region/window/fullscreen (stubs in 0.1)
-- `export` — image export (stub)
-- `storage` — settings IPC placeholders; frontend uses SQL plugin directly in 0.1
+- `capture` — region/window/fullscreen, overlay (Sprint 1.1)
+- `redaction` — `detect_sensitive_data` : OCR + regex detectors (Sprint 1.5)
+- `export` — `export_image` stub (unused; export is frontend offscreen canvas + dialog/fs)
+- `storage` — settings IPC placeholders; frontend uses SQL plugin directly
+
+Redaction engine: `src-tauri/src/redaction/` (Vision macOS, Windows.Media.Ocr).
 
 Register new commands in `lib.rs` and mirror types in `src/shared/types/ipc.ts` + `src/tauri/commands.ts`.
 

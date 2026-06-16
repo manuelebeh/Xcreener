@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RedactionOverlay } from '@/modules/redaction/components/RedactionOverlay';
 import { computeLayout } from '../engine/computeLayout';
 import { fitPreviewSize } from '../engine/fitPreviewSize';
 import { getPresetById } from '../engine/presets';
@@ -171,6 +172,7 @@ export function Canvas() {
               displayScale={displayScale}
               onClose={() => setTextEditRequest(null)}
             />
+            <RedactionOverlay displayScale={displayScale} />
           </div>
         ) : screenshot ? (
           <p className="text-sm text-muted">Preparing preview…</p>
