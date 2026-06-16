@@ -182,7 +182,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **Livré (code, 2026-06-16)**
 
 - **Tray / menu bar** : `src-tauri/src/tray.rs` — icône, toggle show/hide, menu Open / Settings / Quit ; fermeture fenêtre → hide
-- **Raccourcis globaux** : `tauri-plugin-global-shortcut` + `update_capture_shortcut` ; event `capture-triggered` (stub capture + bannière UI)
+- **Raccourcis globaux** : `tauri-plugin-global-shortcut` + `update_capture_shortcut` ; ouverture overlay capture (`show_capture_overlay`)
 - **Settings SQLite** : `theme`, `captureShortcut`, `launchAtLogin`, `analyticsEnabled` ; UI Settings enrichie (`@snapglow/ui`)
 - **Auto-start** : `tauri-plugin-autostart` + sync bootstrap / toggle Settings
 - **Tests** : Vitest (`store.test.ts`, validation raccourcis) ; Playwright smoke (`e2e/settings.spec.ts`) ; `mise run test` + step CI
@@ -191,7 +191,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **Critères de validation**
 
 - [x] Icône menu bar / system tray visible ; fenêtre show/hide au clic
-- [x] Raccourci global configurable déclenche la capture (stub ou action test)
+- [x] Raccourci global configurable ouvre l'overlay de capture
 - [x] Settings complets persistés en SQLite (au-delà du thème)
 - [x] Auto-start activable/désactivable dans les préférences
 - [x] Vitest + au moins 1 test unitaire ; Playwright smoke test configuré
@@ -212,7 +212,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **Livré (code, 2026-06-16)**
 
 - **Accessibilité** : `@storybook/addon-a11y`, token `focus-ring`, composant `Label`, fixes focus/reduced-motion ; [`accessibility-audit.md`](../technical/accessibility-audit.md)
-- **ADRs** : ADR-003 (IPC/events), ADR-004 (tray/shortcuts/autostart), ADR-005 (updater/releases/signing)
+- **ADRs** : ADR-003 (IPC/events), ADR-004 (tray/shortcuts/autostart), ADR-005 (updater/releases/signing) ; ADR-006 (capture overlay) ajouté en Sprint 1.1
 - **Updater** : `tauri-plugin-updater`, GitHub Releases endpoint, `release.yml`, bouton Settings « Check for updates »
 - **Signing** : [`release-signing.md`](../technical/release-signing.md) ; CI conditionnelle (builds non signés tant que certs absents)
 - **Tests natifs** : `cargo test` shortcuts, WebDriver e2e (`e2e-native/`, `e2e-native.yml`), hooks IPC debug ; Playwright smoke en CI
@@ -246,21 +246,35 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P1-001 | Implémenter la capture de zone (sélection libre) — macOS | P0 | 3j | P0-015 |
+| `[x]` (2026-06-16) | P1-001 | Implémenter la capture de zone (sélection libre) — macOS | P0 | 3j | P0-015 |
 | `[ ]` | P1-002 | Implémenter la capture de zone — Windows (Graphics Capture API) | P0 | 3j | P0-015 |
-| `[ ]` | P1-003 | Implémenter la capture de fenêtre (détection auto des bords) — macOS | P0 | 2j | P1-001 |
+| `[x]` (2026-06-16) | P1-003 | Implémenter la capture de fenêtre (détection auto des bords) — macOS | P0 | 2j | P1-001 |
 | `[ ]` | P1-004 | Implémenter la capture de fenêtre — Windows | P0 | 2j | P1-002 |
-| `[ ]` | P1-005 | Implémenter la capture plein écran — macOS + Windows | P0 | 1j | P1-001, P1-002 |
-| `[ ]` | P1-006 | Tests capture sur multi-écran (display scaling, HiDPI) | P0 | 2j | P1-001, P1-002 |
+| `[~]` | P1-005 | Implémenter la capture plein écran — macOS + Windows | P0 | 1j | P1-001, P1-002 |
+| `[x]` (2026-06-16) | P1-006 | Tests capture sur multi-écran (display scaling, HiDPI) | P0 | 2j | P1-001, P1-002 |
 
 **Livrable :** Capture fonctionnelle (zone, fenêtre, plein écran) sur macOS et Windows.
 
+**Livré (code + QA macOS, 2026-06-16)**
+
+- **Backend Rust** : module `src-tauri/src/capture/` (`xcap`) — preview bureau, listage moniteurs/fenêtres, `get_window_at_point`, commandes `capture_*` + validation bornes
+- **Fenêtre overlay** : webview dédiée `capture-overlay` ; snapshot `capture_desktop_preview` avant affichage ; event `capture-overlay-init` (bounds, moniteurs, PNG preview)
+- **UI capture** : `CaptureOverlay` — modes Region / Window / Screen ; barre d’outils ; surbrillance fenêtre (`WindowHighlight`) et écran (`MonitorHighlight`)
+- **UX confirmée** : pas de capture automatique au changement de mode ; Region = sélection puis bouton **Capture** / Entrée ; Window / Screen = survol + clic (ou **Capture** pour Screen) ; découpe client depuis l’aperçu figé (pas de seconde capture native, pas d’overlay « Capturing… »)
+- **Pipeline éditeur** : event `capture-image` → `useCaptureSession` → `setScreenshot` + navigation accueil
+- **Tests** : Rust (`capture/mod.rs`, `validate.rs`) ; Vitest (`store.test.ts`, `image.test.ts`, `captureCursors.test.ts`) ; e2e native overlay visible (`integration.spec.ts`)
+
+**En attente / reporté**
+
+- **Parité Windows** (P1-002, P1-004, reste P1-005) — code `xcap` cross-platform présent ; QA Windows + Graphics Capture API si écart
+- **Commandes natives `capture_*` au confirm** — conservées côté Rust pour tests et usages futurs ; le flux overlay utilise la découpe preview (ADR-006)
+
 **Critères de validation**
 
-- [ ] Capture zone, fenêtre et plein écran fonctionnelles sur macOS
+- [x] Capture zone, fenêtre et plein écran fonctionnelles sur macOS (QA manuelle validée)
 - [ ] Parité Windows pour les 3 modes de capture
-- [ ] Tests multi-écran / HiDPI passent sur au moins 2 configurations
-- [ ] Image capturée affichée dans l'éditeur (pipeline bout-en-bout minimal)
+- [x] Tests multi-écran / HiDPI passent sur au moins 2 configurations (QA macOS validée)
+- [x] Image capturée affichée dans l'éditeur (pipeline bout-en-bout minimal)
 
 ### Sprint 1.2 (Semaines 11–12) — Beautification automatique
 

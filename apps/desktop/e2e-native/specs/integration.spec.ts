@@ -30,11 +30,22 @@ describe('SnapGlow native integration', () => {
     await expect(success).toHaveText('Shortcut saved and registered.');
   });
 
-  it('emits capture-triggered and shows the capture banner', async () => {
+  it('emits capture-triggered and opens the capture overlay', async () => {
     await tauriInvoke('e2e_emit_capture_triggered');
-    const banner = await $('[data-testid="capture-banner"]');
-    await banner.waitForDisplayed({ timeout: 10_000 });
-    await expect(banner).toHaveText('Capture shortcut triggered (stub)');
+
+    await browser.waitUntil(
+      async () => {
+        const overlayVisible = await tauriInvoke<boolean>('e2e_is_capture_overlay_visible');
+        return overlayVisible === true;
+      },
+      {
+        timeout: 10_000,
+        interval: 200,
+        timeoutMsg: 'Expected capture overlay to become visible',
+      }
+    );
+
+    await tauriInvoke('cancel_capture_overlay');
   });
 
   it('hides the main window instead of quitting', async () => {

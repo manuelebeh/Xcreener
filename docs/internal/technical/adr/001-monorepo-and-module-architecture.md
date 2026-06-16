@@ -52,7 +52,7 @@ Modules expose a public API through `index.ts`; internal files stay colocated (`
 
 ### Rust command surface
 
-Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`). **Capture and export** remain stubs until Phase 1. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → `capture-triggered` event, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
+Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Export** remains a stub until a later sprint. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
 
 ### Code intelligence
 
@@ -66,6 +66,7 @@ Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `s
 - [ADR-003](./003-desktop-ipc-and-events.md) — IPC commands and events
 - [ADR-004](./004-system-integration-tray-shortcuts.md) — tray, shortcuts, autostart
 - [ADR-005](./005-distribution-updates-and-signing.md) — updater and release pipeline
+- [ADR-006](./006-native-capture-overlay.md) — native capture overlay (Sprint 1.1)
 
 ## Consequences
 

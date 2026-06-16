@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. We need a stable contract before Phase 1 implements native capture.
+SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). See [ADR-006](./006-native-capture-overlay.md).
 
 ## Decision
 
@@ -14,11 +14,18 @@ SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase
 
 Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls go through this module — no raw string literals in feature code.
 
-| Command | Rust module | Phase 0 status | Payload |
-|---------|-------------|----------------|---------|
-| `capture_region` | `commands/capture.rs` | Stub | `{ x, y, width, height }` → `number[]` |
-| `capture_window` | `commands/capture.rs` | Stub | `{ windowId }` → `number[]` |
-| `capture_fullscreen` | `commands/capture.rs` | Stub | `{ displayId }` → `number[]` |
+| Command | Rust module | Status | Payload |
+|---------|-------------|--------|---------|
+| `capture_region` | `commands/capture.rs` | Live (native; overlay uses preview crop) | `{ x, y, width, height }` → `number[]` |
+| `capture_window` | `commands/capture.rs` | Live (native; overlay uses preview crop) | `{ windowId }` → `number[]` |
+| `capture_fullscreen` | `commands/capture.rs` | Live (native; overlay uses preview crop) | `{ displayId }` → `number[]` |
+| `list_monitors_command` | `commands/capture.rs` | Live | `()` → `MonitorInfo[]` |
+| `list_windows_command` | `commands/capture.rs` | Live | `()` → `WindowInfo[]` |
+| `get_window_at_point_command` | `commands/capture.rs` | Live | `{ x, y }` → `WindowInfo \| null` |
+| `show_capture_overlay` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
+| `hide_capture_overlay` | `commands/capture.rs` | Live | `()` |
+| `cancel_capture_overlay` | `commands/capture.rs` | Live | `()` |
+| `get_capture_overlay_bounds` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
 | `export_image` | `commands/export.rs` | Stub | `{ imageData, format, quality, path }` |
 | `get_setting` / `set_setting` | `commands/storage.rs` | Placeholder | Prefer `@/db` on frontend |
 | `update_capture_shortcut` | `shortcuts.rs` | Live | `{ shortcut }` — Tauri global-shortcut format |
@@ -31,8 +38,12 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 
 | Event | Emitter | Payload | Consumer |
 |-------|---------|---------|----------|
-| `capture-triggered` | Global shortcut handler, debug test hook | `{ source: "shortcut" \| "test" }` | `useGlobalShortcut`, capture module |
+| `capture-overlay-init` | `overlay.rs` | `CaptureOverlayInitPayload` | `CaptureOverlayRoot` |
+| `capture-image` | `CaptureOverlay` (emit) | `CaptureImagePayload` | `useCaptureSession` → editor |
+| `capture-error` | `CaptureOverlay` (emit) | `CaptureErrorPayload` | `useCaptureSession` |
 | `navigate-settings` | Tray menu | `()` | `useTrayNavigation` |
+
+> Le raccourci global et `e2e_emit_capture_triggered` appellent `show_capture_overlay` directement (pas d'event intermédiaire).
 
 ### Settings persistence
 
@@ -42,7 +53,8 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 
 - Shortcut strings validated in TS (`shared/lib/shortcut.ts`) before `invoke`.
 - Rust `update_capture_shortcut` returns `Result<(), String>` — errors surface in Settings UI.
-- Phase 1 capture commands will validate bounds (positive dimensions, display IDs) before native APIs.
+- Capture IPC coordinates rounded to integers in `commands.ts` before `invoke` (HiDPI subpixels).
+- Capture bounds validated in Rust (`capture/validate.rs`) for native `capture_*` commands.
 
 ## Consequences
 
@@ -54,4 +66,5 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 
 - [ADR-001](./001-monorepo-and-module-architecture.md)
 - [ADR-004](./004-system-integration-tray-shortcuts.md)
+- [ADR-006](./006-native-capture-overlay.md)
 - [Technical Stack - Desktop.md](../Technical%20Stack%20-%20Desktop.md)

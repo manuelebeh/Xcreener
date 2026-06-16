@@ -1,18 +1,24 @@
+mod capture;
 mod commands;
+mod overlay;
+#[cfg(target_os = "macos")]
+mod overlay_macos;
 mod shortcuts;
 mod test_support;
 mod tray;
 
 use commands::{
-    capture_fullscreen, capture_region, capture_window, export_image, get_setting, set_setting,
+    cancel_capture_overlay, capture_fullscreen, capture_region, capture_window, export_image,
+    get_capture_overlay_bounds, get_setting, get_window_at_point_command, hide_capture_overlay,
+    list_monitors_command, list_windows_command, set_setting, show_capture_overlay,
 };
 use shortcuts::{
     build_global_shortcut_plugin, init_shortcut_state, register_capture_shortcut,
     update_capture_shortcut,
 };
 use test_support::{
-    e2e_emit_capture_triggered, e2e_hide_main_window, e2e_is_main_window_visible,
-    e2e_show_main_window,
+    e2e_emit_capture_triggered, e2e_hide_main_window, e2e_is_capture_overlay_visible,
+    e2e_is_main_window_visible, e2e_show_main_window,
 };
 use tauri::{Manager, WindowEvent};
 
@@ -37,6 +43,7 @@ pub fn run() {
             init_shortcut_state(app.handle());
             register_capture_shortcut(app.handle(), shortcuts::DEFAULT_CAPTURE_SHORTCUT)?;
             tray::setup_tray(app.handle())?;
+            overlay::setup_overlay_window(app.handle())?;
 
             if let Some(window) = app.get_webview_window("main") {
                 let window_handle = window.clone();
@@ -54,6 +61,13 @@ pub fn run() {
             capture_region,
             capture_window,
             capture_fullscreen,
+            list_monitors_command,
+            list_windows_command,
+            get_window_at_point_command,
+            get_capture_overlay_bounds,
+            show_capture_overlay,
+            hide_capture_overlay,
+            cancel_capture_overlay,
             export_image,
             get_setting,
             set_setting,
@@ -62,6 +76,7 @@ pub fn run() {
             e2e_emit_capture_triggered,
             e2e_hide_main_window,
             e2e_is_main_window_visible,
+            e2e_is_capture_overlay_visible,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

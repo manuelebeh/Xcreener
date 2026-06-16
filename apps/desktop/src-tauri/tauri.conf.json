@@ -11,6 +11,7 @@
   },
   "app": {
     "withGlobalTauri": true,
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
@@ -19,8 +20,21 @@
         "height": 640,
         "resizable": true,
         "decorations": false,
-        "transparent": true,
         "visible": false
+      },
+      {
+        "label": "capture-overlay",
+        "title": "SnapGlow Capture",
+        "width": 800,
+        "height": 600,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visibleOnAllWorkspaces": true,
+        "resizable": false,
+        "visible": false,
+        "focus": false
       }
     ],
     "security": {
@@ -31,8 +45,8 @@
     "sql": {
       "preload": ["sqlite:snapglow.db"]
     },
-    "global-shortcut": {},
-    "autostart": {},
+    "global-shortcut": null,
+    "autostart": null,
     "updater": {
       "active": true,
       "endpoints": [
@@ -45,6 +59,10 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "macOS": {
+      "entitlements": "Entitlements.plist",
+      "infoPlist": "Info.plist"
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

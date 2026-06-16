@@ -57,8 +57,10 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **ADR-003:** IPC commands/events
 - **ADR-004:** tray, shortcuts, autostart
 - **ADR-005:** updater, releases, signing roadmap
+- **ADR-006:** native capture overlay
+- **ADR-006:** native capture overlay + preview crop
 - Invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite settings
-- **Sprint 0.3–0.4** : tray, shortcuts, autostart, updater, native e2e ; capture/export IPC still stubs until Phase 1
+- **Sprint 1.1** : capture native macOS validée en QA (zone / fenêtre / écran) ; parité Windows restante (P1-002, P1-004, P1-005)
 
 ## Agent conventions
 

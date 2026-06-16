@@ -159,9 +159,9 @@ src/
 │   ├── routes.tsx
 │   └── providers/
 ├── modules/
-│   ├── capture/            # Logique de capture (déclenchement, sélection de zone)
-│   │   ├── components/
-│   │   ├── hooks/
+│   ├── capture/            # Overlay capture (sélection zone / fenêtre / écran)
+│   │   ├── components/     # CaptureOverlay, RegionSelector, WindowHighlight, …
+│   │   ├── hooks/          # useCaptureSession, useGlobalShortcut
 │   │   └── store.ts
 │   ├── editor/             # Éditeur inline (beautification, annotations)
 │   │   ├── components/
@@ -245,7 +245,7 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 | `tauri` | 2.x | Framework principal |
 | `image` | 0.25.x | Manipulation d'images (crop, resize, encode/decode) |
 | `screenshots` | 0.8.x | Capture d'écran cross-platform (wrapper) |
-| `xcap` | Latest | Alternative de capture (plus récent, meilleure API) |
+| **xcap** | En usage (Sprint 1.1) | Capture preview, moniteurs, fenêtres (`src-tauri/src/capture/`) |
 | `rusqlite` | 0.31.x | SQLite natif (si besoin de bypasser le plugin) |
 | `serde` / `serde_json` | 1.x | Sérialisation/désérialisation des données IPC |
 | `tokio` | 1.x | Runtime async (pour les opérations I/O non-bloquantes) |
@@ -254,23 +254,15 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 
 ### 4.3 Commandes Tauri (IPC)
 
+> **État Sprint 1.1 :** capture native implémentée (`src-tauri/src/capture/`, `overlay.rs`). Flux overlay : snapshot preview → sélection UI → découpe client → event `capture-image`. Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
+
 ```rust
-// Capture d'écran — commande invocable depuis le frontend
+// Capture — commandes Rust (xcap) ; l'overlay confirme via découpe preview côté React
 #[tauri::command]
-async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>, String> {
-    // Appel à l'API native de capture
-    // Retourne les bytes de l'image capturée
-}
+async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>, String> { ... }
 
 #[tauri::command]
-async fn capture_window(window_id: u64) -> Result<Vec<u8>, String> {
-    // Capture une fenêtre spécifique par son ID
-}
-
-#[tauri::command]
-async fn capture_fullscreen(display_id: u32) -> Result<Vec<u8>, String> {
-    // Capture l'écran entier
-}
+async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> { ... }
 
 #[tauri::command]
 async fn export_image(
@@ -279,7 +271,7 @@ async fn export_image(
     quality: u8,          // 1-100 pour JPG
     path: String
 ) -> Result<(), String> {
-    // Encode et sauvegarde l'image
+    // Encode et sauvegarde l'image (stub Phase 1)
 }
 
 #[tauri::command]

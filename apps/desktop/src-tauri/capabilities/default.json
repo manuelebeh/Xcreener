@@ -1,11 +1,19 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the main window",
-  "windows": ["main"],
-  "permissions": [
+  "description": "Capability for SnapGlow desktop windows",
+  "windows": ["main", "capture-overlay"],
+    "permissions": [
     "core:default",
+    "core:event:default",
     "core:tray:default",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-position",
+    "core:window:allow-set-size",
+    "core:window:allow-is-visible",
+    "core:window:allow-get-all-windows",
     "sql:default",
     "global-shortcut:default",
     "autostart:default",

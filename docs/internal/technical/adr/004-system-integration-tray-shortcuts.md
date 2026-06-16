@@ -23,9 +23,11 @@ SnapGlow runs as a menu-bar / system-tray utility. Users expect show/hide from t
 - Default: `CmdOrControl+Shift+KeyS` (`DEFAULT_CAPTURE_SHORTCUT`).
 - State: `CaptureShortcutState` mutex holds current shortcut string.
 - Registration: unregister previous → register new on change via `update_capture_shortcut` command.
-- On press: emit `capture-triggered` with `{ source: "shortcut" }`.
+- On press: `overlay::open_capture_overlay` (fenêtre `capture-overlay` + snapshot preview).
 
-Frontend: `useGlobalShortcut` listens for the event; Settings persists shortcut in SQLite.
+Frontend: Settings persists shortcut in SQLite via `updateCaptureShortcut`.
+
+> **Sprint 1.1 :** le raccourci ouvre directement l'overlay ; l'event `capture-triggered` n'est plus émis. Le hook e2e `e2e_emit_capture_triggered` appelle aussi `open_capture_overlay`.
 
 ### Autostart (`tauri-plugin-autostart`)
 
@@ -41,7 +43,7 @@ Frontend: `useGlobalShortcut` listens for the event; Settings persists shortcut 
 | Surface | Linux/Windows CI | macOS |
 |---------|------------------|-------|
 | Shortcut register/unregister | Rust `cargo test` + WebDriver | Rust `cargo test` only |
-| `capture-triggered` UI | WebDriver + `e2e_emit_capture_triggered` | IPC hooks (manual / future plugin) |
+| Overlay capture visible | WebDriver + `e2e_emit_capture_triggered` | IPC hooks (manual / future plugin) |
 | Window hide on close | WebDriver | Manual QA |
 | Tray icon click / OS menu | Manual QA | Manual QA |
 
