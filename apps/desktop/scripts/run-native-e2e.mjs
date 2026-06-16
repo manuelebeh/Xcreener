@@ -1,14 +1,21 @@
 import { spawn } from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
 
-const desktopDir = path.dirname(fileURLToPath(new URL('..', import.meta.url)));
+const desktopDir = fileURLToPath(new URL('..', import.meta.url));
+const tauriDir = path.join(desktopDir, 'src-tauri');
+const wdioBin = path.join(desktopDir, 'node_modules', '.bin', 'wdio');
+const configPath = path.join(desktopDir, 'wdio.conf.ts');
+const driverPort = 4444;
 
-function run(command, args) {
+function run(command, args, options = {}) {
+  const { cwd = desktopDir } = options;
+
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
-      cwd: desktopDir,
+      cwd,
       stdio: 'inherit',
       shell: process.platform === 'win32',
     });
@@ -24,20 +31,84 @@ function run(command, args) {
   });
 }
 
-const driver = spawn('tauri-driver', [], {
-  cwd: desktopDir,
-  stdio: 'ignore',
-  shell: process.platform === 'win32',
-  detached: process.platform !== 'win32',
-});
+async function runRustTests() {
+  await run('cargo', ['test', '--locked'], { cwd: tauriDir });
+}
 
-try {
-  await sleep(2000);
-  await run('pnpm', ['exec', 'wdio', 'run', 'wdio.conf.ts']);
-} finally {
-  if (process.platform === 'win32') {
-    driver.kill();
-  } else {
-    process.kill(-driver.pid);
+async function runMacOsFallback() {
+  console.log(
+    'Native WebDriver is not supported on macOS (Tauri uses WKWebView without a driver).'
+  );
+  console.log('Docs: https://v2.tauri.app/develop/tests/webdriver/');
+  console.log('Running Rust shortcut/tray IPC tests instead...\n');
+  await runRustTests();
+  console.log('\nFor full UI automation, use CI (Linux/Windows) or the manual tray QA checklist in e2e-native/README.md.');
+}
+
+async function waitForDriver(maxAttempts = 30) {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    try {
+      const response = await fetch(`http://127.0.0.1:${driverPort}/status`);
+      if (response.ok) {
+        return;
+      }
+    } catch {
+      // driver still starting
+    }
+    await sleep(500);
   }
+
+  throw new Error(
+    `tauri-driver did not start on port ${driverPort}. Install with: cargo install tauri-driver --locked`
+  );
+}
+
+async function runWebDriverSuite() {
+  const driver = spawn('tauri-driver', [], {
+    cwd: desktopDir,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    shell: process.platform === 'win32',
+    detached: process.platform !== 'win32',
+  });
+
+  let driverOutput = '';
+
+  driver.stdout?.on('data', (chunk) => {
+    driverOutput += chunk.toString();
+  });
+  driver.stderr?.on('data', (chunk) => {
+    driverOutput += chunk.toString();
+  });
+
+  try {
+    await waitForDriver();
+    const wdioArgs = ['run', configPath];
+    if (process.platform === 'linux') {
+      await run('xvfb-run', ['-a', wdioBin, ...wdioArgs]);
+      return;
+    }
+    await run(wdioBin, wdioArgs);
+  } catch (error) {
+    if (driverOutput.trim()) {
+      console.error(driverOutput.trim());
+    }
+    throw error;
+  } finally {
+    try {
+      if (process.platform === 'win32') {
+        driver.kill();
+      } else {
+        process.kill(-driver.pid);
+      }
+    } catch {
+      // driver already stopped
+    }
+  }
+}
+
+if (os.platform() === 'darwin') {
+  await runMacOsFallback();
+} else {
+  await runRustTests();
+  await runWebDriverSuite();
 }

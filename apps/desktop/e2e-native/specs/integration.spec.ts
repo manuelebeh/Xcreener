@@ -1,3 +1,4 @@
+import { $, expect } from '@wdio/globals';
 import { tauriInvoke } from '../helpers/tauri';
 
 describe('SnapGlow native integration', () => {

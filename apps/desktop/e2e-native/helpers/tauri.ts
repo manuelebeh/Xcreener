@@ -1,3 +1,5 @@
+import { browser } from '@wdio/globals';
+
 type TauriInvoke = (command: string, args?: Record<string, unknown>) => Promise<unknown>;
 
 export async function tauriInvoke(command: string, args?: Record<string, unknown>) {
