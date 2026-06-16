@@ -49,13 +49,8 @@ function PresetButton({
 }
 
 export function PresetBar() {
-  const screenshot = useEditorStore((s) => s.screenshot);
   const selectedPresetId = useEditorStore((s) => s.selectedPresetId);
   const setPreset = useEditorStore((s) => s.setPreset);
-
-  if (!screenshot) {
-    return null;
-  }
 
   const standardWithoutFree = STANDARD_PRESETS.filter((p) => p.id !== FREE_PRESET_ID);
   const freePreset = STANDARD_PRESETS.find((p) => p.id === FREE_PRESET_ID);

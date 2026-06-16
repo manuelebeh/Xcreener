@@ -11,7 +11,6 @@ function backgroundTabFromConfig(background: BackgroundConfig): BackgroundTab {
 }
 
 export function StyleBar() {
-  const screenshot = useEditorStore((s) => s.screenshot);
   const background = useEditorStore((s) => s.background);
   const padding = useEditorStore((s) => s.padding);
   const borderRadius = useEditorStore((s) => s.borderRadius);
@@ -28,10 +27,6 @@ export function StyleBar() {
   useEffect(() => {
     setActiveTab(backgroundTabFromConfig(background));
   }, [background]);
-
-  if (!screenshot) {
-    return null;
-  }
 
   const solidColor = background.type === 'solid' ? background.color : '#667eea';
   const imageSource = background.type === 'image' ? background.source : null;
