@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SHADOW } from '../store';
 import type { RenderInput } from '../types';
+import { DEFAULT_TRANSFORM } from '../types';
 import { DEFAULT_GRADIENT_PRESET_ID } from './gradients';
+import { getPresetById } from './presets';
 import { renderFrame } from './renderFrame';
 
 function createMockScreenshot(width: number, height: number): ImageBitmap {
@@ -15,6 +17,8 @@ function baseInput(overrides: Partial<RenderInput> = {}): RenderInput {
     padding: 20,
     borderRadius: 8,
     shadow: DEFAULT_SHADOW,
+    frame: null,
+    transform: DEFAULT_TRANSFORM,
     ...overrides,
   };
 }
@@ -44,7 +48,7 @@ function createMockContext(): CanvasRenderingContext2D {
 }
 
 describe('renderFrame', () => {
-  it('composes background, shadow, and screenshot layers', () => {
+  it('composes background, shadow, and screenshot layers in free mode', () => {
     const ctx = createMockContext();
     const input = baseInput();
 
@@ -53,9 +57,24 @@ describe('renderFrame', () => {
     expect(layout).toEqual({
       canvasWidth: 140,
       canvasHeight: 120,
+      content: { x: 20, y: 20, width: 100, height: 80 },
       screenshot: { x: 20, y: 20, width: 100, height: 80 },
     });
     expect(ctx.fillRect).toHaveBeenCalled();
-    expect(ctx.drawImage).toHaveBeenCalledWith(input.screenshot, 20, 20, 100, 80);
+    expect(ctx.drawImage).toHaveBeenCalledWith(input.screenshot, 0, 0, 100, 80, 20, 20, 100, 80);
+  });
+
+  it('renders framed preset with 9-arg drawImage', () => {
+    const ctx = createMockContext();
+    const frame = getPresetById('instagram');
+    const input = baseInput({ frame, padding: 40 });
+
+    const { layout } = renderFrame(ctx, input, 1);
+
+    expect(layout.canvasWidth).toBe(1080);
+    expect(layout.canvasHeight).toBe(1080);
+    expect(ctx.drawImage).toHaveBeenCalled();
+    const drawCall = vi.mocked(ctx.drawImage).mock.calls[0];
+    expect(drawCall).toHaveLength(9);
   });
 });

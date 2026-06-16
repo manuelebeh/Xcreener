@@ -60,7 +60,8 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **ADR-006:** native capture overlay
 - Invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite settings
 - **Sprint 1.1** : capture native macOS validée en QA (zone / fenêtre / écran) ; parité Windows restante (P1-002, P1-004, P1-005)
-- **Sprint 1.2** : moteur beautification Canvas 2D (dégradés, padding, radius, ombre, fond custom) ; `BeautifyPanel` minimal ; StyleBar polie en Sprint 1.3 (P1-017)
+- **Sprint 1.2** : moteur beautification Canvas 2D (dégradés, padding, radius, ombre, fond custom) ; `BeautifyPanel` minimal
+- **Sprint 1.3** : presets format (sociaux + ratios), drag/zoom, `PresetBar` + `StyleBar` inline, presets custom SQLite
 
 ## Agent conventions
 
