@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { setSetting } from '@/db';
 import { isAnalyticsActive } from '@/integrations/observability';
 import { captureTestEvent } from '@/integrations/posthog/events';
+import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/useGlobalShortcut';
 import { isValidCaptureShortcut, normalizeCaptureShortcut } from '@/shared/lib/shortcut';
 import type { ThemePreference } from '@/shared/types/settings';
@@ -23,6 +24,8 @@ export function SettingsPanel() {
   const [shortcutDraft, setShortcutDraft] = useState(captureShortcut);
   const [shortcutError, setShortcutError] = useState<string | null>(null);
   const [shortcutSaved, setShortcutSaved] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<string | null>(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   async function handleThemeChange(value: ThemePreference) {
     setTheme(value);
@@ -61,6 +64,30 @@ export function SettingsPanel() {
     await setSetting(SETTING_KEYS.analyticsEnabled, String(enabled));
   }
 
+  async function handleCheckForUpdates() {
+    setUpdateLoading(true);
+    setUpdateStatus(null);
+
+    const result = await checkForAppUpdate({ install: true });
+
+    switch (result.status) {
+      case 'unavailable':
+        setUpdateStatus('Updates are only available in the desktop app.');
+        break;
+      case 'current':
+        setUpdateStatus('You are on the latest version.');
+        break;
+      case 'available':
+        setUpdateStatus(`Update ${result.version} found — installing…`);
+        break;
+      case 'error':
+        setUpdateStatus(result.message);
+        break;
+    }
+
+    setUpdateLoading(false);
+  }
+
   return (
     <div className="space-y-6 p-4">
       <div>
@@ -95,14 +122,28 @@ export function SettingsPanel() {
             }}
             className="mt-2 font-mono text-xs"
             placeholder="CmdOrControl+Shift+KeyS"
+            aria-invalid={shortcutError ? true : undefined}
+            aria-describedby={
+              shortcutError
+                ? 'capture-shortcut-error'
+                : shortcutSaved
+                  ? 'capture-shortcut-success'
+                  : 'capture-shortcut-hint'
+            }
           />
         </label>
-        <p className="mt-1 text-xs text-muted">
+        <p id="capture-shortcut-hint" className="mt-1 text-xs text-muted">
           Tauri format: modifiers + key (e.g. CmdOrControl+Shift+KeyS)
         </p>
-        {shortcutError ? <p className="mt-2 text-xs text-red-600">{shortcutError}</p> : null}
+        {shortcutError ? (
+          <p id="capture-shortcut-error" className="mt-2 text-xs text-destructive" role="alert">
+            {shortcutError}
+          </p>
+        ) : null}
         {shortcutSaved ? (
-          <p className="mt-2 text-xs text-green-700">Shortcut saved and registered.</p>
+          <p id="capture-shortcut-success" className="mt-2 text-xs text-green-700">
+            Shortcut saved and registered.
+          </p>
         ) : null}
         <Button type="button" className="mt-2" onClick={handleShortcutSave}>
           Save shortcut
@@ -131,6 +172,22 @@ export function SettingsPanel() {
       {!import.meta.env.DEV ? (
         <p className="text-xs text-muted">Analytics are opt-in in production builds.</p>
       ) : null}
+
+      <div className="rounded-md border border-border p-3">
+        <p className="m-0 text-sm font-medium">Updates</p>
+        <p className="mt-1 text-xs text-muted">Check GitHub Releases for new builds.</p>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className="mt-2"
+          disabled={updateLoading}
+          onClick={handleCheckForUpdates}
+        >
+          {updateLoading ? 'Checking…' : 'Check for updates'}
+        </Button>
+        {updateStatus ? <p className="mt-2 text-xs text-muted">{updateStatus}</p> : null}
+      </div>
 
       {import.meta.env.DEV ? (
         <div className="rounded-md border border-border p-3">

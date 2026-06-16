@@ -54,3 +54,36 @@ pub fn build_global_shortcut_plugin() -> impl tauri::plugin::Plugin<tauri::Wry> 
         })
         .build()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str::FromStr;
+    use tauri_plugin_global_shortcut::Shortcut;
+
+    #[test]
+    fn default_capture_shortcut_parses() {
+        let shortcut = Shortcut::from_str(DEFAULT_CAPTURE_SHORTCUT);
+        assert!(shortcut.is_ok(), "expected valid default shortcut");
+    }
+
+    #[test]
+    fn invalid_shortcut_is_rejected() {
+        let shortcut = Shortcut::from_str("not-a-valid-shortcut");
+        assert!(shortcut.is_err());
+    }
+
+    #[test]
+    fn common_capture_shortcut_variants_parse() {
+        for value in [
+            "CmdOrControl+Shift+KeyS",
+            "Alt+KeyX",
+            "CmdOrControl+Alt+KeyC",
+        ] {
+            assert!(
+                Shortcut::from_str(value).is_ok(),
+                "expected {value} to parse"
+            );
+        }
+    }
+}

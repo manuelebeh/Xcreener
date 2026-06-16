@@ -60,6 +60,13 @@ Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `s
 - **Hallmark** skill for UI polish reviews
 - Prefer CodeGraph over blind grep for cross-module refactors
 
+### Related ADRs
+
+- [ADR-002](./002-design-tokens-ui-and-web.md) — design tokens and shared UI
+- [ADR-003](./003-desktop-ipc-and-events.md) — IPC commands and events
+- [ADR-004](./004-system-integration-tray-shortcuts.md) — tray, shortcuts, autostart
+- [ADR-005](./005-distribution-updates-and-signing.md) — updater and release pipeline
+
 ## Consequences
 
 - New apps add a `dev:*` task in `mise.toml` and a Turbo pipeline entry; no root script sprawl.

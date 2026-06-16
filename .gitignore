@@ -10,6 +10,7 @@ src-tauri/target/
 
 # Tauri
 src-tauri/WixTools/
+.tauri/
 
 # CodeGraph index (local, regenerated)
 .codegraph/

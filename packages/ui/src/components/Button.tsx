@@ -1,5 +1,6 @@
 import { clsx } from 'clsx';
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
+import { focusRingClasses } from '../lib/focusRing';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -30,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled={disabled}
       className={clsx(
         'inline-flex items-center justify-center font-medium transition-opacity',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+        focusRingClasses,
         'disabled:opacity-50 disabled:pointer-events-none cursor-pointer',
         variantClasses[variant],
         sizeClasses[size],

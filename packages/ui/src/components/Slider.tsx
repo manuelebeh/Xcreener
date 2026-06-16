@@ -1,5 +1,6 @@
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import { clsx } from 'clsx';
+import { focusRingClasses } from '../lib/focusRing';
 
 export interface SliderProps {
   value?: number[];
@@ -39,7 +40,7 @@ export function Slider({
       <SliderPrimitive.Thumb
         className={clsx(
           'block h-4 w-4 rounded-full border border-primary bg-background shadow-sm',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary',
+          focusRingClasses,
           'disabled:pointer-events-none disabled:opacity-50'
         )}
       />

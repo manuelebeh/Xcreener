@@ -42,17 +42,24 @@ mise run dev:desktop   # or: mise run dev:web
 | `mise run lint` | Biome check (Turbo) |
 | `mise run typecheck` | TypeScript (Turbo) |
 | `mise run test` | Unit tests Vitest (Turbo) |
+| `mise run test:e2e:native` | Native integration tests (WebDriver + tauri-driver) |
 | `mise run format` | Biome write (Turbo) |
 
-Rust: `cd apps/desktop/src-tauri && cargo check`
+Rust: `cd apps/desktop/src-tauri && cargo test`
 
-Desktop e2e: `pnpm --filter @snapglow/desktop test:e2e` (Playwright smoke ; tray/shortcuts natifs en Sprint 0.4)
+Desktop e2e:
+- Web smoke: `pnpm --filter @snapglow/desktop test:e2e`
+- Native (tray/shortcuts): `mise run test:e2e:native` (requires `cargo install tauri-driver`)
 
 ## Architecture
 
 - Module layout: `apps/desktop/src/modules/{capture,editor,export,settings}/`
 - ADR: [`docs/internal/technical/adr/001-monorepo-and-module-architecture.md`](docs/internal/technical/adr/001-monorepo-and-module-architecture.md)
 - ADR: [`docs/internal/technical/adr/002-design-tokens-ui-and-web.md`](docs/internal/technical/adr/002-design-tokens-ui-and-web.md)
+- ADR: [`docs/internal/technical/adr/003-desktop-ipc-and-events.md`](docs/internal/technical/adr/003-desktop-ipc-and-events.md)
+- ADR: [`docs/internal/technical/adr/004-system-integration-tray-shortcuts.md`](docs/internal/technical/adr/004-system-integration-tray-shortcuts.md)
+- ADR: [`docs/internal/technical/adr/005-distribution-updates-and-signing.md`](docs/internal/technical/adr/005-distribution-updates-and-signing.md)
+- Accessibility: [`docs/internal/technical/accessibility-audit.md`](docs/internal/technical/accessibility-audit.md)
 - Agent guide: [`AGENTS.md`](AGENTS.md)
 
 ## License

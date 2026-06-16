@@ -19,9 +19,9 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 ### Shared UI (`packages/ui`)
 
 - React 19 + Tailwind v4 + Radix primitives (slider, tooltip, dropdown)
-- Components: `Button`, `Input`, `Select`, `Slider`, `Tooltip`, `Dropdown`
+- Components: `Button`, `Input`, `Label`, `Select`, `Slider`, `Tooltip`, `Dropdown`
 - `ThemeProvider` / `useTheme` for `data-theme` light/dark/system
-- Storybook in-package: `mise run storybook`
+- Storybook in-package: `mise run storybook` (includes `@storybook/addon-a11y`)
 
 ### Web landing (`apps/web`)
 
@@ -46,4 +46,5 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 ## References
 
 - [ADR-001](./001-monorepo-and-module-architecture.md)
+- [accessibility-audit.md](../accessibility-audit.md)
 - [Sprints & Implementations.md](../../product/Sprints%20%26%20Implementations.md)

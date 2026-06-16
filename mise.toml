@@ -13,6 +13,7 @@ format = "pnpm turbo format"
 "tokens:build" = "pnpm --filter @snapglow/design-tokens build"
 "storybook" = "pnpm --filter @snapglow/ui storybook"
 test = "pnpm turbo test"
+"test:e2e:native" = "pnpm --filter @snapglow/desktop test:e2e:native:ci"
 pre-commit = "pnpm exec lint-staged"
 commit-msg = "pnpm exec commitlint --edit"
 
