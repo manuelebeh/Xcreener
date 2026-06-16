@@ -1,6 +1,7 @@
+use crate::overlay;
 use std::str::FromStr;
 use std::sync::Mutex;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Manager};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
 pub const DEFAULT_CAPTURE_SHORTCUT: &str = "CmdOrControl+Shift+KeyS";
@@ -46,10 +47,12 @@ pub fn build_global_shortcut_plugin() -> impl tauri::plugin::Plugin<tauri::Wry> 
     tauri_plugin_global_shortcut::Builder::new()
         .with_handler(|app, _shortcut, event| {
             if event.state() == ShortcutState::Pressed {
-                let _ = app.emit(
-                    "capture-triggered",
-                    serde_json::json!({ "source": "shortcut" }),
-                );
+                let app = app.clone();
+                std::thread::spawn(move || {
+                    if let Err(error) = overlay::open_capture_overlay(&app) {
+                        eprintln!("[SnapGlow] failed to open capture overlay: {error}");
+                    }
+                });
             }
         })
         .build()

@@ -1,5 +1,5 @@
 import { BrowserRouter, Link } from 'react-router-dom';
-import { useCaptureStore } from '@/modules/capture/store';
+import { useCaptureSession } from '@/modules/capture/hooks/useCaptureSession';
 import { useTrayNavigation } from './hooks/useTrayNavigation';
 import { AppProviders } from './providers';
 import { AppRoutes } from './routes';
@@ -7,33 +7,25 @@ import '@/styles/global.css';
 
 function AppShell() {
   useTrayNavigation();
-  const isCapturing = useCaptureStore((s) => s.isCapturing);
+  useCaptureSession();
 
   return (
-    <>
-      {isCapturing ? (
-        <div
-          data-testid="capture-banner"
-          className="bg-primary px-4 py-2 text-center text-sm text-primary-foreground"
-        >
-          Capture shortcut triggered (stub)
-        </div>
-      ) : null}
+    <div className="min-h-screen bg-background text-foreground">
       <nav className="flex gap-3 border-b border-border px-4 py-2 text-sm">
         <Link to="/">Editor</Link>
         <Link to="/settings">Settings</Link>
       </nav>
       <AppRoutes />
-    </>
+    </div>
   );
 }
 
 export function App() {
   return (
-    <AppProviders>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AppProviders>
         <AppShell />
-      </BrowserRouter>
-    </AppProviders>
+      </AppProviders>
+    </BrowserRouter>
   );
 }
