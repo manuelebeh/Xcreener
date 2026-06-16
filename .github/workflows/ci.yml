@@ -23,11 +23,17 @@ jobs:
       - name: Install dependencies
         run: mise run install
 
+      - name: Build design tokens
+        run: mise run tokens:build
+
       - name: Lint
         run: mise run lint
 
       - name: Typecheck
         run: mise run typecheck
+
+      - name: Build web
+        run: mise exec -- pnpm --filter @snapglow/web build
 
       - name: Cargo check
         working-directory: apps/desktop/src-tauri

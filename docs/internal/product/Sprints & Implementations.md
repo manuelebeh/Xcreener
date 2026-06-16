@@ -33,7 +33,7 @@ Chaque sprint se termine par un **récapitulatif indicatif** (livré, en attente
 ```
 apps/
 ├── desktop/     # Tauri v2 — macOS + Windows        (Phase 0–1)
-├── web/         # Landing marketing — Astro + Vercel (Sprint 0.2)
+├── web/         # Landing marketing — TanStack Start + VPS (Sprint 0.2)
 ├── mobile/      # React Native Expo — iOS + Android  (Phase 1b)
 └── api/         # Fastify + PostgreSQL + Redis       (Phase 2b)
 packages/
@@ -121,7 +121,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | `AGENTS.md` + `.agents/rules/` | Sprint 0.1 | **Adopter** |
 | CodeGraph MCP | Sprint 0.1 | **Adopter** (pas Serena) |
 | `packages/design-tokens` | Sprint 0.2 | **Adopter** (P0-009) |
-| `apps/web` landing **Astro** + Vercel | Sprint 0.2 | **Adopter** (P0-013) |
+| `apps/web` landing **TanStack Start** + VPS | Sprint 0.2 | **Adopter** (P0-013) |
 | `apps/mobile` **Expo / React Native** | Phase 1b | **Adopter** (M1-001) |
 | `apps/api` **Fastify** + PostgreSQL | Phase 2b | **Adopter** (CL-001) |
 | Release Please + CHANGELOG | Sprint 0.4+ | **Reporter** |
@@ -133,24 +133,38 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
 | `[ ]` | P0-008 | Créer le design system Figma (couleurs, typographie, composants) | P0 | 3j | — |
-| `[ ]` | P0-009 | Implémenter les composants UI de base (React + Tailwind) : boutons, inputs, sliders, tooltips, dropdowns — `packages/design-tokens` (pattern fullstack-starter) | P0 | 4j | P0-002, P0-007 |
+| `[x]` (2026-06-16) | P0-009 | Implémenter les composants UI de base (React + Tailwind) : boutons, inputs, sliders, tooltips, dropdowns — `packages/design-tokens` (pattern fullstack-starter) | P0 | 4j | P0-002, P0-007 |
 | `[ ]` | P0-010 | Créer le prototype interactif Figma du flux principal | P0 | 3j | P0-008 |
-| `[ ]` | P0-011 | Configurer Storybook pour la bibliothèque de composants | P1 | 1j | P0-009 |
-| `[ ]` | P0-012 | Implémenter le thème Light/Dark/System | P1 | 2j | P0-009 |
-| `[ ]` | P0-013 | Créer la landing page (`apps/web` — **Astro** + Vercel, pas Next.js) | P1 | 3j | P0-008 |
-| `[ ]` | P0-025 | Étendre `mise.toml` (`dev:web`, `tokens:build`) ; migrer Husky → **hooks git mise** (lint conditionnel par app) | P1 | 0.5j | P0-013 |
+| `[x]` (2026-06-16) | P0-011 | Configurer Storybook pour la bibliothèque de composants | P1 | 1j | P0-009 |
+| `[x]` (2026-06-16) | P0-012 | Implémenter le thème Light/Dark/System | P1 | 2j | P0-009 |
+| `[x]` (2026-06-16) | P0-013 | Créer la landing page (`apps/web` — **TanStack Start** + VPS, pas Next.js) | P1 | 3j | P0-008 |
+| `[x]` (2026-06-16) | P0-025 | Étendre `mise.toml` (`dev:web`, `tokens:build`) ; migrer Husky → **hooks git mise** (lint conditionnel par app) | P1 | 0.5j | P0-013 |
 
-**Livrable :** Design system Figma, composants React, landing Astro en ligne, orchestration mise étendue (`dev:web`), hooks git migrés vers mise.
+**Livrable :** Design system code-first (`packages/design-tokens`, `packages/ui`), composants React + Storybook, landing TanStack Start en local, orchestration mise étendue (`dev:web`, `storybook`, `tokens:build`), hooks git migrés vers mise.
+
+**Livré (code, 2026-06-16)**
+
+- **`packages/design-tokens`** : `tokens.json` DTCG, build → `dist/tokens.css` + `dist/tailwind-theme.css`
+- **`packages/ui`** : Button, Input, Select, Slider, Tooltip, Dropdown, ThemeProvider ; Storybook
+- **Desktop** : Tailwind v4, thème Light/Dark/System visuel, `@snapglow/ui` dans Settings
+- **`apps/web`** : `@snapglow/web` TanStack Start, landing SnapGlow, `mise run dev:web`
+- **Tooling** : Husky retiré ; `mise run install-hooks` ; CI `tokens:build` + build web
+- **ADR-002** : design tokens, UI partagée, web landing
+
+**En parallèle (hors repo)**
+
+- P0-008 / P0-010 : livrables Figma
+- Déploiement VPS landing (reporté)
 
 **Critères de validation**
 
 - [ ] Design system Figma documenté (couleurs, typo, composants de base)
-- [ ] `packages/design-tokens` consommé par desktop + web
-- [ ] Storybook accessible avec les composants UI de base
-- [ ] Thème Light/Dark/System fonctionnel dans l'app desktop
-- [ ] `apps/web` déployé sur Vercel (URL publique)
-- [ ] `mise run dev:web` et `mise run tokens:build` opérationnels
-- [ ] Husky retiré ; hooks mise actifs (lint conditionnel par app)
+- [x] `packages/design-tokens` consommé par desktop + web
+- [x] Storybook accessible avec les composants UI de base
+- [x] Thème Light/Dark/System fonctionnel dans l'app desktop
+- [ ] `apps/web` déployé sur VPS (URL publique) — **reporté** ; `mise run dev:web` opérationnel
+- [x] `mise run dev:web` et `mise run tokens:build` opérationnels
+- [x] Husky retiré ; hooks mise actifs (lint-staged + commitlint)
 
 ### Sprint 0.3 (Semaines 5–6) — Infrastructure & Intégration système
 

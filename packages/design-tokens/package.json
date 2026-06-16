@@ -1,0 +1,21 @@
+{
+  "name": "@snapglow/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tokens.css": "./dist/tokens.css",
+    "./tailwind-theme.css": "./dist/tailwind-theme.css",
+    "./tokens.json": "./tokens.json"
+  },
+  "files": [
+    "dist",
+    "tokens.json"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "lint": "biome check .",
+    "typecheck": "echo 'no types'",
+    "format": "biome check --write ."
+  }
+}

@@ -9,3 +9,15 @@ lint = "pnpm turbo lint"
 typecheck = "pnpm turbo typecheck"
 format = "pnpm turbo format"
 "dev:desktop" = "pnpm --filter @snapglow/desktop tauri dev"
+"dev:web" = "pnpm --filter @snapglow/web dev"
+"tokens:build" = "pnpm --filter @snapglow/design-tokens build"
+"storybook" = "pnpm --filter @snapglow/ui storybook"
+pre-commit = "pnpm exec lint-staged"
+commit-msg = "pnpm exec commitlint --edit"
+
+[tasks.install-hooks]
+run = '''
+mise generate git-pre-commit --write --task=pre-commit
+printf '%s\n' '#!/bin/sh' 'exec mise run commit-msg -- "$1"' > .git/hooks/commit-msg
+chmod +x .git/hooks/commit-msg
+'''

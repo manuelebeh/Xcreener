@@ -3,7 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "src-tauri/target/release/**"]
+      "outputs": ["dist/**", ".output/**", "src-tauri/target/release/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]

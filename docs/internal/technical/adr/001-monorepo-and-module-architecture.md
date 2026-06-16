@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow evolves from a desktop menu-bar app (Tauri) toward a multi-surface product: web landing (Astro), mobile (Expo), and API (Fastify). Sprint 0.1 establishes the monorepo skeleton, shared tooling, and a modular desktop frontend without implementing capture/editor features yet.
+SnapGlow evolves from a desktop menu-bar app (Tauri) toward a multi-surface product: web landing (TanStack Start, VPS), mobile (Expo), and API (Fastify). Sprint 0.1 establishes the monorepo skeleton, shared tooling, and a modular desktop frontend without implementing capture/editor features yet.
 
 ## Decision
 
@@ -15,7 +15,7 @@ SnapGlow evolves from a desktop menu-bar app (Tauri) toward a multi-surface prod
 ```
 screen-cut/
 ├── apps/desktop/     # Tauri v2 + React (Sprint 0.1)
-├── apps/web/         # Astro landing (Sprint 0.2)
+├── apps/web/         # TanStack Start landing, VPS (Sprint 0.2)
 ├── apps/mobile/      # Expo (Phase 1b)
 ├── apps/api/         # Fastify (Phase 2b)
 └── packages/         # Shared config & future design-tokens, i18n
@@ -28,7 +28,7 @@ screen-cut/
 | Toolchains | **mise** | Node 24, pnpm 9, Rust stable |
 | Dev entry | **mise.toml tasks** | `dev:desktop`, `lint`, `typecheck`, `install` |
 | TS cache | **Turborepo** | `build`, `lint`, `typecheck`, `format` across workspaces |
-| Git hooks | **Husky** (Sprint 0.1) → **mise hooks** (Sprint 0.2, P0-025) | Pre-commit Biome; Conventional Commits |
+| Git hooks | **mise** (`pre-commit`, `commit-msg`, P0-025) | Pre-commit Biome; Conventional Commits |
 
 **Not adopted from fullstack-starter:** Flutter, FastAPI, GCP Terraform, oh-my-agent, Serena MCP.
 
@@ -63,7 +63,7 @@ Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `s
 ## Consequences
 
 - New apps add a `dev:*` task in `mise.toml` and a Turbo pipeline entry; no root script sprawl.
-- Husky is temporary; migrate to mise git hooks when `apps/web` adds conditional lint paths (P0-025).
+- Husky was temporary (Sprint 0.1); replaced by mise git hooks in Sprint 0.2 (see ADR-002).
 - Module imports use `@/modules/<name>` or package `index.ts` — avoid deep relative paths across module boundaries.
 
 ## References
