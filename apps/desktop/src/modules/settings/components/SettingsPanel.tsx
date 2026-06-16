@@ -1,3 +1,4 @@
+import { Select } from '@snapglow/ui';
 import { setSetting } from '@/db';
 import type { ThemePreference } from '@/shared/types/settings';
 import { useSettingsStore } from '../store';
@@ -12,20 +13,20 @@ export function SettingsPanel() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2 style={{ marginTop: 0 }}>Settings</h2>
-      <label htmlFor="theme-select">
+    <div className="p-4">
+      <h2 className="mt-0 text-lg font-semibold">Settings</h2>
+      <label htmlFor="theme-select" className="block text-sm font-medium">
         Theme
-        <select
+        <Select
           id="theme-select"
           value={theme}
           onChange={(e) => handleThemeChange(e.target.value as ThemePreference)}
-          style={{ display: 'block', marginTop: 8, width: '100%' }}
+          className="mt-2"
         >
           <option value="system">System</option>
           <option value="light">Light</option>
           <option value="dark">Dark</option>
-        </select>
+        </Select>
       </label>
     </div>
   );

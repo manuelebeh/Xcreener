@@ -1,33 +1,41 @@
 # SnapGlow — Agent guide
 
-Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **Astro web** → **Expo mobile** → **Fastify API**.
+Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack Start web** → **Expo mobile** → **Fastify API**.
 
 ## Stack
 
 | Area | Choice |
 |------|--------|
 | Monorepo | pnpm workspaces + Turborepo |
-| Dev CLI | [mise](https://mise.jdx.dev/) — `mise run dev:desktop`, `lint`, `typecheck` |
+| Dev CLI | [mise](https://mise.jdx.dev/) — `dev:desktop`, `dev:web`, `tokens:build`, `storybook`, `lint`, `typecheck` |
 | Desktop | Tauri v2, React 19, Vite, TypeScript |
+| Web | TanStack Start, Nitro, Tailwind v4 |
+| Design system | `packages/design-tokens` + `packages/ui` (Storybook) |
 | Lint / format | Biome (not ESLint/Prettier) |
 | State | Zustand per module |
 | Local DB | `@tauri-apps/plugin-sql` (SQLite) |
-| Commits | Conventional Commits; Husky pre-commit (→ mise hooks Sprint 0.2) |
+| Commits | Conventional Commits; mise git hooks (lint-staged + commitlint) |
 
 ## Repo map
 
 ```
-apps/desktop/     Tauri app (@snapglow/desktop)
-packages/         biome-config, typescript-config
-docs/internal/    Product & technical specs
-.agents/rules/    Workflow rules for agents
+apps/desktop/          Tauri app (@snapglow/desktop)
+apps/web/              Landing (@snapglow/web)
+packages/design-tokens/  DTCG tokens → CSS
+packages/ui/           Shared React components + Storybook
+packages/              biome-config, typescript-config
+docs/internal/         Product & technical specs
+.agents/rules/         Workflow rules for agents
 ```
 
 ## Commands
 
 ```bash
-mise trust && mise install && mise run install
+mise trust && mise install && mise run install && mise run install-hooks
+mise run tokens:build   # before first dev if tokens dist missing
 mise run dev:desktop    # Tauri dev
+mise run dev:web        # Landing (port 3000)
+mise run storybook      # UI components (port 6006)
 mise run lint
 mise run typecheck
 ```
@@ -38,6 +46,7 @@ Rust checks: `cd apps/desktop/src-tauri && cargo check`
 
 - **Modules:** `apps/desktop/src/modules/{capture,editor,export,settings}/`
 - **ADR-001:** `docs/internal/technical/adr/001-monorepo-and-module-architecture.md`
+- **ADR-002:** `docs/internal/technical/adr/002-design-tokens-ui-and-web.md`
 - Invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite in Sprint 0.1
 
 ## Agent conventions
@@ -53,7 +62,7 @@ Rust checks: `cd apps/desktop/src-tauri && cargo check`
 | Phase | App | mise task |
 |-------|-----|-----------|
 | 0.1 | desktop | `dev:desktop` |
-| 0.2 | web (Astro) | `dev:web` |
+| 0.2 | web (TanStack Start) | `dev:web` |
 | 1b | mobile (Expo) | `dev:mobile` |
 | 2b | api (Fastify) | `dev:api` |
 
