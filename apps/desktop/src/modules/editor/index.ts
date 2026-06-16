@@ -1,3 +1,4 @@
+export { AnnotationToolbar } from './components/AnnotationToolbar';
 export { Canvas } from './components/Canvas';
 export { EditorView } from './components/EditorView';
 export { PresetBar } from './components/PresetBar';

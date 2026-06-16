@@ -19,6 +19,8 @@ function baseInput(overrides: Partial<RenderInput> = {}): RenderInput {
     shadow: DEFAULT_SHADOW,
     frame: null,
     transform: DEFAULT_TRANSFORM,
+    annotations: [],
+    selectedAnnotationId: null,
     ...overrides,
   };
 }
@@ -43,6 +45,15 @@ function createMockContext(): CanvasRenderingContext2D {
     roundRect: vi.fn(),
     fill: vi.fn(),
     clip: vi.fn(),
+    strokeRect: vi.fn(),
+    stroke: vi.fn(),
+    setLineDash: vi.fn(),
+    rect: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    ellipse: vi.fn(),
+    fillText: vi.fn(),
+    measureText: vi.fn(() => ({ width: 40 })),
     drawImage: vi.fn(),
   } as unknown as CanvasRenderingContext2D;
 }
@@ -76,5 +87,29 @@ describe('renderFrame', () => {
     expect(ctx.drawImage).toHaveBeenCalled();
     const drawCall = vi.mocked(ctx.drawImage).mock.calls[0];
     expect(drawCall).toHaveLength(9);
+  });
+
+  it('draws annotations after screenshot layer', () => {
+    const ctx = createMockContext();
+    const input = baseInput({
+      annotations: [
+        {
+          type: 'rect',
+          id: 'rect-1',
+          x: 5,
+          y: 5,
+          width: 20,
+          height: 10,
+          stroke: '#ff0000',
+          strokeWidth: 2,
+          fill: null,
+        },
+      ],
+      selectedAnnotationId: 'rect-1',
+    });
+
+    renderFrame(ctx, input, 1);
+
+    expect(ctx.strokeRect).toHaveBeenCalled();
   });
 });
