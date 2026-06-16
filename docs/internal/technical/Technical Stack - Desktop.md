@@ -164,14 +164,21 @@ src/
 │   │   ├── hooks/          # useCaptureSession, useGlobalShortcut
 │   │   └── store.ts
 │   ├── editor/             # Éditeur inline (beautification, annotations)
+│   │   ├── annotations/    # Types, create, resize, utils (Sprint 1.4)
 │   │   ├── components/
 │   │   │   ├── Canvas.tsx
-│   │   │   ├── BeautifyPanel.tsx   # Sprint 1.2 — panneau minimal
-│   │   │   ├── StyleBar.tsx        # Sprint 1.3 (prévu)
-│   │   │   ├── AnnotationToolbar.tsx  # Sprint 1.4 (prévu)
-│   │   │   └── PresetPicker.tsx    # Sprint 1.3 (prévu)
-│   │   ├── hooks/          # useBeautifyRender (Sprint 1.2)
-│   │   ├── engine/         # Moteur de rendu Canvas 2D (Sprint 1.2)
+│   │   │   ├── EditorView.tsx
+│   │   │   ├── StyleBar.tsx           # Sprint 1.3
+│   │   │   ├── PresetBar.tsx          # Sprint 1.3
+│   │   │   ├── PresetPicker.tsx       # Sprint 1.3
+│   │   │   ├── AnnotationToolbar.tsx  # Sprint 1.4
+│   │   │   └── TextEditorOverlay.tsx  # Sprint 1.4
+│   │   ├── hooks/
+│   │   │   ├── useBeautifyRender.ts         # Sprint 1.2
+│   │   │   ├── useAnnotationInteraction.ts  # Sprint 1.4
+│   │   │   ├── useEditorShortcuts.ts        # Sprint 1.4
+│   │   │   └── useCanvasCoordinates.ts      # Sprint 1.4
+│   │   ├── engine/         # renderFrame, draw*, hitTest, computeLayout
 │   │   └── store.ts
 │   ├── export/             # Export PNG/JPG/WebP, copier, drag & drop
 │   │   ├── components/
@@ -203,19 +210,27 @@ src/
 Chaque module possède son propre store Zustand. Les stores communiquent via des subscriptions ciblées.
 
 ```typescript
-// Exemple : store de l'éditeur
+// Exemple : store de l'éditeur (Sprint 1.4)
 interface EditorState {
   screenshot: ImageBitmap | null
   background: BackgroundConfig
   padding: number
   borderRadius: number
   shadow: ShadowConfig
+  transform: ScreenshotTransform
+  selectedPresetId: string | null
+  activeTool: EditorTool
   annotations: Annotation[]
-  selectedPreset: Preset | null
+  selectedAnnotationId: string | null
+  toolDefaults: ToolDefaults
+  history: { past: Annotation[][]; future: Annotation[][] }
 
-  setScreenshot: (img: ImageBitmap) => void
+  setScreenshot: (img: ImageBitmap | null) => void
   updateBackground: (bg: Partial<BackgroundConfig>) => void
+  setActiveTool: (tool: EditorTool) => void
   addAnnotation: (annotation: Annotation) => void
+  updateAnnotation: (id: string, patch: Partial<Annotation>) => void
+  pushHistory: () => void
   undo: () => void
   redo: () => void
 }
@@ -314,7 +329,7 @@ async fn save_to_history(metadata: CaptureMetadata) -> Result<i64, String> {
 
 ## 5. Moteur de Rendu (Canvas)
 
-> **État Sprint 1.2 :** moteur implémenté dans `modules/editor/engine/` (layers 1–3 : fond, ombre, capture clipée). Rendu via `useBeautifyRender` (rAF, thread principal). UI : `BeautifyPanel` (minimal). Layers 4–5 (redaction, annotations) et `StyleBar` polie : sprints suivants.
+> **État Sprint 1.4 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel, annotations). Rendu via `useBeautifyRender` (rAF). UI : `StyleBar`, `PresetBar`, `AnnotationToolbar`. Undo/redo (20 niveaux). **Redaction automatique** (OCR) et **export fichier** : Sprint 1.5.
 
 ### 5.1 Architecture du moteur
 
@@ -324,12 +339,14 @@ Le moteur de rendu utilise le **Canvas 2D API** du WebView pour composer le rés
 Layers (bas → haut) :
 ┌──────────────────────────────────┐
 │  Layer 5 : Annotations           │  Texte, formes, flèches, highlight
-│  Layer 4 : Redaction masks       │  Zones floutées/masquées
+│  Layer 4 : Blur manuel           │  Zones flou gaussien / pixelate (Sprint 1.4)
 │  Layer 3 : Screenshot            │  L'image capturée (avec border-radius)
 │  Layer 2 : Shadow                │  Ombre portée sous le screenshot
 │  Layer 1 : Background            │  Dégradé, couleur unie, ou image
 └──────────────────────────────────┘
 ```
+
+> **Sprint 1.5 (prévu) :** redaction automatique (OCR on-device) — masques sensibles détectés, distincts du flou manuel layer 4.
 
 ### 5.2 Pipeline de rendu
 
@@ -347,8 +364,9 @@ Composition Canvas :
   1. Dessiner le fond (gradient/color/image)
   2. Appliquer l'ombre portée (shadow)
   3. Dessiner le screenshot (avec border-radius via clip)
-  4. Dessiner les masques de redaction (blur/pixelate)
-  5. Dessiner les annotations (texte, formes)
+  4. Appliquer les masques de flou manuel (gaussian / pixelate) — `drawBlurMasks`
+  5. Dessiner les annotations (texte, formes, highlight) — `drawAnnotations`
+  6. [Sprint 1.5] Redaction automatique (OCR)
   │
   ▼
 Preview temps réel (< 50ms par frame)

@@ -28,6 +28,8 @@ describe('useEditorStore', () => {
       paddingTouched: false,
       selectedPresetId: null,
       transform: DEFAULT_TRANSFORM,
+      annotations: [],
+      selectedAnnotationId: null,
     });
   });
 

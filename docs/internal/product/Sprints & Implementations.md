@@ -343,22 +343,31 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P1-019 | Outil texte : insertion, police, taille, couleur, fond | P0 | 3j | P1-007 |
-| `[ ]` | P1-020 | Formes : rectangle, ellipse | P0 | 2j | P1-007 |
-| `[ ]` | P1-021 | Formes : flèche, ligne | P0 | 1j | P1-020 |
-| `[ ]` | P1-022 | Surbrillance (highlight semi-transparent) | P0 | 1j | P1-007 |
-| `[ ]` | P1-023 | Flou de zone (pixelisation ou blur gaussien) | P0 | 2j | P1-007 |
-| `[ ]` | P1-024 | Gestion des couches : sélection, déplacement, redimensionnement, suppression | P0 | 2j | P1-019 |
-| `[ ]` | P1-025 | Undo/Redo (historique d'actions) | P0 | 1j | P1-024 |
+| `[x]` (2026-06-16) | P1-019 | Outil texte : insertion, police, taille, couleur, fond | P0 | 3j | P1-007 |
+| `[x]` (2026-06-16) | P1-020 | Formes : rectangle, ellipse | P0 | 2j | P1-007 |
+| `[x]` (2026-06-16) | P1-021 | Formes : flèche, ligne | P0 | 1j | P1-020 |
+| `[x]` (2026-06-16) | P1-022 | Surbrillance (highlight semi-transparent) | P0 | 1j | P1-007 |
+| `[x]` (2026-06-16) | P1-023 | Flou de zone (pixelisation ou blur gaussien) | P0 | 2j | P1-007 |
+| `[x]` (2026-06-16) | P1-024 | Gestion des couches : sélection, déplacement, redimensionnement, suppression | P0 | 2j | P1-019 |
+| `[x]` (2026-06-16) | P1-025 | Undo/Redo (historique d'actions) | P0 | 1j | P1-024 |
 
 **Livrable :** Annotations complètes avec gestion des couches et undo/redo.
 
+**Livré (code, 2026-06-16)**
+
+- **Modèle** : `annotations/types.ts` — union `Annotation` (texte, rect, ellipse, arrow, line, highlight, blur)
+- **Moteur** : `drawBlurMasks` (layer 4), `drawAnnotations` (layer 5), `drawSelectionHandles`, `hitTest` ; `renderFrame` étendu
+- **Store** : `annotations`, `activeTool`, `toolDefaults`, `pushHistory` / `undo` / `redo` (20 niveaux) ; reset à chaque capture
+- **Interaction** : `useAnnotationInteraction` (drag-to-draw, select/move/resize), `useScreenshotTransformEnabled` (outil Move), `useEditorShortcuts` (Cmd+Z, Delete)
+- **UI** : `AnnotationToolbar` + `TextEditorOverlay` ; intégré dans `EditorView` entre Canvas et PresetBar
+- **Tests** : Vitest — `drawAnnotations`, `drawBlurMasks`, `hitTest`, `history`, `renderFrame` (annotations)
+
 **Critères de validation**
 
-- [ ] Tous les outils d'annotation fonctionnels (texte, formes, highlight, flou)
-- [ ] Couches sélectionnables, déplaçables, redimensionnables
-- [ ] Undo/redo ≥ 20 niveaux sans corruption du rendu
-- [ ] Annotations incluses à l'export PNG/JPG/WebP
+- [x] Tous les outils d'annotation fonctionnels (texte, formes, highlight, flou)
+- [x] Couches sélectionnables, déplaçables, redimensionnables
+- [x] Undo/redo ≥ 20 niveaux sans corruption du rendu
+- [x] Annotations incluses à l'export PNG/JPG/WebP (composées dans `renderFrame` → `canvasToPngBlob` WYSIWYG)
 
 ### Sprint 1.5 (Semaines 17–18) — Redaction & Export
 

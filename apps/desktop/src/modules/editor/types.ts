@@ -63,6 +63,8 @@ export interface ComputedLayout {
   content: LayoutRect;
 }
 
+import type { Annotation } from './annotations/types';
+
 export interface RenderInput {
   screenshot: ImageBitmap;
   background: BackgroundConfig;
@@ -71,4 +73,6 @@ export interface RenderInput {
   shadow: ShadowConfig;
   frame: FramePreset | null;
   transform: ScreenshotTransform;
+  annotations: Annotation[];
+  selectedAnnotationId: string | null;
 }

@@ -1,11 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { computeLayout } from '../engine/computeLayout';
 import { fitPreviewSize } from '../engine/fitPreviewSize';
 import { getPresetById } from '../engine/presets';
+import {
+  type TextEditRequest,
+  useAnnotationInteraction,
+  useScreenshotTransformEnabled,
+} from '../hooks/useAnnotationInteraction';
 import { useBeautifyRender } from '../hooks/useBeautifyRender';
-import { useScreenshotTransform } from '../hooks/useScreenshotTransform';
+import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
 import { useEditorStore } from '../store';
 import type { RenderInput } from '../types';
+import { TextEditorOverlay } from './TextEditorOverlay';
 
 const PREVIEW_MAX_HEIGHT = 'min(62vh, 560px)';
 
@@ -18,10 +24,14 @@ export function Canvas() {
   const selectedPresetId = useEditorStore((s) => s.selectedPresetId);
   const transform = useEditorStore((s) => s.transform);
   const customPresets = useEditorStore((s) => s.customPresets);
+  const annotations = useEditorStore((s) => s.annotations);
+  const selectedAnnotationId = useEditorStore((s) => s.selectedAnnotationId);
+  const activeTool = useEditorStore((s) => s.activeTool);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [textEditRequest, setTextEditRequest] = useState<TextEditRequest | null>(null);
 
   const frame = useMemo(
     () => (screenshot ? getPresetById(selectedPresetId, customPresets) : null),
@@ -41,8 +51,20 @@ export function Canvas() {
       shadow,
       frame,
       transform,
+      annotations,
+      selectedAnnotationId,
     };
-  }, [screenshot, background, padding, borderRadius, shadow, frame, transform]);
+  }, [
+    screenshot,
+    background,
+    padding,
+    borderRadius,
+    shadow,
+    frame,
+    transform,
+    annotations,
+    selectedAnnotationId,
+  ]);
 
   const layout = useMemo(() => (renderInput ? computeLayout(renderInput) : null), [renderInput]);
 
@@ -58,6 +80,17 @@ export function Canvas() {
       containerSize.height
     );
   }, [layout, containerSize]);
+
+  const displayScale = useMemo(() => {
+    if (!layout || displaySize.width <= 0) {
+      return 1;
+    }
+    return displaySize.width / layout.canvasWidth;
+  }, [displaySize.width, layout]);
+
+  const handleTextEdit = useCallback((request: TextEditRequest) => {
+    setTextEditRequest(request);
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -86,7 +119,14 @@ export function Canvas() {
   }, []);
 
   useBeautifyRender(canvasRef, renderInput);
-  useScreenshotTransform(canvasRef);
+  useScreenshotTransformEnabled(canvasRef, activeTool === 'move');
+  useAnnotationInteraction({
+    canvasRef,
+    layoutWidth: layout?.canvasWidth ?? 0,
+    layoutHeight: layout?.canvasHeight ?? 0,
+    onTextEdit: handleTextEdit,
+  });
+  useEditorShortcuts();
 
   const exportLabel = layout
     ? `${layout.canvasWidth} × ${layout.canvasHeight}px · rendu final`
@@ -125,6 +165,11 @@ export function Canvas() {
               ref={canvasRef}
               data-testid="editor-canvas"
               className="block h-full w-full touch-none"
+            />
+            <TextEditorOverlay
+              request={textEditRequest}
+              displayScale={displayScale}
+              onClose={() => setTextEditRequest(null)}
             />
           </div>
         ) : screenshot ? (

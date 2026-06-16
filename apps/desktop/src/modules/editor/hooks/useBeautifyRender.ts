@@ -30,7 +30,7 @@ export function useBeautifyRender(
       canvas.style.width = '100%';
       canvas.style.height = '100%';
 
-      renderFrame(context, input, pixelRatio);
+      renderFrame(context, input, pixelRatio, canvas);
     };
 
     if (frameRef.current !== null) {
