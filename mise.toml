@@ -12,6 +12,7 @@ format = "pnpm turbo format"
 "dev:web" = "pnpm --filter @snapglow/web dev"
 "tokens:build" = "pnpm --filter @snapglow/design-tokens build"
 "storybook" = "pnpm --filter @snapglow/ui storybook"
+test = "pnpm turbo test"
 pre-commit = "pnpm exec lint-staged"
 commit-msg = "pnpm exec commitlint --edit"
 
