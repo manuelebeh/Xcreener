@@ -23,6 +23,32 @@ export interface ShadowConfig {
   color: string;
 }
 
+export type AspectRatio = '16:9' | '4:3' | '1:1' | '1.91:1' | 'free';
+
+export type PresetCategory = 'social' | 'standard' | 'custom';
+
+export interface FramePreset {
+  id: string;
+  name: string;
+  category: PresetCategory;
+  width: number;
+  height: number;
+  aspectRatio: AspectRatio;
+  icon?: string;
+}
+
+export interface ScreenshotTransform {
+  scale: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+export const DEFAULT_TRANSFORM: ScreenshotTransform = {
+  scale: 1,
+  offsetX: 0,
+  offsetY: 0,
+};
+
 export interface LayoutRect {
   x: number;
   y: number;
@@ -34,6 +60,7 @@ export interface ComputedLayout {
   canvasWidth: number;
   canvasHeight: number;
   screenshot: LayoutRect;
+  content: LayoutRect;
 }
 
 export interface RenderInput {
@@ -42,4 +69,6 @@ export interface RenderInput {
   padding: number;
   borderRadius: number;
   shadow: ShadowConfig;
+  frame: FramePreset | null;
+  transform: ScreenshotTransform;
 }

@@ -15,6 +15,16 @@ export function drawScreenshot(
   ctx.save();
   roundRectPath(ctx, rect, borderRadius);
   ctx.clip();
-  ctx.drawImage(screenshot, rect.x, rect.y, rect.width, rect.height);
+  ctx.drawImage(
+    screenshot,
+    0,
+    0,
+    screenshot.width,
+    screenshot.height,
+    rect.x,
+    rect.y,
+    rect.width,
+    rect.height
+  );
   ctx.restore();
 }
