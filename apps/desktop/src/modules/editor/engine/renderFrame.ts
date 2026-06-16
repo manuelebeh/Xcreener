@@ -1,7 +1,10 @@
 import type { ComputedLayout, RenderInput } from '../types';
 import { computeLayout } from './computeLayout';
+import { drawAnnotations } from './drawAnnotations';
 import { drawBackground } from './drawBackground';
+import { drawBlurMasks } from './drawBlurMasks';
 import { drawScreenshot } from './drawScreenshot';
+import { drawSelectionHandles } from './drawSelectionHandles';
 import { drawShadow } from './drawShadow';
 
 export interface RenderResult {
@@ -11,7 +14,8 @@ export interface RenderResult {
 export function renderFrame(
   ctx: CanvasRenderingContext2D,
   input: RenderInput,
-  pixelRatio = 1
+  pixelRatio = 1,
+  canvas?: HTMLCanvasElement | OffscreenCanvas
 ): RenderResult {
   const layout = computeLayout(input);
 
@@ -26,6 +30,19 @@ export function renderFrame(
 
   drawShadow(ctx, screenshotRect, input.borderRadius, input.shadow);
   drawScreenshot(ctx, input.screenshot, screenshotRect, input.borderRadius);
+
+  drawBlurMasks(ctx, input.annotations, layout.canvasWidth, layout.canvasHeight, pixelRatio);
+
+  drawAnnotations(ctx, input.annotations);
+
+  if (input.selectedAnnotationId) {
+    const selected = input.annotations.find(
+      (annotation) => annotation.id === input.selectedAnnotationId
+    );
+    if (selected) {
+      drawSelectionHandles(ctx, selected);
+    }
+  }
 
   return { layout };
 }

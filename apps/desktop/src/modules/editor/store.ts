@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import type { Annotation, EditorTool, ToolDefaults } from './annotations/types';
+import { DEFAULT_TOOL_DEFAULTS, HISTORY_MAX } from './annotations/types';
+import { cloneAnnotations } from './annotations/utils';
 import { autoPadding, computeLayout } from './engine/computeLayout';
 import { DEFAULT_GRADIENT_PRESET_ID } from './engine/gradients';
 import {
@@ -54,8 +57,14 @@ function computeInitialTransform(
     shadow: DEFAULT_SHADOW,
     frame,
     transform: DEFAULT_TRANSFORM,
+    annotations: [],
+    selectedAnnotationId: null,
   });
   return fitTransform(screenshot, layout.content);
+}
+
+function emptyHistory() {
+  return { past: [] as Annotation[][], future: [] as Annotation[][] };
 }
 
 interface EditorState {
@@ -68,6 +77,11 @@ interface EditorState {
   selectedPresetId: string | null;
   transform: ScreenshotTransform;
   customPresets: FramePreset[];
+  activeTool: EditorTool;
+  annotations: Annotation[];
+  selectedAnnotationId: string | null;
+  toolDefaults: ToolDefaults;
+  history: { past: Annotation[][]; future: Annotation[][] };
   setPadding: (padding: number) => void;
   setScreenshot: (screenshot: ImageBitmap | null) => void;
   updateBackground: (
@@ -83,6 +97,17 @@ interface EditorState {
   addCustomPreset: (preset: FramePreset) => void;
   removeCustomPreset: (id: string) => void;
   applyCustomPresetStyle: (preset: FramePreset & { style?: CustomPresetStyle }) => void;
+  setActiveTool: (tool: EditorTool) => void;
+  setAnnotations: (annotations: Annotation[]) => void;
+  addAnnotation: (annotation: Annotation) => void;
+  updateAnnotation: (id: string, patch: Partial<Annotation>) => void;
+  removeAnnotation: (id: string) => void;
+  selectAnnotation: (id: string | null) => void;
+  updateToolDefaults: (patch: Partial<ToolDefaults>) => void;
+  pushHistory: () => void;
+  commitHistory: () => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 export interface CustomPresetStyle {
@@ -102,6 +127,11 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   selectedPresetId: null,
   transform: DEFAULT_TRANSFORM,
   customPresets: [],
+  activeTool: 'select',
+  annotations: [],
+  selectedAnnotationId: null,
+  toolDefaults: DEFAULT_TOOL_DEFAULTS,
+  history: emptyHistory(),
 
   setPadding: (padding) => set({ padding, paddingTouched: true }),
 
@@ -121,6 +151,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         paddingTouched: false,
         selectedPresetId: null,
         transform: DEFAULT_TRANSFORM,
+        annotations: [],
+        selectedAnnotationId: null,
+        history: emptyHistory(),
       });
       return;
     }
@@ -135,6 +168,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       paddingTouched: false,
       selectedPresetId: null,
       transform: DEFAULT_TRANSFORM,
+      annotations: [],
+      selectedAnnotationId: null,
+      history: emptyHistory(),
     });
   },
 
@@ -295,5 +331,91 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       );
       set({ transform });
     }
+  },
+
+  setActiveTool: (tool) => set({ activeTool: tool }),
+
+  setAnnotations: (annotations) => set({ annotations }),
+
+  addAnnotation: (annotation) =>
+    set((state) => ({
+      annotations: [...state.annotations, annotation],
+      selectedAnnotationId: annotation.id,
+    })),
+
+  updateAnnotation: (id, patch) =>
+    set((state) => ({
+      annotations: state.annotations.map((annotation) =>
+        annotation.id === id ? ({ ...annotation, ...patch } as Annotation) : annotation
+      ),
+    })),
+
+  removeAnnotation: (id) =>
+    set((state) => ({
+      annotations: state.annotations.filter((annotation) => annotation.id !== id),
+      selectedAnnotationId: state.selectedAnnotationId === id ? null : state.selectedAnnotationId,
+    })),
+
+  selectAnnotation: (id) => set({ selectedAnnotationId: id }),
+
+  updateToolDefaults: (patch) =>
+    set((state) => ({
+      toolDefaults: { ...state.toolDefaults, ...patch },
+    })),
+
+  pushHistory: () => {
+    const { annotations, history } = get();
+    const snapshot = cloneAnnotations(annotations);
+    const past = [...history.past, snapshot].slice(-HISTORY_MAX);
+    set({
+      history: {
+        past,
+        future: [],
+      },
+    });
+  },
+
+  commitHistory: () => {
+    get().pushHistory();
+  },
+
+  undo: () => {
+    const { annotations, history } = get();
+    if (history.past.length === 0) {
+      return;
+    }
+
+    const previous = history.past[history.past.length - 1];
+    const past = history.past.slice(0, -1);
+    const current = cloneAnnotations(annotations);
+
+    set({
+      annotations: cloneAnnotations(previous ?? []),
+      selectedAnnotationId: null,
+      history: {
+        past,
+        future: [current, ...history.future],
+      },
+    });
+  },
+
+  redo: () => {
+    const { annotations, history } = get();
+    if (history.future.length === 0) {
+      return;
+    }
+
+    const next = history.future[0];
+    const future = history.future.slice(1);
+    const current = cloneAnnotations(annotations);
+
+    set({
+      annotations: cloneAnnotations(next ?? []),
+      selectedAnnotationId: null,
+      history: {
+        past: [...history.past, current].slice(-HISTORY_MAX),
+        future,
+      },
+    });
   },
 }));

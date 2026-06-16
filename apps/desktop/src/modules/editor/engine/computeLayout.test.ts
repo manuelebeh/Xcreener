@@ -24,6 +24,8 @@ function baseInput(overrides: Partial<RenderInput> = {}): RenderInput {
     shadow: DEFAULT_SHADOW,
     frame: null,
     transform: DEFAULT_TRANSFORM,
+    annotations: [],
+    selectedAnnotationId: null,
     ...overrides,
   };
 }
