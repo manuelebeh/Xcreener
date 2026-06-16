@@ -19,6 +19,7 @@ src/
 │   ├── capture/            # Screen capture orchestration
 │   ├── editor/             # Canvas / beautify UI
 │   ├── export/             # Export formats & flow (Sprint 1.5)
+│   ├── history/            # Capture history grid & reopen (Sprint 1.6)
 │   ├── redaction/          # Sensitive-data scan & masking (Sprint 1.5)
 │   └── settings/           # User preferences UI
 ├── shared/                 # Cross-cutting TypeScript only
@@ -27,7 +28,10 @@ src/
 │   ├── commands.ts         # Typed invoke() wrappers
 │   └── events.ts           # Event listeners
 ├── db/                     # SQLite (@tauri-apps/plugin-sql)
-│   ├── index.ts            # initDatabase, getSetting, setSetting
+│   ├── index.ts            # initDatabase, getSetting, setSetting, loadAppSettings
+│   ├── captures.ts         # Capture history CRUD + prune (Sprint 1.6)
+│   ├── migrate.ts          # Multi-statement migration runner
+│   ├── connection.ts       # Shared DB connection
 │   └── migrations/         # SQL migrations
 ├── styles/
 │   └── global.css
@@ -51,7 +55,7 @@ Rust commands live in `src-tauri/src/commands/` (`capture`, `redaction`, `export
 
 ### State & data
 - **Zustand** per module (`store.ts`) — not React Context (except providers)
-- **SQLite** via `@/db` for local persistence (settings, captures schema)
+- **SQLite** via `@/db` for local persistence (settings, custom presets, capture history)
 - Rust IPC via `@/tauri/commands.ts`; mirror types in `@/shared/types/ipc.ts`
 
 ### Import conventions

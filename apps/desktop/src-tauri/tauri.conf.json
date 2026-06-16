@@ -38,7 +38,14 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.posthog.com https://*.i.posthog.com https://*.sentry.io https://*.ingest.sentry.io https://github.com https://api.github.com https://objects.githubusercontent.com"
+      "csp": "default-src 'self'; img-src 'self' data: blob: asset: http://asset.localhost https://asset.localhost; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.posthog.com https://*.i.posthog.com https://*.sentry.io https://*.ingest.sentry.io https://github.com https://api.github.com https://objects.githubusercontent.com",
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "requireLiteralLeadingDot": false,
+          "allow": ["$APPDATA/**", "$APPLOCALDATA/**", "$APPLOG/**"]
+        }
+      }
     }
   },
   "plugins": {

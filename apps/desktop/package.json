@@ -15,7 +15,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:native": "node scripts/run-native-e2e.mjs",
-    "test:e2e:native:ci": "pnpm tauri build --debug && pnpm test:e2e:native"
+    "test:e2e:native:ci": "pnpm tauri build --debug && pnpm test:e2e:native",
+    "test:stress-captures": "node scripts/stress-captures.mjs"
   },
   "dependencies": {
     "@posthog/react": "^1.7.0",

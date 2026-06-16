@@ -119,13 +119,16 @@ export function Canvas() {
     };
   }, []);
 
-  useBeautifyRender(canvasRef, renderInput);
-  useScreenshotTransformEnabled(canvasRef, activeTool === 'move');
+  const canvasMounted = displaySize.width > 0;
+
+  useBeautifyRender(canvasRef, renderInput, canvasMounted);
+  useScreenshotTransformEnabled(canvasRef, canvasMounted && activeTool === 'move');
   useAnnotationInteraction({
     canvasRef,
     layoutWidth: layout?.canvasWidth ?? 0,
     layoutHeight: layout?.canvasHeight ?? 0,
     onTextEdit: handleTextEdit,
+    enabled: canvasMounted,
   });
   useEditorShortcuts();
 
@@ -177,7 +180,9 @@ export function Canvas() {
         ) : screenshot ? (
           <p className="text-sm text-muted">Preparing preview…</p>
         ) : (
-          <p className="text-sm text-muted">Capture a screenshot to start beautifying</p>
+          <p className="text-sm text-muted" data-testid="canvas-empty-state">
+            Capture a screenshot to start beautifying
+          </p>
         )}
       </div>
     </section>

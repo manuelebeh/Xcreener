@@ -2,6 +2,7 @@ import { listen } from '@tauri-apps/api/event';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEditorStore } from '@/modules/editor/store';
+import { persistCapture } from '@/modules/history/utils/persistCapture';
 import type { CaptureErrorPayload, CaptureImagePayload } from '@/shared/types/ipc';
 import { bytesToImageBitmap } from '@/shared/utils/image';
 import { useCaptureStore } from '../store';
@@ -14,13 +15,19 @@ export function useCaptureSession() {
   const reset = useCaptureStore((s) => s.reset);
 
   useEffect(() => {
+    let cancelled = false;
     let unlistenImage: (() => void) | undefined;
     let unlistenError: (() => void) | undefined;
 
-    listen<CaptureImagePayload>('capture-image', async (event) => {
+    void listen<CaptureImagePayload>('capture-image', async (event) => {
       try {
         const bitmap = await bytesToImageBitmap(event.payload.bytes);
         setScreenshot(bitmap);
+        persistCapture({
+          bytes: event.payload.bytes,
+          width: event.payload.width,
+          height: event.payload.height,
+        });
         setOverlayVisible(false);
         reset();
         navigate('/');
@@ -29,17 +36,26 @@ export function useCaptureSession() {
         setError(message);
       }
     }).then((fn) => {
+      if (cancelled) {
+        fn();
+        return;
+      }
       unlistenImage = fn;
     });
 
-    listen<CaptureErrorPayload>('capture-error', (event) => {
+    void listen<CaptureErrorPayload>('capture-error', (event) => {
       setError(event.payload.message);
       setOverlayVisible(false);
     }).then((fn) => {
+      if (cancelled) {
+        fn();
+        return;
+      }
       unlistenError = fn;
     });
 
     return () => {
+      cancelled = true;
       unlistenImage?.();
       unlistenError?.();
     };

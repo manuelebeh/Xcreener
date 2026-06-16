@@ -26,9 +26,15 @@ Register new commands in `lib.rs` and mirror types in `src/shared/types/ipc.ts` 
 ## SQLite
 
 - Plugin: `tauri-plugin-sql`, preloaded DB `sqlite:snapglow.db`
-- Migrations: `src/db/migrations/*.sql`, applied in `initDatabase()`
-- Capability: `sql:default` in `capabilities/default.json`
+- Migrations: `src/db/migrations/*.sql`, applied via `migrate.ts` (`ensureMigrationsApplied`)
+- Capture history: `src/db/captures.ts` (retention 30, frontend-only)
+- Capability: `sql:default` + `sql:allow-execute` in `capabilities/default.json`
 
-## Security
+## Tauri features & security
+
+- Cargo feature `image-png` on `tauri` — required for clipboard image copy (`Image.fromBytes`)
+- Asset protocol enabled in `tauri.conf.json` — history thumbnails via `convertFileSrc`
+- FS scope: `fs:scope-appdata-recursive` for `$APPDATA/**` (captures, thumbnails)
+- Clipboard: `clipboard-manager:allow-write-image`
 
 CSP in `tauri.conf.json` — keep `'unsafe-inline'` for styles only as needed; no remote scripts.

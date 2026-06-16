@@ -51,7 +51,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 
 ## Architecture
 
-- **Modules:** `apps/desktop/src/modules/{capture,editor,export,redaction,settings}/`
+- **Modules:** `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings}/`
 - **ADR-001:** monorepo + modules
 - **ADR-002:** design tokens + UI + web
 - **ADR-003:** IPC commands/events
@@ -63,7 +63,8 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 1.2** : moteur beautification Canvas 2D (dégradés, padding, radius, ombre, fond custom)
 - **Sprint 1.3** : presets format (sociaux + ratios), drag/zoom (outil Move), `PresetBar` + `StyleBar`, presets custom SQLite
 - **Sprint 1.4** : annotations (texte, formes, highlight, flou manuel), `AnnotationToolbar`, layers 4–5, undo/redo (20 niveaux)
-- **Sprint 1.5** : redaction on-device (OCR macOS/Windows + détecteurs regex), `RedactionBar`, masquage → `BlurAnnotation` ; export WYSIWYG PNG/JPG/WebP, clipboard, drag-out (`ExportBar`)
+- **Sprint 1.5** : redaction on-device (OCR macOS/Windows + détecteurs regex), `RedactionBar`, masquage → `BlurAnnotation` ; export WYSIWYG PNG/JPG/WebP, clipboard (`Image.fromBytes` + `image-png`), drag-out (`ExportBar`)
+- **Sprint 1.6** : historique 30 captures (`modules/history/`, `db/captures.ts`, PNG + miniatures WebP), route `/history`, E2E natif `capture-beautify-export`, perf/stress tests, builds beta unsigned (voir `release-signing.md` §5)
 
 ## Agent conventions
 
