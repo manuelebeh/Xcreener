@@ -42,14 +42,14 @@ mise run dev:desktop   # or: mise run dev:web
 | `mise run lint` | Biome check (Turbo) |
 | `mise run typecheck` | TypeScript (Turbo) |
 | `mise run test` | Unit tests Vitest (Turbo) |
-| `mise run test:e2e:native` | Native integration tests (WebDriver + tauri-driver) |
+| `mise run test:e2e:native` | Native integration tests (WebDriver on Linux/Windows; Rust tests on macOS) |
 | `mise run format` | Biome write (Turbo) |
 
 Rust: `cd apps/desktop/src-tauri && cargo test`
 
 Desktop e2e:
 - Web smoke: `pnpm --filter @snapglow/desktop test:e2e`
-- Native (tray/shortcuts): `mise run test:e2e:native` (requires `cargo install tauri-driver`)
+- Native integration: `mise run test:e2e:native` (WebDriver on Linux/Windows; Rust tests on macOS)
 
 ## Architecture
 
