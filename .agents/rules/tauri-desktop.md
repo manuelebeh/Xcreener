@@ -8,7 +8,7 @@
 
 ## Window (Sprint 0.1 skeleton)
 
-Menu-bar style: 480×640, no decorations, transparent, initially hidden (`visible: false`).
+Menu-bar style: 480×640, native decorations on `main`, frameless `capture-overlay`, initially hidden (`visible: false`).
 
 ## Commands
 
