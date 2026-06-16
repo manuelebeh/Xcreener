@@ -280,21 +280,35 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P1-007 | Implémenter le moteur de rendu Canvas (fond + capture + ombre) | P0 | 4j | P1-001 |
-| `[ ]` | P1-008 | Arrière-plans dégradés : bibliothèque de 50+ presets | P0 | 2j | P1-007 |
-| `[ ]` | P1-009 | Padding intelligent + auto-balance (centrage) | P0 | 2j | P1-007 |
-| `[ ]` | P1-010 | Coins arrondis configurables (slider 0–32px) | P0 | 1j | P1-007 |
-| `[ ]` | P1-011 | Ombre portée (intensité, flou, offset, couleur) | P0 | 1j | P1-007 |
-| `[ ]` | P1-012 | Fond personnalisé (couleur custom + image uploadée) | P1 | 2j | P1-007 |
+| `[x]` (2026-06-16) | P1-007 | Implémenter le moteur de rendu Canvas (fond + capture + ombre) | P0 | 4j | P1-001 |
+| `[x]` (2026-06-16) | P1-008 | Arrière-plans dégradés : bibliothèque de 50+ presets | P0 | 2j | P1-007 |
+| `[x]` (2026-06-16) | P1-009 | Padding intelligent + auto-balance (centrage) | P0 | 2j | P1-007 |
+| `[x]` (2026-06-16) | P1-010 | Coins arrondis configurables (slider 0–32px) | P0 | 1j | P1-007 |
+| `[x]` (2026-06-16) | P1-011 | Ombre portée (intensité, flou, offset, couleur) | P0 | 1j | P1-007 |
+| `[x]` (2026-06-16) | P1-012 | Fond personnalisé (couleur custom + image uploadée) | P1 | 2j | P1-007 |
 
 **Livrable :** Beautification automatique complète avec aperçu temps réel.
 
+**Livré (code + QA macOS, 2026-06-16)**
+
+- **Moteur Canvas 2D** : `modules/editor/engine/` — `computeLayout`, `drawBackground`, `drawShadow`, `drawScreenshot`, `renderFrame` ; composition 3 couches (fond → ombre → capture clipée) ; HiDPI via `devicePixelRatio`
+- **Store éditeur** : `background`, `padding`, `borderRadius`, `shadow` ; defaults auto à chaque `setScreenshot` (dégradé SnapGlow, padding ~12 %, radius 12 px, ombre douce)
+- **56 presets dégradés** : `engine/gradients.ts` (dont brand `#667eea` → `#764ba2`)
+- **UI minimale** : `BeautifyPanel` — onglets Gradient / Solid / Image, grille presets, sliders padding / radius / shadow, color pickers, upload image (`<input type="file">`)
+- **Canvas WYSIWYG** : `useBeautifyRender` (rAF) ; preview composée = source de vérité pour l’export futur (Sprint 1.5)
+- **Tests** : Vitest — `computeLayout`, `gradients` (≥ 50), `drawBackground`, `renderFrame`, `store`
+
+**En attente / reporté**
+
+- **StyleBar inline polie** (P1-017, Sprint 1.3) — `BeautifyPanel` couvre les contrôles fonctionnels du sprint
+- **Profiling perf formel** (< 50–100 ms par frame) — reporté P1-038 ; rendu rAF thread principal suffisant en QA manuelle
+
 **Critères de validation**
 
-- [ ] Canvas rend fond + capture + ombre en temps réel (< 100 ms cible)
-- [ ] ≥ 50 presets dégradés disponibles
-- [ ] Padding, radius et ombre ajustables via UI
-- [ ] Fond couleur custom + image upload fonctionnels
+- [x] Canvas rend fond + capture + ombre en temps réel (rAF ; cible < 100 ms — profiling formel en P1-038)
+- [x] ≥ 50 presets dégradés disponibles (56)
+- [x] Padding, radius et ombre ajustables via UI (`BeautifyPanel`)
+- [x] Fond couleur custom + image upload fonctionnels
 
 ### Sprint 1.3 (Semaines 13–14) — Presets, Format & Éditeur inline
 

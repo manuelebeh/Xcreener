@@ -166,11 +166,12 @@ src/
 │   ├── editor/             # Éditeur inline (beautification, annotations)
 │   │   ├── components/
 │   │   │   ├── Canvas.tsx
-│   │   │   ├── StyleBar.tsx
-│   │   │   ├── AnnotationToolbar.tsx
-│   │   │   └── PresetPicker.tsx
-│   │   ├── hooks/
-│   │   ├── engine/         # Moteur de rendu Canvas 2D
+│   │   │   ├── BeautifyPanel.tsx   # Sprint 1.2 — panneau minimal
+│   │   │   ├── StyleBar.tsx        # Sprint 1.3 (prévu)
+│   │   │   ├── AnnotationToolbar.tsx  # Sprint 1.4 (prévu)
+│   │   │   └── PresetPicker.tsx    # Sprint 1.3 (prévu)
+│   │   ├── hooks/          # useBeautifyRender (Sprint 1.2)
+│   │   ├── engine/         # Moteur de rendu Canvas 2D (Sprint 1.2)
 │   │   └── store.ts
 │   ├── export/             # Export PNG/JPG/WebP, copier, drag & drop
 │   │   ├── components/
@@ -312,6 +313,8 @@ async fn save_to_history(metadata: CaptureMetadata) -> Result<i64, String> {
 ---
 
 ## 5. Moteur de Rendu (Canvas)
+
+> **État Sprint 1.2 :** moteur implémenté dans `modules/editor/engine/` (layers 1–3 : fond, ombre, capture clipée). Rendu via `useBeautifyRender` (rAF, thread principal). UI : `BeautifyPanel` (minimal). Layers 4–5 (redaction, annotations) et `StyleBar` polie : sprints suivants.
 
 ### 5.1 Architecture du moteur
 

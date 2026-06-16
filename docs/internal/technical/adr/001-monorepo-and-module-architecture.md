@@ -52,7 +52,7 @@ Modules expose a public API through `index.ts`; internal files stay colocated (`
 
 ### Rust command surface
 
-Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Export** remains a stub until a later sprint. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
+Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only — no new Rust commands). **Export** remains a stub until Sprint 1.5. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
 
 ### Code intelligence
 
