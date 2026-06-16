@@ -52,7 +52,7 @@ Modules expose a public API through `index.ts`; internal files stay colocated (`
 
 ### Rust command surface
 
-Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`). Sprint 0.1 ships **stubs** that compile and register; real implementations land in Sprint 0.3+. Settings persistence uses the **frontend SQL plugin** directly in Sprint 0.1; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
+Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`). **Capture and export** remain stubs until Phase 1. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → `capture-triggered` event, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/`; Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
 
 ### Code intelligence
 

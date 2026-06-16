@@ -7,7 +7,7 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Area | Choice |
 |------|--------|
 | Monorepo | pnpm workspaces + Turborepo |
-| Dev CLI | [mise](https://mise.jdx.dev/) — `dev:desktop`, `dev:web`, `tokens:build`, `storybook`, `lint`, `typecheck` |
+| Dev CLI | [mise](https://mise.jdx.dev/) — `dev:desktop`, `dev:web`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
 | Desktop | Tauri v2, React 19, Vite, TypeScript |
 | Web | TanStack Start, Nitro, Tailwind v4 |
 | Design system | `packages/design-tokens` + `packages/ui` (Storybook) |
@@ -38,7 +38,10 @@ mise run dev:web        # Landing (port 3000)
 mise run storybook      # UI components (port 6006)
 mise run lint
 mise run typecheck
+mise run test
 ```
+
+Desktop e2e (Playwright, smoke UI) : `pnpm --filter @snapglow/desktop test:e2e`
 
 Rust checks: `cd apps/desktop/src-tauri && cargo check`
 
@@ -47,7 +50,8 @@ Rust checks: `cd apps/desktop/src-tauri && cargo check`
 - **Modules:** `apps/desktop/src/modules/{capture,editor,export,settings}/`
 - **ADR-001:** `docs/internal/technical/adr/001-monorepo-and-module-architecture.md`
 - **ADR-002:** `docs/internal/technical/adr/002-design-tokens-ui-and-web.md`
-- Invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite in Sprint 0.1
+- Invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite settings
+- **Sprint 0.3** : tray (`src-tauri/src/tray.rs`), global shortcuts (`shortcuts.rs`), autostart plugin ; capture/export IPC still stubs until Phase 1
 
 ## Agent conventions
 

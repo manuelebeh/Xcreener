@@ -170,23 +170,32 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P0-014 | Implémenter l'icône menu bar (macOS) / system tray (Windows) | P0 | 3j | P0-002 |
-| `[ ]` | P0-015 | Implémenter le système de raccourcis clavier global | P0 | 3j | P0-014 |
-| `[ ]` | P0-016 | Créer le système de settings/préférences persistant | P0 | 2j | P0-006 |
-| `[ ]` | P0-017 | Implémenter le lancement au démarrage (auto-start) | P1 | 1j | P0-014 |
-| `[ ]` | P0-018 | Setup des tests unitaires (Vitest) + tests e2e (Playwright) | P1 | 2j | P0-002 |
-| `[ ]` | P0-019 | Setup analytics (PostHog) et crash reporting (Sentry) | P1 | 1j | P0-002 |
+| `[x]` (2026-06-16) | P0-014 | Implémenter l'icône menu bar (macOS) / system tray (Windows) | P0 | 3j | P0-002 |
+| `[x]` (2026-06-16) | P0-015 | Implémenter le système de raccourcis clavier global | P0 | 3j | P0-014 |
+| `[x]` (2026-06-16) | P0-016 | Créer le système de settings/préférences persistant | P0 | 2j | P0-006 |
+| `[x]` (2026-06-16) | P0-017 | Implémenter le lancement au démarrage (auto-start) | P1 | 1j | P0-014 |
+| `[x]` (2026-06-16) | P0-018 | Setup des tests unitaires (Vitest) + tests e2e (Playwright) | P1 | 2j | P0-002 |
+| `[x]` (2026-06-16) | P0-019 | Setup analytics (PostHog) et crash reporting (Sentry) | P1 | 1j | P0-002 |
 
 **Livrable :** Application Tauri avec menu bar, raccourcis clavier, settings, auto-start fonctionnel.
 
+**Livré (code, 2026-06-16)**
+
+- **Tray / menu bar** : `src-tauri/src/tray.rs` — icône, toggle show/hide, menu Open / Settings / Quit ; fermeture fenêtre → hide
+- **Raccourcis globaux** : `tauri-plugin-global-shortcut` + `update_capture_shortcut` ; event `capture-triggered` (stub capture + bannière UI)
+- **Settings SQLite** : `theme`, `captureShortcut`, `launchAtLogin`, `analyticsEnabled` ; UI Settings enrichie (`@snapglow/ui`)
+- **Auto-start** : `tauri-plugin-autostart` + sync bootstrap / toggle Settings
+- **Tests** : Vitest (`store.test.ts`, validation raccourcis) ; Playwright smoke (`e2e/settings.spec.ts`) ; `mise run test` + step CI
+- **Observabilité** : PostHog + Sentry desktop (`integrations/observability.ts`) — actif en dev si clés env, opt-in prod ; `apps/desktop/.env.example`
+
 **Critères de validation**
 
-- [ ] Icône menu bar / system tray visible ; fenêtre show/hide au clic
-- [ ] Raccourci global configurable déclenche la capture (stub ou action test)
-- [ ] Settings complets persistés en SQLite (au-delà du thème)
-- [ ] Auto-start activable/désactivable dans les préférences
-- [ ] Vitest + au moins 1 test unitaire ; Playwright smoke test configuré
-- [ ] PostHog + Sentry initialisés (events de test visibles en dashboard)
+- [x] Icône menu bar / system tray visible ; fenêtre show/hide au clic
+- [x] Raccourci global configurable déclenche la capture (stub ou action test)
+- [x] Settings complets persistés en SQLite (au-delà du thème)
+- [x] Auto-start activable/désactivable dans les préférences
+- [x] Vitest + au moins 1 test unitaire ; Playwright smoke test configuré
+- [x] PostHog + Sentry initialisés (events de test visibles en dashboard avec `VITE_POSTHOG_KEY` / `VITE_SENTRY_DSN` en `.env`)
 
 ### Sprint 0.4 (Semaines 7–8) — Polissage Phase 0 & Préparation Phase 1
 
