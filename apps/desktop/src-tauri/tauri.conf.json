@@ -19,7 +19,7 @@
         "width": 480,
         "height": 640,
         "resizable": true,
-        "decorations": false,
+        "decorations": true,
         "visible": false
       },
       {
