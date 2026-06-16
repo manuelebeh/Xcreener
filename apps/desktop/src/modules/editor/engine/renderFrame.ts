@@ -15,7 +15,7 @@ export function renderFrame(
   ctx: CanvasRenderingContext2D,
   input: RenderInput,
   pixelRatio = 1,
-  canvas?: HTMLCanvasElement | OffscreenCanvas
+  _canvas?: HTMLCanvasElement | OffscreenCanvas
 ): RenderResult {
   const layout = computeLayout(input);
 

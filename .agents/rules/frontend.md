@@ -10,7 +10,7 @@
 
 - React 19 + Vite + Tailwind v4 + TypeScript; path alias `@/` → `src/`
 - Imports `@snapglow/ui` and design tokens
-- Feature modules: `src/modules/{capture,editor,export,settings}/`
+- Feature modules: `src/modules/{capture,editor,export,redaction,settings}/`
 - Public module API via `index.ts`; use Zustand stores per module
 - Routes in `src/app/routes.tsx`; providers in `src/app/providers/`
 - Tauri IPC: `src/tauri/commands.ts`, events in `src/tauri/events.ts`

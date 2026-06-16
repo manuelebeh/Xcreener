@@ -1,6 +1,7 @@
 mod capture;
 mod commands;
 mod overlay;
+mod redaction;
 #[cfg(target_os = "macos")]
 mod overlay_macos;
 mod shortcuts;
@@ -8,9 +9,10 @@ mod test_support;
 mod tray;
 
 use commands::{
-    cancel_capture_overlay, capture_fullscreen, capture_region, capture_window, export_image,
-    get_capture_overlay_bounds, get_setting, get_window_at_point_command, hide_capture_overlay,
-    list_monitors_command, list_windows_command, set_setting, show_capture_overlay,
+    cancel_capture_overlay, capture_fullscreen, capture_region, capture_window,
+    detect_sensitive_data, export_image, get_capture_overlay_bounds, get_setting,
+    get_window_at_point_command, hide_capture_overlay, list_monitors_command,
+    list_windows_command, set_setting, show_capture_overlay,
 };
 use shortcuts::{
     build_global_shortcut_plugin, init_shortcut_state, register_capture_shortcut,
@@ -28,6 +30,9 @@ pub fn run() {
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .plugin(build_global_shortcut_plugin())
         .setup(|app| {
             #[cfg(desktop)]
@@ -69,6 +74,7 @@ pub fn run() {
             hide_capture_overlay,
             cancel_capture_overlay,
             export_image,
+            detect_sensitive_data,
             get_setting,
             set_setting,
             update_capture_shortcut,

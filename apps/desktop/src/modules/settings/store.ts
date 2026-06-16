@@ -7,6 +7,7 @@ interface SettingsState extends AppSettings {
   setCaptureShortcut: (captureShortcut: string) => void;
   setLaunchAtLogin: (launchAtLogin: boolean) => void;
   setAnalyticsEnabled: (analyticsEnabled: boolean) => void;
+  setAutoRedaction: (autoRedaction: boolean) => void;
   hydrate: (settings: Partial<AppSettings>) => void;
 }
 
@@ -16,5 +17,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setCaptureShortcut: (captureShortcut) => set({ captureShortcut }),
   setLaunchAtLogin: (launchAtLogin) => set({ launchAtLogin }),
   setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
+  setAutoRedaction: (autoRedaction) => set({ autoRedaction }),
   hydrate: (settings) => set((state) => ({ ...state, ...settings })),
 }));
