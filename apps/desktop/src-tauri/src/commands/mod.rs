@@ -1,5 +1,6 @@
 mod capture;
 mod export;
+mod overlay_layout;
 mod redaction;
 mod storage;
 
@@ -9,5 +10,6 @@ pub use capture::{
     hide_capture_overlay, list_monitors_command, list_windows_command, show_capture_overlay,
 };
 pub use export::export_image;
+pub use overlay_layout::get_overlay_webview_layout;
 pub use redaction::detect_sensitive_data;
 pub use storage::{get_setting, set_setting};

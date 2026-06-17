@@ -13,7 +13,7 @@ mod tray;
 use commands::{
     cancel_capture_overlay, capture_fullscreen, capture_overlay_ready, capture_region,
     capture_window, detect_sensitive_data, export_image, get_capture_overlay_bounds, get_setting,
-    get_window_at_point_command, hide_capture_overlay, list_monitors_command,
+    get_window_at_point_command, get_overlay_webview_layout, hide_capture_overlay, list_monitors_command,
     list_windows_command, set_setting, show_capture_overlay,
 };
 use shortcuts::{
@@ -27,8 +27,14 @@ use test_support::{
 };
 use tauri::{Manager, WindowEvent};
 
+#[cfg(target_os = "windows")]
+mod windows_dpi;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    #[cfg(target_os = "windows")]
+    windows_dpi::ensure_per_monitor_awareness();
+
     tauri::Builder::default()
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -73,6 +79,7 @@ pub fn run() {
             list_windows_command,
             get_window_at_point_command,
             get_capture_overlay_bounds,
+            get_overlay_webview_layout,
             show_capture_overlay,
             capture_overlay_ready,
             hide_capture_overlay,

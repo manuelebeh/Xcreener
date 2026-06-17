@@ -1,6 +1,6 @@
 use crate::capture::{
     capture_desktop_preview, get_overlay_bounds, list_monitors, CaptureOverlayBounds,
-    CaptureOverlayInitPayload, MonitorInfo,
+    CaptureOverlayInitPayload, MonitorInfo, OverlayWebviewLayout,
 };
 use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{AppHandle, Emitter, LogicalPosition, LogicalSize, Manager, Position, Size};
@@ -24,8 +24,20 @@ fn clear_overlay_pending() {
     OVERLAY_AWAITING_READY.store(false, Ordering::SeqCst);
 }
 
-fn present_overlay_window(overlay: &tauri::WebviewWindow) -> Result<(), String> {
+fn present_overlay_window(
+    overlay: &tauri::WebviewWindow,
+    bounds: &CaptureOverlayBounds,
+    monitors: &[MonitorInfo],
+) -> Result<(), String> {
+    #[cfg(target_os = "windows")]
+    overlay_windows::refresh_dpi_if_changed(overlay, bounds, monitors)?;
+
+    sync_overlay_geometry(overlay, bounds, monitors)?;
+
     overlay.show().map_err(|error| error.to_string())?;
+
+    // WebView2 applies DPI/bounds correctly only after one visible layout pass.
+    sync_overlay_geometry(overlay, bounds, monitors)?;
 
     #[cfg(target_os = "macos")]
     overlay_macos::present_overlay_window(overlay).map_err(|error| error.to_string())?;
@@ -35,18 +47,41 @@ fn present_overlay_window(overlay: &tauri::WebviewWindow) -> Result<(), String> 
         let _ = overlay.set_focus();
     }
 
+    if let Ok(layout) = read_overlay_webview_layout_from_window(overlay) {
+        let _ = overlay.emit("capture-overlay-presented", layout);
+    }
+
     Ok(())
+}
+
+pub fn read_overlay_webview_layout(app: &AppHandle) -> Result<OverlayWebviewLayout, String> {
+    let overlay = app
+        .get_webview_window(OVERLAY_LABEL)
+        .ok_or_else(|| "capture overlay window not found".to_string())?;
+
+    read_overlay_webview_layout_from_window(&overlay)
+}
+
+fn read_overlay_webview_layout_from_window(
+    overlay: &tauri::WebviewWindow,
+) -> Result<OverlayWebviewLayout, String> {
+    let scale = overlay.scale_factor().map_err(|error| error.to_string())?;
+    let size = overlay.inner_size().map_err(|error| error.to_string())?;
+
+    Ok(OverlayWebviewLayout {
+        scale_factor: scale,
+        inner_width: size.width as f64 / scale,
+        inner_height: size.height as f64 / scale,
+    })
 }
 
 fn sync_overlay_geometry(
     overlay: &tauri::WebviewWindow,
     bounds: &CaptureOverlayBounds,
+    _monitors: &[MonitorInfo],
 ) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     overlay_macos::configure_overlay_window(overlay)?;
-
-    #[cfg(target_os = "windows")]
-    overlay_windows::configure_overlay_window(overlay)?;
 
     overlay
         .set_position(Position::Logical(LogicalPosition::new(
@@ -61,6 +96,9 @@ fn sync_overlay_geometry(
         )))
         .map_err(|error| error.to_string())?;
 
+    #[cfg(target_os = "windows")]
+    overlay_windows::configure_overlay_window(overlay)?;
+
     Ok(())
 }
 
@@ -73,20 +111,21 @@ pub fn setup_overlay_window(app: &AppHandle) -> Result<(), Box<dyn std::error::E
     overlay_macos::configure_overlay_window(&overlay)
         .map_err(|error| -> Box<dyn std::error::Error> { error.into() })?;
 
-    #[cfg(target_os = "windows")]
-    overlay_windows::configure_overlay_window(&overlay)
-        .map_err(|error| -> Box<dyn std::error::Error> { error.into() })?;
-
     // Prime geometry while hidden so the first capture session starts aligned.
     if let Ok(bounds) = get_overlay_bounds() {
-        let _ = sync_overlay_geometry(&overlay, &bounds);
+        if let Ok(monitors) = list_monitors() {
+            let _ = sync_overlay_geometry(&overlay, &bounds, &monitors);
 
-        #[cfg(target_os = "macos")]
-        {
-            // macOS borderless windows need one show/hide cycle for stable insets.
-            let _ = overlay.show();
-            let _ = sync_overlay_geometry(&overlay, &bounds);
-            let _ = overlay.hide();
+            #[cfg(target_os = "windows")]
+            overlay_windows::seed_layout_fingerprint(&overlay, &bounds, &monitors);
+
+            #[cfg(target_os = "macos")]
+            {
+                // macOS borderless windows need one show/hide cycle for stable insets.
+                let _ = overlay.show();
+                let _ = sync_overlay_geometry(&overlay, &bounds, &monitors);
+                let _ = overlay.hide();
+            }
         }
     }
 
@@ -128,7 +167,7 @@ fn show_prepared_overlay(
 
     let _ = overlay.hide();
 
-    sync_overlay_geometry(&overlay, &bounds)?;
+    sync_overlay_geometry(&overlay, &bounds, &monitors)?;
 
     overlay
         .emit(
@@ -137,6 +176,7 @@ fn show_prepared_overlay(
                 bounds: bounds.clone(),
                 monitors,
                 preview_png,
+                webview_layout: None,
             },
         )
         .map_err(|error| error.to_string())?;
@@ -155,15 +195,24 @@ pub fn present_capture_overlay(app: &AppHandle) -> Result<(), String> {
         .get_webview_window(OVERLAY_LABEL)
         .ok_or_else(|| "capture overlay window not found".to_string())?;
 
-    present_overlay_window(&overlay)
+    let bounds = get_overlay_bounds().map_err(|error| error.into_message())?;
+    let monitors = list_monitors().map_err(|error| error.into_message())?;
+
+    present_overlay_window(&overlay, &bounds, &monitors)
 }
 
-pub fn dismiss_capture_overlay(app: &AppHandle) -> Result<(), String> {
+pub fn hide_capture_overlay_only(app: &AppHandle) -> Result<(), String> {
     clear_overlay_pending();
 
     if let Some(overlay) = app.get_webview_window(OVERLAY_LABEL) {
         overlay.hide().map_err(|error| error.to_string())?;
     }
+
+    Ok(())
+}
+
+pub fn dismiss_capture_overlay(app: &AppHandle) -> Result<(), String> {
+    hide_capture_overlay_only(app)?;
 
     if let Some(main_window) = app.get_webview_window("main") {
         main_window.show().map_err(|error| error.to_string())?;

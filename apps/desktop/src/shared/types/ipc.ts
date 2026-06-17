@@ -40,6 +40,13 @@ export interface CaptureOverlayInitPayload {
   bounds: CaptureOverlayBounds;
   monitors: MonitorInfo[];
   previewPng: number[];
+  webviewLayout?: OverlayWebviewLayout;
+}
+
+export interface OverlayWebviewLayout {
+  scaleFactor: number;
+  innerWidth: number;
+  innerHeight: number;
 }
 
 export interface SensitiveRegion {
