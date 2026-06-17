@@ -60,24 +60,39 @@ export async function decodePngBytesToBitmap(bytes: Uint8Array | number[]): Prom
 
 export async function cropObjectUrlToPngBytes(
   objectUrl: string,
-  rect: { x: number; y: number; width: number; height: number }
+  rect: { x: number; y: number; width: number; height: number },
+  displaySize?: { width: number; height: number }
 ): Promise<{ bytes: number[]; width: number; height: number }> {
   const image = await loadImage(objectUrl);
-  const x = Math.round(rect.x);
-  const y = Math.round(rect.y);
-  const width = Math.round(rect.width);
-  const height = Math.round(rect.height);
+  const displayWidth = displaySize?.width ?? image.width;
+  const displayHeight = displaySize?.height ?? image.height;
+  const scaleX = image.naturalWidth / displayWidth;
+  const scaleY = image.naturalHeight / displayHeight;
+  const sourceX = Math.round(rect.x * scaleX);
+  const sourceY = Math.round(rect.y * scaleY);
+  const sourceWidth = Math.round(rect.width * scaleX);
+  const sourceHeight = Math.round(rect.height * scaleY);
 
   const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = sourceWidth;
+  canvas.height = sourceHeight;
 
   const context = canvas.getContext('2d');
   if (!context) {
     throw new Error('Canvas is not supported');
   }
 
-  context.drawImage(image, x, y, width, height, 0, 0, width, height);
+  context.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    0,
+    0,
+    sourceWidth,
+    sourceHeight
+  );
 
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((value) => {
@@ -92,8 +107,8 @@ export async function cropObjectUrlToPngBytes(
   const buffer = await blob.arrayBuffer();
   return {
     bytes: Array.from(new Uint8Array(buffer)),
-    width,
-    height,
+    width: sourceWidth,
+    height: sourceHeight,
   };
 }
 

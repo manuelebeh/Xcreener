@@ -4,7 +4,7 @@ use crate::capture::{
     list_windows, CaptureOverlayBounds, MonitorInfo, WindowInfo,
 };
 use crate::overlay;
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
 
 #[tauri::command]
 pub async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>, String> {
@@ -42,22 +42,18 @@ pub async fn get_capture_overlay_bounds() -> Result<CaptureOverlayBounds, String
 }
 
 #[tauri::command]
+pub async fn capture_overlay_ready(app: AppHandle) -> Result<(), String> {
+    overlay::present_capture_overlay(&app)
+}
+
+#[tauri::command]
 pub async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> {
     overlay::open_capture_overlay(&app)
 }
 
 #[tauri::command]
 pub async fn hide_capture_overlay(app: AppHandle) -> Result<(), String> {
-    if let Some(overlay) = app.get_webview_window("capture-overlay") {
-        overlay.hide().map_err(|error| error.to_string())?;
-    }
-
-    if let Some(main_window) = app.get_webview_window("main") {
-        main_window.show().map_err(|error| error.to_string())?;
-        main_window.set_focus().map_err(|error| error.to_string())?;
-    }
-
-    Ok(())
+    overlay::dismiss_capture_overlay(&app)
 }
 
 #[tauri::command]

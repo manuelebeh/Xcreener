@@ -4,13 +4,15 @@ mod overlay;
 mod redaction;
 #[cfg(target_os = "macos")]
 mod overlay_macos;
+#[cfg(target_os = "windows")]
+mod overlay_windows;
 mod shortcuts;
 mod test_support;
 mod tray;
 
 use commands::{
-    cancel_capture_overlay, capture_fullscreen, capture_region, capture_window,
-    detect_sensitive_data, export_image, get_capture_overlay_bounds, get_setting,
+    cancel_capture_overlay, capture_fullscreen, capture_overlay_ready, capture_region,
+    capture_window, detect_sensitive_data, export_image, get_capture_overlay_bounds, get_setting,
     get_window_at_point_command, hide_capture_overlay, list_monitors_command,
     list_windows_command, set_setting, show_capture_overlay,
 };
@@ -72,6 +74,7 @@ pub fn run() {
             get_window_at_point_command,
             get_capture_overlay_bounds,
             show_capture_overlay,
+            capture_overlay_ready,
             hide_capture_overlay,
             cancel_capture_overlay,
             export_image,

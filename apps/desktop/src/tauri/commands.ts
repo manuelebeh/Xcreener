@@ -46,6 +46,10 @@ export function showCaptureOverlay() {
   return invoke<CaptureOverlayBounds>('show_capture_overlay');
 }
 
+export function captureOverlayReady() {
+  return invoke<void>('capture_overlay_ready');
+}
+
 export function hideCaptureOverlay() {
   return invoke<void>('hide_capture_overlay');
 }
