@@ -61,19 +61,22 @@ export function CaptureOverlay() {
 
   const finishPreviewCrop = useCallback(
     async (rect: Rect) => {
-      if (!previewUrl) {
+      if (!previewUrl || !bounds) {
         return;
       }
 
       setError(null);
       try {
-        const cropped = await cropObjectUrlToPngBytes(previewUrl, rect);
+        const cropped = await cropObjectUrlToPngBytes(previewUrl, rect, {
+          width: bounds.width,
+          height: bounds.height,
+        });
         await finishCapture(cropped.bytes);
       } catch (failure) {
         await handleCaptureFailure(failure);
       }
     },
-    [finishCapture, handleCaptureFailure, previewUrl, setError]
+    [bounds, finishCapture, handleCaptureFailure, previewUrl, setError]
   );
 
   const handleCancel = useCallback(async () => {
@@ -186,6 +189,52 @@ export function CaptureOverlay() {
   );
 
   useEffect(() => {
+    if (!bounds) {
+      return;
+    }
+
+    const { width, height } = bounds;
+    const html = document.documentElement;
+    const body = document.body;
+    const root = document.getElementById('root');
+
+    const previous = {
+      htmlWidth: html.style.width,
+      htmlHeight: html.style.height,
+      bodyWidth: body.style.width,
+      bodyHeight: body.style.height,
+      bodyMargin: body.style.margin,
+      bodyOverflow: body.style.overflow,
+      rootWidth: root?.style.width ?? '',
+      rootHeight: root?.style.height ?? '',
+    };
+
+    html.style.width = `${width}px`;
+    html.style.height = `${height}px`;
+    body.style.width = `${width}px`;
+    body.style.height = `${height}px`;
+    body.style.margin = '0';
+    body.style.overflow = 'hidden';
+    if (root) {
+      root.style.width = `${width}px`;
+      root.style.height = `${height}px`;
+    }
+
+    return () => {
+      html.style.width = previous.htmlWidth;
+      html.style.height = previous.htmlHeight;
+      body.style.width = previous.bodyWidth;
+      body.style.height = previous.bodyHeight;
+      body.style.margin = previous.bodyMargin;
+      body.style.overflow = previous.bodyOverflow;
+      if (root) {
+        root.style.width = previous.rootWidth;
+        root.style.height = previous.rootHeight;
+      }
+    };
+  }, [bounds]);
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         void handleCancel();
@@ -223,8 +272,12 @@ export function CaptureOverlay() {
       data-testid="capture-overlay"
       role="application"
       aria-label="Screen capture overlay"
-      className="relative h-screen w-screen overflow-hidden text-white"
-      style={overlayCursor ? { cursor: overlayCursor } : undefined}
+      className="relative overflow-hidden text-white"
+      style={{
+        width: bounds.width,
+        height: bounds.height,
+        ...(overlayCursor ? { cursor: overlayCursor } : {}),
+      }}
       onPointerMove={handlePointerMove}
       onClick={
         activeMode === 'window' || activeMode === 'fullscreen' ? handleTargetClick : undefined
