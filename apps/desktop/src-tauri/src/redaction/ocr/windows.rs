@@ -1,8 +1,7 @@
 use image::{ImageBuffer, Rgba};
-use windows::core::HSTRING;
-use windows::Graphics::Imaging::{BitmapAlphaMode, BitmapPixelFormat, SoftwareBitmap};
-use windows::Media::Ocr::OcrEngine;
-use windows::Storage::Streams::{DataWriter, InMemoryRandomAccessStream};
+use windows::Graphics::Imaging::{BitmapPixelFormat, SoftwareBitmap};
+use windows::Media::Ocr::OcrEngine as WinOcrEngine;
+use windows::Storage::Streams::{DataWriter, InMemoryRandomAccessStream, IBuffer};
 
 use super::OcrEngine;
 use crate::redaction::types::TextLine;
@@ -20,11 +19,10 @@ impl OcrEngine for WindowsOcrEngine {
             BitmapPixelFormat::Rgba8,
             image_width as i32,
             image_height as i32,
-            BitmapAlphaMode::Premultiplied,
         )
         .map_err(|error| error.to_string())?;
 
-        let engine = OcrEngine::TryCreateFromUserProfileLanguages()
+        let engine = WinOcrEngine::TryCreateFromUserProfileLanguages()
             .map_err(|error| error.to_string())?;
 
         let result = engine
@@ -46,24 +44,28 @@ impl OcrEngine for WindowsOcrEngine {
                 }
 
                 if let Ok(words) = line.Words() {
-                    if let Ok(first) = words.First() {
-                        if let Ok(last) = words.Last() {
-                            if let (Ok(first_bbox), Ok(last_bbox)) =
-                                (first.BoundingRect(), last.BoundingRect())
+                    if let Ok(size) = words.Size() {
+                        if size > 0 {
+                            if let (Ok(first), Ok(last)) =
+                                (words.GetAt(0), words.GetAt(size - 1))
                             {
-                                let x = first_bbox.X as f64;
-                                let y = first_bbox.Y as f64;
-                                let width =
-                                    (last_bbox.X + last_bbox.Width - first_bbox.X) as f64;
-                                let height = first_bbox.Height as f64;
-                                lines.push(TextLine {
-                                    text,
-                                    x,
-                                    y,
-                                    width,
-                                    height,
-                                });
-                                continue;
+                                if let (Ok(first_bbox), Ok(last_bbox)) =
+                                    (first.BoundingRect(), last.BoundingRect())
+                                {
+                                    let x = first_bbox.X as f64;
+                                    let y = first_bbox.Y as f64;
+                                    let width =
+                                        (last_bbox.X + last_bbox.Width - first_bbox.X) as f64;
+                                    let height = first_bbox.Height as f64;
+                                    lines.push(TextLine {
+                                        text,
+                                        x,
+                                        y,
+                                        width,
+                                        height,
+                                    });
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -83,7 +85,7 @@ impl OcrEngine for WindowsOcrEngine {
     }
 }
 
-fn rgba_to_buffer(rgba: &ImageBuffer<Rgba<u8>, Vec<u8>>) -> Result<windows::Storage::Streams::IBuffer, String> {
+fn rgba_to_buffer(rgba: &ImageBuffer<Rgba<u8>, Vec<u8>>) -> Result<IBuffer, String> {
     let stream = InMemoryRandomAccessStream::new().map_err(|error| error.to_string())?;
     let writer = DataWriter::CreateDataWriter(&stream).map_err(|error| error.to_string())?;
     writer
@@ -94,16 +96,5 @@ fn rgba_to_buffer(rgba: &ImageBuffer<Rgba<u8>, Vec<u8>>) -> Result<windows::Stor
         .map_err(|error| error.to_string())?
         .get()
         .map_err(|error| error.to_string())?;
-    writer.FlushAsync().map_err(|error| error.to_string())?;
-    stream
-        .GetInputStreamAt(0)
-        .map_err(|error| error.to_string())?
-        .ReadAsync(
-            writer.DetachBuffer().map_err(|error| error.to_string())?,
-            writer.UnconsumedBufferLength().map_err(|error| error.to_string())?,
-            windows::Storage::Streams::InputStreamOptions::None,
-        )
-        .map_err(|error| error.to_string())?
-        .get()
-        .map_err(|error| error.to_string())
+    writer.DetachBuffer().map_err(|error| error.to_string())
 }
