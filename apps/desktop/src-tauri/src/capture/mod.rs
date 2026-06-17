@@ -1,10 +1,12 @@
 mod types;
 mod validate;
 
+#[cfg(target_os = "windows")]
 pub mod platform;
 
 pub use types::{
-    CaptureOverlayBounds, CaptureOverlayInitPayload, MonitorInfo, Rect, WindowInfo,
+    CaptureOverlayBounds, CaptureOverlayInitPayload, MonitorInfo, OverlayWebviewLayout, Rect,
+    WindowInfo,
 };
 pub use validate::{validate_monitor_id, validate_region, validate_window_id};
 
@@ -164,6 +166,14 @@ pub(crate) fn find_monitor_for_region<'a>(
     })
 }
 
+fn normalize_monitor_image(image: RgbaImage, width: u32, height: u32) -> RgbaImage {
+    if image.width() == width && image.height() == height {
+        image
+    } else {
+        imageops::resize(&image, width, height, imageops::FilterType::Triangle)
+    }
+}
+
 pub fn capture_desktop_preview() -> Result<Vec<u8>, CaptureError> {
     let monitors = list_monitors()?;
     let bounds = get_overlay_bounds()?;
@@ -173,8 +183,6 @@ pub fn capture_desktop_preview() -> Result<Vec<u8>, CaptureError> {
     }
 
     let mut canvas = RgbaImage::new(bounds.width, bounds.height);
-    #[cfg(not(target_os = "windows"))]
-    let xcap_monitors = Monitor::all().map_err(map_xcap_error)?;
 
     for monitor_info in &monitors {
         let monitor_image = {
@@ -184,22 +192,15 @@ pub fn capture_desktop_preview() -> Result<Vec<u8>, CaptureError> {
             }
             #[cfg(not(target_os = "windows"))]
             {
+                let xcap_monitors = Monitor::all().map_err(map_xcap_error)?;
                 let xcap_monitor = xcap_monitors
                     .get(monitor_info.id as usize)
                     .ok_or(CaptureError::DisplayNotFound(monitor_info.id))?;
-                let monitor_image = xcap_monitor.capture_image().map_err(map_xcap_error)?;
-                if monitor_image.width() == monitor_info.width
-                    && monitor_image.height() == monitor_info.height
-                {
-                    monitor_image
-                } else {
-                    imageops::resize(
-                        &monitor_image,
-                        monitor_info.width,
-                        monitor_info.height,
-                        imageops::FilterType::Triangle,
-                    )
-                }
+                normalize_monitor_image(
+                    xcap_monitor.capture_image().map_err(map_xcap_error)?,
+                    monitor_info.width,
+                    monitor_info.height,
+                )
             }
         };
         let dest_x = monitor_info.x - bounds.x;
@@ -225,29 +226,20 @@ pub fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>
     };
     validate_region(&region, &monitors)?;
 
-    let image = {
-        #[cfg(target_os = "windows")]
-        {
-            platform::capture_screen_region(&region)?
-        }
-        #[cfg(not(target_os = "windows"))]
-        {
-            let monitor = find_monitor_for_region(&monitors, &region)
-                .or(monitors.first())
-                .ok_or(CaptureError::NoDisplays)?;
+    let monitor = find_monitor_for_region(&monitors, &region)
+        .or(monitors.first())
+        .ok_or(CaptureError::NoDisplays)?;
 
-            let xcap_monitors = Monitor::all().map_err(map_xcap_error)?;
-            let xcap_monitor = xcap_monitors
-                .get(monitor.id as usize)
-                .ok_or(CaptureError::DisplayNotFound(monitor.id))?;
+    let xcap_monitors = Monitor::all().map_err(map_xcap_error)?;
+    let xcap_monitor = xcap_monitors
+        .get(monitor.id as usize)
+        .ok_or(CaptureError::DisplayNotFound(monitor.id))?;
 
-            let rel_x = (region.x - monitor.x).max(0) as u32;
-            let rel_y = (region.y - monitor.y).max(0) as u32;
-            xcap_monitor
-                .capture_region(rel_x, rel_y, region.width, region.height)
-                .map_err(map_xcap_error)?
-        }
-    };
+    let rel_x = (region.x - monitor.x).max(0) as u32;
+    let rel_y = (region.y - monitor.y).max(0) as u32;
+    let image = xcap_monitor
+        .capture_region(rel_x, rel_y, region.width, region.height)
+        .map_err(map_xcap_error)?;
 
     encode_png(image.as_raw(), image.width(), image.height())
 }
@@ -278,20 +270,15 @@ pub fn capture_fullscreen(display_id: u32) -> Result<Vec<u8>, CaptureError> {
         .get(display_id as usize)
         .ok_or(CaptureError::DisplayNotFound(display_id))?;
 
-    let image = {
-        #[cfg(target_os = "windows")]
-        {
-            platform::capture_monitor_image(monitor_info)?
-        }
-        #[cfg(not(target_os = "windows"))]
-        {
-            let xcap_monitors = Monitor::all().map_err(map_xcap_error)?;
-            let monitor = xcap_monitors
-                .get(display_id as usize)
-                .ok_or(CaptureError::DisplayNotFound(display_id))?;
-            monitor.capture_image().map_err(map_xcap_error)?
-        }
-    };
+    let xcap_monitors = Monitor::all().map_err(map_xcap_error)?;
+    let monitor = xcap_monitors
+        .get(display_id as usize)
+        .ok_or(CaptureError::DisplayNotFound(display_id))?;
+    let image = normalize_monitor_image(
+        monitor.capture_image().map_err(map_xcap_error)?,
+        monitor_info.width,
+        monitor_info.height,
+    );
 
     encode_png(image.as_raw(), image.width(), image.height())
 }

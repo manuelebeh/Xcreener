@@ -58,5 +58,5 @@ pub async fn hide_capture_overlay(app: AppHandle) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn cancel_capture_overlay(app: AppHandle) -> Result<(), String> {
-    hide_capture_overlay(app).await
+    overlay::hide_capture_overlay_only(&app)
 }

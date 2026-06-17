@@ -1,10 +1,18 @@
 import { emit } from '@tauri-apps/api/event';
-import { useCallback, useEffect } from 'react';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+import { useCallback, useEffect, useState } from 'react';
 import type { CaptureMode, Rect } from '@/shared/types/ipc';
 import { cropObjectUrlToPngBytes, getImageDimensionsFromPng } from '@/shared/utils/image';
 import { cancelCaptureOverlay, getWindowAtPoint, hideCaptureOverlay } from '@/tauri/commands';
 import { captureOverlayCursor } from '../captureCursors';
+import { captureToolbarContainerStyle, captureToolbarStyle } from '../captureToolbarPlacement';
 import { findMonitorAtPoint } from '../findMonitorAtPoint';
+import {
+  clientToBounds,
+  getOverlayViewport,
+  type OverlayViewport,
+  viewportRectToBounds,
+} from '../overlayCoordinates';
 import { useCaptureStore } from '../store';
 import { toOverlayRect } from '../toOverlayRect';
 import { CaptureToolbar } from './CaptureToolbar';
@@ -29,6 +37,7 @@ export function CaptureOverlay() {
   const activeMode = useCaptureStore((s) => s.activeMode);
   const bounds = useCaptureStore((s) => s.bounds);
   const monitors = useCaptureStore((s) => s.monitors);
+  const webviewLayout = useCaptureStore((s) => s.webviewLayout);
   const hoveredWindow = useCaptureStore((s) => s.hoveredWindow);
   const hoveredMonitor = useCaptureStore((s) => s.hoveredMonitor);
   const previewUrl = useCaptureStore((s) => s.previewUrl);
@@ -40,6 +49,67 @@ export function CaptureOverlay() {
   const setHoveredMonitor = useCaptureStore((s) => s.setHoveredMonitor);
   const setError = useCaptureStore((s) => s.setError);
   const reset = useCaptureStore((s) => s.reset);
+  const [revealed, setRevealed] = useState(false);
+  const [viewport, setViewport] = useState<OverlayViewport>(() =>
+    getOverlayViewport(bounds, monitors, { webviewLayout })
+  );
+
+  useEffect(() => {
+    setRevealed(false);
+  }, [bounds, previewUrl]);
+
+  useEffect(() => {
+    if (!webviewLayout) {
+      return;
+    }
+
+    let innerFrame = 0;
+    const outerFrame = requestAnimationFrame(() => {
+      setViewport(getOverlayViewport(bounds, monitors, { webviewLayout }));
+      innerFrame = requestAnimationFrame(() => setRevealed(true));
+    });
+
+    return () => {
+      cancelAnimationFrame(outerFrame);
+      cancelAnimationFrame(innerFrame);
+    };
+  }, [webviewLayout, bounds, monitors]);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setViewport(getOverlayViewport(bounds, monitors, { webviewLayout }));
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+
+    let cancelled = false;
+    void getCurrentWebviewWindow()
+      .scaleFactor()
+      .then((scaleFactor) => {
+        if (cancelled || scaleFactor <= 1.01) {
+          return;
+        }
+
+        setViewport(
+          getOverlayViewport(bounds, monitors, {
+            webviewLayout: {
+              scaleFactor,
+              innerWidth: window.innerWidth,
+              innerHeight: window.innerHeight,
+            },
+          })
+        );
+      })
+      .catch(() => {
+        // Not running inside Tauri — tests and storybook.
+      });
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('resize', updateViewport);
+    };
+  }, [bounds, monitors, webviewLayout]);
 
   const finishCapture = useCallback(
     async (bytes: number[]) => {
@@ -68,15 +138,23 @@ export function CaptureOverlay() {
       setError(null);
       try {
         const cropped = await cropObjectUrlToPngBytes(previewUrl, rect, {
-          width: bounds.width,
-          height: bounds.height,
+          width: viewport.width,
+          height: viewport.height,
         });
         await finishCapture(cropped.bytes);
       } catch (failure) {
         await handleCaptureFailure(failure);
       }
     },
-    [bounds, finishCapture, handleCaptureFailure, previewUrl, setError]
+    [
+      bounds,
+      finishCapture,
+      handleCaptureFailure,
+      previewUrl,
+      setError,
+      viewport.height,
+      viewport.width,
+    ]
   );
 
   const handleCancel = useCallback(async () => {
@@ -112,12 +190,12 @@ export function CaptureOverlay() {
   }, [hoveredMonitor, monitors]);
 
   const handleRegionConfirm = useCallback(() => {
-    if (!selection) {
+    if (!selection || !bounds) {
       return;
     }
 
-    void finishPreviewCrop(selection);
-  }, [finishPreviewCrop, selection]);
+    void finishPreviewCrop(viewportRectToBounds(selection, bounds, viewport));
+  }, [bounds, finishPreviewCrop, selection, viewport]);
 
   const handleWindowClick = useCallback(() => {
     if (!hoveredWindow || activeMode !== 'window' || !bounds) {
@@ -168,8 +246,9 @@ export function CaptureOverlay() {
         return;
       }
 
-      const screenX = event.clientX + bounds.x;
-      const screenY = event.clientY + bounds.y;
+      const point = clientToBounds(event.clientX, event.clientY, bounds, viewport);
+      const screenX = Math.round(point.x) + bounds.x;
+      const screenY = Math.round(point.y) + bounds.y;
 
       if (activeMode === 'window') {
         try {
@@ -185,7 +264,7 @@ export function CaptureOverlay() {
         setHoveredMonitor(findMonitorAtPoint(monitors, screenX, screenY));
       }
     },
-    [activeMode, bounds, monitors, setHoveredMonitor, setHoveredWindow]
+    [activeMode, bounds, monitors, setHoveredMonitor, setHoveredWindow, viewport]
   );
 
   useEffect(() => {
@@ -193,7 +272,6 @@ export function CaptureOverlay() {
       return;
     }
 
-    const { width, height } = bounds;
     const html = document.documentElement;
     const body = document.body;
     const root = document.getElementById('root');
@@ -201,32 +279,38 @@ export function CaptureOverlay() {
     const previous = {
       htmlWidth: html.style.width,
       htmlHeight: html.style.height,
+      htmlBackground: html.style.background,
       bodyWidth: body.style.width,
       bodyHeight: body.style.height,
       bodyMargin: body.style.margin,
       bodyOverflow: body.style.overflow,
+      bodyBackground: body.style.background,
       rootWidth: root?.style.width ?? '',
       rootHeight: root?.style.height ?? '',
     };
 
-    html.style.width = `${width}px`;
-    html.style.height = `${height}px`;
-    body.style.width = `${width}px`;
-    body.style.height = `${height}px`;
+    html.style.width = '100%';
+    html.style.height = '100%';
+    html.style.background = 'transparent';
+    body.style.width = '100%';
+    body.style.height = '100%';
     body.style.margin = '0';
     body.style.overflow = 'hidden';
+    body.style.background = 'transparent';
     if (root) {
-      root.style.width = `${width}px`;
-      root.style.height = `${height}px`;
+      root.style.width = '100%';
+      root.style.height = '100%';
     }
 
     return () => {
       html.style.width = previous.htmlWidth;
       html.style.height = previous.htmlHeight;
+      html.style.background = previous.htmlBackground;
       body.style.width = previous.bodyWidth;
       body.style.height = previous.bodyHeight;
       body.style.margin = previous.bodyMargin;
       body.style.overflow = previous.bodyOverflow;
+      body.style.background = previous.bodyBackground;
       if (root) {
         root.style.width = previous.rootWidth;
         root.style.height = previous.rootHeight;
@@ -264,18 +348,19 @@ export function CaptureOverlay() {
     (activeMode === 'region' && !selection) ||
     (activeMode === 'fullscreen' && !resolveFullscreenMonitor());
 
-  const boundsOffset = { x: bounds.x, y: bounds.y };
   const overlayCursor = captureOverlayCursor(activeMode);
+  const toolbarContainerStyle = captureToolbarContainerStyle(bounds, monitors, viewport);
+  const toolbarStyle = captureToolbarStyle();
 
   return (
     <div
       data-testid="capture-overlay"
       role="application"
       aria-label="Screen capture overlay"
-      className="relative overflow-hidden text-white"
+      className="relative h-full w-full overflow-hidden text-white"
       style={{
-        width: bounds.width,
-        height: bounds.height,
+        opacity: revealed ? 1 : 0,
+        pointerEvents: revealed ? 'auto' : 'none',
         ...(overlayCursor ? { cursor: overlayCursor } : {}),
       }}
       onPointerMove={handlePointerMove}
@@ -297,26 +382,14 @@ export function CaptureOverlay() {
           src={previewUrl}
           alt=""
           aria-hidden
-          className="pointer-events-none absolute inset-0 h-full w-full"
+          className="pointer-events-none absolute inset-0 h-full w-full object-fill"
           draggable={false}
         />
       ) : null}
       <div className="pointer-events-none absolute inset-0 z-[1] bg-black/25" />
 
-      <div className="relative z-10 h-full w-full">
-        {activeMode === 'region' ? (
-          <RegionSelector selection={selection} onSelectionChange={setSelection} />
-        ) : null}
-
-        {activeMode === 'window' ? (
-          <WindowHighlight window={hoveredWindow} boundsOffset={boundsOffset} />
-        ) : null}
-
-        {activeMode === 'fullscreen' ? (
-          <MonitorHighlight monitor={hoveredMonitor} boundsOffset={boundsOffset} />
-        ) : null}
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
+      <div style={toolbarContainerStyle}>
+        <div style={toolbarStyle}>
           <CaptureToolbar
             activeMode={activeMode}
             onModeChange={handleModeChange}
@@ -325,6 +398,20 @@ export function CaptureOverlay() {
             confirmDisabled={confirmDisabled}
           />
         </div>
+      </div>
+
+      <div className="relative z-10 h-full w-full">
+        {activeMode === 'region' ? (
+          <RegionSelector selection={selection} onSelectionChange={setSelection} />
+        ) : null}
+
+        {activeMode === 'window' ? (
+          <WindowHighlight window={hoveredWindow} bounds={bounds} viewport={viewport} />
+        ) : null}
+
+        {activeMode === 'fullscreen' ? (
+          <MonitorHighlight monitor={hoveredMonitor} bounds={bounds} viewport={viewport} />
+        ) : null}
 
         {error ? (
           <div
