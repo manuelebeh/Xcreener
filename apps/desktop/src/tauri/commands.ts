@@ -50,6 +50,10 @@ export function captureOverlayReady() {
   return invoke<void>('capture_overlay_ready');
 }
 
+export function getOverlayWebviewLayout() {
+  return invoke<import('@/shared/types/ipc').OverlayWebviewLayout>('get_overlay_webview_layout');
+}
+
 export function hideCaptureOverlay() {
   return invoke<void>('hide_capture_overlay');
 }

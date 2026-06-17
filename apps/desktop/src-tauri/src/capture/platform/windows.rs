@@ -1,4 +1,4 @@
-use crate::capture::{CaptureError, MonitorInfo, Rect};
+use crate::capture::{CaptureError, MonitorInfo};
 use image::{imageops, RgbaImage};
 use windows::Win32::Graphics::Gdi::{
     BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, GetDIBits,
@@ -48,17 +48,7 @@ fn gdi_capture_area(x: i32, y: i32, width: i32, height: i32) -> Result<RgbaImage
 
         let previous_object = SelectObject(hdc_mem, HGDIOBJ::from(h_bitmap));
 
-        let blit_result = BitBlt(
-            hdc_mem,
-            0,
-            0,
-            width,
-            height,
-            hdc_screen,
-            x,
-            y,
-            SRCCOPY,
-        );
+        let blit_result = BitBlt(hdc_mem, 0, 0, width, height, hdc_screen, x, y, SRCCOPY);
 
         if let Err(error) = blit_result {
             let _ = SelectObject(hdc_mem, previous_object);
@@ -115,35 +105,23 @@ fn downscale_to_logical(image: RgbaImage, width: u32, height: u32) -> RgbaImage 
     imageops::resize(&image, width, height, imageops::FilterType::Triangle)
 }
 
+/// Capture one monitor for the frozen desktop preview.
+///
+/// xcap monitor metadata is in logical virtual-screen coordinates while GDI BitBlt uses
+/// physical pixels — always scale before capture, then downsample to logical size.
 pub fn capture_monitor_image(monitor_info: &MonitorInfo) -> Result<RgbaImage, CaptureError> {
     let scale = monitor_info.scale_factor;
-    let x = logical_to_physical_i32(monitor_info.x, scale);
-    let y = logical_to_physical_i32(monitor_info.y, scale);
-    let width = logical_to_physical_i32(monitor_info.width as i32, scale);
-    let height = logical_to_physical_i32(monitor_info.height as i32, scale);
-
-    let captured = gdi_capture_area(x, y, width, height)?;
+    let captured = gdi_capture_area(
+        logical_to_physical_i32(monitor_info.x, scale),
+        logical_to_physical_i32(monitor_info.y, scale),
+        logical_to_physical_i32(monitor_info.width as i32, scale),
+        logical_to_physical_i32(monitor_info.height as i32, scale),
+    )?;
     Ok(downscale_to_logical(
         captured,
         monitor_info.width,
         monitor_info.height,
     ))
-}
-
-pub fn capture_screen_region(region: &Rect) -> Result<RgbaImage, CaptureError> {
-    let monitors = crate::capture::list_monitors()?;
-    let monitor = crate::capture::find_monitor_for_region(&monitors, region)
-        .or(monitors.first())
-        .ok_or(CaptureError::NoDisplays)?;
-
-    let scale = monitor.scale_factor;
-    let x = logical_to_physical_i32(region.x, scale);
-    let y = logical_to_physical_i32(region.y, scale);
-    let width = logical_to_physical_i32(region.width as i32, scale);
-    let height = logical_to_physical_i32(region.height as i32, scale);
-
-    let captured = gdi_capture_area(x, y, width, height)?;
-    Ok(downscale_to_logical(captured, region.width, region.height))
 }
 
 #[cfg(test)]
