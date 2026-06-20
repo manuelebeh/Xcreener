@@ -10,6 +10,7 @@ import { findMonitorAtPoint } from '../findMonitorAtPoint';
 import {
   clientToBounds,
   getOverlayViewport,
+  isWindowsOverlay,
   type OverlayViewport,
   viewportRectToBounds,
 } from '../overlayCoordinates';
@@ -55,11 +56,15 @@ export function CaptureOverlay() {
   );
 
   useEffect(() => {
-    setRevealed(false);
+    if (isWindowsOverlay()) {
+      setRevealed(false);
+      return;
+    }
+    setRevealed(true);
   }, [bounds, previewUrl]);
 
   useEffect(() => {
-    if (!webviewLayout) {
+    if (!isWindowsOverlay() || !webviewLayout) {
       return;
     }
 

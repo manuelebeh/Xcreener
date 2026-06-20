@@ -182,20 +182,16 @@ fn show_prepared_overlay(
         )
         .map_err(|error| error.to_string())?;
 
-    #[cfg(target_os = "macos")]
-    {
-        // WKWebView does not run requestAnimationFrame while hidden, so the
-        // Windows two-phase present (frontend paints → capture_overlay_ready) never completes.
-        present_overlay_window(&overlay, &bounds, &[])?;
-    }
-
-    #[cfg(not(target_os = "macos"))]
     OVERLAY_AWAITING_READY.store(true, Ordering::SeqCst);
 
     Ok(bounds)
 }
 
 pub fn present_capture_overlay(app: &AppHandle) -> Result<(), String> {
+    dispatch_on_main_thread(app, present_capture_overlay_impl)
+}
+
+fn present_capture_overlay_impl(app: &AppHandle) -> Result<(), String> {
     if !OVERLAY_AWAITING_READY.swap(false, Ordering::SeqCst) {
         return Ok(());
     }
@@ -211,6 +207,10 @@ pub fn present_capture_overlay(app: &AppHandle) -> Result<(), String> {
 }
 
 pub fn hide_capture_overlay_only(app: &AppHandle) -> Result<(), String> {
+    dispatch_on_main_thread(app, hide_capture_overlay_only_impl)
+}
+
+fn hide_capture_overlay_only_impl(app: &AppHandle) -> Result<(), String> {
     clear_overlay_pending();
 
     if let Some(overlay) = app.get_webview_window(OVERLAY_LABEL) {
@@ -221,7 +221,11 @@ pub fn hide_capture_overlay_only(app: &AppHandle) -> Result<(), String> {
 }
 
 pub fn dismiss_capture_overlay(app: &AppHandle) -> Result<(), String> {
-    hide_capture_overlay_only(app)?;
+    dispatch_on_main_thread(app, dismiss_capture_overlay_impl)
+}
+
+fn dismiss_capture_overlay_impl(app: &AppHandle) -> Result<(), String> {
+    hide_capture_overlay_only_impl(app)?;
 
     if let Some(main_window) = app.get_webview_window("main") {
         main_window.show().map_err(|error| error.to_string())?;
@@ -231,22 +235,23 @@ pub fn dismiss_capture_overlay(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-fn dispatch_show_prepared_overlay(
-    app: &AppHandle,
-    prepared: PreparedOverlayOpen,
-) -> Result<CaptureOverlayBounds, String> {
+fn dispatch_on_main_thread<T, F>(app: &AppHandle, f: F) -> Result<T, String>
+where
+    T: Send + 'static,
+    F: FnOnce(&AppHandle) -> Result<T, String> + Send + 'static,
+{
     #[cfg(target_os = "macos")]
     {
         use objc2_foundation::MainThreadMarker;
 
         if MainThreadMarker::new().is_some() {
-            return show_prepared_overlay(app, prepared);
+            return f(app);
         }
 
         let (tx, rx) = std::sync::mpsc::sync_channel(1);
         let app_for_main = app.clone();
         app.run_on_main_thread(move || {
-            let _ = tx.send(show_prepared_overlay(&app_for_main, prepared));
+            let _ = tx.send(f(&app_for_main));
         })
         .map_err(|error| error.to_string())?;
 
@@ -254,7 +259,14 @@ fn dispatch_show_prepared_overlay(
     }
 
     #[cfg(not(target_os = "macos"))]
-    show_prepared_overlay(app, prepared)
+    f(app)
+}
+
+fn dispatch_show_prepared_overlay(
+    app: &AppHandle,
+    prepared: PreparedOverlayOpen,
+) -> Result<CaptureOverlayBounds, String> {
+    dispatch_on_main_thread(app, move |app| show_prepared_overlay(app, prepared))
 }
 
 pub fn open_capture_overlay(app: &AppHandle) -> Result<CaptureOverlayBounds, String> {
@@ -276,11 +288,13 @@ pub fn open_capture_overlay(app: &AppHandle) -> Result<CaptureOverlayBounds, Str
 }
 
 pub fn report_capture_failure(app: &AppHandle, message: &str) {
-    tray::show_main_window(app);
-    let _ = app.emit(
-        "capture-error",
-        CaptureErrorPayload {
-            message: message.to_string(),
-        },
-    );
+    let message = message.to_string();
+    let _ = dispatch_on_main_thread(app, move |app| {
+        tray::show_main_window(app);
+        app.emit(
+            "capture-error",
+            CaptureErrorPayload { message },
+        )
+        .map_err(|error| error.to_string())
+    });
 }
