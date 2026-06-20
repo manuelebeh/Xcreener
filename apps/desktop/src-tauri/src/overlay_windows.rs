@@ -2,7 +2,7 @@ use crate::capture::{CaptureOverlayBounds, MonitorInfo};
 use std::sync::Mutex;
 use tauri::{LogicalPosition, LogicalSize, Position, Size, WebviewWindow};
 
-/// Keep WebView2 at 1:1 zoom — `set_zoom(1/scale)` expands `innerWidth` and pushes
+/// Keep WebView2 at 1:1 zoom - `set_zoom(1/scale)` expands `innerWidth` and pushes
 /// fixed/absolute UI (toolbar) off-screen on HiDPI Windows.
 pub fn configure_overlay_window(window: &WebviewWindow) -> Result<(), String> {
     window.set_zoom(1.0).map_err(|error| error.to_string())
@@ -60,7 +60,7 @@ pub fn seed_layout_fingerprint(
     mark_layout_refreshed(layout_fingerprint(window, bounds, monitors));
 }
 
-/// Minimal 1×1 off-screen show — wakes WebView2 DPI without a visible fullscreen flash.
+/// Minimal 1×1 off-screen show - wakes WebView2 DPI without a visible fullscreen flash.
 fn refresh_webview_dpi_offscreen(window: &WebviewWindow) -> Result<(), String> {
     const OFF_SCREEN: f64 = -32_000.0;
 

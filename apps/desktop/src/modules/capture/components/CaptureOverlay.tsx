@@ -107,7 +107,7 @@ export function CaptureOverlay() {
         );
       })
       .catch(() => {
-        // Not running inside Tauri — tests and storybook.
+        // Not running inside Tauri - tests and storybook.
       });
 
     return () => {

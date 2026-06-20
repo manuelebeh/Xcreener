@@ -3,7 +3,7 @@ description: Desktop app module architecture (React + TypeScript + Tauri v2)
 globs: apps/desktop/src/**/*.{ts,tsx}
 ---
 
-# Desktop Architecture — Modules / App / Shared
+# Desktop Architecture - Modules / App / Shared
 
 The SnapGlow desktop frontend uses a **module-first** architecture: domain modules, an app shell, shared types, Tauri IPC wrappers, and local SQLite.
 
@@ -45,26 +45,26 @@ Rust commands live in `src-tauri/src/commands/` (`capture`, `redaction`, `export
 ### Module boundaries
 - Each module lives under `modules/<name>/` with a public `index.ts` barrel
 - Typical layout: `store.ts`, `components/`, `hooks/`, `utils/`
-- Modules import from `@/shared/`, `@/db/`, `@/tauri/` — not from sibling modules
+- Modules import from `@/shared/`, `@/db/`, `@/tauri/` - not from sibling modules
 - If two modules need shared code, extract to `shared/` or a workspace package
 
 ### App layer
 - `app/routes.tsx` defines React Router routes only
 - `app/providers/` handles one-time bootstrap (e.g. `initDatabase()`)
-- No business logic in `App.tsx` — layout and navigation only
+- No business logic in `App.tsx` - layout and navigation only
 
 ### State & data
-- **Zustand** per module (`store.ts`) — not React Context (except providers)
+- **Zustand** per module (`store.ts`) - not React Context (except providers)
 - **SQLite** via `@/db` for local persistence (settings, custom presets, capture history)
 - Rust IPC via `@/tauri/commands.ts`; mirror types in `@/shared/types/ipc.ts`
 
 ### Import conventions
 - Always use the `@/` alias: `import { getSetting } from '@/db'`
 - Module-internal imports use relative paths
-- Export a module's public API via `index.ts` — avoid deep imports from consumers
+- Export a module's public API via `index.ts` - avoid deep imports from consumers
 
 ### Component guidelines
 - Functional components only
 - Co-locate component-specific types with the component
-- Biome for lint/format — no ESLint/Prettier
+- Biome for lint/format - no ESLint/Prettier
 - UI polish: use the Hallmark skill when building new surfaces

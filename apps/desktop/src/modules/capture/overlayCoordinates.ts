@@ -18,7 +18,7 @@ function primaryMonitor(monitors?: MonitorInfo[]): MonitorInfo | undefined {
   return monitors?.find((monitor) => monitor.isPrimary) ?? monitors?.[0];
 }
 
-/** Best-effort Windows display scale — xcap may report 1.0 when DPI-unaware. */
+/** Best-effort Windows display scale - xcap may report 1.0 when DPI-unaware. */
 export function resolveWindowsDisplayScale(
   bounds: CaptureOverlayBounds,
   monitors: MonitorInfo[] | undefined,

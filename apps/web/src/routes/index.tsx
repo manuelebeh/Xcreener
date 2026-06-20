@@ -9,7 +9,7 @@ const features = [
   },
   {
     title: 'Beautify in seconds',
-    description: 'Padding, backgrounds, and polish — no design skills required.',
+    description: 'Padding, backgrounds, and polish - no design skills required.',
   },
   {
     title: 'Share with confidence',
@@ -26,7 +26,7 @@ const linkButtonSecondary =
 export const Route = createFileRoute('/')({
   head: () => ({
     meta: [
-      { title: 'SnapGlow — Screenshots that shine' },
+      { title: 'SnapGlow - Screenshots that shine' },
       {
         name: 'description',
         content:
@@ -58,7 +58,7 @@ function LandingPage() {
               Screenshots that shine.
             </h1>
             <p className="mt-5 text-lg text-muted">
-              Transform any capture into a polished visual in under 5 seconds — without sending your
+              Transform any capture into a polished visual in under 5 seconds - without sending your
               data to the cloud.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -105,7 +105,7 @@ function LandingPage() {
             </div>
             <div className="mt-6">
               <Button variant="ghost" size="sm" type="button">
-                Windows — coming soon
+                Windows - coming soon
               </Button>
             </div>
           </div>
@@ -113,7 +113,7 @@ function LandingPage() {
       </main>
 
       <footer className="border-t border-border py-8 text-center text-sm text-muted">
-        SnapGlow — screenshots that shine.
+        SnapGlow - screenshots that shine.
       </footer>
     </div>
   );

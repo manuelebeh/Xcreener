@@ -17,17 +17,17 @@ body:
     attributes:
       label: Area
       options:
-        - Desktop — capture (apps/desktop)
-        - Desktop — editor / beautify (apps/desktop)
-        - Desktop — export (apps/desktop)
-        - Desktop — settings / SQLite (apps/desktop)
-        - Desktop — menu bar / system tray / shortcuts
-        - Desktop — Tauri / Rust (src-tauri)
+        - Desktop - capture (apps/desktop)
+        - Desktop - editor / beautify (apps/desktop)
+        - Desktop - export (apps/desktop)
+        - Desktop - settings / SQLite (apps/desktop)
+        - Desktop - menu bar / system tray / shortcuts
+        - Desktop - Tauri / Rust (src-tauri)
         - Monorepo / CI / tooling (mise, Biome, Husky)
         - Documentation
-        - Web (apps/web) — not shipped yet
-        - Mobile (apps/mobile) — not shipped yet
-        - API (apps/api) — not shipped yet
+        - Web (apps/web) - not shipped yet
+        - Mobile (apps/mobile) - not shipped yet
+        - API (apps/api) - not shipped yet
         - Other
     validations:
       required: true
