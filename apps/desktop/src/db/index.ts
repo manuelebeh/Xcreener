@@ -2,6 +2,7 @@ import {
   type AppSettings,
   DEFAULT_APP_SETTINGS,
   SETTING_KEYS,
+  type OcrEngineMode,
   type ThemePreference,
 } from '@/shared/types/settings';
 import { DB_URL, getDb } from './connection';
@@ -39,20 +40,37 @@ function parseBoolean(value: string | null, fallback: boolean): boolean {
 }
 
 export async function loadAppSettings(): Promise<AppSettings> {
-  const [theme, captureShortcut, launchAtLogin, analyticsEnabled, autoRedaction, autoStyleSuggestion] =
-    await Promise.all([
-      getSetting(SETTING_KEYS.theme),
-      getSetting(SETTING_KEYS.captureShortcut),
-      getSetting(SETTING_KEYS.launchAtLogin),
-      getSetting(SETTING_KEYS.analyticsEnabled),
-      getSetting(SETTING_KEYS.autoRedaction),
-      getSetting(SETTING_KEYS.autoStyleSuggestion),
-    ]);
+  const [
+    theme,
+    captureShortcut,
+    launchAtLogin,
+    analyticsEnabled,
+    autoRedaction,
+    autoStyleSuggestion,
+    smartCompression,
+    ocrEngine,
+    ocrLanguages,
+  ] = await Promise.all([
+    getSetting(SETTING_KEYS.theme),
+    getSetting(SETTING_KEYS.captureShortcut),
+    getSetting(SETTING_KEYS.launchAtLogin),
+    getSetting(SETTING_KEYS.analyticsEnabled),
+    getSetting(SETTING_KEYS.autoRedaction),
+    getSetting(SETTING_KEYS.autoStyleSuggestion),
+    getSetting(SETTING_KEYS.smartCompression),
+    getSetting(SETTING_KEYS.ocrEngine),
+    getSetting(SETTING_KEYS.ocrLanguages),
+  ]);
 
   const resolvedTheme =
     theme && ['light', 'dark', 'system'].includes(theme)
       ? (theme as ThemePreference)
       : DEFAULT_APP_SETTINGS.theme;
+
+  const resolvedOcrEngine =
+    ocrEngine && ['auto', 'native', 'tesseract'].includes(ocrEngine)
+      ? (ocrEngine as OcrEngineMode)
+      : DEFAULT_APP_SETTINGS.ocrEngine;
 
   return {
     theme: resolvedTheme,
@@ -64,5 +82,8 @@ export async function loadAppSettings(): Promise<AppSettings> {
       autoStyleSuggestion,
       DEFAULT_APP_SETTINGS.autoStyleSuggestion
     ),
+    smartCompression: parseBoolean(smartCompression, DEFAULT_APP_SETTINGS.smartCompression),
+    ocrEngine: resolvedOcrEngine,
+    ocrLanguages: ocrLanguages ?? DEFAULT_APP_SETTINGS.ocrLanguages,
   };
 }

@@ -6,7 +6,7 @@ import { captureTestEvent } from '@/integrations/posthog/events';
 import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/useGlobalShortcut';
 import { isValidCaptureShortcut, normalizeCaptureShortcut } from '@/shared/lib/shortcut';
-import type { ThemePreference } from '@/shared/types/settings';
+import type { OcrEngineMode, ThemePreference } from '@/shared/types/settings';
 import { SETTING_KEYS } from '@/shared/types/settings';
 import { syncAutostart } from '../autostart';
 import { useSettingsStore } from '../store';
@@ -18,12 +18,18 @@ export function SettingsPanel() {
   const analyticsEnabled = useSettingsStore((s) => s.analyticsEnabled);
   const autoRedaction = useSettingsStore((s) => s.autoRedaction);
   const autoStyleSuggestion = useSettingsStore((s) => s.autoStyleSuggestion);
+  const smartCompression = useSettingsStore((s) => s.smartCompression);
+  const ocrEngine = useSettingsStore((s) => s.ocrEngine);
+  const ocrLanguages = useSettingsStore((s) => s.ocrLanguages);
   const setTheme = useSettingsStore((s) => s.setTheme);
   const setCaptureShortcut = useSettingsStore((s) => s.setCaptureShortcut);
   const setLaunchAtLogin = useSettingsStore((s) => s.setLaunchAtLogin);
   const setAnalyticsEnabled = useSettingsStore((s) => s.setAnalyticsEnabled);
   const setAutoRedaction = useSettingsStore((s) => s.setAutoRedaction);
   const setAutoStyleSuggestion = useSettingsStore((s) => s.setAutoStyleSuggestion);
+  const setSmartCompression = useSettingsStore((s) => s.setSmartCompression);
+  const setOcrEngine = useSettingsStore((s) => s.setOcrEngine);
+  const setOcrLanguages = useSettingsStore((s) => s.setOcrLanguages);
 
   const [shortcutDraft, setShortcutDraft] = useState(captureShortcut);
   const [shortcutError, setShortcutError] = useState<string | null>(null);
@@ -76,6 +82,21 @@ export function SettingsPanel() {
   async function handleAutoStyleSuggestionChange(enabled: boolean) {
     setAutoStyleSuggestion(enabled);
     await setSetting(SETTING_KEYS.autoStyleSuggestion, String(enabled));
+  }
+
+  async function handleSmartCompressionChange(enabled: boolean) {
+    setSmartCompression(enabled);
+    await setSetting(SETTING_KEYS.smartCompression, String(enabled));
+  }
+
+  async function handleOcrEngineChange(value: OcrEngineMode) {
+    setOcrEngine(value);
+    await setSetting(SETTING_KEYS.ocrEngine, value);
+  }
+
+  async function handleOcrLanguagesChange(value: string) {
+    setOcrLanguages(value);
+    await setSetting(SETTING_KEYS.ocrLanguages, value);
   }
 
   async function handleCheckForUpdates() {
@@ -212,6 +233,53 @@ export function SettingsPanel() {
         On-device classification suggests a matching background and padding. Apply manually in one
         click.
       </p>
+
+      <label className="flex items-center gap-2 text-sm font-medium">
+        <input
+          type="checkbox"
+          checked={smartCompression}
+          onChange={(e) => handleSmartCompressionChange(e.target.checked)}
+          className="sg-focus-ring size-4 rounded border-border"
+          data-testid="smart-compression-toggle"
+        />
+        Smart export compression
+      </label>
+      <p className="text-xs text-muted">
+        Uses pngquant-style palette reduction and optimized JPEG/WebP encoding on export.
+      </p>
+
+      <div>
+        <label htmlFor="ocr-engine" className="block text-sm font-medium">
+          OCR engine
+          <Select
+            id="ocr-engine"
+            value={ocrEngine}
+            onChange={(e) => handleOcrEngineChange(e.target.value as OcrEngineMode)}
+            className="mt-2"
+            data-testid="ocr-engine-select"
+          >
+            <option value="auto">Auto (native first)</option>
+            <option value="native">Native (Vision / Windows OCR)</option>
+            <option value="tesseract">Tesseract CLI</option>
+          </Select>
+        </label>
+      </div>
+
+      <div>
+        <label htmlFor="ocr-languages" className="block text-sm font-medium">
+          OCR languages
+          <Input
+            id="ocr-languages"
+            value={ocrLanguages}
+            onChange={(e) => handleOcrLanguagesChange(e.target.value)}
+            className="mt-2 font-mono text-xs"
+            placeholder="eng+fra+deu+jpn"
+            data-testid="ocr-languages-input"
+          />
+        </label>
+        <p className="mt-1 text-xs text-muted">Tesseract language codes joined with +</p>
+      </div>
+
       {!import.meta.env.DEV ? (
         <p className="text-xs text-muted">Analytics are opt-in in production builds.</p>
       ) : null}

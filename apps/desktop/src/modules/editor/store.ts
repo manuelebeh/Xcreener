@@ -76,6 +76,7 @@ interface EditorState {
   history: { past: Annotation[][]; future: Annotation[][] };
   setPadding: (padding: number) => void;
   setScreenshot: (screenshot: ImageBitmap | null) => void;
+  cropScreenshot: (screenshot: ImageBitmap) => void;
   updateBackground: (
     background: Partial<BackgroundConfig> & { type: BackgroundConfig['type'] }
   ) => void;
@@ -163,6 +164,21 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       annotations: [],
       selectedAnnotationId: null,
       history: emptyHistory(),
+    });
+  },
+
+  cropScreenshot: (screenshot) => {
+    const previous = get();
+    if (previous.screenshot && previous.screenshot !== screenshot) {
+      previous.screenshot.close();
+    }
+
+    const padding = autoPadding(screenshot);
+    set({
+      screenshot,
+      padding,
+      paddingTouched: false,
+      transform: DEFAULT_TRANSFORM,
     });
   },
 

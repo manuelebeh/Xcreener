@@ -2,6 +2,18 @@ import { afterAll, describe, expect, it, vi } from 'vitest';
 import type { RenderInput } from '@/modules/editor/types';
 import { exportRenderInput, renderToExportCanvas } from './canvasExport';
 
+vi.mock('@/tauri/commands', () => ({
+  compressExportBytes: vi.fn(async (imageData: number[]) => imageData),
+}));
+
+vi.mock('@/modules/settings/store', () => ({
+  useSettingsStore: {
+    getState: () => ({
+      smartCompression: false,
+    }),
+  },
+}));
+
 class MockOffscreenCanvas {
   width: number;
   height: number;

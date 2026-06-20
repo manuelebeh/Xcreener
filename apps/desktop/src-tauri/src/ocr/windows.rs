@@ -4,7 +4,7 @@ use windows::Media::Ocr::OcrEngine as WinOcrEngine;
 use windows::Storage::Streams::{DataWriter, InMemoryRandomAccessStream, IBuffer};
 
 use super::OcrEngine;
-use crate::redaction::types::TextLine;
+use crate::ocr::types::TextLine;
 
 pub struct WindowsOcrEngine;
 

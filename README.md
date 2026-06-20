@@ -12,6 +12,10 @@ Privacy-first screenshot app - capture, beautify, and share without the cloud.
 | `packages/design-tokens` | DTCG design tokens → CSS / Tailwind + `tokens.native` |
 | `packages/ui` | Shared React web components + Storybook |
 | `packages/ui-native` | Shared React Native components |
+| `packages/editor-core` | Shared editor logic (layout, presets, annotations) |
+| `packages/redaction-core` | On-device detectors + layout mapping (desktop + mobile) |
+| `packages/style-suggestion-core` | Content class → style mapping (desktop) |
+| `packages/ocr-core` | OCR types + text assembly helpers (desktop copy-text) |
 | `packages/biome-config` | Shared Biome lint/format config |
 | `packages/typescript-config` | Shared TypeScript configs |
 
@@ -99,7 +103,7 @@ Requires Xcode (iOS) or Android Studio (Android). See [`.agents/rules/mobile.md`
 
 ## Architecture
 
-- Module layout: `apps/desktop/src/modules/{capture,editor,export,settings}/`
+- Module layout: `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings,style-suggestion,text-extraction,auto-crop}/`
 - ADR: [`docs/internal/technical/adr/001-monorepo-and-module-architecture.md`](docs/internal/technical/adr/001-monorepo-and-module-architecture.md)
 - ADR: [`docs/internal/technical/adr/002-design-tokens-ui-and-web.md`](docs/internal/technical/adr/002-design-tokens-ui-and-web.md)
 - ADR: [`docs/internal/technical/adr/003-desktop-ipc-and-events.md`](docs/internal/technical/adr/003-desktop-ipc-and-events.md)
