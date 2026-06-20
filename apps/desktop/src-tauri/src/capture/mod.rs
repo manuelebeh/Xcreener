@@ -1,12 +1,12 @@
 mod types;
 mod validate;
 
-#[cfg(target_os = "windows")]
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 pub mod platform;
 
 pub use types::{
-    CaptureOverlayBounds, CaptureOverlayInitPayload, MonitorInfo, OverlayWebviewLayout, Rect,
-    WindowInfo,
+    CaptureErrorPayload, CaptureOverlayBounds, CaptureOverlayInitPayload, MonitorInfo,
+    OverlayWebviewLayout, Rect, WindowInfo,
 };
 pub use validate::{validate_monitor_id, validate_region, validate_window_id};
 
@@ -30,7 +30,7 @@ pub enum CaptureError {
     DisplayNotFound(u32),
     #[error("window {0} not found")]
     WindowNotFound(u64),
-    #[error("screen recording permission denied — enable Screen Recording for SnapGlow in System Settings")]
+    #[error("screen recording permission denied - enable Screen Recording for SnapGlow in System Settings")]
     PermissionDenied,
     #[error("capture failed: {0}")]
     Backend(String),
@@ -175,6 +175,9 @@ fn normalize_monitor_image(image: RgbaImage, width: u32, height: u32) -> RgbaIma
 }
 
 pub fn capture_desktop_preview() -> Result<Vec<u8>, CaptureError> {
+    #[cfg(target_os = "macos")]
+    platform::ensure_screen_capture_permission()?;
+
     let monitors = list_monitors()?;
     let bounds = get_overlay_bounds()?;
 

@@ -46,6 +46,7 @@ export function useCaptureSession() {
     void listen<CaptureErrorPayload>('capture-error', (event) => {
       setError(event.payload.message);
       setOverlayVisible(false);
+      navigate('/');
     }).then((fn) => {
       if (cancelled) {
         fn();
