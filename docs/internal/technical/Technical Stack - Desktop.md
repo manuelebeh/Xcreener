@@ -159,8 +159,8 @@ src/
 │   ├── components/         # AppTopNav (nav N1b - Sprint 1.6 polish)
 │   └── providers/
 ├── modules/
-│   ├── capture/            # Overlay capture (sélection zone / fenêtre / écran)
-│   │   ├── components/     # CaptureOverlay, RegionSelector, WindowHighlight, …
+│   ├── capture/            # Overlay capture (zone / fenêtre / écran / scroll / menu, Sprint 2b.3)
+│   │   ├── components/     # CaptureOverlay, CaptureProgress (HUD), CaptureToolbar, …
 │   │   ├── hooks/          # useCaptureSession, useGlobalShortcut
 │   │   └── store.ts
 │   ├── editor/             # Éditeur inline (beautification, annotations)
@@ -282,6 +282,8 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 
 ### 4.3 Commandes Tauri (IPC)
 
+> **État Sprint 2b.3 :** en plus du livrable 2b.2 — capture live **Scroll** (`capture_scrolling_window_command`, `capture/scroll.rs`, `capture/stitch.rs`, `resolve_window`), **Menu** + **Delay** (`capture_native_command`), HUD overlay scroll, `stop_scrolling_capture_command`. Détail : [ADR-007](./adr/007-live-capture-flows.md).
+
 > **État Sprint 2b.2 :** capture native (Sprint 1.1), redaction + OCR copy-text (`detect_sensitive_data`, `recognize_text_command`), auto-crop (`detect_content_bounds_command`, `crop_image_command`), compression export (`compress_export_bytes_command`), classification (`classify_content_command`), export fichier côté frontend (offscreen canvas + compression Rust optionnelle + dialog/fs/clipboard), historique captures côté frontend (`db/captures.ts` + fs). Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
 
 ```rust
@@ -319,6 +321,16 @@ async fn compress_export_bytes_command(
 // Classification - Sprint 2b.1
 #[tauri::command]
 async fn classify_content_command(image_data: Vec<u8>) -> Result<ClassificationResult, String> { ... }
+
+// Live capture - Sprint 2b.3 (src-tauri/src/capture/, ADR-007)
+#[tauri::command]
+async fn capture_native_command(app: AppHandle, request: CaptureNativeRequest) -> Result<Vec<u8>, String> { ... }
+
+#[tauri::command]
+async fn capture_scrolling_window_command(app: AppHandle, window: WindowInfo) -> Result<Vec<u8>, String> { ... }
+
+#[tauri::command]
+async fn stop_scrolling_capture_command() -> Result<(), String> { ... }
 
 // Historique - Sprint 1.6 : frontend-only (db/captures.ts + fs plugin, pas de commande Rust)
 ```

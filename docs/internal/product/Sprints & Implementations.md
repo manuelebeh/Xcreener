@@ -687,15 +687,31 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | AC-001 | Capture scrollante macOS (scroll automatique + assemblage) | P0 | 4j | P1-001 |
-| `[ ]` | AC-002 | Capture scrollante Windows | P0 | 4j | P1-002 |
-| `[ ]` | AC-003 | Capture différée (timer 3/5/10 secondes) | P1 | 1j | P1-001 |
-| `[ ]` | AC-004 | Capture de menu ouvert | P1 | 2j | P1-001 |
+| `[x]` (2026-06-20) | AC-001 | Capture scrollante macOS (scroll automatique + assemblage) | P0 | 4j | P1-001 |
+| `[x]` (2026-06-20) | AC-002 | Capture scrollante Windows | P0 | 4j | P1-002 |
+| `[x]` (2026-06-20) | AC-003 | Capture différée (timer 3/5/10 secondes) | P1 | 1j | P1-001 |
+| `[x]` (2026-06-20) | AC-004 | Capture de menu ouvert | P1 | 2j | P1-001 |
+
+**Livré (code + QA manuelle, 2026-06-20)**
+
+- **ADR-007** : flux live capture (preview crop vs native grab) — [007-live-capture-flows.md](../technical/adr/007-live-capture-flows.md)
+- **Rust** : `capture/native.rs` (`capture_native_command`), `capture/scroll.rs` + `capture/stitch.rs` (`capture_scrolling_window_command`), `resolve_window` (WindowInfo, exclusion fenêtres SnapGlow), scroll plateforme macOS (CGEvent clavier Home / ⌘↑ / Page Down) + Windows (`VK_HOME` / `VK_NEXT`)
+- **Overlay** : modes **Scroll** et **Menu** ; dropdown **Delay** (Off / 3s / 5s / 10s) ; countdown overlay ; HUD flottant scroll (pastille + **Done** + état « Finishing capture… »)
+- **Menu** : overlay live sans preview, délai 3s par défaut, capture region ou fenêtre après countdown
+- **Scroll** : remontée en haut → pause 600 ms → capture viewport → Page Down → pause settle interruptible 550 ms → stitch overlap (`stitch.rs`) ; **Done** = `stop_scrolling_capture_command` (assemble les frames acquises, pas annulation) ; **Cancel** = `cancel_live_capture_command`
+- **IPC** : `capture-progress`, `cancel_live_capture_command`, `stop_scrolling_capture_command`, `show_live_capture_overlay` ; payload scroll = `WindowInfo` (pas seul `windowId`)
+
+**Améliorations post-livraison (backlog)**
+
+- Sticky headers / overlap stitch sur pages complexes (headers répétés, cartes identiques)
+- Matrice apps (Electron, Safari, PDF viewers, scroll interne vs fenêtre)
+- Permission **Accessibilité** macOS si Page Down synthétique ignorée
+- Affinage settle / vitesse selon app cible
 
 **Critères de validation**
 
-- [ ] Capture scrollante macOS + Windows sur pages test (long scroll)
-- [ ] Timer différé et capture menu ouvert fonctionnels
+- [x] (2026-06-20) Capture scrollante macOS + Windows sur pages test (long scroll) — QA manuelle OK ; améliorations stitch prévues
+- [x] (2026-06-20) Timer différé et capture menu ouvert fonctionnels — QA manuelle OK
 
 ### Sprint 2b.4 (Semaines 33–34) - Capture vidéo/GIF
 

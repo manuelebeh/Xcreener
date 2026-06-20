@@ -15,8 +15,15 @@ describe('useCaptureStore', () => {
     expect(useCaptureStore.getState()).toMatchObject({
       overlayVisible: false,
       activeMode: 'idle',
+      delaySecs: 0,
+      liveOverlay: false,
       error: null,
       isCapturing: false,
+      countdownSecs: null,
+      scrollFrame: null,
+      scrollFinishing: false,
+      progressHudMode: false,
+      captureProgress: null,
       previewUrl: null,
     });
   });

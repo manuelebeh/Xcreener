@@ -8,6 +8,32 @@ pub fn configure_overlay_window(window: &WebviewWindow) -> Result<(), String> {
     window.set_zoom(1.0).map_err(|error| error.to_string())
 }
 
+pub fn set_overlay_click_through(window: &WebviewWindow, enabled: bool) -> Result<(), String> {
+    use windows::Win32::Foundation::HWND;
+    use windows::Win32::UI::WindowsAndMessaging::{
+        GetWindowLongPtrW, SetWindowLongPtrW, GWL_EXSTYLE, WS_EX_LAYERED, WS_EX_TRANSPARENT,
+    };
+
+    let hwnd = HWND(
+        window
+            .hwnd()
+            .map_err(|error| error.to_string())?
+            .0 as _,
+    );
+
+    unsafe {
+        let style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32;
+        let style = if enabled {
+            style | WS_EX_LAYERED.0 | WS_EX_TRANSPARENT.0
+        } else {
+            style & !WS_EX_TRANSPARENT.0
+        };
+        SetWindowLongPtrW(hwnd, GWL_EXSTYLE, style as _);
+    }
+
+    Ok(())
+}
+
 #[derive(Clone, PartialEq, Debug)]
 struct LayoutFingerprint {
     window_scale: f64,

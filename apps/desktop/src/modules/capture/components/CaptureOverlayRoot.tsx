@@ -8,12 +8,13 @@ import { CaptureOverlay } from './CaptureOverlay';
 
 export function CaptureOverlayRoot() {
   const bounds = useCaptureStore((s) => s.bounds);
-  const previewUrl = useCaptureStore((s) => s.previewUrl);
+  const progressHudMode = useCaptureStore((s) => s.progressHudMode);
   const setBounds = useCaptureStore((s) => s.setBounds);
   const setMonitors = useCaptureStore((s) => s.setMonitors);
   const setWebviewLayout = useCaptureStore((s) => s.setWebviewLayout);
   const setActiveMode = useCaptureStore((s) => s.setActiveMode);
   const setPreviewUrl = useCaptureStore((s) => s.setPreviewUrl);
+  const setLiveOverlay = useCaptureStore((s) => s.setLiveOverlay);
 
   useEffect(() => {
     let cancelled = false;
@@ -33,7 +34,12 @@ export function CaptureOverlayRoot() {
       setWebviewLayout(null);
       setBounds(event.payload.bounds);
       setMonitors(event.payload.monitors);
-      setPreviewUrl(bytesToObjectUrl(event.payload.previewPng));
+      setLiveOverlay(Boolean(event.payload.liveOverlay));
+      setPreviewUrl(
+        event.payload.previewPng?.length
+          ? bytesToObjectUrl(event.payload.previewPng)
+          : null
+      );
       setActiveMode('region');
     }).then((fn) => {
       unlistenInit = fn;
@@ -52,9 +58,15 @@ export function CaptureOverlayRoot() {
       unlistenInit?.();
       unlistenPresented?.();
     };
-  }, [setActiveMode, setBounds, setMonitors, setPreviewUrl, setWebviewLayout]);
+  }, [setActiveMode, setBounds, setLiveOverlay, setMonitors, setPreviewUrl, setWebviewLayout]);
 
   useEffect(() => {
+    if (progressHudMode) {
+      document.documentElement.style.backgroundColor = 'transparent';
+      document.body.style.backgroundColor = 'transparent';
+      return;
+    }
+
     document.documentElement.style.backgroundColor = '#000';
     document.body.style.backgroundColor = '#000';
 
@@ -62,22 +74,22 @@ export function CaptureOverlayRoot() {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
     };
-  }, []);
+  }, [progressHudMode]);
 
   useLayoutEffect(() => {
-    if (!bounds || !previewUrl) {
+    if (!bounds) {
       return;
     }
 
     void captureOverlayReady();
-  }, [bounds, previewUrl]);
+  }, [bounds]);
 
-  if (!bounds || !previewUrl) {
+  if (!bounds) {
     return null;
   }
 
   return (
-    <div className="h-screen w-screen bg-black">
+    <div className={progressHudMode ? 'h-screen w-screen bg-transparent' : 'h-screen w-screen bg-black'}>
       <CaptureOverlay />
     </div>
   );

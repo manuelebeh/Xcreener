@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). **Sprint 1.6** adds capture history (frontend `db/captures.ts` + filesystem, no Rust IPC) and debug-only E2E hooks in `test_support.rs`. **Sprint 2b.1** adds `classify_content_command`. **Sprint 2b.2** adds OCR copy-text, auto-crop, and smart export compression IPC. See [ADR-006](./006-native-capture-overlay.md).
+SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). **Sprint 1.6** adds capture history (frontend `db/captures.ts` + filesystem, no Rust IPC) and debug-only E2E hooks in `test_support.rs`. **Sprint 2b.1** adds `classify_content_command`. **Sprint 2b.2** adds OCR copy-text, auto-crop, and smart export compression IPC. **Sprint 2b.3** adds live capture flows (delay, menu, scroll) — see [ADR-007](./007-live-capture-flows.md). See also [ADR-006](./006-native-capture-overlay.md).
 
 ## Decision
 
@@ -23,6 +23,13 @@ Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls 
 | `list_windows_command` | `commands/capture.rs` | Live | `()` → `WindowInfo[]` |
 | `get_window_at_point_command` | `commands/capture.rs` | Live | `{ x, y }` → `WindowInfo \| null` |
 | `show_capture_overlay` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
+| `show_live_capture_overlay` | `commands/capture.rs` | Live (Sprint 2b.3) | `()` → `CaptureOverlayBounds` — overlay sans preview (menu) |
+| `capture_overlay_ready` | `commands/capture.rs` | Live | `()` — présente l'overlay après init geometry |
+| `get_overlay_webview_layout` | `commands/overlay_layout.rs` | Live | `()` → `OverlayWebviewLayout` |
+| `capture_native_command` | `commands/capture.rs` | Live (Sprint 2b.3) | `{ request: CaptureNativeRequest }` → `number[]` — delay / menu / native grab |
+| `capture_scrolling_window_command` | `commands/capture.rs` | Live (Sprint 2b.3) | `{ window: WindowInfo }` → `number[]` — scroll Home + Page Down + stitch |
+| `stop_scrolling_capture_command` | `commands/capture.rs` | Live (Sprint 2b.3) | `()` — fin anticipée scroll (Done ; assemble frames acquises) |
+| `cancel_live_capture_command` | `commands/capture.rs` | Live (Sprint 2b.3) | `()` — annule countdown / capture live en cours |
 | `hide_capture_overlay` | `commands/capture.rs` | Live | `()` |
 | `cancel_capture_overlay` | `commands/capture.rs` | Live | `()` |
 | `get_capture_overlay_bounds` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
@@ -55,6 +62,9 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 | Event | Emitter | Payload | Consumer |
 |-------|---------|---------|----------|
 | `capture-overlay-init` | `overlay.rs` | `CaptureOverlayInitPayload` | `CaptureOverlayRoot` |
+| `capture-overlay-presented` | `overlay.rs` | `OverlayWebviewLayout` | `CaptureOverlayRoot` |
+| `capture-overlay-progress-hud` | `overlay.rs` | `()` | `CaptureOverlay` — mode HUD scroll (pastille flottante) |
+| `capture-progress` | `capture/native.rs`, `capture/scroll.rs`, overlay (emit) | `CaptureProgressPayload` | `CaptureOverlay`, `useCaptureSession` (countdown main app uniquement) |
 | `capture-image` | `CaptureOverlay` (emit) | `CaptureImagePayload` | `useCaptureSession` → editor |
 | `capture-error` | `CaptureOverlay` (emit) | `CaptureErrorPayload` | `useCaptureSession` |
 | `navigate-settings` | Tray menu | `()` | `useTrayNavigation` |
@@ -92,4 +102,5 @@ Frontend-only - no Rust IPC:
 - [ADR-001](./001-monorepo-and-module-architecture.md)
 - [ADR-004](./004-system-integration-tray-shortcuts.md)
 - [ADR-006](./006-native-capture-overlay.md)
+- [ADR-007](./007-live-capture-flows.md)
 - [Technical Stack - Desktop.md](../Technical%20Stack%20-%20Desktop.md)

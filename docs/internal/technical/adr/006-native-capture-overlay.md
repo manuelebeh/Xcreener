@@ -39,7 +39,7 @@ Dedicated route in `capture-overlay` window (`CaptureOverlayRoot` → `CaptureOv
 `capture_region`, `capture_window`, `capture_fullscreen` remain implemented and registered for:
 
 - Unit/integration tests
-- Future flows that need a fresh native grab (e.g. delayed capture)
+- Future flows that need a fresh native grab (e.g. delayed capture) — see **ADR-007** (Sprint 2b.3)
 
 The overlay confirm path does **not** call them in Sprint 1.1.
 
