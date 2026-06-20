@@ -67,11 +67,19 @@ Main window listens via `useCaptureSession` → `setScreenshot` → navigate hom
 
 `overlay_macos.rs` configures overlay window level / transparency. Screen Recording permission required for `xcap` preview.
 
+### Windows specifics
+
+`overlay_windows.rs` keeps WebView2 at 1:1 zoom (`set_zoom(1.0)`) so HiDPI scaling does not inflate `innerWidth` and push fixed UI (toolbar) off-screen. Layout is re-applied when display scale or bounds change between capture sessions.
+
+Frontend: `overlayCoordinates.ts` and `captureToolbarPlacement.ts` resolve Windows display scale when `xcap` reports 1.0 while DPI is > 100% (Vitest coverage in `overlayCoordinates.test.ts`, `captureToolbarPlacement.test.ts`).
+
+Capture preview, monitor/window listing, and the three overlay modes use `xcap` cross-platform (P1-002, P1-004, P1-005). Manual QA validated region, window, and fullscreen on Windows (2026-06-20).
+
 ## Consequences
 
 - Preview is a point-in-time snapshot; content changing after overlay open is not reflected until a new capture session.
-- Windows parity relies on `xcap`; dedicated Graphics Capture API work tracked as P1-002 / P1-004 if gaps appear.
-- Multi-monitor / HiDPI validated on macOS via manual QA (2026-06-16); automated CI matrix on macOS remains limited ([ADR-004](./004-system-integration-tray-shortcuts.md)).
+- Region, window, and fullscreen capture validated on macOS and Windows via manual QA (macOS 2026-06-16, Windows 2026-06-20).
+- Multi-monitor / HiDPI: macOS validated on at least two configurations (2026-06-16); Windows overlay scale and toolbar placement validated in manual QA (2026-06-20). Automated CI matrix on macOS remains limited ([ADR-004](./004-system-integration-tray-shortcuts.md)).
 
 ## References
 

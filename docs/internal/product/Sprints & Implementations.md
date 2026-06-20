@@ -247,15 +247,15 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
 | `[x]` (2026-06-16) | P1-001 | Implémenter la capture de zone (sélection libre) - macOS | P0 | 3j | P0-015 |
-| `[ ]` | P1-002 | Implémenter la capture de zone - Windows (Graphics Capture API) | P0 | 3j | P0-015 |
+| `[x]` (2026-06-20) | P1-002 | Implémenter la capture de zone - Windows (Graphics Capture API) | P0 | 3j | P0-015 |
 | `[x]` (2026-06-16) | P1-003 | Implémenter la capture de fenêtre (détection auto des bords) - macOS | P0 | 2j | P1-001 |
-| `[ ]` | P1-004 | Implémenter la capture de fenêtre - Windows | P0 | 2j | P1-002 |
-| `[~]` | P1-005 | Implémenter la capture plein écran - macOS + Windows | P0 | 1j | P1-001, P1-002 |
+| `[x]` (2026-06-20) | P1-004 | Implémenter la capture de fenêtre - Windows | P0 | 2j | P1-002 |
+| `[x]` (2026-06-20) | P1-005 | Implémenter la capture plein écran - macOS + Windows | P0 | 1j | P1-001, P1-002 |
 | `[x]` (2026-06-16) | P1-006 | Tests capture sur multi-écran (display scaling, HiDPI) | P0 | 2j | P1-001, P1-002 |
 
 **Livrable :** Capture fonctionnelle (zone, fenêtre, plein écran) sur macOS et Windows.
 
-**Livré (code + QA macOS, 2026-06-16)**
+**Livré (code + QA macOS, 2026-06-16 ; parité Windows validée, 2026-06-20)**
 
 - **Backend Rust** : module `src-tauri/src/capture/` (`xcap`) - preview bureau, listage moniteurs/fenêtres, `get_window_at_point`, commandes `capture_*` + validation bornes
 - **Fenêtre overlay** : webview dédiée `capture-overlay` ; snapshot `capture_desktop_preview` avant affichage ; event `capture-overlay-init` (bounds, moniteurs, PNG preview)
@@ -266,14 +266,13 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **En attente / reporté**
 
-- **Parité Windows** (P1-002, P1-004, reste P1-005) - code `xcap` cross-platform présent ; QA Windows + Graphics Capture API si écart
 - **Commandes natives `capture_*` au confirm** - conservées côté Rust pour tests et usages futurs ; le flux overlay utilise la découpe preview (ADR-006)
 
 **Critères de validation**
 
 - [x] Capture zone, fenêtre et plein écran fonctionnelles sur macOS (QA manuelle validée)
-- [ ] Parité Windows pour les 3 modes de capture
-- [x] Tests multi-écran / HiDPI passent sur au moins 2 configurations (QA macOS validée)
+- [x] Parité Windows pour les 3 modes de capture (QA manuelle validée, 2026-06-20)
+- [x] Tests multi-écran / HiDPI passent sur au moins 2 configurations (QA macOS validée ; scale overlay Windows validé en QA manuelle, 2026-06-20)
 - [x] Image capturée affichée dans l'éditeur (pipeline bout-en-bout minimal)
 
 ### Sprint 1.2 (Semaines 11–12) - Beautification automatique
