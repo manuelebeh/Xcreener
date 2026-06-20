@@ -37,7 +37,9 @@ apps/
 ├── mobile/      # React Native Expo - iOS + Android  (Phase 1b)
 └── api/         # Fastify + PostgreSQL + Redis       (Phase 2b)
 packages/
-├── design-tokens/   # SSOT couleurs, spacing (Sprint 0.2)
+├── design-tokens/   # SSOT couleurs, spacing (Sprint 0.2) + tokens.native (Sprint 1b.1)
+├── ui/              # Composants React web + Storybook (Sprint 0.2)
+├── ui-native/       # Composants React Native (Sprint 1b.1)
 ├── biome-config/    # Biome partagé (Sprint 0.1)
 ├── typescript-config/
 └── i18n/            # SSOT traductions (Phase 4)
@@ -122,7 +124,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | CodeGraph MCP | Sprint 0.1 | **Adopter** (pas Serena) |
 | `packages/design-tokens` | Sprint 0.2 | **Adopter** (P0-009) |
 | `apps/web` landing **TanStack Start** + VPS | Sprint 0.2 | **Adopter** (P0-013) |
-| `apps/mobile` **Expo / React Native** | Phase 1b | **Adopter** (M1-001) |
+| `apps/mobile` **Expo / React Native** | Phase 1b | **Adopter** (M1-001, 2026-06-20) |
 | `apps/api` **Fastify** + PostgreSQL | Phase 2b | **Adopter** (CL-001) |
 | Release Please + CHANGELOG | Sprint 0.4+ | **Reporter** |
 | Terraform GCP + Docker infra | Phase 2b+ | **Reporter** |
@@ -459,16 +461,36 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | M1-001 | Setup projet React Native (Expo) iOS + Android ; ajouter `dev:mobile` dans `mise.toml` | P0 | 2j | - |
-| `[ ]` | M1-002 | Implémenter Share Extension iOS (import depuis Photos/apps) | P0 | 3j | M1-001 |
-| `[ ]` | M1-003 | Implémenter Share Intent Android (import depuis Photos/apps) | P0 | 3j | M1-001 |
-| `[ ]` | M1-004 | Réutiliser les composants UI du design system (adaptation mobile) | P0 | 2j | P0-009, M1-001 |
+| `[x]` (2026-06-20) | M1-001 | Setup projet React Native (Expo) iOS + Android ; ajouter `dev:mobile` dans `mise.toml` | P0 | 2j | - |
+| `[x]` (2026-06-20) | M1-002 | Implémenter Share Extension iOS (import depuis Photos/apps) | P0 | 3j | M1-001 |
+| `[x]` (2026-06-20) | M1-003 | Implémenter Share Intent Android (import depuis Photos/apps) | P0 | 3j | M1-001 |
+| `[x]` (2026-06-20) | M1-004 | Réutiliser les composants UI du design system (adaptation mobile) | P0 | 2j | P0-009, M1-001 |
+
+**Livrable :** App Expo iOS + Android (development builds), import image via share sheet, design tokens SnapGlow sur mobile.
+
+**Livré (code, 2026-06-20)**
+
+- **`apps/mobile`** (`@snapglow/mobile`) : Expo SDK 56, Expo Router, `expo-dev-client`, `mise run dev:mobile` / `dev:mobile:ios` / `dev:mobile:android`
+- **Share import** : `expo-share-intent` (Share Extension iOS + Intent Android `image/*`), module `src/modules/capture/` (Zustand + `useShareImport`), écran `/import`
+- **`packages/design-tokens`** : build étendu → `dist/tokens.native.ts` (OKLCH → hex, thèmes light/dark, spacing/radius)
+- **`packages/ui-native`** : `ThemeProvider`, `Button` (StyleSheet, API alignée web) ; consomme `tokens.native`
+- **UI** : écran home showcase tokens + toggle thème ; preview image importée tokenisée
+- **Tooling** : `metro.config.js` monorepo, `.agents/rules/mobile.md`, `typescript-config/react-native.json`
+- **Build iOS** : prebuild + simulateur OK (warnings Xcode bénins) ; `ios/`/`android/` gitignorés (regénérés par prebuild)
+
+**Checklist QA interne (Sprint 1b.1)**
+
+- [x] `mise run dev:mobile` démarre Metro dev client
+- [x] `mise run dev:mobile:ios` — build + install simulateur iPhone 17
+- [x] Share Photos → SnapGlow → preview `/import` (iOS simulateur / device)
+- [x] Share Galerie → SnapGlow → preview `/import` (Android émulateur / device)
+- [x] Boutons primary/secondary/destructive + thème light/dark sur home
 
 **Critères de validation**
 
-- [ ] `mise run dev:mobile` lance Expo sur iOS + Android
-- [ ] Share Extension / Intent importe une image dans l'app
-- [ ] Composants design-tokens rendus correctement sur mobile
+- [x] `mise run dev:mobile` lance Expo dev client ; `dev:mobile:ios` / `dev:mobile:android` disponibles
+- [x] Share Extension / Intent importe une image dans l'app (QA iOS + Android validée)
+- [x] Composants design-tokens rendus correctement sur mobile (`@snapglow/ui-native` + écran showcase)
 
 ### Sprint 1b.2 (Semaines 17–18) - Beautification & Presets mobile
 

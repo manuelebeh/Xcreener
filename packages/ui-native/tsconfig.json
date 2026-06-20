@@ -1,0 +1,7 @@
+{
+  "extends": "@snapglow/typescript-config/react-native.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
+}

@@ -13,7 +13,7 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 ### Design tokens (`packages/design-tokens`)
 
 - **SSOT:** `tokens.json` in [DTCG](https://tr.designtokens.org/format/) format
-- **Build:** `node scripts/build.mjs` → `dist/tokens.css` (CSS variables) + `dist/tailwind-theme.css` (`@theme` for Tailwind v4)
+- **Build:** `node scripts/build.mjs` → `dist/tokens.css` (CSS variables) + `dist/tailwind-theme.css` (`@theme` for Tailwind v4) + `dist/tokens.native.ts` (RN themes, OKLCH → hex — Sprint 1b.1)
 - **Task:** `mise run tokens:build`
 
 ### Shared UI (`packages/ui`)
@@ -36,6 +36,17 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 - Consumes `@snapglow/design-tokens` and `@snapglow/ui`
 - Local dev: `mise run dev:web` (port 3000)
 - VPS deploy deferred; CI smoke-builds via `pnpm --filter @snapglow/web build`
+
+### Mobile app (`apps/mobile`, Sprint 1b.1)
+
+- **Expo SDK 56** + Expo Router + development builds (`expo-dev-client`, not Expo Go)
+- Package: `@snapglow/mobile`
+- **`packages/ui-native`** — sibling of `@snapglow/ui` (Pressable + StyleSheet, no Radix/Tailwind on RN)
+- Consumes `@snapglow/design-tokens/tokens.native` and `@snapglow/ui-native`
+- Share import: `expo-share-intent` (iOS Share Extension + Android Intent)
+- Local dev: `mise run dev:mobile` ; native run: `dev:mobile:ios` / `dev:mobile:android`
+- Generated `ios/` / `android/` folders are gitignored; regen via `expo prebuild`
+- Agent rules: [`.agents/rules/mobile.md`](../../../../.agents/rules/mobile.md)
 
 ### Git hooks
 
