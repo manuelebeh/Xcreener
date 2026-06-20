@@ -181,6 +181,14 @@ fn show_prepared_overlay(
         )
         .map_err(|error| error.to_string())?;
 
+    #[cfg(target_os = "macos")]
+    {
+        // WKWebView does not run requestAnimationFrame while hidden, so the
+        // Windows two-phase present (frontend paints → capture_overlay_ready) never completes.
+        present_overlay_window(&overlay, &bounds, &[])?;
+    }
+
+    #[cfg(not(target_os = "macos"))]
     OVERLAY_AWAITING_READY.store(true, Ordering::SeqCst);
 
     Ok(bounds)
