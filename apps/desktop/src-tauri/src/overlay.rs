@@ -18,7 +18,8 @@ static OVERLAY_AWAITING_READY: AtomicBool = AtomicBool::new(false);
 struct PreparedOverlayOpen {
     bounds: CaptureOverlayBounds,
     monitors: Vec<MonitorInfo>,
-    preview_png: Vec<u8>,
+    preview_png: Option<Vec<u8>>,
+    live_overlay: bool,
 }
 
 fn clear_overlay_pending() {
@@ -133,18 +134,22 @@ pub fn setup_overlay_window(app: &AppHandle) -> Result<(), Box<dyn std::error::E
     Ok(())
 }
 
-fn prepare_overlay_open() -> Result<PreparedOverlayOpen, String> {
+fn prepare_overlay_open(skip_preview: bool) -> Result<PreparedOverlayOpen, String> {
     let bounds = get_overlay_bounds().map_err(|error| error.into_message())?;
     let monitors = list_monitors().map_err(|error| error.into_message())?;
 
-    // Capture immediately while the user's app is still frontmost.
-    // Do not touch SnapGlow windows before this snapshot.
-    let preview_png = capture_desktop_preview().map_err(|error| error.into_message())?;
+    let preview_png = if skip_preview {
+        None
+    } else {
+        // Capture immediately while the user's app is still frontmost.
+        Some(capture_desktop_preview().map_err(|error| error.into_message())?)
+    };
 
     Ok(PreparedOverlayOpen {
         bounds,
         monitors,
         preview_png,
+        live_overlay: skip_preview,
     })
 }
 
@@ -156,6 +161,7 @@ fn show_prepared_overlay(
         bounds,
         monitors,
         preview_png,
+        live_overlay,
     } = prepared;
 
     if let Some(main_window) = app.get_webview_window("main") {
@@ -177,6 +183,7 @@ fn show_prepared_overlay(
                 bounds: bounds.clone(),
                 monitors,
                 preview_png,
+                live_overlay,
                 webview_layout: None,
             },
         )
@@ -214,10 +221,70 @@ fn hide_capture_overlay_only_impl(app: &AppHandle) -> Result<(), String> {
     clear_overlay_pending();
 
     if let Some(overlay) = app.get_webview_window(OVERLAY_LABEL) {
+        set_overlay_click_through(&overlay, false)?;
         overlay.hide().map_err(|error| error.to_string())?;
     }
 
     Ok(())
+}
+
+pub fn show_capture_progress_hud(app: &AppHandle) -> Result<(), String> {
+    dispatch_on_main_thread(app, show_capture_progress_hud_impl)
+}
+
+fn show_capture_progress_hud_impl(app: &AppHandle) -> Result<(), String> {
+    clear_overlay_pending();
+
+    let overlay = app
+        .get_webview_window(OVERLAY_LABEL)
+        .ok_or_else(|| "capture overlay window not found".to_string())?;
+
+    let bounds = crate::capture::get_overlay_bounds().map_err(|error| error.into_message())?;
+
+    const HUD_WIDTH: f64 = 420.0;
+    const HUD_HEIGHT: f64 = 48.0;
+    const HUD_MARGIN_BOTTOM: f64 = 24.0;
+
+    let x = bounds.x as f64 + (bounds.width as f64 - HUD_WIDTH) / 2.0;
+    let y = bounds.y as f64 + bounds.height as f64 - HUD_HEIGHT - HUD_MARGIN_BOTTOM;
+
+    overlay
+        .set_position(Position::Logical(LogicalPosition::new(x, y)))
+        .map_err(|error| error.to_string())?;
+    overlay
+        .set_size(Size::Logical(LogicalSize::new(HUD_WIDTH, HUD_HEIGHT)))
+        .map_err(|error| error.to_string())?;
+
+    overlay
+        .emit("capture-overlay-progress-hud", ())
+        .map_err(|error| error.to_string())?;
+
+    set_overlay_click_through(&overlay, false)?;
+
+    #[cfg(target_os = "macos")]
+    overlay_macos::present_overlay_window(&overlay).map_err(|error| error.to_string())?;
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        overlay.show().map_err(|error| error.to_string())?;
+        let _ = overlay.set_focus();
+    }
+
+    Ok(())
+}
+
+fn set_overlay_click_through(overlay: &tauri::WebviewWindow, enabled: bool) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    return overlay_macos::set_overlay_click_through(overlay, enabled);
+
+    #[cfg(target_os = "windows")]
+    return overlay_windows::set_overlay_click_through(overlay, enabled);
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        let _ = (overlay, enabled);
+        Ok(())
+    }
 }
 
 pub fn dismiss_capture_overlay(app: &AppHandle) -> Result<(), String> {
@@ -225,6 +292,10 @@ pub fn dismiss_capture_overlay(app: &AppHandle) -> Result<(), String> {
 }
 
 fn dismiss_capture_overlay_impl(app: &AppHandle) -> Result<(), String> {
+    if let Some(overlay) = app.get_webview_window(OVERLAY_LABEL) {
+        set_overlay_click_through(&overlay, false)?;
+    }
+
     hide_capture_overlay_only_impl(app)?;
 
     if let Some(main_window) = app.get_webview_window("main") {
@@ -270,7 +341,14 @@ fn dispatch_show_prepared_overlay(
 }
 
 pub fn open_capture_overlay(app: &AppHandle) -> Result<CaptureOverlayBounds, String> {
-    let prepared = match prepare_overlay_open() {
+    open_capture_overlay_with_options(app, false)
+}
+
+pub fn open_capture_overlay_with_options(
+    app: &AppHandle,
+    skip_preview: bool,
+) -> Result<CaptureOverlayBounds, String> {
+    let prepared = match prepare_overlay_open(skip_preview) {
         Ok(prepared) => prepared,
         Err(error) => {
             report_capture_failure(app, &error);

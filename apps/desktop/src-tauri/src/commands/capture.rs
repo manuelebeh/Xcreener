@@ -1,7 +1,10 @@
 use crate::capture::{
-    capture_fullscreen as capture_fullscreen_impl, capture_region as capture_region_impl,
+    cancel_live_capture, capture_fullscreen as capture_fullscreen_impl,
+    capture_native as capture_native_impl, capture_region as capture_region_impl,
+    capture_scrolling_window as capture_scrolling_window_impl,
     capture_window as capture_window_impl, get_overlay_bounds, get_window_at_point, list_monitors,
-    list_windows, CaptureOverlayBounds, MonitorInfo, WindowInfo,
+    list_windows, request_scroll_capture_stop, CaptureNativeRequest, CaptureOverlayBounds,
+    MonitorInfo, WindowInfo,
 };
 use crate::overlay;
 use tauri::AppHandle;
@@ -42,13 +45,46 @@ pub async fn get_capture_overlay_bounds() -> Result<CaptureOverlayBounds, String
 }
 
 #[tauri::command]
-pub async fn capture_overlay_ready(app: AppHandle) -> Result<(), String> {
-    overlay::present_capture_overlay(&app)
+pub async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> {
+    overlay::open_capture_overlay(&app)
 }
 
 #[tauri::command]
-pub async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> {
-    overlay::open_capture_overlay(&app)
+pub async fn show_live_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> {
+    overlay::open_capture_overlay_with_options(&app, true)
+}
+
+#[tauri::command]
+pub async fn capture_native_command(
+    app: AppHandle,
+    request: CaptureNativeRequest,
+) -> Result<Vec<u8>, String> {
+    capture_native_impl(&app, request)
+}
+
+#[tauri::command]
+pub async fn capture_scrolling_window_command(
+    app: AppHandle,
+    window: WindowInfo,
+) -> Result<Vec<u8>, String> {
+    capture_scrolling_window_impl(&app, window)
+}
+
+#[tauri::command]
+pub async fn cancel_live_capture_command() -> Result<(), String> {
+    cancel_live_capture();
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn stop_scrolling_capture_command() -> Result<(), String> {
+    request_scroll_capture_stop();
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn capture_overlay_ready(app: AppHandle) -> Result<(), String> {
+    overlay::present_capture_overlay(&app)
 }
 
 #[tauri::command]

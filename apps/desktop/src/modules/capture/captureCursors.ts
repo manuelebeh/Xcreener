@@ -7,8 +7,10 @@ export function captureOverlayCursor(mode: CaptureMode): string | undefined {
   switch (mode) {
     case 'window':
     case 'fullscreen':
+    case 'scroll':
       return CAPTURE_CAMERA_CURSOR;
     case 'region':
+    case 'menu':
       return 'crosshair';
     default:
       return undefined;

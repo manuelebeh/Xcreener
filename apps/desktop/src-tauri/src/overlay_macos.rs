@@ -28,6 +28,11 @@ pub fn configure_overlay_window(window: &WebviewWindow) -> Result<(), String> {
     Ok(())
 }
 
+pub fn set_overlay_click_through(window: &WebviewWindow, enabled: bool) -> Result<(), String> {
+    ns_window(window)?.setIgnoresMouseEvents(enabled);
+    Ok(())
+}
+
 /// Show the overlay without stealing the macOS menu bar from the app the user was in.
 pub fn present_overlay_window(window: &WebviewWindow) -> Result<(), String> {
     let ns_window = ns_window(window)?;

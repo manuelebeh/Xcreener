@@ -1,8 +1,12 @@
-import type { CaptureMode } from '@/shared/types/ipc';
+import type { CaptureDelaySecs, CaptureMode } from '@/shared/types/ipc';
+import { CaptureDelaySelect } from './CaptureDelaySelect';
 
 interface CaptureToolbarProps {
   activeMode: CaptureMode;
+  delaySecs: CaptureDelaySecs;
+  isCapturing: boolean;
   onModeChange: (mode: CaptureMode) => void;
+  onDelayChange: (delay: CaptureDelaySecs) => void;
   onCancel: () => void;
   onConfirm?: () => void;
   confirmDisabled?: boolean;
@@ -12,11 +16,16 @@ const MODES: { id: CaptureMode; label: string }[] = [
   { id: 'region', label: 'Region' },
   { id: 'window', label: 'Window' },
   { id: 'fullscreen', label: 'Screen' },
+  { id: 'scroll', label: 'Scroll' },
+  { id: 'menu', label: 'Menu' },
 ];
 
 export function CaptureToolbar({
   activeMode,
+  delaySecs,
+  isCapturing,
   onModeChange,
+  onDelayChange,
   onCancel,
   onConfirm,
   confirmDisabled = false,
@@ -34,6 +43,7 @@ export function CaptureToolbar({
           className={`sg-focus-ring cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap transition-colors ${
             activeMode === mode.id ? 'capture-hud-btn-active' : 'capture-hud-btn'
           }`}
+          disabled={isCapturing}
           onPointerDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation();
@@ -43,6 +53,12 @@ export function CaptureToolbar({
           {mode.label}
         </button>
       ))}
+      <span className="capture-hud-divider mx-1 h-5 w-px" aria-hidden="true" />
+      <CaptureDelaySelect
+        delaySecs={delaySecs}
+        onDelayChange={onDelayChange}
+        disabled={isCapturing || activeMode === 'scroll'}
+      />
       {onConfirm ? (
         <>
           <span className="capture-hud-divider mx-1 h-5 w-px" aria-hidden="true" />
@@ -50,7 +66,7 @@ export function CaptureToolbar({
             type="button"
             data-testid="capture-confirm"
             className="sg-focus-ring cursor-pointer rounded-full bg-primary px-3 py-1.5 text-sm font-medium whitespace-nowrap text-primary-foreground transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={confirmDisabled}
+            disabled={confirmDisabled || isCapturing}
             onPointerDown={(event) => event.stopPropagation()}
             onClick={(event) => {
               event.stopPropagation();

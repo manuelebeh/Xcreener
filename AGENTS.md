@@ -80,6 +80,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 1b.3** : `@snapglow/redaction-core`, redaction mobile (`snapglow-ocr` Vision/ML Kit, `RedactionBar`), export pleine résolution (`ExportCanvas`), EAS/store prep, matrice QA devices
 - **Sprint 2b.1** : `@snapglow/style-suggestion-core`, classification on-device desktop (`classify_content_command`), UI `StyleSuggestionBar`, training tooling (`tools/style-classifier/`) — **modèle ML non entraîné** (pas de dataset ; fallback heuristique)
 - **Sprint 2b.2** : `@snapglow/ocr-core`, OCR copy-text desktop (`recognize_text_command`), UI `TextExtractionBar`, auto-crop (`detect_content_bounds_command`), compression export (`compress_export_bytes_command`)
+- **Sprint 2b.3** : capture scrollante viewport (`capture_scrolling_window_command`, Home + Page Down + stitch), timer différé + mode Menu (`capture_native_command`), HUD progress + `stop_scrolling_capture_command`, ADR-007 — **QA OK**, améliorations stitch en backlog
 
 ## Agent conventions
 

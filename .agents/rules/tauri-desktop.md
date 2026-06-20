@@ -14,7 +14,7 @@ Menu-bar style: 480×640, native decorations on `main`, frameless `capture-overl
 
 Rust modules in `src-tauri/src/commands/`:
 
-- `capture` - region/window/fullscreen, overlay (Sprint 1.1)
+- `capture` - region/window/fullscreen, overlay, scroll/menu/delay live flows (Sprint 1.1 + 2b.3, ADR-007)
 - `redaction` - `detect_sensitive_data` : OCR + regex detectors (Sprint 1.5)
 - `classification` - `classify_content_command` : on-device screenshot content classifier (Sprint 2b.1)
 - `ocr` - `recognize_text_command` : copy-text OCR, returns raw `TextLine[]` (Sprint 2b.2)
@@ -24,6 +24,7 @@ Rust modules in `src-tauri/src/commands/`:
 
 Engines:
 
+- **Capture** (`src-tauri/src/capture/`) : xcap preview/native grab, `scroll.rs` + `stitch.rs`, platform scroll (Home / Page Down)
 - **OCR** (`src-tauri/src/ocr/`) : Vision macOS, Windows.Media.Ocr, Tesseract CLI fallback — shared by redaction and copy-text
 - **Redaction** (`src-tauri/src/redaction/`) : regex detectors on OCR lines
 - **Classification** (`src-tauri/src/classification/`) : TFLite when bundled, heuristic fallback
