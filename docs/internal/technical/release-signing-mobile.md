@@ -1,0 +1,90 @@
+# Mobile release & signing (Sprint 1b.3)
+
+Operational guide for SnapGlow iOS + Android builds via [EAS Build](https://docs.expo.dev/build/introduction/).
+
+## Prerequisites
+
+| Requirement | Status (Sprint 1b.3) |
+|-------------|----------------------|
+| [Expo account](https://expo.dev/signup) | Required for EAS |
+| Apple Developer Program ($99/yr) | **Not yet** — blocks TestFlight |
+| Google Play Console ($25 one-time) | **Not yet** — blocks Play Internal |
+| `EXPO_TOKEN` CI secret | Document only until CI enabled |
+
+## Local setup
+
+```bash
+cd apps/mobile
+npm install -g eas-cli   # or: npx eas-cli
+eas login
+eas init                 # replaces placeholder projectId in app.config.ts extra.eas
+```
+
+## Build profiles (`eas.json`)
+
+| Profile | Use | dev-client | Distribution |
+|---------|-----|------------|--------------|
+| `development` | Daily dev + device testing | Yes | Internal (simulator OK on iOS) |
+| `preview` | QA / internal testers | No | Internal APK/IPA |
+| `production` | Store submission | No | App Store / Play (AAB) |
+
+```bash
+cd apps/mobile
+eas build --profile preview --platform ios
+eas build --profile preview --platform android
+eas build --profile production --platform all
+```
+
+`APP_VARIANT=production` omits `expo-dev-client` from native build (see `app.config.ts`).
+
+## Credentials
+
+EAS manages credentials by default:
+
+```bash
+eas credentials
+```
+
+### iOS
+
+- Distribution certificate + provisioning profile (EAS or manual upload)
+- App ID: `com.snapglow.app`
+- Capabilities: Photos (write), Share Extension (via `expo-share-intent`)
+
+### Android
+
+- Keystore: EAS-generated or upload existing
+- Package: `com.snapglow.app`
+- Play App Signing recommended when Play Console is active
+
+## Store upload (after accounts active)
+
+```bash
+# After preview/production build succeeds
+eas submit --profile production --platform ios
+eas submit --profile production --platform android
+```
+
+Update placeholder values in `eas.json` → `submit.production`:
+
+- `appleId`, `ascAppId`, `appleTeamId`
+- `google-play-service-account.json` (Play API service account)
+
+## Privacy & data safety
+
+Disclose in store forms:
+
+| Data | Collected | Shared | Purpose |
+|------|-----------|--------|---------|
+| Photos | Write only (user export) | No | Save edited screenshots |
+| Share import | Read incoming image | No | User-initiated edit |
+| OCR / redaction | On-device only | No | Sensitive data detection |
+| Analytics | None in mobile MVP | No | — |
+
+Privacy policy URL: **TBD** before public submission (required by both stores).
+
+## Related
+
+- [listing-checklist.md](../store/listing-checklist.md) — screenshots, copy, assets
+- [device-matrix.md](../qa/device-matrix.md) — QA matrix
+- Desktop signing: [release-signing.md](./release-signing.md)

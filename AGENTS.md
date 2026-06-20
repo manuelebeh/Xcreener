@@ -26,6 +26,7 @@ apps/web/              Landing (@snapglow/web)
 apps/mobile/           Expo app (@snapglow/mobile)
 packages/design-tokens/  DTCG tokens → CSS + tokens.native
 packages/editor-core/    Shared editor logic (layout, presets, annotations)
+packages/redaction-core/ Shared on-device detectors + mapRegionToLayout (desktop + mobile)
 packages/ui/           Shared React web components + Storybook
 packages/ui-native/    Shared React Native components
 packages/              biome-config, typescript-config
@@ -73,7 +74,8 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 1.5** : redaction on-device (OCR macOS/Windows + détecteurs regex), `RedactionBar`, masquage → `BlurAnnotation` ; export WYSIWYG PNG/JPG/WebP, clipboard (`Image.fromBytes` + `image-png`), drag-out (`ExportBar`)
 - **Sprint 1.6** : historique 30 captures (`modules/history/`, `db/captures.ts`, PNG + miniatures WebP), route `/history`, E2E natif `capture-beautify-export`, perf/stress tests, builds beta unsigned (voir `release-signing.md` §5) ; polish UX P1-037 (`design.md`, Feature Stack editor, warm tokens, `AppTopNav`)
 - **Sprint 1b.1** : app mobile Expo (`apps/mobile/`), share import iOS/Android (`expo-share-intent`), `@snapglow/ui-native` + `tokens.native`, dev builds (`dev:mobile`)
-- **Sprint 1b.2** : `@snapglow/editor-core`, éditeur Skia mobile (presets, annotations tactiles), export Photos + share sheet (`modules/export/`)
+- **Sprint 1b.2** : `@snapglow/editor-core`, éditeur Skia mobile (presets, annotations tactiles), export Photos + share sheet (`modules/export/`) — preview-scaled
+- **Sprint 1b.3** : `@snapglow/redaction-core`, redaction mobile (`snapglow-ocr` Vision/ML Kit, `RedactionBar`), export pleine résolution (`ExportCanvas`), EAS/store prep, matrice QA devices
 
 ## Agent conventions
 

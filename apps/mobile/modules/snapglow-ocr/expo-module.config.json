@@ -1,0 +1,15 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["SnapglowOcrModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.snapglowocr.SnapglowOcrModule"],
+    "publication": {
+      "groupId": "com.snapglow.app",
+      "artifactId": "snapglow-ocr",
+      "version": "0.1.0",
+      "repository": "local-maven-repo"
+    }
+  }
+}

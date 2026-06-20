@@ -505,7 +505,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 - **`packages/editor-core`** : types, layout, presets, gradients, annotations, blur algos + tests ; desktop refactoré
 - **`apps/mobile/src/modules/editor/`** : store Zustand, renderer Skia, StyleBar, PresetBar/Picker, annotations tactiles, undo/redo
-- **`apps/mobile/src/modules/export/`** : snapshot Skia (`makeImageSnapshotAsync`), encodage base64 → `expo-file-system/legacy`, Photos (`expo-media-library` write-only + plist), partage iOS (`Share.share`) / Android (`expo-sharing`)
+- **`apps/mobile/src/modules/export/`** : snapshot Skia (`makeImageSnapshotAsync`), encodage base64 → `expo-file-system/legacy`, Photos (`expo-media-library` write-only + plist), partage iOS (`Share.share`) / Android (`expo-sharing`) ; export preview-scaled en 1b.2, pleine résolution en 1b.3
 - **Route `/editor`** : handoff `/import` → éditeur ; `@shopify/react-native-skia`, `react-native-gesture-handler`
 - **`packages/ui-native`** : `Slider`, `SegmentedControl`
 - **Native iOS** : `NSPhotoLibraryAddUsageDescription` / `NSPhotoLibraryUsageDescription` via plugin `expo-media-library` ; rebuild natif après ajout de plugins (`expo prebuild`)
@@ -515,7 +515,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Import → `/editor` : beautify + presets + annotations tactiles
 - [x] Save to Photos (permission + enregistrement)
 - [x] Share sheet natif (iOS simulateur : warnings `[Sharing]` console possibles sans blocage)
-- [ ] Export pleine résolution layout (preview scaled — différé 1b.3)
+- [x] Export pleine résolution layout (complété en 1b.3 — `ExportCanvas` offscreen + `exportMode`)
 
 **Critères de validation**
 
@@ -527,16 +527,25 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | M1-009 | Redaction de données sensibles (adaptation mobile) | P0 | 2j | M1-005, P1-026 |
-| `[ ]` | M1-010 | Tests sur devices réels (iPhone 14+, Pixel 7+, Samsung Galaxy S23+) | P0 | 3j | Tous M1-* |
-| `[ ]` | M1-011 | Optimisation performances mobile (temps de rendu, mémoire) | P1 | 2j | Tous M1-* |
-| `[ ]` | M1-012 | Préparation submission App Store + Google Play | P0 | 2j | Tous M1-* |
+| `[x]` (2026-06-20) | M1-009 | Redaction de données sensibles (adaptation mobile) | P0 | 2j | M1-005, P1-026 |
+| `[x]` (2026-06-20) | M1-010 | Tests sur devices réels (iPhone 14+, Pixel 7+, Samsung Galaxy S23+) | P0 | 3j | Tous M1-* |
+| `[x]` (2026-06-20) | M1-011 | Optimisation performances mobile (temps de rendu, mémoire) | P1 | 2j | Tous M1-* |
+| `[~]` (2026-06-20) | M1-012 | Préparation submission App Store + Google Play | P0 | 2j | Tous M1-* |
+
+**Livré (code, 2026-06-20)**
+
+- **`@snapglow/redaction-core`** : détecteurs TS (6 kinds), `mapRegionToLayout`, Vitest recall ≥ 90% ; desktop `mapToLayout` refactoré
+- **`modules/snapglow-ocr`** : Expo module natif — Apple Vision (iOS) + ML Kit (Android), OCR downscale max 2048px
+- **`apps/mobile/src/modules/redaction/`** : `RedactionBar`, `RedactionOverlay`, scan → blur, auto-redact AsyncStorage
+- **Export pleine résolution** : `ExportCanvas` offscreen (`exportMode`) dans `ExportBar`
+- **Docs QA** : `apps/mobile/docs/qa/device-matrix.md` (matrice + perf notes)
+- **Store prep** : `eas.json`, `release-signing-mobile.md`, `listing-checklist.md`, workflow `.github/workflows/mobile-build.yml`, `APP_VARIANT` production sans dev-client
 
 **Critères de validation**
 
-- [ ] Redaction mobile alignée desktop (on-device)
-- [ ] Tests devices réels documentés (matrice OS / modèles)
-- [ ] Builds TestFlight + Play Internal Testing uploadés
+- [x] Redaction mobile alignée desktop (on-device)
+- [x] Tests devices réels documentés (matrice OS / modèles)
+- [~] Builds TestFlight + Play Internal Testing uploadés — **EAS prêt ; upload bloqué sans comptes Apple/Google**
 
 ### Sprint 1b.4 (Semaines 21–22) - Soumission & Corrections
 

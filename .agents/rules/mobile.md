@@ -17,7 +17,7 @@ mise run dev:mobile:ios      # Build & run iOS simulator (first run runs prebuil
 mise run dev:mobile:android  # Build & run Android emulator
 ```
 
-First native run requires Xcode (iOS) or Android Studio (Android). After plugin changes (e.g. `expo-share-intent`, `expo-media-library`), rebuild with `mise run dev:mobile:ios` / `dev:mobile:android` (Metro seul ne met pas à jour Info.plist).
+First native run requires Xcode (iOS) or Android Studio (Android). After plugin or native module changes (e.g. `expo-share-intent`, `expo-media-library`, `snapglow-ocr`), rebuild with `mise run dev:mobile:ios` / `dev:mobile:android` (Metro alone does not link native modules).
 
 When adding or upgrading Expo packages, prefer `npx expo install <pkg>` in `apps/mobile/` so versions stay aligned with SDK 56 (see [SDK 56 docs](https://docs.expo.dev/versions/v56.0.0/)).
 
@@ -27,11 +27,14 @@ When adding or upgrading Expo packages, prefer `npx expo install <pkg>` in `apps
 apps/mobile/
 ├── app/                 # Expo Router screens
 ├── app.config.ts        # Expo config + share-intent plugin
+├── eas.json             # EAS Build profiles (development / preview / production)
 ├── metro.config.js      # Monorepo workspace resolution
+├── modules/snapglow-ocr/  # Local Expo module — Vision (iOS) + ML Kit (Android)
 └── src/modules/
     ├── capture/         # Share import + image state (Sprint 1b.1)
     ├── editor/          # Skia beautify, presets, annotations (Sprint 1b.2)
-    └── export/          # Photos save + share sheet (Sprint 1b.2)
+    ├── export/          # Full-res export, Photos save + share sheet (Sprint 1b.2–1b.3)
+    └── redaction/       # On-device OCR scan + blur masking (Sprint 1b.3)
 ```
 
 ## Shared packages
@@ -40,6 +43,7 @@ apps/mobile/
 |---------|------|
 | `@snapglow/design-tokens` | SSOT — import `tokens.native` for RN theme |
 | `@snapglow/editor-core` | Shared layout, presets, annotations (desktop + mobile) |
+| `@snapglow/redaction-core` | On-device sensitive-data detectors + coordinate mapping |
 | `@snapglow/ui-native` | RN components (Button, ThemeProvider) — sibling of web `@snapglow/ui` |
 
 Do **not** import `@snapglow/ui` (web/Radix/Tailwind) in mobile code.
@@ -51,13 +55,14 @@ Do **not** import `@snapglow/ui` (web/Radix/Tailwind) in mobile code.
 3. `useShareImport` stores image in `capture` Zustand store
 4. App navigates to `/import` preview screen → user continues to `/editor`
 
-## Export flow (Sprint 1b.2)
+## Export flow (Sprint 1b.2–1b.3)
 
-1. Skia canvas snapshot via `makeImageSnapshotAsync()` (textures GPU — `useImage`)
-2. Encode PNG/JPG → base64 → write `documentDirectory` via `expo-file-system/legacy`
-3. **Save to Photos** : `expo-media-library` permission write-only (`requestPermissionsAsync(true)`) + `saveToLibraryAsync` (legacy)
-4. **Share** : iOS `Share.share({ url })` ; Android `expo-sharing` with `mimeType` / `UTI`
-5. Simulateur iOS : logs `[Sharing] error fetching item…` possibles sans échec fonctionnel
+1. **Full-res render (1b.3)** : offscreen `ExportCanvas` with `exportMode` — layout WYSIWYG, capped at 8192px **physical** per side (Metal limit ÷ device pixel ratio, e.g. ~2730pt on @3x)
+2. Skia snapshot via `makeImageSnapshotAsync()` (textures GPU — `useImage`)
+3. Encode PNG/JPG → base64 → write `documentDirectory` via `expo-file-system/legacy`
+4. **Save to Photos** : `expo-media-library` permission write-only (`requestPermissionsAsync(true)`) + `saveToLibraryAsync` (legacy)
+5. **Share** : iOS `Share.share({ url })` ; Android `expo-sharing` with `mimeType` / `UTI`
+6. Simulateur iOS : logs `[Sharing] error fetching item…` possibles sans échec fonctionnel
 
 ## Module conventions
 

@@ -46,7 +46,7 @@ export {
   computeLayout,
   zoomTransformAtPointer,
 } from './computeLayout';
-export { fitPreviewSize } from './fitPreviewSize';
+export { fitGpuTextureSize, fitPreviewSize, MAX_GPU_TEXTURE_SIZE } from './fitPreviewSize';
 export {
   DEFAULT_GRADIENT_PRESET_ID,
   DEFAULT_SOLID_COLOR,

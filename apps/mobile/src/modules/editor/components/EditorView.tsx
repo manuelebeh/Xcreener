@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ExportBar } from '@/modules/export/components/ExportBar';
+import { RedactionBar, useAutoRedaction } from '@/modules/redaction';
 import { useEditorStore } from '../store';
 import { AnnotationToolbar } from './AnnotationToolbar';
 import type { BeautifyCanvasHandle } from './BeautifyCanvas';
@@ -16,6 +17,7 @@ export function EditorView() {
   const { colors } = useTheme();
   const screenshot = useEditorStore((state) => state.screenshot);
   const canvasRef = useRef<BeautifyCanvasHandle>(null);
+  useAutoRedaction();
 
   if (!screenshot) {
     return (
@@ -38,6 +40,7 @@ export function EditorView() {
         <PresetBar />
         <StyleBar />
         <AnnotationToolbar />
+        <RedactionBar />
         <ExportBar canvasRef={canvasRef} />
       </ScrollView>
     </SafeAreaView>
