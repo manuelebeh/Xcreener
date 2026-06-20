@@ -1,4 +1,4 @@
-# SnapGlow — Agent guide
+# SnapGlow - Agent guide
 
 Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack Start web** → **Expo mobile** → **Fastify API**.
 
@@ -7,7 +7,7 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Area | Choice |
 |------|--------|
 | Monorepo | pnpm workspaces + Turborepo |
-| Dev CLI | [mise](https://mise.jdx.dev/) — `dev:desktop`, `dev:web`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
+| Dev CLI | [mise](https://mise.jdx.dev/) - `dev:desktop`, `dev:web`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
 | Desktop | Tauri v2, React 19, Vite, TypeScript |
 | Web | TanStack Start, Nitro, Tailwind v4 |
 | Design system | `packages/design-tokens` + `packages/ui` (Storybook) |
@@ -43,7 +43,7 @@ mise run test
 
 Desktop e2e:
 - Playwright smoke UI: `pnpm --filter @snapglow/desktop test:e2e`
-- Native integration: `mise run test:e2e:native` (WebDriver on Linux/Windows; `cargo test` fallback on macOS — [Tauri limitation](https://v2.tauri.app/develop/tests/webdriver/))
+- Native integration: `mise run test:e2e:native` (WebDriver on Linux/Windows; `cargo test` fallback on macOS - [Tauri limitation](https://v2.tauri.app/develop/tests/webdriver/))
 
 Rust: `cd apps/desktop/src-tauri && cargo test`
 
@@ -54,7 +54,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Modules:** `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings}/`
 - **ADR-001:** monorepo + modules
 - **ADR-002:** design tokens + UI + web
-- **Design system (desktop):** `design.md` — layout, typography, tokens mapping (Hallmark locked, Sprint 1.6)
+- **Design system (desktop):** `design.md` - layout, typography, tokens mapping (Hallmark locked, Sprint 1.6)
 - **ADR-003:** IPC commands/events
 - **ADR-004:** tray, shortcuts, autostart
 - **ADR-005:** updater, releases, signing roadmap
@@ -70,10 +70,10 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 ## Agent conventions
 
 1. **CodeGraph > grep** for exploring structure across TS and Rust.
-2. **Hallmark** (`.cursor/skills/hallmark/`) for UI/UX polish — read `design.md` first (locked system; conformance, not macrostructure rotation).
+2. **Hallmark** (`.cursor/skills/hallmark/`) for UI/UX polish - read `design.md` first (locked system; conformance, not macrostructure rotation).
 3. **Privacy-first:** no telemetry, no cloud upload without explicit user action.
 4. **Minimal diffs:** match existing patterns; don't add ESLint/Prettier.
-5. **mise** is the dev entry point — add new apps as `dev:*` tasks, not ad-hoc root scripts.
+5. **mise** is the dev entry point - add new apps as `dev:*` tasks, not ad-hoc root scripts.
 
 ## Multi-app roadmap
 

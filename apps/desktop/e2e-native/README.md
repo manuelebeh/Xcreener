@@ -10,14 +10,14 @@ Automated integration tests for tray-adjacent behaviour and global shortcuts.
 | **Windows** | Supported (msedgedriver) | Full native e2e |
 | **macOS** | **Not supported** by Tauri | `cargo test` + manual tray QA |
 
-Tauri documents this limitation: [WebDriver testing](https://v2.tauri.app/develop/tests/webdriver/) — macOS has no WKWebView WebDriver.
+Tauri documents this limitation: [WebDriver testing](https://v2.tauri.app/develop/tests/webdriver/) - macOS has no WKWebView WebDriver.
 
 ## Run locally
 
 ### macOS
 
 ```bash
-# Full pipeline (debug build + Rust tests — no WebDriver)
+# Full pipeline (debug build + Rust tests - no WebDriver)
 mise run test:e2e:native
 
 # Or after a debug build:
@@ -32,12 +32,12 @@ cargo install tauri-driver --locked
 # Linux also needs:
 # sudo apt install webkit2gtk-driver xvfb
 
-# Windows also needs msedgedriver on PATH — see Tauri docs
+# Windows also needs msedgedriver on PATH - see Tauri docs
 
 mise run test:e2e:native
 ```
 
-## Manual QA (macOS tray — not automatable with tauri-driver)
+## Manual QA (macOS tray - not automatable with tauri-driver)
 
 - [ ] Tray icon visible in menu bar
 - [ ] Left click toggles window show/hide

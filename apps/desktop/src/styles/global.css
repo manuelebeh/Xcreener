@@ -40,7 +40,7 @@ a:hover {
   outline-offset: 2px;
 }
 
-/* Capture overlay HUD — semantic tokens, not raw neutral scale */
+/* Capture overlay HUD - semantic tokens, not raw neutral scale */
 .capture-hud {
   background: color-mix(in oklch, var(--sg-color-neutral-950) 92%, transparent);
   color: var(--sg-color-neutral-50);

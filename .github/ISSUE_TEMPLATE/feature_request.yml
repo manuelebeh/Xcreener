@@ -26,14 +26,14 @@ body:
     attributes:
       label: Primary Area
       options:
-        - Desktop — capture
-        - Desktop — editor / beautify
-        - Desktop — export
-        - Desktop — settings / privacy
-        - Desktop — cross-cutting (shell, IPC, SQLite)
-        - Web landing (apps/web — Astro)
-        - Mobile (apps/mobile — Expo)
-        - API / cloud (apps/api — Fastify)
+        - Desktop - capture
+        - Desktop - editor / beautify
+        - Desktop - export
+        - Desktop - settings / privacy
+        - Desktop - cross-cutting (shell, IPC, SQLite)
+        - Web landing (apps/web - Astro)
+        - Mobile (apps/mobile - Expo)
+        - API / cloud (apps/api - Fastify)
         - Packages (design-tokens, i18n, shared config)
         - Docs / DX / CI
     validations:
@@ -48,7 +48,7 @@ body:
         - label: Desktop changes will live under `apps/desktop/src/modules/<name>/` (or `shared/`, `db/`, `tauri/`).
         - label: New Rust logic will go in `src-tauri/src/commands/` with TS wrappers in `src/tauri/commands.ts`.
         - label: Shared logic placement has been considered (workspace package vs module vs `shared/`).
-        - label: Privacy-first — no cloud upload or telemetry without explicit user action.
+        - label: Privacy-first - no cloud upload or telemetry without explicit user action.
 
   - type: textarea
     id: alternatives
@@ -74,7 +74,7 @@ body:
     attributes:
       label: Sprint / Phase (optional)
       description: If you know where this fits in the roadmap, reference a sprint ID (e.g. P1-007, P0-013).
-      placeholder: "Phase 1 — Sprint 1.2 (P1-007) or Phase 0.2 (P0-013)"
+      placeholder: "Phase 1 - Sprint 1.2 (P1-007) or Phase 0.2 (P0-013)"
 
   - type: textarea
     id: notes

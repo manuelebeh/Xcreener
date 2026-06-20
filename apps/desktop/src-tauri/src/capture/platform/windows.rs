@@ -108,7 +108,7 @@ fn downscale_to_logical(image: RgbaImage, width: u32, height: u32) -> RgbaImage 
 /// Capture one monitor for the frozen desktop preview.
 ///
 /// xcap monitor metadata is in logical virtual-screen coordinates while GDI BitBlt uses
-/// physical pixels — always scale before capture, then downsample to logical size.
+/// physical pixels - always scale before capture, then downsample to logical size.
 pub fn capture_monitor_image(monitor_info: &MonitorInfo) -> Result<RgbaImage, CaptureError> {
     let scale = monitor_info.scale_factor;
     let captured = gdi_capture_area(

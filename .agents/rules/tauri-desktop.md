@@ -14,10 +14,10 @@ Menu-bar style: 480×640, native decorations on `main`, frameless `capture-overl
 
 Rust modules in `src-tauri/src/commands/`:
 
-- `capture` — region/window/fullscreen, overlay (Sprint 1.1)
-- `redaction` — `detect_sensitive_data` : OCR + regex detectors (Sprint 1.5)
-- `export` — `export_image` stub (unused; export is frontend offscreen canvas + dialog/fs)
-- `storage` — settings IPC placeholders; frontend uses SQL plugin directly
+- `capture` - region/window/fullscreen, overlay (Sprint 1.1)
+- `redaction` - `detect_sensitive_data` : OCR + regex detectors (Sprint 1.5)
+- `export` - `export_image` stub (unused; export is frontend offscreen canvas + dialog/fs)
+- `storage` - settings IPC placeholders; frontend uses SQL plugin directly
 
 Redaction engine: `src-tauri/src/redaction/` (Vision macOS, Windows.Media.Ocr).
 
@@ -32,9 +32,9 @@ Register new commands in `lib.rs` and mirror types in `src/shared/types/ipc.ts` 
 
 ## Tauri features & security
 
-- Cargo feature `image-png` on `tauri` — required for clipboard image copy (`Image.fromBytes`)
-- Asset protocol enabled in `tauri.conf.json` — history thumbnails via `convertFileSrc`
+- Cargo feature `image-png` on `tauri` - required for clipboard image copy (`Image.fromBytes`)
+- Asset protocol enabled in `tauri.conf.json` - history thumbnails via `convertFileSrc`
 - FS scope: `fs:scope-appdata-recursive` for `$APPDATA/**` (captures, thumbnails)
 - Clipboard: `clipboard-manager:allow-write-image`
 
-CSP in `tauri.conf.json` — keep `'unsafe-inline'` for styles only as needed; no remote scripts.
+CSP in `tauri.conf.json` - keep `'unsafe-inline'` for styles only as needed; no remote scripts.
