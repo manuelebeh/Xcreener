@@ -1,4 +1,4 @@
-# ADR-002 — Design tokens, shared UI, and web landing
+# ADR-002 - Design tokens, shared UI, and web landing
 
 **Status:** Accepted  
 **Date:** 2026-06-16  
@@ -25,7 +25,7 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 
 ### Desktop product design (`design.md`)
 
-- Sprint 1.6 (P1-037): locked UX/layout doc at repo root — complements tokens/UI packages
+- Sprint 1.6 (P1-037): locked UX/layout doc at repo root - complements tokens/UI packages
 - Covers macrostructure (Feature Stack), nav (N1b), typography (IBM Plex), semantic token mapping, editor tool order
 - Code SSOT remains `packages/design-tokens/tokens.json`; `design.md` is the product-level rule set for desktop surfaces
 
@@ -51,7 +51,7 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 
 ## References
 
-- [design.md](../../../../design.md) — desktop product design system (Sprint 1.6)
+- [design.md](../../../../design.md) - desktop product design system (Sprint 1.6)
 - [ADR-001](./001-monorepo-and-module-architecture.md)
 - [accessibility-audit.md](../accessibility-audit.md)
 - [Sprints & Implementations.md](../../product/Sprints%20%26%20Implementations.md)

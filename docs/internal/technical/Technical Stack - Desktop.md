@@ -1,4 +1,4 @@
-# Technical Stack — Desktop (macOS & Windows)
+# Technical Stack - Desktop (macOS & Windows)
 
 > Architecture technique détaillée pour les applications desktop SnapGlow
 > **Version :** 1.0 | **Date :** Juin 2026 | **Statut :** Brouillon
@@ -141,7 +141,7 @@
 
 | Technologie | Version | Rôle |
 |---|---|---|
-| **React** | 19.x | UI framework — composants déclaratifs |
+| **React** | 19.x | UI framework - composants déclaratifs |
 | **TypeScript** | 5.x | Type safety, meilleure DX, refactoring sûr |
 | **Tailwind CSS** | 4.x | Utility-first CSS, design system cohérent |
 | **Zustand** | 5.x | State management léger (< 1KB), pas de boilerplate |
@@ -156,7 +156,7 @@ src/
 ├── app/                    # Point d'entrée, routing, providers
 │   ├── App.tsx
 │   ├── routes.tsx
-│   ├── components/         # AppTopNav (nav N1b — Sprint 1.6 polish)
+│   ├── components/         # AppTopNav (nav N1b - Sprint 1.6 polish)
 │   └── providers/
 ├── modules/
 │   ├── capture/            # Overlay capture (sélection zone / fenêtre / écran)
@@ -204,7 +204,7 @@ src/
 │   ├── lib/                # tauri, shortcut helpers
 │   ├── types/              # Types TypeScript partagés (ipc, settings)
 │   └── utils/              # Utilitaires communs (image)
-├── styles/                 # global.css — tokens import + design system stamp
+├── styles/                 # global.css - tokens import + design system stamp
 └── tauri/
     ├── commands.ts         # Wrappers typés pour les commandes Tauri (invoke)
     └── events.ts           # Wrappers typés pour les événements Tauri (listen/emit)
@@ -278,14 +278,14 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 > **État Sprint 1.6 :** capture native (Sprint 1.1), redaction on-device (`detect_sensitive_data`), export fichier côté frontend (offscreen canvas + plugins dialog/fs/clipboard), historique captures côté frontend (`db/captures.ts` + fs). Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
 
 ```rust
-// Capture — commandes Rust (xcap) ; l'overlay confirme via découpe preview côté React
+// Capture - commandes Rust (xcap) ; l'overlay confirme via découpe preview côté React
 #[tauri::command]
 async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>, String> { ... }
 
 #[tauri::command]
 async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> { ... }
 
-// Export — stub Rust non utilisé ; l'UI exporte via renderFrame offscreen → blob → dialog/fs
+// Export - stub Rust non utilisé ; l'UI exporte via renderFrame offscreen → blob → dialog/fs
 #[tauri::command]
 async fn export_image(
     image_data: Vec<u8>,
@@ -294,13 +294,13 @@ async fn export_image(
     path: String
 ) -> Result<(), String> { ... }  // stub
 
-// Redaction — Sprint 1.5 : OCR + regex on-device (src-tauri/src/redaction/)
+// Redaction - Sprint 1.5 : OCR + regex on-device (src-tauri/src/redaction/)
 #[tauri::command]
 async fn detect_sensitive_data(image_data: Vec<u8>) -> Result<Vec<SensitiveRegion>, String> {
     // Vision (macOS) / Windows.Media.Ocr → détecteurs email, phone, card, api_key, url, password
 }
 
-// Historique — Sprint 1.6 : frontend-only (db/captures.ts + fs plugin, pas de commande Rust)
+// Historique - Sprint 1.6 : frontend-only (db/captures.ts + fs plugin, pas de commande Rust)
 ```
 
 ### 4.4 APIs natives par plateforme
@@ -331,7 +331,7 @@ async fn detect_sensitive_data(image_data: Vec<u8>) -> Result<Vec<SensitiveRegio
 
 ## 5. Moteur de Rendu (Canvas)
 
-> **État Sprint 1.6 :** moteur `renderFrame` dans `modules/editor/engine/` — layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem — le canvas est monté conditionnellement après `displaySize`). **Shell UI** : `AppTopNav` (N1b) + routes ; **éditeur** Feature Stack (`EditorView` — canvas sticky + `EditorToolsPanel` scrollable, ordre Format → Style → Annotations → Sensitive data → Export). **Design system** : `design.md` (verrouillé) + `@snapglow/design-tokens` + `@snapglow/ui`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`). Clipboard : `Image.fromBytes` + feature Cargo `image-png`.
+> **État Sprint 1.6 :** moteur `renderFrame` dans `modules/editor/engine/` - layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem - le canvas est monté conditionnellement après `displaySize`). **Shell UI** : `AppTopNav` (N1b) + routes ; **éditeur** Feature Stack (`EditorView` - canvas sticky + `EditorToolsPanel` scrollable, ordre Format → Style → Annotations → Sensitive data → Export). **Design system** : `design.md` (verrouillé) + `@snapglow/design-tokens` + `@snapglow/ui`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`). Clipboard : `Image.fromBytes` + feature Cargo `image-png`.
 
 ### 5.1 Architecture du moteur
 
@@ -348,7 +348,7 @@ Layers (bas → haut) :
 └──────────────────────────────────┘
 ```
 
-> **Redaction (Sprint 1.5) :** le scan OCR crée des `BlurAnnotation` sur la layer 4 — pas de couche de rendu séparée. L’overlay `RedactionOverlay` sert uniquement à la prévisualisation avant masquage.
+> **Redaction (Sprint 1.5) :** le scan OCR crée des `BlurAnnotation` sur la layer 4 - pas de couche de rendu séparée. L’overlay `RedactionOverlay` sert uniquement à la prévisualisation avant masquage.
 
 ### 5.2 Pipeline de rendu
 
@@ -366,8 +366,8 @@ Composition Canvas :
   1. Dessiner le fond (gradient/color/image)
   2. Appliquer l'ombre portée (shadow)
   3. Dessiner le screenshot (avec border-radius via clip)
-  4. Appliquer les masques de flou (gaussian / pixelate) — `drawBlurMasks` (manuel + redaction)
-  5. Dessiner les annotations (texte, formes, highlight) — `drawAnnotations`
+  4. Appliquer les masques de flou (gaussian / pixelate) - `drawBlurMasks` (manuel + redaction)
+  5. Dessiner les annotations (texte, formes, highlight) - `drawAnnotations`
   │
   ▼
 Preview temps réel (< 50ms par frame)
@@ -459,7 +459,7 @@ CREATE INDEX idx_captures_tags ON captures(tags);
 
 ## 7. Détection de données sensibles (On-device)
 
-> **Livré Sprint 1.5** — module Rust `src-tauri/src/redaction/` + UI `modules/redaction/`.
+> **Livré Sprint 1.5** - module Rust `src-tauri/src/redaction/` + UI `modules/redaction/`.
 
 ### 7.1 Architecture du moteur de redaction
 
@@ -491,7 +491,7 @@ UI : highlight (`RedactionOverlay`) puis masquage → `BlurAnnotation` (layer 4,
 
 - Le traitement OCR est 100% on-device (aucun appel réseau)
 - Les patterns regex s'exécutent localement sur le texte extrait
-- Les données sensibles détectées ne sont jamais persistées — seules les positions des masques sont sauvegardées
+- Les données sensibles détectées ne sont jamais persistées - seules les positions des masques sont sauvegardées
 - Aucune télémétrie ne contient de données sensibles
 
 ---
@@ -609,7 +609,7 @@ jobs:
 
 | Outil | Usage |
 |---|---|
-| **PostHog** | Product analytics — événements clés (capture, export, preset utilisé) |
+| **PostHog** | Product analytics - événements clés (capture, export, preset utilisé) |
 | **Sentry** | Crash reporting + error tracking (frontend + Rust panics) |
 | **Tauri Updater** | Monitoring des mises à jour (adoption, erreurs) |
 | **Custom metrics** | Temps de capture, temps de rendu, taille des exports (anonymisé) |
@@ -680,7 +680,7 @@ jobs:
 | `framer-motion` | Animations fluides |
 | `@tauri-apps/api` | API Tauri côté frontend |
 | `@tauri-apps/plugin-*` | Plugins Tauri (voir section 2.3) |
-| `tesseract.js` | OCR cross-platform pour extraction de texte (Phase 2b — distinct de la redaction Sprint 1.5) |
+| `tesseract.js` | OCR cross-platform pour extraction de texte (Phase 2b - distinct de la redaction Sprint 1.5) |
 | `@phosphor-icons/react` | Icônes cohérentes |
 | `date-fns` | Manipulation de dates (historique) |
 | `zod` | Validation de schémas (settings, presets) |
@@ -689,12 +689,12 @@ jobs:
 
 ## Documents liés
 
-- [[Cahier des Charges]] — Point d'entrée documentation
-- [[Product Requirements]] — Exigences produit
-- [[Sprints & Implementations]] — Planning de développement
-- [[Cahier des Charges]] — Spécifications originales
-- [[Competitive Analysis]] — Benchmarking concurrents
+- [[Cahier des Charges]] - Point d'entrée documentation
+- [[Product Requirements]] - Exigences produit
+- [[Sprints & Implementations]] - Planning de développement
+- [[Cahier des Charges]] - Spécifications originales
+- [[Competitive Analysis]] - Benchmarking concurrents
 
 ---
 
-*v1.0 — Juin 2026 — Usage confidentiel*
+*v1.0 - Juin 2026 - Usage confidentiel*

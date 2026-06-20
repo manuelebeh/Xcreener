@@ -1,4 +1,4 @@
-# ADR-006 — Native capture overlay and preview crop
+# ADR-006 - Native capture overlay and preview crop
 
 **Status:** Accepted  
 **Date:** 2026-06-16  
@@ -77,5 +77,5 @@ Main window listens via `useCaptureSession` → `setScreenshot` → navigate hom
 
 - [ADR-003](./003-desktop-ipc-and-events.md)
 - [ADR-004](./004-system-integration-tray-shortcuts.md)
-- [Sprints & Implementations — Sprint 1.1](../../product/Sprints%20%26%20Implementations.md)
-- [Sprints & Implementations — Sprint 1.2](../../product/Sprints%20%26%20Implementations.md)
+- [Sprints & Implementations - Sprint 1.1](../../product/Sprints%20%26%20Implementations.md)
+- [Sprints & Implementations - Sprint 1.2](../../product/Sprints%20%26%20Implementations.md)

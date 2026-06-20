@@ -1,4 +1,4 @@
-# Accessibility audit — SnapGlow design system (WCAG 2.1 AA)
+# Accessibility audit - SnapGlow design system (WCAG 2.1 AA)
 
 **Date:** 2026-06-16  
 **Sprint:** 0.4 (P0-020)  
@@ -29,9 +29,9 @@
 
 | Pair | Light | Dark | Notes |
 |------|-------|------|-------|
-| `foreground` / `background` | neutral.900 on neutral.0 | neutral.50 on neutral.950 | Body text — AA large+ |
-| `primary` / `primary-foreground` | brand.500 on neutral.0 | brand.400 on neutral.950 | Buttons — AA for text |
-| `muted` / `background` | neutral.500 on neutral.0 | neutral.400 on neutral.950 | Helper text — AA for small text on light; verify in product UI |
+| `foreground` / `background` | neutral.900 on neutral.0 | neutral.50 on neutral.950 | Body text - AA large+ |
+| `primary` / `primary-foreground` | brand.500 on neutral.0 | brand.400 on neutral.950 | Buttons - AA for text |
+| `muted` / `background` | neutral.500 on neutral.0 | neutral.400 on neutral.950 | Helper text - AA for small text on light; verify in product UI |
 | `destructive` / `primary-foreground` | oklch red on white | lighter red on dark bg | Error states |
 
 **Follow-up (Phase 1):** run automated contrast checks when Figma tokens (P0-008) land.
@@ -50,7 +50,7 @@
 - [x] All interactive components use shared focus ring
 - [x] `prefers-reduced-motion` respected globally
 - [x] Settings shortcut field accessible error association
-- [ ] Full axe CI gate (deferred — addon manual review sufficient for Phase 0)
+- [ ] Full axe CI gate (deferred - addon manual review sufficient for Phase 0)
 
 ## References
 

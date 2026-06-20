@@ -4,7 +4,7 @@ Operational guide for signed SnapGlow desktop releases. **Phase 0 (Sprint 0.4):*
 
 ## 1. Tauri updater (Ed25519)
 
-Distinct from platform code signing — signs `latest.json` and update bundles.
+Distinct from platform code signing - signs `latest.json` and update bundles.
 
 ### Generate key pair (once per team)
 
@@ -76,7 +76,7 @@ Until Apple Developer ID and Windows Authenticode certificates are provisioned, 
 | Secret | Required for beta updater | Notes |
 |--------|---------------------------|-------|
 | `TAURI_SIGNING_PRIVATE_KEY` | Yes (recommended) | Signs `latest.json` + update bundles |
-| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | If key encrypted | — |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | If key encrypted | - |
 | `APPLE_*` | No (unsigned macOS) | Add when Developer ID cert is ready |
 | Windows `.pfx` / Authenticode | No (unsigned Windows) | See section 3 + commented block in `release.yml` |
 

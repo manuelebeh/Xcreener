@@ -1,7 +1,7 @@
-# Design — SnapGlow
+# Design - SnapGlow
 
 Locked design system (Hallmark pass 4, 2026-06-16). Future Hallmark runs read this
-file first; pages defer to it. Amend intentionally — the file is the rule.
+file first; pages defer to it. Amend intentionally - the file is the rule.
 
 **SSOT in code:** `packages/design-tokens/tokens.json` → built to
 `packages/design-tokens/dist/tokens.css` and `dist/tailwind-theme.css`.
@@ -10,11 +10,11 @@ Do not edit generated dist files; change `tokens.json` and run `mise run tokens:
 ## System
 
 - **Genre** · modern-minimal (utilitarian desktop tool)
-- **Macrostructure** · Feature Stack — sticky canvas left, scrollable tools rail right
-- **Nav** · N1b canonical inline — wordmark + inline links, active pill fill
+- **Macrostructure** · Feature Stack - sticky canvas left, scrollable tools rail right
+- **Nav** · N1b canonical inline - wordmark + inline links, active pill fill
 - **Theme** · custom (vibe: "warm linen · amber primary · technical")
 - **Axes** · light / mono-display / warm
-- **Tone** · utilitarian — dense tool UI, honest copy, no decorative chrome
+- **Tone** · utilitarian - dense tool UI, honest copy, no decorative chrome
 
 ## Layout (desktop editor)
 
@@ -23,7 +23,7 @@ Do not edit generated dist files; change `tokens.json` and run `mise run tokens:
   - Left: sticky canvas preview (`lg:sticky lg:top-4`)
   - Right: unified `EditorToolsPanel`, scrollable (`lg:max-h-[calc(100vh-5.5rem)]`)
 - **Tool order** · Format → Style → Annotations → Sensitive data → **Export** (last)
-- **Section labels** · `text-xs font-medium text-muted` — roman, vertical stack, no uppercase eyebrows
+- **Section labels** · `text-xs font-medium text-muted` - roman, vertical stack, no uppercase eyebrows
 - **Container** · `max-w-7xl` editor, `max-w-5xl` history
 
 ## Typography
@@ -32,7 +32,7 @@ Do not edit generated dist files; change `tokens.json` and run `mise run tokens:
 - **Display / wordmark / page titles** · IBM Plex Mono (`font-display`, `--sg-font-family-display`)
 - **Code / shortcuts** · IBM Plex Mono (`--sg-font-family-mono`)
 - **Bundled via** · `@fontsource/ibm-plex-sans` + `@fontsource/ibm-plex-mono` in `global.css`
-- **Headers** · always roman — no italic display type
+- **Headers** · always roman - no italic display type
 
 ## Tokens (canonical mapping)
 
@@ -66,7 +66,7 @@ Hallmark role → SnapGlow semantic token (light mode):
 - **Tooltips** · 800ms hover delay · silent success preferred over celebratory toasts
 - **Motion** · motion-cut · `transition-colors` / `transition-opacity` only · no layout animation
 - **Reduced motion** · ≤150ms opacity crossfade
-- **Capture HUD** · `.capture-hud` classes — semantic tokens via `color-mix`, not raw Tailwind neutrals
+- **Capture HUD** · `.capture-hud` classes - semantic tokens via `color-mix`, not raw Tailwind neutrals
 
 ## Exports
 
@@ -105,7 +105,7 @@ See `packages/design-tokens/dist/tailwind-theme.css`. Consumed by desktop via
 
 ### 3 · DTCG `tokens.json`
 
-See `packages/design-tokens/tokens.json` — full brand scale, neutrals, semantic
+See `packages/design-tokens/tokens.json` - full brand scale, neutrals, semantic
 aliases, spacing, radius, typography. Do not duplicate here; edit that file.
 
 ### 4 · shadcn/ui CSS variables (OKLCH triples)
@@ -132,9 +132,9 @@ aliases, spacing, radius, typography. Do not duplicate here; edit that file.
 
 ## Notes
 
-- Gradient presets in `gradients.ts` are curated warm/neutral — avoid reintroducing
+- Gradient presets in `gradients.ts` are curated warm/neutral - avoid reintroducing
   template-neon stops (`#667eea`, `#c471f5`, pure `#000000`).
-- Canvas/render engine may use raw hex for `<input type="color">` — acceptable;
+- Canvas/render engine may use raw hex for `<input type="color">` - acceptable;
   React chrome must stay on semantic tokens.
-- Hallmark diversification is **inverted** while this file exists — new pages share
+- Hallmark diversification is **inverted** while this file exists - new pages share
   this system; amend `design.md` for intentional variants, don't override locally.

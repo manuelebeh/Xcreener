@@ -85,7 +85,7 @@ export function SettingsPanel() {
         setUpdateStatus('You are on the latest version.');
         break;
       case 'available':
-        setUpdateStatus(`Update ${result.version} found — installing…`);
+        setUpdateStatus(`Update ${result.version} found - installing…`);
         break;
       case 'error':
         setUpdateStatus(result.message);

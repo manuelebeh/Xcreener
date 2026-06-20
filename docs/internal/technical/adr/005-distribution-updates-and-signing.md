@@ -1,4 +1,4 @@
-# ADR-005 — Distribution, auto-updates, and code signing
+# ADR-005 - Distribution, auto-updates, and code signing
 
 **Status:** Accepted  
 **Date:** 2026-06-16  
@@ -18,8 +18,8 @@ Phase 0 requires installable desktop builds and a test update channel before MVP
 | macOS Intel | `.dmg` (x86_64) | `macos-latest` |
 | Windows | `.msi` / `.exe` (NSIS) | `windows-latest` |
 
-- **PR / main builds:** `.github/workflows/build.yml` — unsigned smoke builds.
-- **Releases:** `.github/workflows/release.yml` — triggered on tag `v*`; draft GitHub Release; signed updater metadata.
+- **PR / main builds:** `.github/workflows/build.yml` - unsigned smoke builds.
+- **Releases:** `.github/workflows/release.yml` - triggered on tag `v*`; draft GitHub Release; signed updater metadata.
 
 ### Tauri updater
 
@@ -40,7 +40,7 @@ Until certificates are available:
 
 - Builds remain **unsigned** (Gatekeeper / SmartScreen warnings expected).
 - `docs/internal/technical/release-signing.md` documents required secrets.
-- CI uses conditional env blocks — signing activates when secrets are present.
+- CI uses conditional env blocks - signing activates when secrets are present.
 
 Required secrets (future):
 

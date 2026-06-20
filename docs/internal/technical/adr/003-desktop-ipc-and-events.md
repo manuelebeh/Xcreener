@@ -1,4 +1,4 @@
-# ADR-003 — Desktop IPC commands and events
+# ADR-003 - Desktop IPC commands and events
 
 **Status:** Accepted  
 **Date:** 2026-06-16  
@@ -12,7 +12,7 @@ SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase
 
 ### Invoke commands (Rust → frontend)
 
-Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls go through this module — no raw string literals in feature code.
+Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls go through this module - no raw string literals in feature code.
 
 | Command | Rust module | Status | Payload |
 |---------|-------------|--------|---------|
@@ -27,11 +27,11 @@ Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls 
 | `cancel_capture_overlay` | `commands/capture.rs` | Live | `()` |
 | `get_capture_overlay_bounds` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
 | `detect_sensitive_data` | `commands/redaction.rs` | Live | `imageData: number[]` → `SensitiveRegion[]` |
-| `export_image` | `commands/export.rs` | Stub (unused) | `{ imageData, format, quality, path }` — export UI uses frontend `renderToExportCanvas` + dialog/fs |
+| `export_image` | `commands/export.rs` | Stub (unused) | `{ imageData, format, quality, path }` - export UI uses frontend `renderToExportCanvas` + dialog/fs |
 | `get_setting` / `set_setting` | `commands/storage.rs` | Placeholder | Prefer `@/db` on frontend |
-| `update_capture_shortcut` | `shortcuts.rs` | Live | `{ shortcut }` — Tauri global-shortcut format |
+| `update_capture_shortcut` | `shortcuts.rs` | Live | `{ shortcut }` - Tauri global-shortcut format |
 
-**Debug-only (E2E, `#[cfg(debug_assertions)]`)** — registered in `test_support.rs`:
+**Debug-only (E2E, `#[cfg(debug_assertions)]`)** - registered in `test_support.rs`:
 
 | Command | Purpose |
 |---------|---------|
@@ -62,9 +62,9 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 
 ### Capture history (Sprint 1.6)
 
-Frontend-only — no Rust IPC:
+Frontend-only - no Rust IPC:
 
-- **SQLite:** `db/captures.ts` — insert/list/prune/delete on `captures` table (retention 30)
+- **SQLite:** `db/captures.ts` - insert/list/prune/delete on `captures` table (retention 30)
 - **Filesystem:** `$APPDATA/captures/YYYY-MM/capture_*.png` + `$APPDATA/thumbnails/thumb_*.webp`
 - **Hook:** `useCaptureSession` → `persistCapture` (sequential queue after capture)
 - **Thumbnails:** `convertFileSrc` via Tauri asset protocol (`assetProtocol.enable` in `tauri.conf.json`)
@@ -72,7 +72,7 @@ Frontend-only — no Rust IPC:
 ### Validation
 
 - Shortcut strings validated in TS (`shared/lib/shortcut.ts`) before `invoke`.
-- Rust `update_capture_shortcut` returns `Result<(), String>` — errors surface in Settings UI.
+- Rust `update_capture_shortcut` returns `Result<(), String>` - errors surface in Settings UI.
 - Capture IPC coordinates rounded to integers in `commands.ts` before `invoke` (HiDPI subpixels).
 - Capture bounds validated in Rust (`capture/validate.rs`) for native `capture_*` commands.
 

@@ -1,4 +1,4 @@
-# ADR-004 — System integration: tray, shortcuts, autostart
+# ADR-004 - System integration: tray, shortcuts, autostart
 
 **Status:** Accepted  
 **Date:** 2026-06-16  
@@ -15,7 +15,7 @@ SnapGlow runs as a menu-bar / system-tray utility. Users expect show/hide from t
 - **Icon:** app default window icon via `TrayIconBuilder`.
 - **Left click:** toggle main window show/hide.
 - **Context menu:** Open, Settings (emits `navigate-settings` + show), Quit.
-- **Close button:** `CloseRequested` → `prevent_close()` + `hide()` — app stays in tray.
+- **Close button:** `CloseRequested` → `prevent_close()` + `hide()` - app stays in tray.
 
 ### Global shortcuts (`src-tauri/src/shortcuts.rs`)
 
@@ -49,12 +49,12 @@ Frontend: Settings persists shortcut in SQLite via `updateCaptureShortcut`.
 
 **macOS:** `tauri-driver` does not support WKWebView ([Tauri WebDriver docs](https://v2.tauri.app/develop/tests/webdriver/)). Native WebDriver e2e runs on Linux + Windows in CI; macOS uses Rust tests + manual tray checklist.
 
-Global key injection in CI is unreliable — covered by IPC test hooks + Rust tests, not key simulation.
+Global key injection in CI is unreliable - covered by IPC test hooks + Rust tests, not key simulation.
 
 ## Consequences
 
 - Tray menu labels are English-only until i18n package (Phase 4).
-- Shortcut conflicts return plugin errors — surfaced in Settings.
+- Shortcut conflicts return plugin errors - surfaced in Settings.
 - New tray actions: extend `tray.rs` menu + emit typed events (avoid direct frontend imports from Rust).
 
 ## References

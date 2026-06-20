@@ -1,4 +1,4 @@
-# ADR-001 — Monorepo orchestration & desktop module architecture
+# ADR-001 - Monorepo orchestration & desktop module architecture
 
 **Status:** Accepted  
 **Date:** 2026-06-15  
@@ -36,25 +36,25 @@ screen-cut/
 
 Feature boundaries live under `apps/desktop/src/modules/`:
 
-- **capture** — screen capture orchestration (Zustand store + hooks)
-- **editor** — canvas / beautify UI
-- **export** — WYSIWYG export (offscreen `renderFrame`, PNG/JPG/WebP, clipboard, drag-out)
-- **history** — capture history grid, preview, reopen in editor (Sprint 1.6)
-- **redaction** — sensitive-data scan UI, overlay, auto-redaction setting
-- **settings** — user preferences UI
+- **capture** - screen capture orchestration (Zustand store + hooks)
+- **editor** - canvas / beautify UI
+- **export** - WYSIWYG export (offscreen `renderFrame`, PNG/JPG/WebP, clipboard, drag-out)
+- **history** - capture history grid, preview, reopen in editor (Sprint 1.6)
+- **redaction** - sensitive-data scan UI, overlay, auto-redaction setting
+- **settings** - user preferences UI
 
 Cross-cutting:
 
-- `src/app/` — routing, providers, shell
-- `src/shared/types/` — shared TS types (IPC payloads, settings)
-- `src/tauri/` — typed wrappers for `invoke` and event listeners
-- `src/db/` — SQLite via `@tauri-apps/plugin-sql` (settings, custom presets, capture history)
+- `src/app/` - routing, providers, shell
+- `src/shared/types/` - shared TS types (IPC payloads, settings)
+- `src/tauri/` - typed wrappers for `invoke` and event listeners
+- `src/db/` - SQLite via `@tauri-apps/plugin-sql` (settings, custom presets, capture history)
 
 Modules expose a public API through `index.ts`; internal files stay colocated (`store.ts`, `components/`, `hooks/`).
 
 ### Rust command surface
 
-Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`, `redaction`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot — ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only — no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Sprint 1.5** adds on-device redaction (`src-tauri/src/redaction/`, IPC `detect_sensitive_data`) and frontend export (`modules/export/` via offscreen canvas + Tauri dialog/fs/clipboard; Rust `export_image` remains an unused stub). **Sprint 1.6** adds capture history (`modules/history/`, `db/captures.ts`, filesystem under `$APPDATA/captures/` + `$APPDATA/thumbnails/` — frontend-only, no Rust IPC). **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/` (`migrate.ts` splits multi-statement SQL); Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
+Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`, `redaction`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot - ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only - no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Sprint 1.5** adds on-device redaction (`src-tauri/src/redaction/`, IPC `detect_sensitive_data`) and frontend export (`modules/export/` via offscreen canvas + Tauri dialog/fs/clipboard; Rust `export_image` remains an unused stub). **Sprint 1.6** adds capture history (`modules/history/`, `db/captures.ts`, filesystem under `$APPDATA/captures/` + `$APPDATA/thumbnails/` - frontend-only, no Rust IPC). **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/` (`migrate.ts` splits multi-statement SQL); Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
 
 ### Code intelligence
 
@@ -64,17 +64,17 @@ Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `s
 
 ### Related ADRs
 
-- [ADR-002](./002-design-tokens-ui-and-web.md) — design tokens and shared UI
-- [ADR-003](./003-desktop-ipc-and-events.md) — IPC commands and events
-- [ADR-004](./004-system-integration-tray-shortcuts.md) — tray, shortcuts, autostart
-- [ADR-005](./005-distribution-updates-and-signing.md) — updater and release pipeline
-- [ADR-006](./006-native-capture-overlay.md) — native capture overlay (Sprint 1.1)
+- [ADR-002](./002-design-tokens-ui-and-web.md) - design tokens and shared UI
+- [ADR-003](./003-desktop-ipc-and-events.md) - IPC commands and events
+- [ADR-004](./004-system-integration-tray-shortcuts.md) - tray, shortcuts, autostart
+- [ADR-005](./005-distribution-updates-and-signing.md) - updater and release pipeline
+- [ADR-006](./006-native-capture-overlay.md) - native capture overlay (Sprint 1.1)
 
 ## Consequences
 
 - New apps add a `dev:*` task in `mise.toml` and a Turbo pipeline entry; no root script sprawl.
 - Husky was temporary (Sprint 0.1); replaced by mise git hooks in Sprint 0.2 (see ADR-002).
-- Module imports use `@/modules/<name>` or package `index.ts` — avoid deep relative paths across module boundaries.
+- Module imports use `@/modules/<name>` or package `index.ts` - avoid deep relative paths across module boundaries.
 
 ## References
 

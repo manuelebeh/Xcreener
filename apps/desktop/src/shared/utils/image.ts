@@ -7,7 +7,7 @@ export function bytesToObjectUrl(bytes: Uint8Array | number[], mimeType = 'image
   return URL.createObjectURL(bytesToBlob(bytes, mimeType));
 }
 
-/** Fast path for live capture IPC bytes — works reliably with canvas drawImage in Tauri. */
+/** Fast path for live capture IPC bytes - works reliably with canvas drawImage in Tauri. */
 export async function bytesToImageBitmap(bytes: Uint8Array | number[]): Promise<ImageBitmap> {
   return createImageBitmap(bytesToBlob(bytes, 'image/png'));
 }
@@ -23,7 +23,7 @@ function loadImage(objectUrl: string): Promise<HTMLImageElement> {
 
 /**
  * Decode PNG bytes via an intermediate canvas.
- * Required when reopening from disk — direct createImageBitmap(blob) can yield
+ * Required when reopening from disk - direct createImageBitmap(blob) can yield
  * empty bitmaps in WKWebView while still reporting correct dimensions.
  */
 export async function decodePngBytesToBitmap(bytes: Uint8Array | number[]): Promise<ImageBitmap> {

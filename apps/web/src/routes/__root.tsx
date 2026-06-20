@@ -21,7 +21,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'SnapGlow — Screenshots that shine',
+        title: 'SnapGlow - Screenshots that shine',
       },
     ],
     links: [

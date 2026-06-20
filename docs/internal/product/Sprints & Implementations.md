@@ -1,4 +1,4 @@
-# Sprints & Implementations — SnapGlow
+# Sprints & Implementations - SnapGlow
 
 > Plan de développement détaillé, sprints, livrables et dépendances
 > **Version :** 1.0 | **Date :** Juin 2026 | **Statut :** Brouillon
@@ -13,8 +13,8 @@
 - **Cérémonies** : Sprint Planning (lundi S1), Daily standup, Sprint Review + Retro (vendredi S2)
 - **Outil de suivi** : Linear (ou GitHub Projects)
 - **Branches** : `main` (production), `develop` (intégration), `feature/*`, `fix/*`
-- **Commits** : [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, …) — Husky + Commitlint en Sprint 0.1 ; **migration vers hooks mise** dès Sprint 0.2 (`apps/web`)
-- **Monorepo** : `mise` (porte d'entrée dev + pin toolchains) + **Turborepo** (cache/build packages TS) — pattern inspiré de [fullstack-starter](https://github.com/first-fluke/fullstack-starter), stack SnapGlow propre (Tauri, Expo, Fastify — pas Flutter/FastAPI/GCP)
+- **Commits** : [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `chore:`, …) - Husky + Commitlint en Sprint 0.1 ; **migration vers hooks mise** dès Sprint 0.2 (`apps/web`)
+- **Monorepo** : `mise` (porte d'entrée dev + pin toolchains) + **Turborepo** (cache/build packages TS) - pattern inspiré de [fullstack-starter](https://github.com/first-fluke/fullstack-starter), stack SnapGlow propre (Tauri, Expo, Fastify - pas Flutter/FastAPI/GCP)
 - **CI/CD** : Build + tests automatiques à chaque PR, release automatique sur merge dans `main`
 
 ### Colonne Statut (suivi des tâches)
@@ -32,9 +32,9 @@ Chaque sprint se termine par un **récapitulatif indicatif** (livré, en attente
 
 ```
 apps/
-├── desktop/     # Tauri v2 — macOS + Windows        (Phase 0–1)
-├── web/         # Landing marketing — TanStack Start + VPS (Sprint 0.2)
-├── mobile/      # React Native Expo — iOS + Android  (Phase 1b)
+├── desktop/     # Tauri v2 - macOS + Windows        (Phase 0–1)
+├── web/         # Landing marketing - TanStack Start + VPS (Sprint 0.2)
+├── mobile/      # React Native Expo - iOS + Android  (Phase 1b)
 └── api/         # Fastify + PostgreSQL + Redis       (Phase 2b)
 packages/
 ├── design-tokens/   # SSOT couleurs, spacing (Sprint 0.2)
@@ -50,29 +50,29 @@ packages/
 ## 2. Vue d'ensemble des phases
 
 ```
-PHASE 0 — Fondations          M1–M2     (4 sprints)     Architecture & Setup
-PHASE 1 — MVP Desktop         M2–M5     (6 sprints)     Core macOS + Windows
-PHASE 1b — MVP Mobile         M4–M6     (4 sprints)     iOS + Android
-PHASE 2 — Lancement           M6        (2 sprints)     Beta + Product Hunt
-PHASE 2b — IA & Cloud         M7–M9     (6 sprints)     Intelligence + Cloud
-PHASE 3 — Team & B2B          M10–M14   (10 sprints)    Collaboration + API
-PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
+PHASE 0 - Fondations          M1–M2     (4 sprints)     Architecture & Setup
+PHASE 1 - MVP Desktop         M2–M5     (6 sprints)     Core macOS + Windows
+PHASE 1b - MVP Mobile         M4–M6     (4 sprints)     iOS + Android
+PHASE 2 - Lancement           M6        (2 sprints)     Beta + Product Hunt
+PHASE 2b - IA & Cloud         M7–M9     (6 sprints)     Intelligence + Cloud
+PHASE 3 - Team & B2B          M10–M14   (10 sprints)    Collaboration + API
+PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 ```
 
 **Total estimé : ~40 sprints sur 18 mois**
 
 ---
 
-## 3. PHASE 0 — Fondations (M1–M2)
+## 3. PHASE 0 - Fondations (M1–M2)
 
 > Objectif : poser l'architecture technique, le design system, et l'infrastructure de développement.
 
-### Sprint 0.1 (Semaines 1–2) — Setup & Architecture
+### Sprint 0.1 (Semaines 1–2) - Setup & Architecture
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[x]` (2026-06-15) | P0-001 | Initialiser monorepo (Turborepo + pnpm) + `mise.toml` (toolchains + tasks racine `dev:*`, `lint`, `install`) | P0 | 2j | — |
-| `[x]` (2026-06-15) | P0-002 | Setup Tauri v2 — projet skeleton macOS + Windows | P0 | 3j | P0-001 |
+| `[x]` (2026-06-15) | P0-001 | Initialiser monorepo (Turborepo + pnpm) + `mise.toml` (toolchains + tasks racine `dev:*`, `lint`, `install`) | P0 | 2j | - |
+| `[x]` (2026-06-15) | P0-002 | Setup Tauri v2 - projet skeleton macOS + Windows | P0 | 3j | P0-001 |
 | `[x]` (2026-06-15) | P0-003 | Configurer TypeScript + Biome (lint + format) | P0 | 1j | P0-001 |
 | `[x]` (2026-06-15) | P0-004 | Configurer CI/CD (GitHub Actions) : build, lint, tests | P0 | 2j | P0-001 |
 | `[x]` (2026-06-15) | P0-005 | Définir l'architecture des modules (capture, editor, export, settings) | P0 | 2j | P0-002 |
@@ -108,16 +108,16 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] SQLite : setting `theme` persiste après redémarrage
 - [x] CI PR verte ; build matrix verte sur `main` après premier push
 
-> **Inspiration [fullstack-starter](https://github.com/first-fluke/fullstack-starter)** — patterns DX monorepo multi-apps, stack SnapGlow distincte.
+> **Inspiration [fullstack-starter](https://github.com/first-fluke/fullstack-starter)** - patterns DX monorepo multi-apps, stack SnapGlow distincte.
 
 | Élément | Quand | Décision SnapGlow |
 |---|---|---|
 | Monorepo `apps/` + `packages/` | Sprint 0.1 | **Adopter** |
-| **mise tasks racine** (`dev:desktop`, `lint`, `install`…) | Sprint 0.1 | **Adopter** — porte d'entrée dev unique |
-| **Turborepo** (cache/build TS) | Sprint 0.1 | **Adopter** — sous-jacent à mise pour packages JS |
+| **mise tasks racine** (`dev:desktop`, `lint`, `install`…) | Sprint 0.1 | **Adopter** - porte d'entrée dev unique |
+| **Turborepo** (cache/build TS) | Sprint 0.1 | **Adopter** - sous-jacent à mise pour packages JS |
 | Biome + Commitlint | Sprint 0.1 | **Adopter** |
 | **Husky** git hooks | Sprint 0.1 | **Adopter** (temporaire) |
-| **Hooks mise conditionnels** (lint par app) | Sprint 0.2 | **Adopter** — remplace Husky (P0-025) |
+| **Hooks mise conditionnels** (lint par app) | Sprint 0.2 | **Adopter** - remplace Husky (P0-025) |
 | `AGENTS.md` + `.agents/rules/` | Sprint 0.1 | **Adopter** |
 | CodeGraph MCP | Sprint 0.1 | **Adopter** (pas Serena) |
 | `packages/design-tokens` | Sprint 0.2 | **Adopter** (P0-009) |
@@ -126,18 +126,18 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | `apps/api` **Fastify** + PostgreSQL | Phase 2b | **Adopter** (CL-001) |
 | Release Please + CHANGELOG | Sprint 0.4+ | **Reporter** |
 | Terraform GCP + Docker infra | Phase 2b+ | **Reporter** |
-| oh-my-agent | — | **Ne pas adopter** |
+| oh-my-agent | - | **Ne pas adopter** |
 
-### Sprint 0.2 (Semaines 3–4) — Design System & Prototype
+### Sprint 0.2 (Semaines 3–4) - Design System & Prototype
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | P0-008 | Créer le design system Figma (couleurs, typographie, composants) | P0 | 3j | — |
-| `[x]` (2026-06-16) | P0-009 | Implémenter les composants UI de base (React + Tailwind) : boutons, inputs, sliders, tooltips, dropdowns — `packages/design-tokens` (pattern fullstack-starter) | P0 | 4j | P0-002, P0-007 |
+| `[ ]` | P0-008 | Créer le design system Figma (couleurs, typographie, composants) | P0 | 3j | - |
+| `[x]` (2026-06-16) | P0-009 | Implémenter les composants UI de base (React + Tailwind) : boutons, inputs, sliders, tooltips, dropdowns - `packages/design-tokens` (pattern fullstack-starter) | P0 | 4j | P0-002, P0-007 |
 | `[ ]` | P0-010 | Créer le prototype interactif Figma du flux principal | P0 | 3j | P0-008 |
 | `[x]` (2026-06-16) | P0-011 | Configurer Storybook pour la bibliothèque de composants | P1 | 1j | P0-009 |
 | `[x]` (2026-06-16) | P0-012 | Implémenter le thème Light/Dark/System | P1 | 2j | P0-009 |
-| `[x]` (2026-06-16) | P0-013 | Créer la landing page (`apps/web` — **TanStack Start** + VPS, pas Next.js) | P1 | 3j | P0-008 |
+| `[x]` (2026-06-16) | P0-013 | Créer la landing page (`apps/web` - **TanStack Start** + VPS, pas Next.js) | P1 | 3j | P0-008 |
 | `[x]` (2026-06-16) | P0-025 | Étendre `mise.toml` (`dev:web`, `tokens:build`) ; migrer Husky → **hooks git mise** (lint conditionnel par app) | P1 | 0.5j | P0-013 |
 
 **Livrable :** Design system code-first (`packages/design-tokens`, `packages/ui`), composants React + Storybook, landing TanStack Start en local, orchestration mise étendue (`dev:web`, `storybook`, `tokens:build`), hooks git migrés vers mise.
@@ -162,11 +162,11 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] `packages/design-tokens` consommé par desktop + web
 - [x] Storybook accessible avec les composants UI de base
 - [x] Thème Light/Dark/System fonctionnel dans l'app desktop
-- [ ] `apps/web` déployé sur VPS (URL publique) — **reporté** ; `mise run dev:web` opérationnel
+- [ ] `apps/web` déployé sur VPS (URL publique) - **reporté** ; `mise run dev:web` opérationnel
 - [x] `mise run dev:web` et `mise run tokens:build` opérationnels
 - [x] Husky retiré ; hooks mise actifs (lint-staged + commitlint)
 
-### Sprint 0.3 (Semaines 5–6) — Infrastructure & Intégration système
+### Sprint 0.3 (Semaines 5–6) - Infrastructure & Intégration système
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -181,12 +181,12 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code, 2026-06-16)**
 
-- **Tray / menu bar** : `src-tauri/src/tray.rs` — icône, toggle show/hide, menu Open / Settings / Quit ; fermeture fenêtre → hide
+- **Tray / menu bar** : `src-tauri/src/tray.rs` - icône, toggle show/hide, menu Open / Settings / Quit ; fermeture fenêtre → hide
 - **Raccourcis globaux** : `tauri-plugin-global-shortcut` + `update_capture_shortcut` ; ouverture overlay capture (`show_capture_overlay`)
 - **Settings SQLite** : `theme`, `captureShortcut`, `launchAtLogin`, `analyticsEnabled` ; UI Settings enrichie (`@snapglow/ui`)
 - **Auto-start** : `tauri-plugin-autostart` + sync bootstrap / toggle Settings
 - **Tests** : Vitest (`store.test.ts`, validation raccourcis) ; Playwright smoke (`e2e/settings.spec.ts`) ; `mise run test` + step CI
-- **Observabilité** : PostHog + Sentry desktop (`integrations/observability.ts`) — actif en dev si clés env, opt-in prod ; `apps/desktop/.env.example`
+- **Observabilité** : PostHog + Sentry desktop (`integrations/observability.ts`) - actif en dev si clés env, opt-in prod ; `apps/desktop/.env.example`
 
 **Critères de validation**
 
@@ -197,12 +197,12 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Vitest + au moins 1 test unitaire ; Playwright smoke test configuré
 - [x] PostHog + Sentry initialisés (events de test visibles en dashboard avec `VITE_POSTHOG_KEY` / `VITE_SENTRY_DSN` en `.env`)
 
-### Sprint 0.4 (Semaines 7–8) — Polissage Phase 0 & Préparation Phase 1
+### Sprint 0.4 (Semaines 7–8) - Polissage Phase 0 & Préparation Phase 1
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[x]` (2026-06-16) | P0-020 | Audit qualité du design system — ajustements accessibilité (WCAG AA) | P0 | 2j | P0-009 |
-| `[x]` (2026-06-16) | P0-021 | Documentation architecture (ADRs — Architecture Decision Records) | P1 | 2j | P0-005 |
+| `[x]` (2026-06-16) | P0-020 | Audit qualité du design system - ajustements accessibilité (WCAG AA) | P0 | 2j | P0-009 |
+| `[x]` (2026-06-16) | P0-021 | Documentation architecture (ADRs - Architecture Decision Records) | P1 | 2j | P0-005 |
 | `[x]` (2026-06-16) | P0-022 | Setup du système de mise à jour automatique (Tauri updater) | P1 | 2j | P0-002 |
 | `[x]` (2026-06-16) | P0-023 | Code signing macOS (Developer ID) + Windows (code signing cert) | P0 | 2j | P0-002 |
 | `[x]` (2026-06-16) | P0-024 | Tests d'intégration menu bar + raccourcis sur macOS et Windows | P0 | 2j | P0-014, P0-015 |
@@ -219,16 +219,16 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Reporté**
 
-- **Release Please + CHANGELOG** — début Phase 1
-- **Builds signés macOS/Windows** — en attente certificats (pipeline prêt)
-- **Release test `v0.1.0-test`** — nécessite secret `TAURI_SIGNING_PRIVATE_KEY` sur GitHub + tag manuel
+- **Release Please + CHANGELOG** - début Phase 1
+- **Builds signés macOS/Windows** - en attente certificats (pipeline prêt)
+- **Release test `v0.1.0-test`** - nécessite secret `TAURI_SIGNING_PRIVATE_KEY` sur GitHub + tag manuel
 
 **Critères de validation**
 
 - [x] Audit accessibilité WCAG AA documenté avec corrections appliquées
 - [x] ADRs complémentaires rédigés (capture, IPC, updater…)
 - [x] Tauri updater configuré (canal de release test via GitHub Releases)
-- [~] Builds signés macOS + Windows — **scaffolding CI** ; artefacts non signés OK (certs à provisionner)
+- [~] Builds signés macOS + Windows - **scaffolding CI** ; artefacts non signés OK (certs à provisionner)
 - [x] Tests menu bar + raccourcis (Rust + native e2e Linux/Windows CI ; macOS = Rust tests + QA manuelle tray)
 - [x] Jalon J0 validé en sprint review
 
@@ -238,36 +238,36 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 4. PHASE 1 — MVP Desktop (M2–M5)
+## 4. PHASE 1 - MVP Desktop (M2–M5)
 
 > Objectif : livrer les fonctionnalités core de capture + beautification sur macOS et Windows.
 
-### Sprint 1.1 (Semaines 9–10) — Capture d'écran native
+### Sprint 1.1 (Semaines 9–10) - Capture d'écran native
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[x]` (2026-06-16) | P1-001 | Implémenter la capture de zone (sélection libre) — macOS | P0 | 3j | P0-015 |
-| `[ ]` | P1-002 | Implémenter la capture de zone — Windows (Graphics Capture API) | P0 | 3j | P0-015 |
-| `[x]` (2026-06-16) | P1-003 | Implémenter la capture de fenêtre (détection auto des bords) — macOS | P0 | 2j | P1-001 |
-| `[ ]` | P1-004 | Implémenter la capture de fenêtre — Windows | P0 | 2j | P1-002 |
-| `[~]` | P1-005 | Implémenter la capture plein écran — macOS + Windows | P0 | 1j | P1-001, P1-002 |
+| `[x]` (2026-06-16) | P1-001 | Implémenter la capture de zone (sélection libre) - macOS | P0 | 3j | P0-015 |
+| `[ ]` | P1-002 | Implémenter la capture de zone - Windows (Graphics Capture API) | P0 | 3j | P0-015 |
+| `[x]` (2026-06-16) | P1-003 | Implémenter la capture de fenêtre (détection auto des bords) - macOS | P0 | 2j | P1-001 |
+| `[ ]` | P1-004 | Implémenter la capture de fenêtre - Windows | P0 | 2j | P1-002 |
+| `[~]` | P1-005 | Implémenter la capture plein écran - macOS + Windows | P0 | 1j | P1-001, P1-002 |
 | `[x]` (2026-06-16) | P1-006 | Tests capture sur multi-écran (display scaling, HiDPI) | P0 | 2j | P1-001, P1-002 |
 
 **Livrable :** Capture fonctionnelle (zone, fenêtre, plein écran) sur macOS et Windows.
 
 **Livré (code + QA macOS, 2026-06-16)**
 
-- **Backend Rust** : module `src-tauri/src/capture/` (`xcap`) — preview bureau, listage moniteurs/fenêtres, `get_window_at_point`, commandes `capture_*` + validation bornes
+- **Backend Rust** : module `src-tauri/src/capture/` (`xcap`) - preview bureau, listage moniteurs/fenêtres, `get_window_at_point`, commandes `capture_*` + validation bornes
 - **Fenêtre overlay** : webview dédiée `capture-overlay` ; snapshot `capture_desktop_preview` avant affichage ; event `capture-overlay-init` (bounds, moniteurs, PNG preview)
-- **UI capture** : `CaptureOverlay` — modes Region / Window / Screen ; barre d’outils ; surbrillance fenêtre (`WindowHighlight`) et écran (`MonitorHighlight`)
+- **UI capture** : `CaptureOverlay` - modes Region / Window / Screen ; barre d’outils ; surbrillance fenêtre (`WindowHighlight`) et écran (`MonitorHighlight`)
 - **UX confirmée** : pas de capture automatique au changement de mode ; Region = sélection puis bouton **Capture** / Entrée ; Window / Screen = survol + clic (ou **Capture** pour Screen) ; découpe client depuis l’aperçu figé (pas de seconde capture native, pas d’overlay « Capturing… »)
 - **Pipeline éditeur** : event `capture-image` → `useCaptureSession` → `setScreenshot` + navigation accueil
 - **Tests** : Rust (`capture/mod.rs`, `validate.rs`) ; Vitest (`store.test.ts`, `image.test.ts`, `captureCursors.test.ts`) ; e2e native overlay visible (`integration.spec.ts`)
 
 **En attente / reporté**
 
-- **Parité Windows** (P1-002, P1-004, reste P1-005) — code `xcap` cross-platform présent ; QA Windows + Graphics Capture API si écart
-- **Commandes natives `capture_*` au confirm** — conservées côté Rust pour tests et usages futurs ; le flux overlay utilise la découpe preview (ADR-006)
+- **Parité Windows** (P1-002, P1-004, reste P1-005) - code `xcap` cross-platform présent ; QA Windows + Graphics Capture API si écart
+- **Commandes natives `capture_*` au confirm** - conservées côté Rust pour tests et usages futurs ; le flux overlay utilise la découpe preview (ADR-006)
 
 **Critères de validation**
 
@@ -276,7 +276,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Tests multi-écran / HiDPI passent sur au moins 2 configurations (QA macOS validée)
 - [x] Image capturée affichée dans l'éditeur (pipeline bout-en-bout minimal)
 
-### Sprint 1.2 (Semaines 11–12) — Beautification automatique
+### Sprint 1.2 (Semaines 11–12) - Beautification automatique
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -291,26 +291,26 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code + QA macOS, 2026-06-16)**
 
-- **Moteur Canvas 2D** : `modules/editor/engine/` — `computeLayout`, `drawBackground`, `drawShadow`, `drawScreenshot`, `renderFrame` ; composition 3 couches (fond → ombre → capture clipée) ; HiDPI via `devicePixelRatio`
+- **Moteur Canvas 2D** : `modules/editor/engine/` - `computeLayout`, `drawBackground`, `drawShadow`, `drawScreenshot`, `renderFrame` ; composition 3 couches (fond → ombre → capture clipée) ; HiDPI via `devicePixelRatio`
 - **Store éditeur** : `background`, `padding`, `borderRadius`, `shadow` ; defaults auto à chaque `setScreenshot` (dégradé SnapGlow, padding ~12 %, radius 12 px, ombre douce)
 - **56 presets dégradés** : `engine/gradients.ts` (dont brand warm linen `#f2ece4` → `#ddd4c8`, id `snapglow-brand`)
-- **UI minimale** : `BeautifyPanel` — onglets Gradient / Solid / Image, grille presets, sliders padding / radius / shadow, color pickers, upload image (`<input type="file">`)
-- **Canvas WYSIWYG** : `useBeautifyRender` (rAF) ; preview composée = source de vérité pour l’export (Sprint 1.5 — `renderToExportCanvas`)
-- **Tests** : Vitest — `computeLayout`, `gradients` (≥ 50), `drawBackground`, `renderFrame`, `store`
+- **UI minimale** : `BeautifyPanel` - onglets Gradient / Solid / Image, grille presets, sliders padding / radius / shadow, color pickers, upload image (`<input type="file">`)
+- **Canvas WYSIWYG** : `useBeautifyRender` (rAF) ; preview composée = source de vérité pour l’export (Sprint 1.5 - `renderToExportCanvas`)
+- **Tests** : Vitest - `computeLayout`, `gradients` (≥ 50), `drawBackground`, `renderFrame`, `store`
 
 **En attente / reporté**
 
-- **StyleBar inline polie** (P1-017, Sprint 1.3) — `BeautifyPanel` couvre les contrôles fonctionnels du sprint
-- **Profiling perf formel** (< 50–100 ms par frame) — reporté P1-038 ; rendu rAF thread principal suffisant en QA manuelle
+- **StyleBar inline polie** (P1-017, Sprint 1.3) - `BeautifyPanel` couvre les contrôles fonctionnels du sprint
+- **Profiling perf formel** (< 50–100 ms par frame) - reporté P1-038 ; rendu rAF thread principal suffisant en QA manuelle
 
 **Critères de validation**
 
-- [x] Canvas rend fond + capture + ombre en temps réel (rAF ; cible < 100 ms — profiling formel en P1-038)
+- [x] Canvas rend fond + capture + ombre en temps réel (rAF ; cible < 100 ms - profiling formel en P1-038)
 - [x] ≥ 50 presets dégradés disponibles (56)
 - [x] Padding, radius et ombre ajustables via UI (`BeautifyPanel`)
 - [x] Fond couleur custom + image upload fonctionnels
 
-### Sprint 1.3 (Semaines 13–14) — Presets, Format & Éditeur inline
+### Sprint 1.3 (Semaines 13–14) - Presets, Format & Éditeur inline
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -325,12 +325,12 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code, 2026-06-16)**
 
-- **Moteur cadre** : `engine/presets.ts` — 5 presets sociaux + ratios 16:9 / 4:3 / 1:1 / libre ; `computeLayout` v2 (mode libre inchangé + dimensions export fixes) ; `ScreenshotTransform` (scale + offset)
-- **Interaction** : `useScreenshotTransform` — drag pointeur + molette zoom (0.5×–3×) sur le canvas
+- **Moteur cadre** : `engine/presets.ts` - 5 presets sociaux + ratios 16:9 / 4:3 / 1:1 / libre ; `computeLayout` v2 (mode libre inchangé + dimensions export fixes) ; `ScreenshotTransform` (scale + offset)
+- **Interaction** : `useScreenshotTransform` - drag pointeur + molette zoom (0.5×–3×) sur le canvas
 - **Presets custom SQLite** : `db/presets.ts` CRUD sur `custom_presets` ; hydratation via `useCustomPresetsLoader`
-- **UI inline** : `EditorView` — Feature Stack (`Canvas` sticky gauche + `EditorToolsPanel` droite) ; sections Format (`PresetBar`) puis Style (`StyleBar`, ex-`BeautifyPanel`, carrousel dégradés, shadow offsetX)
-- **Export prep** : `export/utils/canvasExport.ts` — `canvasToPngBlob` + dimensions bitmap
-- **Tests** : Vitest — `presets`, `computeLayout` (cadre), `store` (preset), `canvasExport`, `renderFrame` (9-arg drawImage)
+- **UI inline** : `EditorView` - Feature Stack (`Canvas` sticky gauche + `EditorToolsPanel` droite) ; sections Format (`PresetBar`) puis Style (`StyleBar`, ex-`BeautifyPanel`, carrousel dégradés, shadow offsetX)
+- **Export prep** : `export/utils/canvasExport.ts` - `canvasToPngBlob` + dimensions bitmap
+- **Tests** : Vitest - `presets`, `computeLayout` (cadre), `store` (preset), `canvasExport`, `renderFrame` (9-arg drawImage)
 
 **Critères de validation**
 
@@ -339,7 +339,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Drag/zoom capture dans le cadre fluide
 - [x] Barre de style et barre de presets utilisables sans régression perf (rAF inchangé)
 
-### Sprint 1.4 (Semaines 15–16) — Annotations
+### Sprint 1.4 (Semaines 15–16) - Annotations
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -355,12 +355,12 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code, 2026-06-16)**
 
-- **Modèle** : `annotations/types.ts` — union `Annotation` (texte, rect, ellipse, arrow, line, highlight, blur)
+- **Modèle** : `annotations/types.ts` - union `Annotation` (texte, rect, ellipse, arrow, line, highlight, blur)
 - **Moteur** : `drawBlurMasks` (layer 4), `drawAnnotations` (layer 5), `drawSelectionHandles`, `hitTest` ; `renderFrame` étendu
 - **Store** : `annotations`, `activeTool`, `toolDefaults`, `pushHistory` / `undo` / `redo` (20 niveaux) ; reset à chaque capture
 - **Interaction** : `useAnnotationInteraction` (drag-to-draw, select/move/resize), `useScreenshotTransformEnabled` (outil Move), `useEditorShortcuts` (Cmd+Z, Delete)
 - **UI** : `AnnotationToolbar` + `TextEditorOverlay` ; section Annotations dans `EditorToolsPanel` (Feature Stack)
-- **Tests** : Vitest — `drawAnnotations`, `drawBlurMasks`, `hitTest`, `history`, `renderFrame` (annotations)
+- **Tests** : Vitest - `drawAnnotations`, `drawBlurMasks`, `hitTest`, `history`, `renderFrame` (annotations)
 
 **Critères de validation**
 
@@ -369,7 +369,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Undo/redo ≥ 20 niveaux sans corruption du rendu
 - [x] Annotations incluses à l'export PNG/JPG/WebP (composées dans `renderFrame` → `canvasToPngBlob` WYSIWYG)
 
-### Sprint 1.5 (Semaines 17–18) — Redaction & Export
+### Sprint 1.5 (Semaines 17–18) - Redaction & Export
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -386,9 +386,9 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code, 2026-06-16)**
 
-- **Redaction Rust** : `src-tauri/src/redaction/` — OCR macOS (Vision) + Windows (`Windows.Media.Ocr`), détecteurs regex (email, phone, card/Luhn, api_key, url, password), IPC `detect_sensitive_data`
-- **Redaction UI** : `modules/redaction/` — `RedactionBar`, `RedactionOverlay`, scan → masquage 1-clic → `BlurAnnotation`, `useAutoRedaction` + toggle settings
-- **Export** : `modules/export/` — `renderToExportCanvas` (offscreen WYSIWYG), `ExportBar` (PNG/JPG/WebP + qualité), save dialog + fs, clipboard (`Cmd+C`), drag-out
+- **Redaction Rust** : `src-tauri/src/redaction/` - OCR macOS (Vision) + Windows (`Windows.Media.Ocr`), détecteurs regex (email, phone, card/Luhn, api_key, url, password), IPC `detect_sensitive_data`
+- **Redaction UI** : `modules/redaction/` - `RedactionBar`, `RedactionOverlay`, scan → masquage 1-clic → `BlurAnnotation`, `useAutoRedaction` + toggle settings
+- **Export** : `modules/export/` - `renderToExportCanvas` (offscreen WYSIWYG), `ExportBar` (PNG/JPG/WebP + qualité), save dialog + fs, clipboard (`Cmd+C`), drag-out
 - **Plugins Tauri** : clipboard-manager, dialog, fs
 - **Analytics** : `export_completed`, `redaction_triggered`
 - **Tests** : Vitest export/redaction layout ; Rust recall ≥ 90% sur corpus détecteurs
@@ -398,9 +398,9 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Détection PII on-device (aucun appel réseau) avec taux de rappel acceptable sur jeu de test
 - [x] Masquage 1-clic + mode auto activable
 - [x] Export PNG/JPG/WebP + copier presse-papier + drag-out fonctionnels
-- [x] Masquage via `drawBlurMasks` (blur gaussien) sur régions détectées — pas de fuite de pixels sur le rendu exporté
+- [x] Masquage via `drawBlurMasks` (blur gaussien) sur régions détectées - pas de fuite de pixels sur le rendu exporté
 
-### Sprint 1.6 (Semaines 19–20) — Historique & Polish MVP
+### Sprint 1.6 (Semaines 19–20) - Historique & Polish MVP
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -415,18 +415,18 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code, 2026-06-16)**
 
-- **Historique** : `modules/history/` — persistance PNG + miniatures WebP on-device, SQLite `captures`, retention 30, queue séquentielle
-- **DB** : `db/captures.ts` — insert/list/prune/delete
+- **Historique** : `modules/history/` - persistance PNG + miniatures WebP on-device, SQLite `captures`, retention 30, queue séquentielle
+- **DB** : `db/captures.ts` - insert/list/prune/delete
 - **UI** : route `/history`, grille + preview modal + open/delete, nav History
 - **E2E natif** : `e2e_inject_screenshot`, bridge export dev, spec `capture-beautify-export.spec.ts`, fixture PNG 800×600
 - **Perf** : marks `snapglow-render` en dev, `stressCaptures.test.ts` + `pnpm test:stress-captures`
 - **Release beta unsigned** : doc install Gatekeeper/SmartScreen, checklist secrets updater, stub Windows signing dans `release.yml`
 - **Polish UX (P1-037, Hallmark)** : `design.md` verrouillé (Feature Stack, nav N1b, thème warm amber OKLCH, IBM Plex Sans/Mono) ; passes audit 0 critical / ship-ready ; conformité pass 5
 - **Shell** : `AppTopNav` (wordmark + liens Editor / History / Settings), routes `min-h-0 flex-1` (scroll unique)
-- **Éditeur** : `EditorSection` + `EditorToolsPanel` — ordre Format → Style → Annotations → Sensitive data → Export ; gradients adoucis ; focus rings, tooltip 800 ms, boutons `:active`
+- **Éditeur** : `EditorSection` + `EditorToolsPanel` - ordre Format → Style → Annotations → Sensitive data → Export ; gradients adoucis ; focus rings, tooltip 800 ms, boutons `:active`
 - **Historique / Settings** : parité layout `max-w-5xl`, titres `font-display`
 
-**Checklist QA interne (P1-037 — buffer sprint review)**
+**Checklist QA interne (P1-037 - buffer sprint review)**
 
 - [x] Capture → entrée historique + miniature visible
 - [x] Historique → preview → réouverture éditeur (état frais)
@@ -451,16 +451,16 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 5. PHASE 1b — MVP Mobile (M4–M6)
+## 5. PHASE 1b - MVP Mobile (M4–M6)
 
 > Objectif : proposer une app compagnon iOS et Android avec parité fonctionnelle sur la beautification.
 > Note : démarrage en parallèle du Sprint 1.4 desktop.
 
-### Sprint 1b.1 (Semaines 15–16) — Setup React Native & Capture mobile
+### Sprint 1b.1 (Semaines 15–16) - Setup React Native & Capture mobile
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | M1-001 | Setup projet React Native (Expo) iOS + Android ; ajouter `dev:mobile` dans `mise.toml` | P0 | 2j | — |
+| `[ ]` | M1-001 | Setup projet React Native (Expo) iOS + Android ; ajouter `dev:mobile` dans `mise.toml` | P0 | 2j | - |
 | `[ ]` | M1-002 | Implémenter Share Extension iOS (import depuis Photos/apps) | P0 | 3j | M1-001 |
 | `[ ]` | M1-003 | Implémenter Share Intent Android (import depuis Photos/apps) | P0 | 3j | M1-001 |
 | `[ ]` | M1-004 | Réutiliser les composants UI du design system (adaptation mobile) | P0 | 2j | P0-009, M1-001 |
@@ -471,7 +471,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Share Extension / Intent importe une image dans l'app
 - [ ] Composants design-tokens rendus correctement sur mobile
 
-### Sprint 1b.2 (Semaines 17–18) — Beautification & Presets mobile
+### Sprint 1b.2 (Semaines 17–18) - Beautification & Presets mobile
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -486,7 +486,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Annotations tactiles utilisables
 - [ ] Export Photos + share sheet natif fonctionnels
 
-### Sprint 1b.3 (Semaines 19–20) — Polish & Tests mobile
+### Sprint 1b.3 (Semaines 19–20) - Polish & Tests mobile
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -501,12 +501,12 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Tests devices réels documentés (matrice OS / modèles)
 - [ ] Builds TestFlight + Play Internal Testing uploadés
 
-### Sprint 1b.4 (Semaines 21–22) — Soumission & Corrections
+### Sprint 1b.4 (Semaines 21–22) - Soumission & Corrections
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | M1-013 | Soumission App Store (review Apple) | P0 | — | M1-012 |
-| `[ ]` | M1-014 | Soumission Google Play | P0 | — | M1-012 |
+| `[ ]` | M1-013 | Soumission App Store (review Apple) | P0 | - | M1-012 |
+| `[ ]` | M1-014 | Soumission Google Play | P0 | - | M1-012 |
 | `[ ]` | M1-015 | Corrections post-review et ajustements | P0 | 3j | M1-013, M1-014 |
 | `[ ]` | M1-016 | Publication et monitoring | P0 | 1j | M1-015 |
 
@@ -525,11 +525,11 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 6. PHASE 2 — Lancement (M6)
+## 6. PHASE 2 - Lancement (M6)
 
 > Objectif : beta fermée, feedback, puis lancement public coordonné.
 
-### Sprint 2.1 (Semaines 23–24) — Beta fermée
+### Sprint 2.1 (Semaines 23–24) - Beta fermée
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -546,7 +546,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] 0 bug P0 ouvert en fin de sprint
 - [ ] Landing finalisée (vidéo, pricing, FAQ live)
 
-### Sprint 2.2 (Semaines 25–26) — Lancement public
+### Sprint 2.2 (Semaines 25–26) - Lancement public
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -569,19 +569,19 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-**Jalon J3 (M6) :** Lancement public — Product Hunt + AppSumo.
+**Jalon J3 (M6) :** Lancement public - Product Hunt + AppSumo.
 
 ---
 
-## 7. PHASE 2b — IA & Cloud (M7–M9)
+## 7. PHASE 2b - IA & Cloud (M7–M9)
 
 > Objectif : ajouter l'intelligence artificielle, les captures avancées, et le cloud.
 
-### Sprint 2b.1 (Semaines 27–28) — Suggestion de style IA
+### Sprint 2b.1 (Semaines 27–28) - Suggestion de style IA
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | AI-001 | Entraîner/adapter un modèle de classification de contenu (code, UI, photo, texte) | P0 | 4j | — |
+| `[ ]` | AI-001 | Entraîner/adapter un modèle de classification de contenu (code, UI, photo, texte) | P0 | 4j | - |
 | `[ ]` | AI-002 | Intégrer le modèle on-device (TF Lite macOS/Windows, Core ML macOS) | P0 | 3j | AI-001 |
 | `[ ]` | AI-003 | Mapper classification → presets de style recommandés | P0 | 2j | AI-001 |
 | `[ ]` | AI-004 | UI : badge "Suggested" + application en 1 clic | P0 | 1j | AI-003 |
@@ -592,12 +592,12 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Badge "Suggested" + application preset en 1 clic
 - [ ] Précision acceptable sur jeu de test interne (≥ 80 %)
 
-### Sprint 2b.2 (Semaines 29–30) — OCR & Auto-crop
+### Sprint 2b.2 (Semaines 29–30) - OCR & Auto-crop
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | AI-005 | Intégrer Tesseract.js (cross-platform) pour OCR | P0 | 2j | — |
-| `[ ]` | AI-006 | Intégrer Apple Vision Framework (macOS) comme moteur OCR alternatif | P1 | 2j | — |
+| `[ ]` | AI-005 | Intégrer Tesseract.js (cross-platform) pour OCR | P0 | 2j | - |
+| `[ ]` | AI-006 | Intégrer Apple Vision Framework (macOS) comme moteur OCR alternatif | P1 | 2j | - |
 | `[ ]` | AI-007 | UI : bouton "Copier le texte", sélection de zones de texte | P0 | 2j | AI-005 |
 | `[ ]` | AI-008 | Auto-crop : détection et suppression des espaces vides excessifs | P0 | 2j | P1-007 |
 | `[ ]` | AI-009 | Compression intelligente (mozjpeg + pngquant) | P1 | 2j | P1-030 |
@@ -608,7 +608,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Auto-crop réduit marges vides sans rogner le contenu
 - [ ] Compression réduit taille fichier ≥ 30 % sans perte visible
 
-### Sprint 2b.3 (Semaines 31–32) — Capture scrollante & GIF
+### Sprint 2b.3 (Semaines 31–32) - Capture scrollante & GIF
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -622,12 +622,12 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Capture scrollante macOS + Windows sur pages test (long scroll)
 - [ ] Timer différé et capture menu ouvert fonctionnels
 
-### Sprint 2b.4 (Semaines 33–34) — Capture vidéo/GIF
+### Sprint 2b.4 (Semaines 33–34) - Capture vidéo/GIF
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | AC-005 | Enregistrement de zone d'écran (< 30s) — macOS | P0 | 3j | P1-001 |
-| `[ ]` | AC-006 | Enregistrement de zone d'écran — Windows | P0 | 3j | P1-002 |
+| `[ ]` | AC-005 | Enregistrement de zone d'écran (< 30s) - macOS | P0 | 3j | P1-001 |
+| `[ ]` | AC-006 | Enregistrement de zone d'écran - Windows | P0 | 3j | P1-002 |
 | `[ ]` | AC-007 | Encodage GIF optimisé (< 10MB pour 10s) | P0 | 2j | AC-005 |
 | `[ ]` | AC-008 | Export vidéo MP4 (H.264) | P1 | 2j | AC-005 |
 | `[ ]` | AC-009 | UI : contrôles d'enregistrement (start, stop, pause) | P0 | 1j | AC-005 |
@@ -638,20 +638,20 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] GIF < 10 MB pour 10 s ; export MP4 optionnel
 - [ ] Contrôles start/stop/pause utilisables
 
-### Sprint 2b.5 (Semaines 35–36) — Cloud & Partage
+### Sprint 2b.5 (Semaines 35–36) - Cloud & Partage
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | CL-001 | Setup backend API (Fastify) + PostgreSQL + Redis ; ajouter `dev:api` dans `mise.toml` | P0 | 3j | — |
+| `[ ]` | CL-001 | Setup backend API (Fastify) + PostgreSQL + Redis ; ajouter `dev:api` dans `mise.toml` | P0 | 3j | - |
 | `[ ]` | CL-002 | Setup stockage fichiers (Cloudflare R2) | P0 | 2j | CL-001 |
-| `[ ]` | CL-003 | Système d'authentification (Clerk/Auth0 — OAuth2) | P0 | 2j | CL-001 |
+| `[ ]` | CL-003 | Système d'authentification (Clerk/Auth0 - OAuth2) | P0 | 2j | CL-001 |
 | `[ ]` | CL-004 | Upload automatique + génération de lien partageable | P0 | 2j | CL-002 |
 | `[ ]` | CL-005 | Page de visualisation publique du lien partagé | P0 | 2j | CL-004 |
 | `[ ]` | CL-006 | Expiration configurable des liens (1h, 24h, 7j, permanent) | P1 | 1j | CL-004 |
 
 **Reporté**
 
-- **Terraform GCP + Docker infra** — infra cloud gérée manuellement ou via PaaS en premier temps.
+- **Terraform GCP + Docker infra** - infra cloud gérée manuellement ou via PaaS en premier temps.
 
 **Critères de validation**
 
@@ -659,7 +659,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Upload → lien public → page viewer fonctionnels
 - [ ] Expiration liens configurable et respectée
 
-### Sprint 2b.6 (Semaines 37–38) — Intégrations & Organisation
+### Sprint 2b.6 (Semaines 37–38) - Intégrations & Organisation
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -678,7 +678,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Intégration Slack opérationnelle (envoi depuis éditeur)
 - [ ] Bibliothèque cloud avec recherche OCR
 - [ ] Tags et collections utilisables
-- [ ] Jalon J4 validé (1 000 utilisateurs payants — métrique produit)
+- [ ] Jalon J4 validé (1 000 utilisateurs payants - métrique produit)
 
 ---
 
@@ -686,11 +686,11 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 8. PHASE 3 — Team & B2B (M10–M14)
+## 8. PHASE 3 - Team & B2B (M10–M14)
 
 > Objectif : débloquer le segment B2B avec collaboration, workspaces, et API.
 
-### Sprint 3.1–3.2 (Semaines 39–42) — Workspace & Gestion d'équipe
+### Sprint 3.1–3.2 (Semaines 39–42) - Workspace & Gestion d'équipe
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -706,7 +706,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Brand kit partagé appliqué aux exports team
 - [ ] Billing Stripe par siège opérationnel (sandbox puis prod)
 
-### Sprint 3.3–3.4 (Semaines 43–46) — Collaboration temps réel
+### Sprint 3.3–3.4 (Semaines 43–46) - Collaboration temps réel
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -720,7 +720,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] 2+ utilisateurs annotent simultanément avec sync < 200 ms
 - [ ] Commentaires + notifications email/in-app fonctionnels
 
-### Sprint 3.5–3.6 (Semaines 47–50) — API publique
+### Sprint 3.5–3.6 (Semaines 47–50) - API publique
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -736,7 +736,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Endpoints upload/beautify/export/list + rate limiting testés
 - [ ] SDK npm publié (beta)
 
-### Sprint 3.7–3.8 (Semaines 51–54) — Plugins
+### Sprint 3.7–3.8 (Semaines 51–54) - Plugins
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -750,14 +750,14 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] Plugin VS Code publié sur Marketplace (ou VSIX interne)
 - [ ] Rapports d'utilisation team disponibles dans dashboard
 
-### Sprint 3.9–3.10 (Semaines 55–58) — Polish & Stabilisation B2B
+### Sprint 3.9–3.10 (Semaines 55–58) - Polish & Stabilisation B2B
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
 | `[ ]` | T-019 | Tests de charge API (1000+ requêtes/min) | P0 | 2j | T-011 |
 | `[ ]` | T-020 | Audit sécurité (OWASP, pentest basique) | P0 | 3j | Tous T-* |
 | `[ ]` | T-021 | Onboarding team : wizard de setup workspace | P0 | 2j | T-002 |
-| `[ ]` | T-022 | Documentation utilisateur (help center / knowledge base) | P0 | 3j | — |
+| `[ ]` | T-022 | Documentation utilisateur (help center / knowledge base) | P0 | 3j | - |
 | `[ ]` | T-023 | Corrections bugs et polish UX B2B | P0 | 4j | Tous T-* |
 
 **Livrable :** Plans Team fonctionnels avec collaboration, API, plugins, et brand kit.
@@ -775,7 +775,7 @@ PHASE 4 — Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 9. PHASE 4 — Scale (M15–M18)
+## 9. PHASE 4 - Scale (M15–M18)
 
 > Objectif : scaler l'acquisition, internationaliser, et créer un écosystème.
 
@@ -836,18 +836,18 @@ CL-001 (backend) ──── CL-003 (auth) ──── T-001 (multi-tenant) �
 | Phase 2 | M6 | 2 | Beta 200 testeurs → lancement Product Hunt + AppSumo | J3 |
 | Phase 2b | M7–M9 | 6 | IA style, OCR, capture scrollante/GIF, cloud + liens partageables | J4 |
 | Phase 3 | M10–M14 | 10 | Workspace team, collaboration, API, plugins, brand kit | J5 |
-| Phase 4 | M15–M18 | 8 | Marketplace, affiliés, i18n, sync cross-device | — |
+| Phase 4 | M15–M18 | 8 | Marketplace, affiliés, i18n, sync cross-device | - |
 
 ---
 
 ## Documents liés
 
-- [[Cahier des Charges]] — Point d'entrée documentation
-- [[Product Requirements]] — Exigences produit détaillées
-- [[Technical Stack - Desktop]] — Architecture technique desktop
-- [[Cahier des Charges]] — Spécifications originales
-- [[Market Analysis]] — Analyse de marché
+- [[Cahier des Charges]] - Point d'entrée documentation
+- [[Product Requirements]] - Exigences produit détaillées
+- [[Technical Stack - Desktop]] - Architecture technique desktop
+- [[Cahier des Charges]] - Spécifications originales
+- [[Market Analysis]] - Analyse de marché
 
 ---
 
-*v1.0 — Juin 2026 — Usage confidentiel*
+*v1.0 - Juin 2026 - Usage confidentiel*
