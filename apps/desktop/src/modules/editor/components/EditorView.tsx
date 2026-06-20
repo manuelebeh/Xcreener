@@ -1,8 +1,10 @@
 import { ExportBar } from '@/modules/export/components/ExportBar';
+import { AutoCropBar } from '@/modules/auto-crop/components/AutoCropBar';
 import { RedactionBar } from '@/modules/redaction/components/RedactionBar';
 import { useAutoRedaction } from '@/modules/redaction/hooks/useAutoRedaction';
 import { StyleSuggestionBar } from '@/modules/style-suggestion/components/StyleSuggestionBar';
 import { useAutoStyleSuggestion } from '@/modules/style-suggestion/hooks/useAutoStyleSuggestion';
+import { TextExtractionBar } from '@/modules/text-extraction/components/TextExtractionBar';
 import { useCustomPresetsLoader } from '../hooks/useCustomPresets';
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { Canvas } from './Canvas';
@@ -35,6 +37,9 @@ export function EditorView() {
             <EditorSection title="Format" testId="preset-bar-section">
               <PresetBar embedded />
             </EditorSection>
+            <EditorSection title="Auto-crop" testId="auto-crop-section">
+              <AutoCropBar embedded />
+            </EditorSection>
             <EditorSection title="Style suggestion" testId="style-suggestion-section">
               <StyleSuggestionBar embedded />
             </EditorSection>
@@ -43,6 +48,9 @@ export function EditorView() {
             </EditorSection>
             <EditorSection title="Annotations" testId="annotation-toolbar-section">
               <AnnotationToolbar embedded />
+            </EditorSection>
+            <EditorSection title="Text extraction" testId="text-extraction-section">
+              <TextExtractionBar embedded />
             </EditorSection>
             <EditorSection title="Sensitive data" testId="redaction-bar-section">
               <RedactionBar embedded />

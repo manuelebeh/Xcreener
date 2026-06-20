@@ -10,8 +10,6 @@ type RunnableClassifier = RunnableModel<TypedFact, Box<dyn TypedOp>, Graph<Typed
 
 static MODEL: OnceLock<Option<RunnableClassifier>> = OnceLock::new();
 
-const LABELS: [&str; 6] = ["code", "ui", "terminal", "photo", "diagram", "text"];
-
 pub fn model_path() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("resources/models/content_classifier.tflite")
 }
@@ -55,24 +53,16 @@ pub fn classify(image: &image::DynamicImage) -> Option<ClassificationResult> {
         .max_by(|(_, left), (_, right)| left.partial_cmp(right).unwrap_or(std::cmp::Ordering::Equal))
         .map(|(index, confidence)| (index, *confidence))?;
 
-    let label = LABELS.get(best_index).copied().unwrap_or("ui");
+    let label = ContentClass::MODEL_LABELS
+        .get(best_index)
+        .copied()
+        .unwrap_or("ui");
 
     Some(ClassificationResult {
-        content_class: parse_class(label),
+        content_class: ContentClass::from_label(label),
         confidence,
         latency_ms: start.elapsed().as_millis() as u64,
     })
-}
-
-fn parse_class(label: &str) -> ContentClass {
-    match label {
-        "code" => ContentClass::Code,
-        "terminal" => ContentClass::Terminal,
-        "photo" => ContentClass::Photo,
-        "diagram" => ContentClass::Diagram,
-        "text" => ContentClass::Text,
-        _ => ContentClass::Ui,
-    }
 }
 
 fn softmax(values: &[f32]) -> Vec<f32> {

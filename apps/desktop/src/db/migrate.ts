@@ -10,6 +10,9 @@ const DEFAULT_SETTING_ENTRIES: Record<string, string> = {
   [SETTING_KEYS.analyticsEnabled]: String(DEFAULT_APP_SETTINGS.analyticsEnabled),
   [SETTING_KEYS.autoRedaction]: String(DEFAULT_APP_SETTINGS.autoRedaction),
   [SETTING_KEYS.autoStyleSuggestion]: String(DEFAULT_APP_SETTINGS.autoStyleSuggestion),
+  [SETTING_KEYS.smartCompression]: String(DEFAULT_APP_SETTINGS.smartCompression),
+  [SETTING_KEYS.ocrEngine]: DEFAULT_APP_SETTINGS.ocrEngine,
+  [SETTING_KEYS.ocrLanguages]: DEFAULT_APP_SETTINGS.ocrLanguages,
 };
 
 /** Split a SQL migration file into executable statements (Tauri SQL runs one at a time). */

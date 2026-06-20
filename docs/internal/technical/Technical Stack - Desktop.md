@@ -185,8 +185,11 @@ src/
 │   ├── export/             # Export PNG/JPG/WebP, copier, drag & drop (Sprint 1.5)
 │   │   ├── components/ExportBar.tsx
 │   │   ├── hooks/useExportRender.ts
-│   │   ├── utils/canvasExport.ts, saveExport.ts, copyExport.ts, formats.ts
+│   │   ├── utils/canvasExport.ts, smartCompression.ts, saveExport.ts, copyExport.ts, formats.ts
 │   │   └── store.ts
+│   ├── style-suggestion/   # Suggestion de style IA (Sprint 2b.1)
+│   ├── text-extraction/    # OCR copy-text (Sprint 2b.2)
+│   ├── auto-crop/          # Rogner marges vides (Sprint 2b.2)
 │   ├── redaction/          # Détection et masquage de données sensibles (Sprint 1.5)
 │   │   ├── components/RedactionBar.tsx, RedactionOverlay.tsx
 │   │   ├── hooks/useRedactionScan.ts, useAutoRedaction.ts
@@ -272,10 +275,14 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 | `tokio` | 1.x | Runtime async (pour les opérations I/O non-bloquantes) |
 | `anyhow` / `thiserror` | Latest | Gestion d'erreurs ergonomique |
 | `tracing` | 0.1.x | Logging structuré |
+| `imagequant` | 4.x | Compression PNG palette (pngquant-style, Sprint 2b.2) |
+| `webp` | 0.3.x | Encodage WebP export (Sprint 2b.2) |
+| `png` | 0.17.x | Encodage PNG indexé post-quantization (Sprint 2b.2) |
+| `tempfile` | 3.x | Fichiers temporaires pour Tesseract CLI (Sprint 2b.2) |
 
 ### 4.3 Commandes Tauri (IPC)
 
-> **État Sprint 1.6 :** capture native (Sprint 1.1), redaction on-device (`detect_sensitive_data`), export fichier côté frontend (offscreen canvas + plugins dialog/fs/clipboard), historique captures côté frontend (`db/captures.ts` + fs). Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
+> **État Sprint 2b.2 :** capture native (Sprint 1.1), redaction + OCR copy-text (`detect_sensitive_data`, `recognize_text_command`), auto-crop (`detect_content_bounds_command`, `crop_image_command`), compression export (`compress_export_bytes_command`), classification (`classify_content_command`), export fichier côté frontend (offscreen canvas + compression Rust optionnelle + dialog/fs/clipboard), historique captures côté frontend (`db/captures.ts` + fs). Détail : [ADR-006](./adr/006-native-capture-overlay.md), [ADR-003](./adr/003-desktop-ipc-and-events.md).
 
 ```rust
 // Capture - commandes Rust (xcap) ; l'overlay confirme via découpe preview côté React
@@ -285,20 +292,33 @@ async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u
 #[tauri::command]
 async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> { ... }
 
-// Export - stub Rust non utilisé ; l'UI exporte via renderFrame offscreen → blob → dialog/fs
-#[tauri::command]
-async fn export_image(
-    image_data: Vec<u8>,
-    format: String,       // "png" | "jpg" | "webp"
-    quality: u8,          // 1-100 pour JPG
-    path: String
-) -> Result<(), String> { ... }  // stub
-
 // Redaction - Sprint 1.5 : OCR + regex on-device (src-tauri/src/redaction/)
 #[tauri::command]
 async fn detect_sensitive_data(image_data: Vec<u8>) -> Result<Vec<SensitiveRegion>, String> {
-    // Vision (macOS) / Windows.Media.Ocr → détecteurs email, phone, card, api_key, url, password
+    // src-tauri/src/ocr/ → détecteurs email, phone, card, api_key, url, password
 }
+
+// OCR copy-text - Sprint 2b.2 (src-tauri/src/ocr/, moteur partagé avec redaction)
+#[tauri::command]
+async fn recognize_text_command(
+    image_data: Vec<u8>,
+    options: RecognizeTextOptions,  // engine: auto|native|tesseract, languages
+) -> Result<Vec<TextLine>, String> { ... }
+
+// Auto-crop + compression - Sprint 2b.2 (src-tauri/src/image_processing/)
+#[tauri::command]
+async fn detect_content_bounds_command(image_data: Vec<u8>) -> Result<ContentBounds, String> { ... }
+
+#[tauri::command]
+async fn compress_export_bytes_command(
+    image_data: Vec<u8>,
+    format: String,
+    quality: u8,
+) -> Result<Vec<u8>, String> { ... }
+
+// Classification - Sprint 2b.1
+#[tauri::command]
+async fn classify_content_command(image_data: Vec<u8>) -> Result<ClassificationResult, String> { ... }
 
 // Historique - Sprint 1.6 : frontend-only (db/captures.ts + fs plugin, pas de commande Rust)
 ```
@@ -331,7 +351,7 @@ async fn detect_sensitive_data(image_data: Vec<u8>) -> Result<Vec<SensitiveRegio
 
 ## 5. Moteur de Rendu (Canvas)
 
-> **État Sprint 1.6 :** moteur `renderFrame` dans `modules/editor/engine/` - layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem - le canvas est monté conditionnellement après `displaySize`). **Shell UI** : `AppTopNav` (N1b) + routes ; **éditeur** Feature Stack (`EditorView` - canvas sticky + `EditorToolsPanel` scrollable, ordre Format → Style → Annotations → Sensitive data → Export). **Design system** : `design.md` (verrouillé) + `@snapglow/design-tokens` + `@snapglow/ui`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`). Clipboard : `Image.fromBytes` + feature Cargo `image-png`.
+> **État Sprint 2b.2 :** moteur `renderFrame` dans `modules/editor/engine/` - layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem - le canvas est monté conditionnellement après `displaySize`). **Shell UI** : `AppTopNav` (N1b) + routes ; **éditeur** Feature Stack (`EditorView` - canvas sticky + `EditorToolsPanel` scrollable, ordre Format → Auto-crop → Style suggestion → Style → Annotations → Text extraction → Sensitive data → Export). **Design system** : `design.md` (verrouillé) + `@snapglow/design-tokens` + `@snapglow/ui`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`) + compression Rust optionnelle (`smartCompression` setting). Clipboard image : `Image.fromBytes` ; clipboard texte OCR : `writeText`.
 
 ### 5.1 Architecture du moteur
 
@@ -467,9 +487,10 @@ CREATE INDEX idx_captures_tags ON captures(tags);
 Image capturée (PNG bytes bruts, pas le canvas beautifié)
   │
   ▼
-OCR (extraction du texte + positions)
+OCR (extraction du texte + positions) — moteur partagé `src-tauri/src/ocr/`
   ├── macOS : Apple Vision Framework (objc2-vision)
-  └── Windows : Windows.Media.Ocr
+  ├── Windows : Windows.Media.Ocr
+  └── Fallback : Tesseract CLI (TSV) — langues EN/FR/DE/JP via settings
   │
   ▼
 Pattern matching (regex sur le texte extrait)
@@ -532,6 +553,23 @@ UI : highlight (`RedactionOverlay`) puis masquage → `BlurAnnotation` (layer 4,
 | Photo | Fond flou extrait de l'image | Aucune | Petit (20px) | 0px |
 | Diagramme | Fond blanc uni | Légère | Moyen (40px) | 0px |
 | Texte / document | Fond crème | Légère | Moyen (40px) | 4px |
+
+### 8.3 OCR copy-text, auto-crop, compression export (Sprint 2b.2)
+
+> **Statut implémentation (2026-06-20)** : desktop livré. Package `@snapglow/ocr-core`, UI `TextExtractionBar` + overlay sélection, `AutoCropBar`, setting **Smart export compression**.
+
+| Feature | Backend | Frontend | IPC |
+|---|---|---|---|
+| Copy-text OCR | `src-tauri/src/ocr/` | `modules/text-extraction/` | `recognize_text_command` |
+| Auto-crop marges | `src-tauri/src/image_processing/trim.rs` | `modules/auto-crop/` | `detect_content_bounds_command`, `crop_image_command` |
+| Compression export | `src-tauri/src/image_processing/compress.rs` (imagequant PNG, JPEG/WebP) | `modules/export/utils/smartCompression.ts` | `compress_export_bytes_command` |
+
+**Notes**
+
+- OCR copy-text réutilise le même moteur que la redaction ; `detect_sensitive_data` applique les regex PII, `recognize_text_command` retourne les lignes brutes.
+- Tesseract : CLI système (`tesseract … tsv`), pas `tesseract.js` WASM — voir settings `ocrEngine` / `ocrLanguages`.
+- Auto-crop : refuse si gain < 5 % de surface ; undo via historique éditeur (`pushHistory` + `cropScreenshot`).
+- Compression : activée par défaut ; cible ≥ 30 % sur PNG UI typiques (test Rust `png_compression_reduces_size`).
 
 ---
 
@@ -694,8 +732,10 @@ jobs:
 | `framer-motion` | Animations fluides |
 | `@tauri-apps/api` | API Tauri côté frontend |
 | `@tauri-apps/plugin-*` | Plugins Tauri (voir section 2.3) |
-| `tesseract.js` | OCR cross-platform pour extraction de texte (Phase 2b - distinct de la redaction Sprint 1.5) |
 | `@phosphor-icons/react` | Icônes cohérentes |
+| `@snapglow/style-suggestion-core` | Mapping classification → style (desktop, Sprint 2b.1) |
+| `@snapglow/ocr-core` | Types OCR + helpers copy-text (desktop, Sprint 2b.2) |
+| `@snapglow/redaction-core` | Détecteurs regex + mapRegionToLayout (desktop + mobile) |
 | `date-fns` | Manipulation de dates (historique) |
 | `zod` | Validation de schémas (settings, presets) |
 

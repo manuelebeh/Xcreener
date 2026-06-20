@@ -28,6 +28,7 @@ packages/design-tokens/  DTCG tokens → CSS + tokens.native
 packages/editor-core/    Shared editor logic (layout, presets, annotations)
 packages/redaction-core/ Shared on-device detectors + mapRegionToLayout (desktop + mobile)
 packages/style-suggestion-core/ Content class → style mapping for AI suggestions (desktop)
+packages/ocr-core/           OCR types + text assembly helpers (desktop copy-text)
 packages/ui/           Shared React web components + Storybook
 packages/ui-native/    Shared React Native components
 packages/              biome-config, typescript-config
@@ -78,6 +79,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 1b.2** : `@snapglow/editor-core`, éditeur Skia mobile (presets, annotations tactiles), export Photos + share sheet (`modules/export/`) — preview-scaled
 - **Sprint 1b.3** : `@snapglow/redaction-core`, redaction mobile (`snapglow-ocr` Vision/ML Kit, `RedactionBar`), export pleine résolution (`ExportCanvas`), EAS/store prep, matrice QA devices
 - **Sprint 2b.1** : `@snapglow/style-suggestion-core`, classification on-device desktop (`classify_content_command`), UI `StyleSuggestionBar`, training tooling (`tools/style-classifier/`) — **modèle ML non entraîné** (pas de dataset ; fallback heuristique)
+- **Sprint 2b.2** : `@snapglow/ocr-core`, OCR copy-text desktop (`recognize_text_command`), UI `TextExtractionBar`, auto-crop (`detect_content_bounds_command`), compression export (`compress_export_bytes_command`)
 
 ## Agent conventions
 

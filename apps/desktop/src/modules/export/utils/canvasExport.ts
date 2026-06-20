@@ -1,7 +1,9 @@
 import { computeLayout } from '@/modules/editor/engine/computeLayout';
 import { renderFrame } from '@/modules/editor/engine/renderFrame';
 import type { RenderInput } from '@/modules/editor/types';
+import { useSettingsStore } from '@/modules/settings/store';
 import type { ExportFormat } from './formats';
+import { maybeCompressExportBlob } from './smartCompression';
 
 export type ExportCanvas = HTMLCanvasElement | OffscreenCanvas;
 
@@ -122,10 +124,17 @@ export async function exportRenderInput(
   input: RenderInput,
   format: ExportFormat,
   quality = 100
-): Promise<{ blob: Blob; width: number; height: number }> {
+): Promise<{ blob: Blob; width: number; height: number; compressionPercent: number | null }> {
   const { canvas, width, height } = renderToExportCanvas(input);
   const blob = await canvasToBlob(canvas, format, quality);
-  return { blob, width, height };
+  const smartCompression = useSettingsStore.getState().smartCompression;
+  const compressed = await maybeCompressExportBlob(blob, format, quality, smartCompression);
+  return {
+    blob: compressed.blob,
+    width,
+    height,
+    compressionPercent: compressed.compressionPercent,
+  };
 }
 
 export async function loadImageFromBlob(blob: Blob): Promise<HTMLImageElement> {

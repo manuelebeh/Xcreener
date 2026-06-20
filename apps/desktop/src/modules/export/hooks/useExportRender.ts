@@ -41,6 +41,7 @@ export function useExportRender() {
       ...result,
       durationMs,
       format,
+      compressionPercent: result.compressionPercent,
     };
   }, []);
 

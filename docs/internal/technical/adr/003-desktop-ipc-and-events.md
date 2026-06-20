@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). **Sprint 1.6** adds capture history (frontend `db/captures.ts` + filesystem, no Rust IPC) and debug-only E2E hooks in `test_support.rs`. See [ADR-006](./006-native-capture-overlay.md).
+SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). **Sprint 1.6** adds capture history (frontend `db/captures.ts` + filesystem, no Rust IPC) and debug-only E2E hooks in `test_support.rs`. **Sprint 2b.1** adds `classify_content_command`. **Sprint 2b.2** adds OCR copy-text, auto-crop, and smart export compression IPC. See [ADR-006](./006-native-capture-overlay.md).
 
 ## Decision
 
@@ -27,7 +27,12 @@ Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls 
 | `cancel_capture_overlay` | `commands/capture.rs` | Live | `()` |
 | `get_capture_overlay_bounds` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
 | `detect_sensitive_data` | `commands/redaction.rs` | Live | `imageData: number[]` → `SensitiveRegion[]` |
-| `export_image` | `commands/export.rs` | Stub (unused) | `{ imageData, format, quality, path }` - export UI uses frontend `renderToExportCanvas` + dialog/fs |
+| `recognize_text_command` | `commands/ocr.rs` | Live (Sprint 2b.2) | `{ imageData, options }` → `TextLine[]` (copy-text OCR; shared engine in `src-tauri/src/ocr/`) |
+| `detect_content_bounds_command` | `commands/image_processing.rs` | Live (Sprint 2b.2) | `imageData: number[]` → `ContentBounds` |
+| `crop_image_command` | `commands/image_processing.rs` | Live (Sprint 2b.2) | `{ imageData, bounds }` → `number[]` (PNG bytes) |
+| `compress_export_bytes_command` | `commands/image_processing.rs` | Live (Sprint 2b.2) | `{ imageData, format, quality }` → `number[]` — optional post-pass after frontend canvas render |
+| `classify_content_command` | `commands/classification.rs` | Live (Sprint 2b.1) | `imageData: number[]` → `ClassificationResult` |
+| `export_image` | `commands/export.rs` | Live (path write helper) | `{ imageData, format, quality, path }` — compresses then writes file; primary export UI still uses frontend render + `compress_export_bytes_command` |
 | `get_setting` / `set_setting` | `commands/storage.rs` | Placeholder | Prefer `@/db` on frontend |
 | `update_capture_shortcut` | `shortcuts.rs` | Live | `{ shortcut }` - Tauri global-shortcut format |
 

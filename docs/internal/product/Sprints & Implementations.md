@@ -656,17 +656,32 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | AI-005 | Intégrer Tesseract.js (cross-platform) pour OCR | P0 | 2j | - |
-| `[ ]` | AI-006 | Intégrer Apple Vision Framework (macOS) comme moteur OCR alternatif | P1 | 2j | - |
-| `[ ]` | AI-007 | UI : bouton "Copier le texte", sélection de zones de texte | P0 | 2j | AI-005 |
-| `[ ]` | AI-008 | Auto-crop : détection et suppression des espaces vides excessifs | P0 | 2j | P1-007 |
-| `[ ]` | AI-009 | Compression intelligente (mozjpeg + pngquant) | P1 | 2j | P1-030 |
+| `[x]` (2026-06-20) | AI-005 | Intégrer Tesseract.js (cross-platform) pour OCR | P0 | 2j | - |
+| `[x]` (2026-06-20) | AI-006 | Intégrer Apple Vision Framework (macOS) comme moteur OCR alternatif | P1 | 2j | - |
+| `[x]` (2026-06-20) | AI-007 | UI : bouton "Copier le texte", sélection de zones de texte | P0 | 2j | AI-005 |
+| `[x]` (2026-06-20) | AI-008 | Auto-crop : détection et suppression des espaces vides excessifs | P0 | 2j | P1-007 |
+| `[x]` (2026-06-20) | AI-009 | Compression intelligente (mozjpeg + pngquant) | P1 | 2j | P1-030 |
+
+**Livré (code, 2026-06-20)**
+
+- **`@snapglow/ocr-core`** : types `TextLine`, helpers `linesToPlainText` / `mergeSelectedLines`, `mapLineToLayout`
+- **`apps/desktop/src-tauri/src/ocr/`** : moteurs natifs (Vision macOS, Windows OCR) + fallback **Tesseract CLI** ; commande `recognize_text_command`
+- **`apps/desktop/src/modules/text-extraction/`** : `TextExtractionBar`, overlay sélection, copie presse-papiers (`writeText`)
+- **`apps/desktop/src-tauri/src/image_processing/trim.rs`** : `detect_content_bounds_command`, `crop_image_command` ; UI `AutoCropBar`
+- **`apps/desktop/src-tauri/src/image_processing/compress.rs`** : `compress_export_bytes_command` (imagequant PNG, JPEG optimisé, WebP) ; toggle **Smart export compression** dans Settings
+- **Settings** : `ocrEngine`, `ocrLanguages`, `smartCompression`
+
+**Notes d'implémentation**
+
+- AI-005 : Tesseract via **CLI système** (`tesseract … tsv`) plutôt que `tesseract.js` WASM — même intent FR-009, meilleure intégration Tauri offline
+- AI-006 : Vision déjà utilisée pour redaction ; exposée pour copy-text via `recognize_text_command` (mode `native` / `auto`)
+- Tesseract fallback : `brew install tesseract` (+ langues) sur macOS dev ; variable `TESSDATA_PREFIX` ou `SNAPGLOW_TESSDATA_DIR`
 
 **Critères de validation**
 
-- [ ] OCR copie texte depuis capture ; sélection de zones OK
-- [ ] Auto-crop réduit marges vides sans rogner le contenu
-- [ ] Compression réduit taille fichier ≥ 30 % sans perte visible
+- [x] OCR copie texte depuis capture ; sélection de zones OK (desktop)
+- [x] Auto-crop réduit marges vides sans rogner le contenu (tests Rust trim + undo éditeur)
+- [x] Compression réduit taille fichier ≥ 30 % sans perte visible (test Rust `png_compression_reduces_size`)
 
 ### Sprint 2b.3 (Semaines 31–32) - Capture scrollante & GIF
 

@@ -74,6 +74,34 @@ export function classifyContent(imageData: number[]) {
   });
 }
 
+export function recognizeText(imageData: number[], options: import('@/shared/types/ipc').RecognizeTextOptions) {
+  return invoke<import('@/shared/types/ipc').TextLine[]>('recognize_text_command', {
+    imageData,
+    options,
+  });
+}
+
+export function detectContentBounds(imageData: number[]) {
+  return invoke<import('@/shared/types/ipc').ContentBounds>('detect_content_bounds_command', {
+    imageData,
+  });
+}
+
+export function cropImage(imageData: number[], bounds: import('@/shared/types/ipc').ContentBounds) {
+  return invoke<number[]>('crop_image_command', {
+    imageData,
+    bounds,
+  });
+}
+
+export function compressExportBytes(imageData: number[], format: string, quality: number) {
+  return invoke<number[]>('compress_export_bytes_command', {
+    imageData,
+    format,
+    quality,
+  });
+}
+
 export function exportImage(imageData: number[], format: string, quality: number, path: string) {
   return invoke<void>('export_image', { imageData, format, quality, path });
 }
