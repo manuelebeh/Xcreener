@@ -627,16 +627,30 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | AI-001 | Entraîner/adapter un modèle de classification de contenu (code, UI, photo, texte) | P0 | 4j | - |
-| `[ ]` | AI-002 | Intégrer le modèle on-device (TF Lite macOS/Windows, Core ML macOS) | P0 | 3j | AI-001 |
-| `[ ]` | AI-003 | Mapper classification → presets de style recommandés | P0 | 2j | AI-001 |
-| `[ ]` | AI-004 | UI : badge "Suggested" + application en 1 clic | P0 | 1j | AI-003 |
+| `[~]` (2026-06-20) | AI-001 | Entraîner/adapter un modèle de classification de contenu (code, UI, photo, texte) | P0 | 4j | - |
+| `[~]` (2026-06-20) | AI-002 | Intégrer le modèle on-device (TF Lite macOS/Windows, Core ML macOS) | P0 | 3j | AI-001 |
+| `[x]` (2026-06-20) | AI-003 | Mapper classification → presets de style recommandés | P0 | 2j | AI-001 |
+| `[x]` (2026-06-20) | AI-004 | UI : badge "Suggested" + application en 1 clic | P0 | 1j | AI-003 |
+
+**Livré (code, 2026-06-20)**
+
+- **`@snapglow/style-suggestion-core`** : 6 classes (`code`, `ui`, `terminal`, `photo`, `diagram`, `text`), mapping §8.2 → gradient/solid/blur + ombres, Vitest
+- **`apps/desktop/src/modules/style-suggestion/`** : `StyleSuggestionBar`, scan auto (`autoStyleSuggestion`, défaut ON), Apply 1 clic, fond photo flouté
+- **`apps/desktop/src-tauri/src/classification/`** : commande `classify_content_command`, preprocessing 224×224, inférence TFLite (`tract-tflite`) si modèle bundlé, **fallback heuristique** sinon ; latence < 500 ms (test Rust)
+- **`tools/style-classifier/`** : scripts `collect`, `train` (MobileNetV3-Small), `evaluate` (gate ≥ 80 %), `export` (.tflite + .mlmodel) — voir `tools/README.md`
+
+**En attente (bloquant prod ML)**
+
+- **Dataset interne** : aucune capture annotée sous `tools/style-classifier/dataset/` — entraînement non lancé
+- **Artefacts modèle** : `content_classifier.tflite` / `.mlmodel` absents de `apps/desktop/src-tauri/resources/models/` (seul `labels.json`)
+- **Core ML natif macOS** : délègue au TFLite bundlé ; inférence `.mlmodel` directe non câblée
+- **Précision ≥ 80 %** : gate `evaluate.py` non validé sans jeu test
 
 **Critères de validation**
 
-- [ ] Classification on-device sans réseau ; latence < 500 ms
-- [ ] Badge "Suggested" + application preset en 1 clic
-- [ ] Précision acceptable sur jeu de test interne (≥ 80 %)
+- [x] Classification on-device sans réseau ; latence < 500 ms (heuristique + pipeline TFLite prêt)
+- [x] Badge "Suggested" + application style en 1 clic (desktop)
+- [ ] Précision acceptable sur jeu de test interne (≥ 80 %) — **bloqué dataset + entraînement AI-001**
 
 ### Sprint 2b.2 (Semaines 29–30) - OCR & Auto-crop
 

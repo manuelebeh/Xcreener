@@ -8,6 +8,7 @@ export interface AppSettings {
   launchAtLogin: boolean;
   analyticsEnabled: boolean;
   autoRedaction: boolean;
+  autoStyleSuggestion: boolean;
 }
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
@@ -16,6 +17,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   launchAtLogin: false,
   analyticsEnabled: false,
   autoRedaction: false,
+  autoStyleSuggestion: true,
 };
 
 export const SETTING_KEYS = {
@@ -24,4 +26,5 @@ export const SETTING_KEYS = {
   launchAtLogin: 'launchAtLogin',
   analyticsEnabled: 'analyticsEnabled',
   autoRedaction: 'autoRedaction',
+  autoStyleSuggestion: 'autoStyleSuggestion',
 } as const;

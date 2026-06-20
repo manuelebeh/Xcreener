@@ -57,6 +57,14 @@ export interface SensitiveRegion {
   kind: string;
 }
 
+export type ContentClass = 'code' | 'ui' | 'terminal' | 'photo' | 'diagram' | 'text';
+
+export interface ClassificationResult {
+  class: ContentClass;
+  confidence: number;
+  latencyMs: number;
+}
+
 export interface CaptureMetadata {
   filename: string;
   filepath: string;

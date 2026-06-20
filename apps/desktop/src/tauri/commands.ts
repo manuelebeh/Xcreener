@@ -68,6 +68,12 @@ export function detectSensitiveData(imageData: number[]) {
   });
 }
 
+export function classifyContent(imageData: number[]) {
+  return invoke<import('@/shared/types/ipc').ClassificationResult>('classify_content_command', {
+    imageData,
+  });
+}
+
 export function exportImage(imageData: number[], format: string, quality: number, path: string) {
   return invoke<void>('export_image', { imageData, format, quality, path });
 }

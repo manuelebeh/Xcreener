@@ -498,15 +498,29 @@ UI : highlight (`RedactionOverlay`) puis masquage → `BlurAnnotation` (layer 4,
 
 ## 8. IA On-device (Phase 2)
 
+> **Statut implémentation (2026-06-20)** : pipeline desktop livré (Sprint 2b.1). Mapping style dans `@snapglow/style-suggestion-core`, UI `StyleSuggestionBar`, commande Tauri `classify_content_command`. **Modèle MobileNetV3 non entraîné** — pas de dataset ; fallback heuristique on-device en attendant `tools/style-classifier/` + export vers `src-tauri/resources/models/`.
+
 ### 8.1 Modèle de suggestion de style
 
 | Aspect | Détail |
 |---|---|
 | **Type** | Classification d'image (code, UI web, terminal, photo, diagramme, texte) |
-| **Framework** | TensorFlow Lite (cross-platform) + Core ML (macOS natif) |
+| **Framework** | TensorFlow Lite (cross-platform, `tract-tflite`) + Core ML (macOS natif, export prévu) |
+| **Runtime actuel** | Heuristique couleur/luminosité/contours si `.tflite` absent ; TFLite si modèle bundlé |
 | **Taille du modèle** | < 5 MB (MobileNet V3 fine-tuné) |
-| **Latence** | < 100ms sur CPU (pas besoin de GPU) |
-| **Entraînement** | Dataset custom de ~10K captures annotées par type de contenu |
+| **Latence** | < 500 ms (critère sprint) ; cible doc < 100 ms CPU avec modèle entraîné |
+| **Entraînement** | Dataset custom ~500–2000 captures/classe ; tooling `tools/style-classifier/` |
+| **Gate qualité** | ≥ 80 % accuracy sur split `test/` (`scripts/evaluate.py`) avant export prod |
+
+**Fichiers clés**
+
+| Zone | Chemin |
+|---|---|
+| Mapping style | `packages/style-suggestion-core/` |
+| UI desktop | `apps/desktop/src/modules/style-suggestion/` |
+| Inférence Rust | `apps/desktop/src-tauri/src/classification/` |
+| Training offline | `tools/style-classifier/` |
+| Modèles bundlés | `apps/desktop/src-tauri/resources/models/` |
 
 ### 8.2 Mapping classification → style
 

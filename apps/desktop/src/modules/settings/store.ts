@@ -8,6 +8,7 @@ interface SettingsState extends AppSettings {
   setLaunchAtLogin: (launchAtLogin: boolean) => void;
   setAnalyticsEnabled: (analyticsEnabled: boolean) => void;
   setAutoRedaction: (autoRedaction: boolean) => void;
+  setAutoStyleSuggestion: (autoStyleSuggestion: boolean) => void;
   hydrate: (settings: Partial<AppSettings>) => void;
 }
 
@@ -18,5 +19,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setLaunchAtLogin: (launchAtLogin) => set({ launchAtLogin }),
   setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
   setAutoRedaction: (autoRedaction) => set({ autoRedaction }),
+  setAutoStyleSuggestion: (autoStyleSuggestion) => set({ autoStyleSuggestion }),
   hydrate: (settings) => set((state) => ({ ...state, ...settings })),
 }));

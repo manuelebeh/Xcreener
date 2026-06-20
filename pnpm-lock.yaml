@@ -47,6 +47,9 @@ importers:
       '@snapglow/redaction-core':
         specifier: workspace:*
         version: link:../../packages/redaction-core
+      '@snapglow/style-suggestion-core':
+        specifier: workspace:*
+        version: link:../../packages/style-suggestion-core
       '@snapglow/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -375,6 +378,25 @@ importers:
         version: 3.2.6(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/redaction-core:
+    dependencies:
+      '@snapglow/editor-core':
+        specifier: workspace:*
+        version: link:../editor-core
+    devDependencies:
+      '@snapglow/biome-config':
+        specifier: workspace:*
+        version: link:../biome-config
+      '@snapglow/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/style-suggestion-core:
     dependencies:
       '@snapglow/editor-core':
         specifier: workspace:*
