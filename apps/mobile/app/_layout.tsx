@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { ShareIntentProvider } from 'expo-share-intent';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useShareImport } from '@/modules/capture/hooks/useShareImport';
 
@@ -21,14 +22,17 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <ShareIntentProvider>
-      <SnapGlowThemeProvider>
-        <ShareImportListener />
-        <Stack>
-          <Stack.Screen name="index" options={{ title: 'SnapGlow' }} />
-          <Stack.Screen name="import" options={{ title: 'Import' }} />
-        </Stack>
-      </SnapGlowThemeProvider>
-    </ShareIntentProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ShareIntentProvider>
+        <SnapGlowThemeProvider>
+          <ShareImportListener />
+          <Stack>
+            <Stack.Screen name="index" options={{ title: 'SnapGlow' }} />
+            <Stack.Screen name="import" options={{ title: 'Import' }} />
+            <Stack.Screen name="editor" options={{ title: 'Editor' }} />
+          </Stack>
+        </SnapGlowThemeProvider>
+      </ShareIntentProvider>
+    </GestureHandlerRootView>
   );
 }

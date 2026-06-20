@@ -496,16 +496,32 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | M1-005 | Porter le moteur de beautification sur mobile (Canvas/Skia) | P0 | 4j | M1-001, P1-007 |
-| `[ ]` | M1-006 | Presets réseaux sociaux (format mobile) | P0 | 1j | M1-005 |
-| `[ ]` | M1-007 | Annotations tactiles : texte, formes, flou | P0 | 3j | M1-005 |
-| `[ ]` | M1-008 | Export : sauvegarde dans Photos, partage via sheet natif | P0 | 2j | M1-005 |
+| `[x]` (2026-06-20) | M1-005 | Porter le moteur de beautification sur mobile (Canvas/Skia) | P0 | 4j | M1-001, P1-007 |
+| `[x]` (2026-06-20) | M1-006 | Presets réseaux sociaux (format mobile) | P0 | 1j | M1-005 |
+| `[x]` (2026-06-20) | M1-007 | Annotations tactiles : texte, formes, flou | P0 | 3j | M1-005 |
+| `[x]` (2026-06-20) | M1-008 | Export : sauvegarde dans Photos, partage via sheet natif | P0 | 2j | M1-005 |
+
+**Livré (code, 2026-06-20)**
+
+- **`packages/editor-core`** : types, layout, presets, gradients, annotations, blur algos + tests ; desktop refactoré
+- **`apps/mobile/src/modules/editor/`** : store Zustand, renderer Skia, StyleBar, PresetBar/Picker, annotations tactiles, undo/redo
+- **`apps/mobile/src/modules/export/`** : snapshot Skia (`makeImageSnapshotAsync`), encodage base64 → `expo-file-system/legacy`, Photos (`expo-media-library` write-only + plist), partage iOS (`Share.share`) / Android (`expo-sharing`)
+- **Route `/editor`** : handoff `/import` → éditeur ; `@shopify/react-native-skia`, `react-native-gesture-handler`
+- **`packages/ui-native`** : `Slider`, `SegmentedControl`
+- **Native iOS** : `NSPhotoLibraryAddUsageDescription` / `NSPhotoLibraryUsageDescription` via plugin `expo-media-library` ; rebuild natif après ajout de plugins (`expo prebuild`)
+
+**Checklist QA interne (Sprint 1b.2)**
+
+- [x] Import → `/editor` : beautify + presets + annotations tactiles
+- [x] Save to Photos (permission + enregistrement)
+- [x] Share sheet natif (iOS simulateur : warnings `[Sharing]` console possibles sans blocage)
+- [ ] Export pleine résolution layout (preview scaled — différé 1b.3)
 
 **Critères de validation**
 
-- [ ] Beautification mobile paritaire avec desktop (presets, padding, ombre)
-- [ ] Annotations tactiles utilisables
-- [ ] Export Photos + share sheet natif fonctionnels
+- [x] Beautification mobile paritaire avec desktop (presets, padding, ombre)
+- [x] Annotations tactiles utilisables
+- [x] Export Photos + share sheet natif fonctionnels
 
 ### Sprint 1b.3 (Semaines 19–20) - Polish & Tests mobile
 

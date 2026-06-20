@@ -48,6 +48,13 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 - Generated `ios/` / `android/` folders are gitignored; regen via `expo prebuild`
 - Agent rules: [`.agents/rules/mobile.md`](../../../../.agents/rules/mobile.md)
 
+### Mobile editor & export (Sprint 1b.2)
+
+- **`packages/editor-core`** — shared layout, presets, gradients, annotations, blur algos (desktop + mobile) ; Vitest in-package
+- **`apps/mobile`** renderer : `@shopify/react-native-skia` ; state Zustand per module
+- Export : snapshot async, `expo-file-system/legacy` for file write, `expo-media-library` + native share sheet
+- Desktop imports `@snapglow/editor-core` via thin re-exports in `apps/desktop/src/modules/editor/engine/`
+
 ### Git hooks
 
 - Husky removed (Sprint 0.1 temporary)

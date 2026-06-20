@@ -6,12 +6,27 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useCaptureStore } from '@/modules/capture';
+import { useEditorStore } from '@/modules/editor';
 
 export default function ImportScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const importedImage = useCaptureStore((state) => state.importedImage);
   const clearImportedImage = useCaptureStore((state) => state.clearImportedImage);
+  const setScreenshot = useEditorStore((state) => state.setScreenshot);
+
+  const handleContinue = () => {
+    if (!importedImage) {
+      return;
+    }
+
+    setScreenshot({
+      uri: importedImage.uri,
+      width: importedImage.width ?? 800,
+      height: importedImage.height ?? 600,
+    });
+    router.push('/editor');
+  };
 
   const handleBack = () => {
     clearImportedImage();
@@ -57,8 +72,8 @@ export default function ImportScreen() {
         ) : null}
 
         <View style={styles.actions}>
-          <Button variant="primary" onPress={() => router.replace('/')}>
-            Continue
+          <Button variant="primary" onPress={handleContinue}>
+            Continue to editor
           </Button>
           <Button variant="secondary" onPress={handleBack}>
             Import another

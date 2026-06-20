@@ -12,22 +12,14 @@ import {
   resolvePresetPadding,
 } from './engine/presets';
 import type { BackgroundConfig, FramePreset, ScreenshotTransform, ShadowConfig } from './types';
-import { DEFAULT_TRANSFORM } from './types';
+import {
+  DEFAULT_BACKGROUND,
+  DEFAULT_BORDER_RADIUS,
+  DEFAULT_SHADOW,
+  DEFAULT_TRANSFORM,
+} from './types';
 
-export const DEFAULT_BORDER_RADIUS = 12;
-
-export const DEFAULT_SHADOW: ShadowConfig = {
-  opacity: 0.35,
-  blur: 24,
-  offsetX: 0,
-  offsetY: 8,
-  color: '#000000',
-};
-
-export const DEFAULT_BACKGROUND: BackgroundConfig = {
-  type: 'gradient',
-  presetId: DEFAULT_GRADIENT_PRESET_ID,
-};
+export { DEFAULT_BORDER_RADIUS, DEFAULT_SHADOW, DEFAULT_BACKGROUND } from './types';
 
 function closeBackgroundImage(background: BackgroundConfig): void {
   if (background.type === 'image' && background.source) {
