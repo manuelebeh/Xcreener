@@ -39,13 +39,14 @@ function parseBoolean(value: string | null, fallback: boolean): boolean {
 }
 
 export async function loadAppSettings(): Promise<AppSettings> {
-  const [theme, captureShortcut, launchAtLogin, analyticsEnabled, autoRedaction] =
+  const [theme, captureShortcut, launchAtLogin, analyticsEnabled, autoRedaction, autoStyleSuggestion] =
     await Promise.all([
       getSetting(SETTING_KEYS.theme),
       getSetting(SETTING_KEYS.captureShortcut),
       getSetting(SETTING_KEYS.launchAtLogin),
       getSetting(SETTING_KEYS.analyticsEnabled),
       getSetting(SETTING_KEYS.autoRedaction),
+      getSetting(SETTING_KEYS.autoStyleSuggestion),
     ]);
 
   const resolvedTheme =
@@ -59,5 +60,9 @@ export async function loadAppSettings(): Promise<AppSettings> {
     launchAtLogin: parseBoolean(launchAtLogin, DEFAULT_APP_SETTINGS.launchAtLogin),
     analyticsEnabled: parseBoolean(analyticsEnabled, DEFAULT_APP_SETTINGS.analyticsEnabled),
     autoRedaction: parseBoolean(autoRedaction, DEFAULT_APP_SETTINGS.autoRedaction),
+    autoStyleSuggestion: parseBoolean(
+      autoStyleSuggestion,
+      DEFAULT_APP_SETTINGS.autoStyleSuggestion
+    ),
   };
 }

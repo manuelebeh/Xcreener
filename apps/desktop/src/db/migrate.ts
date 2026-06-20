@@ -9,6 +9,7 @@ const DEFAULT_SETTING_ENTRIES: Record<string, string> = {
   [SETTING_KEYS.launchAtLogin]: String(DEFAULT_APP_SETTINGS.launchAtLogin),
   [SETTING_KEYS.analyticsEnabled]: String(DEFAULT_APP_SETTINGS.analyticsEnabled),
   [SETTING_KEYS.autoRedaction]: String(DEFAULT_APP_SETTINGS.autoRedaction),
+  [SETTING_KEYS.autoStyleSuggestion]: String(DEFAULT_APP_SETTINGS.autoStyleSuggestion),
 };
 
 /** Split a SQL migration file into executable statements (Tauri SQL runs one at a time). */
