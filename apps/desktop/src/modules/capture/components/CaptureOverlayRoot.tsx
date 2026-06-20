@@ -1,5 +1,5 @@
 import { listen } from '@tauri-apps/api/event';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import type { CaptureOverlayInitPayload, OverlayWebviewLayout } from '@/shared/types/ipc';
 import { bytesToObjectUrl } from '@/shared/utils/image';
 import { captureOverlayReady } from '@/tauri/commands';
@@ -55,32 +55,30 @@ export function CaptureOverlayRoot() {
   }, [setActiveMode, setBounds, setMonitors, setPreviewUrl, setWebviewLayout]);
 
   useEffect(() => {
+    document.documentElement.style.backgroundColor = '#000';
+    document.body.style.backgroundColor = '#000';
+
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
+
+  useLayoutEffect(() => {
     if (!bounds || !previewUrl) {
       return;
     }
 
-    let cancelled = false;
-
-    void (async () => {
-      // Paint the frozen preview in the hidden webview before the native window is shown.
-      await new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      });
-      if (cancelled) {
-        return;
-      }
-
-      await captureOverlayReady();
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    void captureOverlayReady();
   }, [bounds, previewUrl]);
 
   if (!bounds || !previewUrl) {
     return null;
   }
 
-  return <CaptureOverlay />;
+  return (
+    <div className="h-screen w-screen bg-black">
+      <CaptureOverlay />
+    </div>
+  );
 }
