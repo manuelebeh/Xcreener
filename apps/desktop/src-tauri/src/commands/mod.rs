@@ -1,6 +1,8 @@
 mod capture;
 mod classification;
 mod export;
+mod image_processing;
+mod ocr;
 mod overlay_layout;
 mod redaction;
 mod storage;
@@ -12,6 +14,10 @@ pub use capture::{
 };
 pub use classification::classify_content_command;
 pub use export::export_image;
+pub use image_processing::{
+    compress_export_bytes_command, crop_image_command, detect_content_bounds_command,
+};
+pub use ocr::recognize_text_command;
 pub use overlay_layout::get_overlay_webview_layout;
 pub use redaction::detect_sensitive_data;
 pub use storage::{get_setting, set_setting};

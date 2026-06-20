@@ -47,15 +47,20 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
           duration_ms: result.durationMs,
         });
 
+        const compressionMessage =
+          result.compressionPercent && result.compressionPercent > 0
+            ? ` · −${result.compressionPercent}%`
+            : '';
+
         if (action === 'save') {
           const path = await saveExportBlob(result.blob, format);
-          setLastMessage(path ? `Saved to ${path}` : 'Export cancelled');
+          setLastMessage(path ? `Saved to ${path}${compressionMessage}` : 'Export cancelled');
           return;
         }
 
         dragBlobRef.current = result.blob;
         setDragReady(true);
-        setLastMessage('Drag the handle to another app');
+        setLastMessage(`Drag the handle to another app${compressionMessage}`);
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         setLastMessage(message);

@@ -9,6 +9,9 @@ interface SettingsState extends AppSettings {
   setAnalyticsEnabled: (analyticsEnabled: boolean) => void;
   setAutoRedaction: (autoRedaction: boolean) => void;
   setAutoStyleSuggestion: (autoStyleSuggestion: boolean) => void;
+  setSmartCompression: (smartCompression: boolean) => void;
+  setOcrEngine: (ocrEngine: AppSettings['ocrEngine']) => void;
+  setOcrLanguages: (ocrLanguages: string) => void;
   hydrate: (settings: Partial<AppSettings>) => void;
 }
 
@@ -20,5 +23,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
   setAutoRedaction: (autoRedaction) => set({ autoRedaction }),
   setAutoStyleSuggestion: (autoStyleSuggestion) => set({ autoStyleSuggestion }),
+  setSmartCompression: (smartCompression) => set({ smartCompression }),
+  setOcrEngine: (ocrEngine) => set({ ocrEngine }),
+  setOcrLanguages: (ocrLanguages) => set({ ocrLanguages }),
   hydrate: (settings) => set((state) => ({ ...state, ...settings })),
 }));

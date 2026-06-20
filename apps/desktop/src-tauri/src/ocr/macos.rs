@@ -8,7 +8,7 @@ use objc2_vision::{
 };
 
 use super::OcrEngine;
-use crate::redaction::types::TextLine;
+use crate::ocr::types::TextLine;
 
 pub struct MacOcrEngine;
 

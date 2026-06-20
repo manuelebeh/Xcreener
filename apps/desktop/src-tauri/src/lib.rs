@@ -1,6 +1,8 @@
 mod capture;
 mod commands;
 mod classification;
+mod image_processing;
+mod ocr;
 mod overlay;
 mod redaction;
 #[cfg(target_os = "macos")]
@@ -13,9 +15,11 @@ mod tray;
 
 use commands::{
     cancel_capture_overlay, capture_fullscreen, capture_overlay_ready, capture_region,
-    capture_window, classify_content_command, detect_sensitive_data, export_image, get_capture_overlay_bounds,
+    capture_window, classify_content_command, compress_export_bytes_command, crop_image_command,
+    detect_content_bounds_command, detect_sensitive_data, export_image, get_capture_overlay_bounds,
     get_setting, get_window_at_point_command, get_overlay_webview_layout, hide_capture_overlay,
-    list_monitors_command, list_windows_command, set_setting, show_capture_overlay,
+    list_monitors_command, list_windows_command, recognize_text_command, set_setting,
+    show_capture_overlay,
 };
 use shortcuts::{
     build_global_shortcut_plugin, init_shortcut_state, register_capture_shortcut,
@@ -87,6 +91,10 @@ pub fn run() {
             cancel_capture_overlay,
             export_image,
             detect_sensitive_data,
+            recognize_text_command,
+            detect_content_bounds_command,
+            crop_image_command,
+            compress_export_bytes_command,
             classify_content_command,
             get_setting,
             set_setting,
