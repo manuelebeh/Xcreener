@@ -62,6 +62,26 @@ export function cancelCaptureOverlay() {
   return invoke<void>('cancel_capture_overlay');
 }
 
+export function captureNative(request: import('@/shared/types/ipc').CaptureNativeRequest) {
+  return invoke<number[]>('capture_native_command', { request });
+}
+
+export function captureScrollingWindow(window: import('@/shared/types/ipc').WindowInfo) {
+  return invoke<number[]>('capture_scrolling_window_command', { window });
+}
+
+export function cancelLiveCapture() {
+  return invoke<void>('cancel_live_capture_command');
+}
+
+export function stopScrollingCapture() {
+  return invoke<void>('stop_scrolling_capture_command');
+}
+
+export function showLiveCaptureOverlay() {
+  return invoke<CaptureOverlayBounds>('show_live_capture_overlay');
+}
+
 export function detectSensitiveData(imageData: number[]) {
   return invoke<import('@/shared/types/ipc').SensitiveRegion[]>('detect_sensitive_data', {
     imageData,

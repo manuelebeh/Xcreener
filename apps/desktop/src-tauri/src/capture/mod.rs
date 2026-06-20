@@ -4,10 +4,16 @@ mod validate;
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 pub mod platform;
 
+pub mod native;
+pub mod scroll;
+pub mod stitch;
+
 pub use types::{
-    CaptureErrorPayload, CaptureOverlayBounds, CaptureOverlayInitPayload, MonitorInfo,
-    OverlayWebviewLayout, Rect, WindowInfo,
+    CaptureErrorPayload, CaptureNativeRequest, CaptureOverlayBounds, CaptureOverlayInitPayload,
+    CaptureProgressPayload, MonitorInfo, OverlayWebviewLayout, Rect, WindowInfo,
 };
+pub use native::{cancel_live_capture, capture_native};
+pub use scroll::{capture_scrolling_window, request_scroll_capture_stop};
 pub use validate::{validate_monitor_id, validate_region, validate_window_id};
 
 use image::codecs::png::PngEncoder;
@@ -67,6 +73,74 @@ fn monitor_scale_factor(monitor: &Monitor) -> f64 {
     monitor.scale_factor().unwrap_or(1.0) as f64
 }
 
+fn is_snapglow_window(window: &Window) -> bool {
+    if window.pid().ok() == Some(std::process::id()) {
+        return true;
+    }
+
+    if let Ok(app_name) = window.app_name() {
+        if app_name.eq_ignore_ascii_case("SnapGlow") {
+            return true;
+        }
+    }
+
+    if let Ok(title) = window.title() {
+        if title.eq_ignore_ascii_case("SnapGlow Capture") {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn window_info_matches(window: &Window, target: &WindowInfo) -> bool {
+    let Ok(x) = window.x() else {
+        return false;
+    };
+    let Ok(y) = window.y() else {
+        return false;
+    };
+    let Ok(width) = window.width() else {
+        return false;
+    };
+    let Ok(height) = window.height() else {
+        return false;
+    };
+
+    let title_matches = window
+        .title()
+        .ok()
+        .is_some_and(|title| title == target.title);
+
+    let tolerance = 12;
+    title_matches
+        && x.abs_diff(target.x) <= tolerance
+        && y.abs_diff(target.y) <= tolerance
+        && width.abs_diff(target.width) <= tolerance
+        && height.abs_diff(target.height) <= tolerance
+}
+
+pub(crate) fn resolve_window(target: &WindowInfo) -> Result<Window, CaptureError> {
+    let windows = Window::all().map_err(map_xcap_error)?;
+
+    if let Some(window) = windows.iter().find(|window| {
+        window.id().ok().map(u64::from) == Some(target.id) && !is_snapglow_window(window)
+    }) {
+        return Ok(window.clone());
+    }
+
+    windows
+        .into_iter()
+        .filter(|window| !is_snapglow_window(window))
+        .find(|window| window_info_matches(window, target))
+        .ok_or(CaptureError::WindowNotFound(target.id))
+}
+
+pub(crate) fn capture_xcap_window(window: &Window) -> Result<Vec<u8>, CaptureError> {
+    let image = window.capture_image().map_err(map_xcap_error)?;
+    encode_png(image.as_raw(), image.width(), image.height())
+}
+
 pub fn list_monitors() -> Result<Vec<MonitorInfo>, CaptureError> {
     Monitor::all()
         .map_err(map_xcap_error)?
@@ -91,6 +165,7 @@ pub fn list_windows() -> Result<Vec<WindowInfo>, CaptureError> {
     Window::all()
         .map_err(map_xcap_error)?
         .into_iter()
+        .filter(|window| !is_snapglow_window(window))
         .filter_map(|window| {
             let title = window.title().ok()?;
             if title.is_empty() {

@@ -1,10 +1,81 @@
 use crate::capture::{CaptureError, MonitorInfo};
 use image::{imageops, RgbaImage};
+use windows::Win32::Foundation::HWND;
+use windows::Win32::UI::Input::KeyboardAndMouse::{
+    SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYEVENTF_KEYUP, VIRTUAL_KEY,
+};
+use windows::Win32::UI::WindowsAndMessaging::{GetDesktopWindow, SetForegroundWindow};
+
+const VK_HOME: u16 = 0x24;
+const VK_NEXT: u16 = 0x22;
+
+pub fn focus_xcap_window(window: &xcap::Window) -> Result<(), CaptureError> {
+    let window_id = window.id().map_err(|error| CaptureError::Backend(error.to_string()))?;
+
+    unsafe {
+        let hwnd = HWND(window_id as isize);
+        if hwnd.0 == 0 {
+            return Ok(());
+        }
+
+        let _ = SetForegroundWindow(hwnd);
+    }
+
+    Ok(())
+}
+
+fn send_virtual_key(vk: u16) -> Result<(), CaptureError> {
+    let down = INPUT {
+        r#type: INPUT_KEYBOARD,
+        Anonymous: INPUT_0 {
+            ki: KEYBDINPUT {
+                wVk: VIRTUAL_KEY(vk),
+                ..Default::default()
+            },
+        },
+    };
+    let up = INPUT {
+        r#type: INPUT_KEYBOARD,
+        Anonymous: INPUT_0 {
+            ki: KEYBDINPUT {
+                wVk: VIRTUAL_KEY(vk),
+                dwFlags: KEYEVENTF_KEYUP,
+                ..Default::default()
+            },
+        },
+    };
+
+    unsafe {
+        let sent = SendInput(&[down, up], std::mem::size_of::<INPUT>() as i32);
+        if sent == 0 {
+            return Err(CaptureError::Backend("SendInput key failed".into()));
+        }
+    }
+
+    Ok(())
+}
+
+pub fn scroll_xcap_window_to_top(window: &xcap::Window) -> Result<(), CaptureError> {
+    focus_xcap_window(window)?;
+    std::thread::sleep(std::time::Duration::from_millis(150));
+
+    for _ in 0..5 {
+        send_virtual_key(VK_HOME)?;
+        std::thread::sleep(std::time::Duration::from_millis(60));
+    }
+
+    Ok(())
+}
+
+pub fn scroll_xcap_window_page_down(window: &xcap::Window) -> Result<(), CaptureError> {
+    focus_xcap_window(window)?;
+    send_virtual_key(VK_NEXT)
+}
+
 use windows::Win32::Graphics::Gdi::{
     BitBlt, CreateCompatibleBitmap, CreateCompatibleDC, DeleteDC, DeleteObject, GetDC, GetDIBits,
     ReleaseDC, SelectObject, BITMAPINFO, BITMAPINFOHEADER, DIB_RGB_COLORS, HGDIOBJ, SRCCOPY,
 };
-use windows::Win32::UI::WindowsAndMessaging::GetDesktopWindow;
 
 pub fn logical_to_physical_i32(value: i32, scale: f64) -> i32 {
     (value as f64 * scale).round() as i32

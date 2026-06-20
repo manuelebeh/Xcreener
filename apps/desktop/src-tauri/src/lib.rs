@@ -14,12 +14,13 @@ mod test_support;
 mod tray;
 
 use commands::{
-    cancel_capture_overlay, capture_fullscreen, capture_overlay_ready, capture_region,
-    capture_window, classify_content_command, compress_export_bytes_command, crop_image_command,
+    cancel_capture_overlay, cancel_live_capture_command, capture_fullscreen, capture_native_command,
+    capture_overlay_ready, capture_region, capture_scrolling_window_command, capture_window,
+    classify_content_command, compress_export_bytes_command, crop_image_command,
     detect_content_bounds_command, detect_sensitive_data, export_image, get_capture_overlay_bounds,
     get_setting, get_window_at_point_command, get_overlay_webview_layout, hide_capture_overlay,
     list_monitors_command, list_windows_command, recognize_text_command, set_setting,
-    show_capture_overlay,
+    show_capture_overlay, show_live_capture_overlay, stop_scrolling_capture_command,
 };
 use shortcuts::{
     build_global_shortcut_plugin, init_shortcut_state, register_capture_shortcut,
@@ -80,6 +81,11 @@ pub fn run() {
             capture_region,
             capture_window,
             capture_fullscreen,
+            capture_native_command,
+            capture_scrolling_window_command,
+            cancel_live_capture_command,
+            stop_scrolling_capture_command,
+            show_live_capture_overlay,
             list_monitors_command,
             list_windows_command,
             get_window_at_point_command,

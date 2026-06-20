@@ -1,9 +1,24 @@
-import { emit } from '@tauri-apps/api/event';
+import { emit, listen } from '@tauri-apps/api/event';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 import { useCallback, useEffect, useState } from 'react';
-import type { CaptureMode, Rect } from '@/shared/types/ipc';
+import type {
+  CaptureDelaySecs,
+  CaptureMode,
+  CaptureNativeRequest,
+  CaptureProgressPayload,
+  Rect,
+  WindowInfo,
+} from '@/shared/types/ipc';
 import { cropObjectUrlToPngBytes, getImageDimensionsFromPng } from '@/shared/utils/image';
-import { cancelCaptureOverlay, getWindowAtPoint, hideCaptureOverlay } from '@/tauri/commands';
+import {
+  cancelCaptureOverlay,
+  cancelLiveCapture,
+  captureNative,
+  captureScrollingWindow,
+  getWindowAtPoint,
+  hideCaptureOverlay,
+  stopScrollingCapture,
+} from '@/tauri/commands';
 import { captureOverlayCursor } from '../captureCursors';
 import { captureToolbarContainerStyle, captureToolbarStyle } from '../captureToolbarPlacement';
 import { findMonitorAtPoint } from '../findMonitorAtPoint';
@@ -15,7 +30,10 @@ import {
   viewportRectToBounds,
 } from '../overlayCoordinates';
 import { useCaptureStore } from '../store';
+import { isLiveOverlayMode, needsNativeCapture } from '../utils/captureFlow';
 import { toOverlayRect } from '../toOverlayRect';
+import { CaptureCountdown } from './CaptureCountdown';
+import { CaptureProgress } from './CaptureProgress';
 import { CaptureToolbar } from './CaptureToolbar';
 import { MonitorHighlight } from './MonitorHighlight';
 import { RegionSelector } from './RegionSelector';
@@ -34,8 +52,14 @@ async function publishCaptureError(message: string) {
   await emit('capture-error', { message });
 }
 
+function isWindowSelectionMode(mode: CaptureMode): boolean {
+  return mode === 'window' || mode === 'scroll' || mode === 'menu';
+}
+
 export function CaptureOverlay() {
   const activeMode = useCaptureStore((s) => s.activeMode);
+  const delaySecs = useCaptureStore((s) => s.delaySecs);
+  const liveOverlay = useCaptureStore((s) => s.liveOverlay);
   const bounds = useCaptureStore((s) => s.bounds);
   const monitors = useCaptureStore((s) => s.monitors);
   const webviewLayout = useCaptureStore((s) => s.webviewLayout);
@@ -44,16 +68,30 @@ export function CaptureOverlay() {
   const previewUrl = useCaptureStore((s) => s.previewUrl);
   const selection = useCaptureStore((s) => s.selection);
   const error = useCaptureStore((s) => s.error);
+  const isCapturing = useCaptureStore((s) => s.isCapturing);
+  const countdownSecs = useCaptureStore((s) => s.countdownSecs);
+  const scrollFrame = useCaptureStore((s) => s.scrollFrame);
+  const scrollFinishing = useCaptureStore((s) => s.scrollFinishing);
+  const progressHudMode = useCaptureStore((s) => s.progressHudMode);
+  const setProgressHudMode = useCaptureStore((s) => s.setProgressHudMode);
+  const setScrollFinishing = useCaptureStore((s) => s.setScrollFinishing);
   const setActiveMode = useCaptureStore((s) => s.setActiveMode);
+  const setDelaySecs = useCaptureStore((s) => s.setDelaySecs);
+  const setLiveOverlay = useCaptureStore((s) => s.setLiveOverlay);
   const setSelection = useCaptureStore((s) => s.setSelection);
   const setHoveredWindow = useCaptureStore((s) => s.setHoveredWindow);
   const setHoveredMonitor = useCaptureStore((s) => s.setHoveredMonitor);
   const setError = useCaptureStore((s) => s.setError);
+  const setCapturing = useCaptureStore((s) => s.setCapturing);
+  const setCountdownSecs = useCaptureStore((s) => s.setCountdownSecs);
+  const setScrollFrame = useCaptureStore((s) => s.setScrollFrame);
   const reset = useCaptureStore((s) => s.reset);
   const [revealed, setRevealed] = useState(false);
   const [viewport, setViewport] = useState<OverlayViewport>(() =>
     getOverlayViewport(bounds, monitors, { webviewLayout })
   );
+
+  const showPreview = previewUrl && !isLiveOverlayMode(activeMode, liveOverlay);
 
   useEffect(() => {
     if (isWindowsOverlay()) {
@@ -61,7 +99,7 @@ export function CaptureOverlay() {
       return;
     }
     setRevealed(true);
-  }, [bounds, previewUrl]);
+  }, [bounds, previewUrl, liveOverlay, activeMode]);
 
   useEffect(() => {
     if (!isWindowsOverlay() || !webviewLayout) {
@@ -116,6 +154,42 @@ export function CaptureOverlay() {
     };
   }, [bounds, monitors, webviewLayout]);
 
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+
+    listen<CaptureProgressPayload>('capture-progress', (event) => {
+      if (event.payload.phase === 'countdown' && event.payload.remainingSecs) {
+        setCountdownSecs(event.payload.remainingSecs);
+      }
+
+      if (event.payload.phase === 'scroll' && event.payload.current != null) {
+        if (!useCaptureStore.getState().scrollFinishing) {
+          setScrollFrame(event.payload.current);
+        }
+      }
+    }).then((fn) => {
+      unlisten = fn;
+    });
+
+    return () => {
+      unlisten?.();
+    };
+  }, [setCountdownSecs, setScrollFrame]);
+
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+
+    listen('capture-overlay-progress-hud', () => {
+      setProgressHudMode(true);
+    }).then((fn) => {
+      unlisten = fn;
+    });
+
+    return () => {
+      unlisten?.();
+    };
+  }, [setProgressHudMode]);
+
   const finishCapture = useCallback(
     async (bytes: number[]) => {
       await hideCaptureOverlay();
@@ -128,10 +202,15 @@ export function CaptureOverlay() {
   const handleCaptureFailure = useCallback(
     async (failure: unknown) => {
       const message = failure instanceof Error ? failure.message : String(failure);
+      setCapturing(false);
+      setCountdownSecs(null);
+      setScrollFrame(null);
+      setProgressHudMode(false);
       setError(message);
       await publishCaptureError(message);
+      await hideCaptureOverlay();
     },
-    [setError]
+    [setCapturing, setCountdownSecs, setError, setProgressHudMode, setScrollFrame]
   );
 
   const finishPreviewCrop = useCallback(
@@ -151,21 +230,87 @@ export function CaptureOverlay() {
         await handleCaptureFailure(failure);
       }
     },
+    [bounds, finishCapture, handleCaptureFailure, previewUrl, viewport.height, viewport.width]
+  );
+
+  const finishNativeCapture = useCallback(
+    async (request: CaptureNativeRequest) => {
+      setError(null);
+      setCapturing(true);
+      setCountdownSecs(request.delaySecs > 0 ? request.delaySecs : null);
+      setScrollFrame(null);
+
+      try {
+        const bytes = await captureNative(request);
+        await finishCapture(bytes);
+      } catch (failure) {
+        await handleCaptureFailure(failure);
+      }
+    },
+    [finishCapture, handleCaptureFailure, setCapturing, setCountdownSecs, setError, setScrollFrame]
+  );
+
+  const finishScrollCapture = useCallback(
+    async (window: WindowInfo) => {
+      setError(null);
+      setCapturing(true);
+      setProgressHudMode(true);
+      setScrollFinishing(false);
+      setCountdownSecs(null);
+      setScrollFrame(0);
+
+      try {
+        await emit('capture-progress', { phase: 'scroll', current: 0 });
+        const bytes = await captureScrollingWindow(window);
+        await finishCapture(bytes);
+      } catch (failure) {
+        await handleCaptureFailure(failure);
+      }
+    },
     [
-      bounds,
       finishCapture,
       handleCaptureFailure,
-      previewUrl,
+      setCapturing,
+      setCountdownSecs,
       setError,
-      viewport.height,
-      viewport.width,
+      setProgressHudMode,
+      setScrollFinishing,
+      setScrollFrame,
     ]
   );
 
+  const captureRect = useCallback(
+    async (rect: Rect) => {
+      if (needsNativeCapture(activeMode, delaySecs)) {
+        await finishNativeCapture({
+          kind: 'region',
+          rect,
+          delaySecs,
+        });
+        return;
+      }
+
+      await finishPreviewCrop(rect);
+    },
+    [activeMode, delaySecs, finishNativeCapture, finishPreviewCrop]
+  );
+
   const handleCancel = useCallback(async () => {
+    if (isCapturing) {
+      await cancelLiveCapture();
+    }
     await cancelCaptureOverlay();
     reset();
-  }, [reset]);
+  }, [isCapturing, reset]);
+
+  const handleStopScroll = useCallback(async () => {
+    if (useCaptureStore.getState().scrollFinishing) {
+      return;
+    }
+
+    setScrollFinishing(true);
+    await stopScrollingCapture();
+  }, [setScrollFinishing]);
 
   const handleModeChange = useCallback(
     (mode: CaptureMode) => {
@@ -178,8 +323,30 @@ export function CaptureOverlay() {
       setHoveredMonitor(null);
       setSelection(null);
       setError(null);
+
+      if (mode === 'menu') {
+        setDelaySecs(3);
+        setLiveOverlay(true);
+        return;
+      }
+
+      if (mode === 'scroll') {
+        setDelaySecs(0);
+        setLiveOverlay(false);
+        return;
+      }
+
+      setLiveOverlay(false);
     },
-    [setActiveMode, setError, setHoveredMonitor, setHoveredWindow, setSelection]
+    [
+      setActiveMode,
+      setDelaySecs,
+      setError,
+      setHoveredMonitor,
+      setHoveredWindow,
+      setLiveOverlay,
+      setSelection,
+    ]
   );
 
   const resolveFullscreenMonitor = useCallback(() => {
@@ -199,16 +366,40 @@ export function CaptureOverlay() {
       return;
     }
 
-    void finishPreviewCrop(viewportRectToBounds(selection, bounds, viewport));
-  }, [bounds, finishPreviewCrop, selection, viewport]);
+    void captureRect(viewportRectToBounds(selection, bounds, viewport));
+  }, [bounds, captureRect, selection, viewport]);
 
   const handleWindowClick = useCallback(() => {
-    if (!hoveredWindow || activeMode !== 'window' || !bounds) {
+    if (!hoveredWindow || !isWindowSelectionMode(activeMode) || !bounds) {
       return;
     }
 
-    void finishPreviewCrop(toOverlayRect(hoveredWindow, bounds));
-  }, [activeMode, bounds, finishPreviewCrop, hoveredWindow]);
+    if (activeMode === 'scroll') {
+      void finishScrollCapture(hoveredWindow);
+      return;
+    }
+
+    const rect = toOverlayRect(hoveredWindow, bounds);
+
+    if (needsNativeCapture(activeMode, delaySecs)) {
+      void finishNativeCapture({
+        kind: 'window',
+        windowId: hoveredWindow.id,
+        delaySecs,
+      });
+      return;
+    }
+
+    void finishPreviewCrop(rect);
+  }, [
+    activeMode,
+    bounds,
+    delaySecs,
+    finishNativeCapture,
+    finishPreviewCrop,
+    finishScrollCapture,
+    hoveredWindow,
+  ]);
 
   const handleScreenClick = useCallback(() => {
     if (activeMode !== 'fullscreen' || !bounds) {
@@ -220,11 +411,29 @@ export function CaptureOverlay() {
       return;
     }
 
-    void finishPreviewCrop(toOverlayRect(monitor, bounds));
-  }, [activeMode, bounds, finishPreviewCrop, resolveFullscreenMonitor]);
+    const rect = toOverlayRect(monitor, bounds);
+
+    if (needsNativeCapture(activeMode, delaySecs)) {
+      void finishNativeCapture({
+        kind: 'fullscreen',
+        monitorId: monitor.id,
+        delaySecs,
+      });
+      return;
+    }
+
+    void finishPreviewCrop(rect);
+  }, [
+    activeMode,
+    bounds,
+    delaySecs,
+    finishNativeCapture,
+    finishPreviewCrop,
+    resolveFullscreenMonitor,
+  ]);
 
   const handleTargetClick = useCallback(() => {
-    if (activeMode === 'window') {
+    if (isWindowSelectionMode(activeMode)) {
       handleWindowClick();
       return;
     }
@@ -235,19 +444,40 @@ export function CaptureOverlay() {
   }, [activeMode, handleScreenClick, handleWindowClick]);
 
   const handleConfirm = useCallback(() => {
+    if (activeMode === 'menu') {
+      if (selection) {
+        handleRegionConfirm();
+      } else if (hoveredWindow) {
+        handleWindowClick();
+      }
+      return;
+    }
+
     if (activeMode === 'region') {
       handleRegionConfirm();
+      return;
+    }
+
+    if (activeMode === 'scroll') {
+      handleWindowClick();
       return;
     }
 
     if (activeMode === 'fullscreen') {
       handleScreenClick();
     }
-  }, [activeMode, handleRegionConfirm, handleScreenClick]);
+  }, [
+    activeMode,
+    handleRegionConfirm,
+    handleScreenClick,
+    handleWindowClick,
+    hoveredWindow,
+    selection,
+  ]);
 
   const handlePointerMove = useCallback(
     async (event: React.PointerEvent<HTMLDivElement>) => {
-      if (!bounds) {
+      if (!bounds || isCapturing) {
         return;
       }
 
@@ -255,7 +485,7 @@ export function CaptureOverlay() {
       const screenX = Math.round(point.x) + bounds.x;
       const screenY = Math.round(point.y) + bounds.y;
 
-      if (activeMode === 'window') {
+      if (isWindowSelectionMode(activeMode)) {
         try {
           const window = await getWindowAtPoint(screenX, screenY);
           setHoveredWindow(window);
@@ -269,7 +499,7 @@ export function CaptureOverlay() {
         setHoveredMonitor(findMonitorAtPoint(monitors, screenX, screenY));
       }
     },
-    [activeMode, bounds, monitors, setHoveredMonitor, setHoveredWindow, viewport]
+    [activeMode, bounds, isCapturing, monitors, setHoveredMonitor, setHoveredWindow, viewport]
   );
 
   useEffect(() => {
@@ -326,13 +556,26 @@ export function CaptureOverlay() {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        void handleCancel();
+        if (progressHudMode && !scrollFinishing) {
+          void handleStopScroll();
+        } else if (!progressHudMode) {
+          void handleCancel();
+        }
         return;
       }
 
+      if (isCapturing) {
+        return;
+      }
+
+      const canConfirmRegion =
+        (activeMode === 'region' || activeMode === 'menu') && Boolean(selection);
+      const canConfirmScroll = activeMode === 'scroll' && Boolean(hoveredWindow);
+      const canConfirmFullscreen = activeMode === 'fullscreen';
+
       if (
         event.key === 'Enter' &&
-        ((activeMode === 'region' && selection) || activeMode === 'fullscreen')
+        (canConfirmRegion || canConfirmScroll || canConfirmFullscreen)
       ) {
         event.preventDefault();
         handleConfirm();
@@ -341,21 +584,47 @@ export function CaptureOverlay() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [activeMode, handleCancel, handleConfirm, selection]);
+  }, [activeMode, handleCancel, handleConfirm, handleStopScroll, hoveredWindow, isCapturing, progressHudMode, scrollFinishing, selection]);
 
   if (!bounds) {
     return null;
   }
 
-  const showConfirm = activeMode === 'region' || activeMode === 'fullscreen';
+  if (progressHudMode) {
+    return (
+      <div
+        data-testid="capture-overlay"
+        className="relative h-full w-full overflow-hidden"
+        role="status"
+        aria-label="Scrolling capture progress"
+      >
+        <CaptureProgress
+          phase="scroll"
+          current={scrollFrame}
+          variant="hud"
+          finishing={scrollFinishing}
+          onDone={() => void handleStopScroll()}
+        />
+      </div>
+    );
+  }
+
+  const showConfirm =
+    activeMode === 'region' ||
+    activeMode === 'fullscreen' ||
+    activeMode === 'scroll' ||
+    activeMode === 'menu';
 
   const confirmDisabled =
     (activeMode === 'region' && !selection) ||
+    (activeMode === 'menu' && !selection && !hoveredWindow) ||
+    (activeMode === 'scroll' && !hoveredWindow) ||
     (activeMode === 'fullscreen' && !resolveFullscreenMonitor());
 
   const overlayCursor = captureOverlayCursor(activeMode);
   const toolbarContainerStyle = captureToolbarContainerStyle(bounds, monitors, viewport);
   const toolbarStyle = captureToolbarStyle();
+  const dimOpacity = isLiveOverlayMode(activeMode, liveOverlay) ? 'bg-black/45' : 'bg-black/25';
 
   return (
     <div
@@ -365,16 +634,18 @@ export function CaptureOverlay() {
       className="relative h-full w-full overflow-hidden text-white"
       style={{
         opacity: revealed ? 1 : 0,
-        pointerEvents: revealed ? 'auto' : 'none',
+        pointerEvents: revealed && !isCapturing ? 'auto' : 'none',
         ...(overlayCursor ? { cursor: overlayCursor } : {}),
       }}
       onPointerMove={handlePointerMove}
       onClick={
-        activeMode === 'window' || activeMode === 'fullscreen' ? handleTargetClick : undefined
+        isWindowSelectionMode(activeMode) || activeMode === 'fullscreen'
+          ? handleTargetClick
+          : undefined
       }
       onKeyDown={(event) => {
         if (
-          (activeMode === 'window' || activeMode === 'fullscreen') &&
+          (isWindowSelectionMode(activeMode) || activeMode === 'fullscreen') &&
           (event.key === 'Enter' || event.key === ' ')
         ) {
           event.preventDefault();
@@ -382,7 +653,7 @@ export function CaptureOverlay() {
         }
       }}
     >
-      {previewUrl ? (
+      {showPreview ? (
         <img
           src={previewUrl}
           alt=""
@@ -391,13 +662,16 @@ export function CaptureOverlay() {
           draggable={false}
         />
       ) : null}
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-black/25" />
+      <div className={`pointer-events-none absolute inset-0 z-[1] ${dimOpacity}`} />
 
       <div style={toolbarContainerStyle}>
         <div style={toolbarStyle}>
           <CaptureToolbar
             activeMode={activeMode}
+            delaySecs={delaySecs}
+            isCapturing={isCapturing}
             onModeChange={handleModeChange}
+            onDelayChange={(delay: CaptureDelaySecs) => setDelaySecs(delay)}
             onCancel={() => void handleCancel()}
             onConfirm={showConfirm ? handleConfirm : undefined}
             confirmDisabled={confirmDisabled}
@@ -406,17 +680,20 @@ export function CaptureOverlay() {
       </div>
 
       <div className="relative z-10 h-full w-full">
-        {activeMode === 'region' ? (
+        {activeMode === 'region' || activeMode === 'menu' ? (
           <RegionSelector selection={selection} onSelectionChange={setSelection} />
         ) : null}
 
-        {activeMode === 'window' ? (
+        {isWindowSelectionMode(activeMode) ? (
           <WindowHighlight window={hoveredWindow} bounds={bounds} viewport={viewport} />
         ) : null}
 
         {activeMode === 'fullscreen' ? (
           <MonitorHighlight monitor={hoveredMonitor} bounds={bounds} viewport={viewport} />
         ) : null}
+
+        {countdownSecs ? <CaptureCountdown remainingSecs={countdownSecs} /> : null}
+        {scrollFrame ? <CaptureProgress phase="scroll" current={scrollFrame} /> : null}
 
         {error ? (
           <div

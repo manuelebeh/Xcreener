@@ -1,6 +1,8 @@
-export type CaptureType = 'region' | 'window' | 'fullscreen';
+export type CaptureType = 'region' | 'window' | 'fullscreen' | 'scroll' | 'menu';
 
 export type CaptureMode = CaptureType | 'idle';
+
+export type CaptureDelaySecs = 0 | 3 | 5 | 10;
 
 export interface Rect {
   x: number;
@@ -39,8 +41,24 @@ export interface CaptureOverlayBounds {
 export interface CaptureOverlayInitPayload {
   bounds: CaptureOverlayBounds;
   monitors: MonitorInfo[];
-  previewPng: number[];
+  previewPng?: number[];
+  liveOverlay?: boolean;
   webviewLayout?: OverlayWebviewLayout;
+}
+
+export interface CaptureNativeRequest {
+  kind: CaptureType;
+  rect?: Rect;
+  windowId?: number;
+  monitorId?: number;
+  delaySecs: CaptureDelaySecs;
+}
+
+export interface CaptureProgressPayload {
+  phase: 'countdown' | 'scroll';
+  remainingSecs?: number;
+  current?: number;
+  total?: number;
 }
 
 export interface OverlayWebviewLayout {
