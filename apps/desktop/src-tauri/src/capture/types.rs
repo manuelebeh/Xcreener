@@ -53,6 +53,12 @@ pub struct WindowInfo {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+pub struct CaptureErrorPayload {
+    pub message: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CaptureOverlayBounds {
     pub x: i32,
     pub y: i32,
