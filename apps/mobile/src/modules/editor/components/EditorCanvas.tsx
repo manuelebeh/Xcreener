@@ -1,5 +1,8 @@
-import { useRef, useState } from 'react';
+import { fitPreviewSize } from '@snapglow/editor-core';
+import { useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
+
+import { RedactionOverlay } from '@/modules/redaction';
 
 import { useAnnotationInteraction } from '../hooks/useAnnotationInteraction';
 import { useLayoutDimensions } from '../hooks/useLayoutDimensions';
@@ -19,13 +22,25 @@ export function EditorCanvas({ canvasRef }: EditorCanvasProps) {
   const internalRef = useRef<BeautifyCanvasHandle>(null);
   const ref = canvasRef ?? internalRef;
 
+  const displaySize = useMemo(() => {
+    if (!layout || containerSize.width <= 0 || containerSize.height <= 0) {
+      return { width: 0, height: 0 };
+    }
+    return fitPreviewSize(
+      layout.canvasWidth,
+      layout.canvasHeight,
+      containerSize.width,
+      containerSize.height
+    );
+  }, [containerSize.height, containerSize.width, layout]);
+
   const panHandlers = useAnnotationInteraction({
     layoutWidth: layout?.canvasWidth ?? 0,
-    displayWidth: containerSize.width,
+    displayWidth: displaySize.width,
     onTextEdit: setTextEditRequest,
   });
 
-  if (!renderInput) {
+  if (!renderInput || !layout) {
     return null;
   }
 
@@ -36,15 +51,20 @@ export function EditorCanvas({ canvasRef }: EditorCanvasProps) {
         const { width, height } = event.nativeEvent.layout;
         setContainerSize({ width, height });
       }}
-      {...panHandlers}
     >
-      <BeautifyCanvas
-        ref={ref}
-        input={renderInput}
-        imageUri={renderInput.screenshot.uri}
-        containerWidth={containerSize.width}
-        containerHeight={containerSize.height}
-      />
+      <View
+        style={{ width: displaySize.width, height: displaySize.height, position: 'relative' }}
+        {...panHandlers}
+      >
+        <BeautifyCanvas
+          ref={ref}
+          input={renderInput}
+          imageUri={renderInput.screenshot.uri}
+          containerWidth={displaySize.width}
+          containerHeight={displaySize.height}
+        />
+        <RedactionOverlay containerWidth={displaySize.width} containerHeight={displaySize.height} />
+      </View>
       <TextEditorOverlay request={textEditRequest} onClose={() => setTextEditRequest(null)} />
     </View>
   );

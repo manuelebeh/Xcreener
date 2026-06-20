@@ -1,6 +1,6 @@
 import { spacing } from '@snapglow/design-tokens/tokens.native';
 import { Button, useTheme } from '@snapglow/ui-native';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import type { BeautifyCanvasHandle } from '@/modules/editor/components/BeautifyCanvas';
@@ -10,6 +10,7 @@ import { useExportStore } from '../store';
 import { saveToPhotos } from '../utils/saveToPhotos';
 import { shareExport } from '../utils/shareExport';
 import { buildExportRenderInput, encodeSnapshotToFile } from '../utils/skiaExport';
+import { ExportCanvas, type ExportCanvasHandle } from './ExportCanvas';
 
 interface ExportBarProps {
   canvasRef: React.RefObject<BeautifyCanvasHandle | null>;
@@ -21,23 +22,26 @@ export function ExportBar({ canvasRef }: ExportBarProps) {
   const exporting = useExportStore((state) => state.exporting);
   const setExporting = useExportStore((state) => state.setExporting);
   const renderInput = useMobileRenderInput();
+  const exportInput = buildExportRenderInput(renderInput);
+  const exportCanvasRef = useRef<ExportCanvasHandle>(null);
   const [status, setStatus] = useState<string | null>(null);
 
   const runExport = useCallback(async () => {
-    const input = buildExportRenderInput(renderInput);
-    if (!input) {
+    if (!exportInput) {
       return null;
     }
-    void input;
 
     setExporting(true);
     try {
-      const snapshot = await canvasRef.current?.makeSnapshot();
-      return await encodeSnapshotToFile(snapshot, format);
+      const snapshot =
+        (await exportCanvasRef.current?.makeSnapshot()) ??
+        (await canvasRef.current?.makeSnapshot());
+      const fileUri = await encodeSnapshotToFile(snapshot, format);
+      return fileUri;
     } finally {
       setExporting(false);
     }
-  }, [canvasRef, format, renderInput, setExporting]);
+  }, [canvasRef, exportInput, format, setExporting]);
 
   const handleSave = async () => {
     setStatus(null);
@@ -67,6 +71,7 @@ export function ExportBar({ canvasRef }: ExportBarProps) {
 
   return (
     <View style={styles.container}>
+      {exportInput ? <ExportCanvas ref={exportCanvasRef} input={exportInput} /> : null}
       <View style={styles.row}>
         <Button variant="primary" disabled={exporting} onPress={handleSave} style={styles.button}>
           Save to Photos

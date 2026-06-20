@@ -25,6 +25,7 @@
     "@sentry/react": "^10.42.0",
     "@snapglow/design-tokens": "workspace:*",
     "@snapglow/editor-core": "workspace:*",
+    "@snapglow/redaction-core": "workspace:*",
     "@snapglow/typescript-config": "workspace:*",
     "@snapglow/ui": "workspace:*",
     "@tauri-apps/api": "^2",
