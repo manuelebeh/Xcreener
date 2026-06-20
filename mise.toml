@@ -14,8 +14,25 @@ format = "pnpm turbo format"
 "storybook" = "pnpm --filter @snapglow/ui storybook"
 test = "pnpm turbo test"
 "test:e2e:native" = "pnpm --filter @snapglow/desktop test:e2e:native:ci"
+"build:desktop:prep:mac" = "rustup target add aarch64-apple-darwin x86_64-apple-darwin"
+"build:desktop:prep:windows" = "rustup target add x86_64-pc-windows-msvc"
 pre-commit = "pnpm exec lint-staged"
 commit-msg = "pnpm exec commitlint --edit"
+
+[tasks."build:desktop:arm64"]
+depends = ["tokens:build", "build:desktop:prep:mac"]
+run = "pnpm --filter @snapglow/desktop tauri build --target aarch64-apple-darwin"
+
+[tasks."build:desktop:intel"]
+depends = ["tokens:build", "build:desktop:prep:mac"]
+run = "pnpm --filter @snapglow/desktop tauri build --target x86_64-apple-darwin"
+
+[tasks."build:desktop:windows"]
+depends = ["tokens:build", "build:desktop:prep:windows"]
+run = "pnpm --filter @snapglow/desktop tauri build --target x86_64-pc-windows-msvc"
+
+[tasks."build:desktop:mac"]
+depends = ["build:desktop:arm64", "build:desktop:intel"]
 
 [tasks.install-hooks]
 run = '''

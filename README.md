@@ -44,8 +44,39 @@ mise run dev:desktop   # or: mise run dev:web
 | `mise run test` | Unit tests Vitest (Turbo) |
 | `mise run test:e2e:native` | Native integration tests (WebDriver on Linux/Windows; Rust tests on macOS) |
 | `mise run format` | Biome write (Turbo) |
+| `mise run build:desktop:arm64` | macOS `.dmg` (Apple Silicon) — run on macOS |
+| `mise run build:desktop:intel` | macOS `.dmg` (Intel) — run on macOS |
+| `mise run build:desktop:mac` | Both macOS `.dmg` targets — run on macOS |
+| `mise run build:desktop:windows` | Windows `.msi` + `.exe` — run on Windows |
 
 Rust: `cd apps/desktop/src-tauri && cargo test`
+
+### Desktop release builds
+
+Build on the **same OS** as the target (cross-compiling Windows from macOS is not supported here).
+
+**macOS** — Apple Silicon or Intel dev machine:
+
+```bash
+mise run build:desktop:arm64   # Apple Silicon testers
+mise run build:desktop:intel   # Intel Mac testers
+mise run build:desktop:mac     # both DMGs
+```
+
+Output: `apps/desktop/src-tauri/target/release/bundle/dmg/*.dmg`
+
+**Windows** — dev machine with [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) (WebView2, MSVC):
+
+```bash
+mise run build:desktop:windows
+```
+
+Output:
+
+- `apps/desktop/src-tauri/target/release/bundle/msi/*.msi`
+- `apps/desktop/src-tauri/target/release/bundle/nsis/*.exe`
+
+**All platforms via CI** — tag `v*` → draft GitHub Release with macOS (arm64 + x86_64) + Windows artifacts. Beta installs are unsigned until code-signing certs are configured — see [`docs/internal/technical/release-signing.md`](docs/internal/technical/release-signing.md).
 
 Desktop e2e:
 - Web smoke: `pnpm --filter @snapglow/desktop test:e2e`
