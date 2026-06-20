@@ -11,6 +11,10 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.snapglow.app',
+    infoPlist: {
+      NSPhotoLibraryAddUsageDescription: 'SnapGlow saves edited screenshots to your photo library.',
+      NSPhotoLibraryUsageDescription: 'SnapGlow saves edited screenshots to your photo library.',
+    },
   },
   android: {
     package: 'com.snapglow.app',
@@ -31,6 +35,14 @@ const config: ExpoConfig = {
     'expo-router',
     'expo-dev-client',
     'expo-image',
+    'expo-sharing',
+    [
+      'expo-media-library',
+      {
+        photosPermission: 'Allow SnapGlow to save edited screenshots to your photo library.',
+        savePhotosPermission: 'Allow SnapGlow to save edited screenshots to your photo library.',
+      },
+    ],
     [
       'expo-share-intent',
       {
