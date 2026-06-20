@@ -32,6 +32,7 @@ thiserror = "2"
 [target.'cfg(target_os = "macos")'.dependencies]
 objc2 = { version = "0.6", default-features = false, features = ["std"] }
 objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "NSApplication", "NSWindow"] }
+objc2-core-graphics = { version = "0.3", default-features = false, features = ["std", "CGWindow"] }
 objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSData", "NSDictionary", "NSArray", "NSString", "NSError"] }
 objc2-vision = { version = "0.3", default-features = false, features = ["std", "VNRecognizeTextRequest", "VNRequestHandler", "VNRequest", "VNObservation", "VNTypes", "block2", "objc2-core-foundation"] }
 

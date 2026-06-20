@@ -1,7 +1,8 @@
 use crate::capture::{
-    capture_desktop_preview, get_overlay_bounds, list_monitors, CaptureOverlayBounds,
-    CaptureOverlayInitPayload, MonitorInfo, OverlayWebviewLayout,
+    capture_desktop_preview, get_overlay_bounds, list_monitors, CaptureErrorPayload,
+    CaptureOverlayBounds, CaptureOverlayInitPayload, MonitorInfo, OverlayWebviewLayout,
 };
+use crate::tray;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{AppHandle, Emitter, LogicalPosition, LogicalSize, Manager, Position, Size};
 
@@ -257,6 +258,29 @@ fn dispatch_show_prepared_overlay(
 }
 
 pub fn open_capture_overlay(app: &AppHandle) -> Result<CaptureOverlayBounds, String> {
-    let prepared = prepare_overlay_open()?;
-    dispatch_show_prepared_overlay(app, prepared)
+    let prepared = match prepare_overlay_open() {
+        Ok(prepared) => prepared,
+        Err(error) => {
+            report_capture_failure(app, &error);
+            return Err(error);
+        }
+    };
+
+    match dispatch_show_prepared_overlay(app, prepared) {
+        Ok(bounds) => Ok(bounds),
+        Err(error) => {
+            report_capture_failure(app, &error);
+            Err(error)
+        }
+    }
+}
+
+pub fn report_capture_failure(app: &AppHandle, message: &str) {
+    tray::show_main_window(app);
+    let _ = app.emit(
+        "capture-error",
+        CaptureErrorPayload {
+            message: message.to_string(),
+        },
+    );
 }

@@ -1,5 +1,6 @@
 import { BrowserRouter } from 'react-router-dom';
 import { registerE2EBridge } from '@/e2e/bridge';
+import { CaptureErrorBanner } from '@/modules/capture/components/CaptureErrorBanner';
 import { useCaptureSession } from '@/modules/capture/hooks/useCaptureSession';
 import { AppTopNav } from './components/AppTopNav';
 import { useTrayNavigation } from './hooks/useTrayNavigation';
@@ -14,6 +15,7 @@ function AppShell() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <CaptureErrorBanner />
       <AppTopNav />
       <div className="min-h-0 min-w-0 flex-1 overflow-x-clip">
         <AppRoutes />
