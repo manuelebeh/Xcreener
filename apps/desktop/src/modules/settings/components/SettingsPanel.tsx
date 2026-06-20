@@ -17,11 +17,13 @@ export function SettingsPanel() {
   const launchAtLogin = useSettingsStore((s) => s.launchAtLogin);
   const analyticsEnabled = useSettingsStore((s) => s.analyticsEnabled);
   const autoRedaction = useSettingsStore((s) => s.autoRedaction);
+  const autoStyleSuggestion = useSettingsStore((s) => s.autoStyleSuggestion);
   const setTheme = useSettingsStore((s) => s.setTheme);
   const setCaptureShortcut = useSettingsStore((s) => s.setCaptureShortcut);
   const setLaunchAtLogin = useSettingsStore((s) => s.setLaunchAtLogin);
   const setAnalyticsEnabled = useSettingsStore((s) => s.setAnalyticsEnabled);
   const setAutoRedaction = useSettingsStore((s) => s.setAutoRedaction);
+  const setAutoStyleSuggestion = useSettingsStore((s) => s.setAutoStyleSuggestion);
 
   const [shortcutDraft, setShortcutDraft] = useState(captureShortcut);
   const [shortcutError, setShortcutError] = useState<string | null>(null);
@@ -69,6 +71,11 @@ export function SettingsPanel() {
   async function handleAutoRedactionChange(enabled: boolean) {
     setAutoRedaction(enabled);
     await setSetting(SETTING_KEYS.autoRedaction, String(enabled));
+  }
+
+  async function handleAutoStyleSuggestionChange(enabled: boolean) {
+    setAutoStyleSuggestion(enabled);
+    await setSetting(SETTING_KEYS.autoStyleSuggestion, String(enabled));
   }
 
   async function handleCheckForUpdates() {
@@ -189,6 +196,21 @@ export function SettingsPanel() {
       </label>
       <p className="text-xs text-muted">
         On-device OCR scan runs when a screenshot opens in the editor.
+      </p>
+
+      <label className="flex items-center gap-2 text-sm font-medium">
+        <input
+          type="checkbox"
+          checked={autoStyleSuggestion}
+          onChange={(e) => handleAutoStyleSuggestionChange(e.target.checked)}
+          className="sg-focus-ring size-4 rounded border-border"
+          data-testid="auto-style-suggestion-toggle"
+        />
+        Suggest style when a screenshot opens
+      </label>
+      <p className="text-xs text-muted">
+        On-device classification suggests a matching background and padding. Apply manually in one
+        click.
       </p>
       {!import.meta.env.DEV ? (
         <p className="text-xs text-muted">Analytics are opt-in in production builds.</p>

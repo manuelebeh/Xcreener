@@ -1,6 +1,8 @@
 import { ExportBar } from '@/modules/export/components/ExportBar';
 import { RedactionBar } from '@/modules/redaction/components/RedactionBar';
 import { useAutoRedaction } from '@/modules/redaction/hooks/useAutoRedaction';
+import { StyleSuggestionBar } from '@/modules/style-suggestion/components/StyleSuggestionBar';
+import { useAutoStyleSuggestion } from '@/modules/style-suggestion/hooks/useAutoStyleSuggestion';
 import { useCustomPresetsLoader } from '../hooks/useCustomPresets';
 import { AnnotationToolbar } from './AnnotationToolbar';
 import { Canvas } from './Canvas';
@@ -11,6 +13,7 @@ import { StyleBar } from './StyleBar';
 export function EditorView() {
   useCustomPresetsLoader();
   useAutoRedaction();
+  useAutoStyleSuggestion();
 
   return (
     <div className="mx-auto w-full max-w-7xl">
@@ -31,6 +34,9 @@ export function EditorView() {
           <EditorToolsPanel>
             <EditorSection title="Format" testId="preset-bar-section">
               <PresetBar embedded />
+            </EditorSection>
+            <EditorSection title="Style suggestion" testId="style-suggestion-section">
+              <StyleSuggestionBar embedded />
             </EditorSection>
             <EditorSection title="Style" testId="style-bar-section">
               <StyleBar embedded />
