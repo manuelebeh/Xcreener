@@ -7,10 +7,11 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Area | Choice |
 |------|--------|
 | Monorepo | pnpm workspaces + Turborepo |
-| Dev CLI | [mise](https://mise.jdx.dev/) - `dev:desktop`, `dev:web`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
+| Dev CLI | [mise](https://mise.jdx.dev/) - `dev:desktop`, `dev:web`, `dev:mobile`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
 | Desktop | Tauri v2, React 19, Vite, TypeScript |
 | Web | TanStack Start, Nitro, Tailwind v4 |
-| Design system | `packages/design-tokens` + `packages/ui` (Storybook) |
+| Mobile | Expo SDK 56, Expo Router, development builds |
+| Design system | `packages/design-tokens` + `packages/ui` (web) + `packages/ui-native` (RN) |
 | Lint / format | Biome (not ESLint/Prettier) |
 | State | Zustand per module |
 | Local DB | `@tauri-apps/plugin-sql` (SQLite) |
@@ -21,8 +22,10 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 ```
 apps/desktop/          Tauri app (@snapglow/desktop)
 apps/web/              Landing (@snapglow/web)
-packages/design-tokens/  DTCG tokens → CSS
-packages/ui/           Shared React components + Storybook
+apps/mobile/           Expo app (@snapglow/mobile)
+packages/design-tokens/  DTCG tokens → CSS + tokens.native
+packages/ui/           Shared React web components + Storybook
+packages/ui-native/    Shared React Native components
 packages/              biome-config, typescript-config
 docs/internal/         Product & technical specs
 .agents/rules/         Workflow rules for agents
@@ -35,6 +38,7 @@ mise trust && mise install && mise run install && mise run install-hooks
 mise run tokens:build   # before first dev if tokens dist missing
 mise run dev:desktop    # Tauri dev
 mise run dev:web        # Landing (port 3000)
+mise run dev:mobile     # Expo dev client
 mise run storybook      # UI components (port 6006)
 mise run lint
 mise run typecheck
@@ -66,6 +70,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 1.4** : annotations (texte, formes, highlight, flou manuel), `AnnotationToolbar`, layers 4–5, undo/redo (20 niveaux)
 - **Sprint 1.5** : redaction on-device (OCR macOS/Windows + détecteurs regex), `RedactionBar`, masquage → `BlurAnnotation` ; export WYSIWYG PNG/JPG/WebP, clipboard (`Image.fromBytes` + `image-png`), drag-out (`ExportBar`)
 - **Sprint 1.6** : historique 30 captures (`modules/history/`, `db/captures.ts`, PNG + miniatures WebP), route `/history`, E2E natif `capture-beautify-export`, perf/stress tests, builds beta unsigned (voir `release-signing.md` §5) ; polish UX P1-037 (`design.md`, Feature Stack editor, warm tokens, `AppTopNav`)
+- **Sprint 1b.1** : app mobile Expo (`apps/mobile/`), share import iOS/Android (`expo-share-intent`), `@snapglow/ui-native` + `tokens.native`, dev builds (`dev:mobile`)
 
 ## Agent conventions
 
@@ -84,4 +89,4 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 | 1b | mobile (Expo) | `dev:mobile` |
 | 2b | api (Fastify) | `dev:api` |
 
-Rules for future surfaces: `.agents/rules/mobile.md`, `api.md` (Phase 1b / 2b).
+Rules for future surfaces: `.agents/rules/mobile.md` (Expo SDK 56 docs), `api.md` (Phase 2b).
