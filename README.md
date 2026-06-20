@@ -8,12 +8,14 @@ Privacy-first screenshot app - capture, beautify, and share without the cloud.
 |------|-------------|
 | `apps/desktop` | Tauri v2 + React (menu-bar desktop app) |
 | `apps/web` | TanStack Start landing (`@snapglow/web`) |
-| `packages/design-tokens` | DTCG design tokens → CSS / Tailwind theme |
-| `packages/ui` | Shared React components + Storybook |
+| `apps/mobile` | Expo SDK 56 + React Native (`@snapglow/mobile`) |
+| `packages/design-tokens` | DTCG design tokens → CSS / Tailwind + `tokens.native` |
+| `packages/ui` | Shared React web components + Storybook |
+| `packages/ui-native` | Shared React Native components |
 | `packages/biome-config` | Shared Biome lint/format config |
 | `packages/typescript-config` | Shared TypeScript configs |
 
-Future: `apps/mobile` (Expo), `apps/api` (Fastify).
+Future: `apps/api` (Fastify).
 
 ## Prerequisites
 
@@ -28,7 +30,7 @@ mise install
 mise run install
 mise run install-hooks
 mise run tokens:build
-mise run dev:desktop   # or: mise run dev:web
+mise run dev:desktop   # or: mise run dev:web, mise run dev:mobile
 ```
 
 ## Scripts (via mise)
@@ -37,6 +39,9 @@ mise run dev:desktop   # or: mise run dev:web
 |---------|-------------|
 | `mise run dev:desktop` | Start Tauri dev server |
 | `mise run dev:web` | Start landing dev server (port 3000) |
+| `mise run dev:mobile` | Start Expo dev client (Metro) |
+| `mise run dev:mobile:ios` | Build & run iOS simulator (development build) |
+| `mise run dev:mobile:android` | Build & run Android emulator (development build) |
 | `mise run storybook` | UI component library (port 6006) |
 | `mise run tokens:build` | Build design token CSS |
 | `mise run lint` | Biome check (Turbo) |
@@ -81,6 +86,16 @@ Output:
 Desktop e2e:
 - Web smoke: `pnpm --filter @snapglow/desktop test:e2e`
 - Native integration: `mise run test:e2e:native` (WebDriver on Linux/Windows; Rust tests on macOS)
+
+Mobile (Expo development builds — not Expo Go):
+
+```bash
+mise run dev:mobile              # Metro dev client
+mise run dev:mobile:ios          # first run runs prebuild + simulator
+mise run dev:mobile:android      # requires Android Studio + emulator
+```
+
+Requires Xcode (iOS) or Android Studio (Android). See [`.agents/rules/mobile.md`](.agents/rules/mobile.md).
 
 ## Architecture
 

@@ -6,6 +6,7 @@
   "exports": {
     "./tokens.css": "./dist/tokens.css",
     "./tailwind-theme.css": "./dist/tailwind-theme.css",
+    "./tokens.native": "./dist/tokens.native.ts",
     "./tokens.json": "./tokens.json"
   },
   "files": [
@@ -17,5 +18,8 @@
     "lint": "biome check .",
     "typecheck": "echo 'no types'",
     "format": "biome check --write ."
+  },
+  "devDependencies": {
+    "culori": "^4.0.2"
   }
 }

@@ -1,0 +1,30 @@
+{
+  "name": "@snapglow/ui-native",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'source-only package'",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write ."
+  },
+  "dependencies": {
+    "@snapglow/design-tokens": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-native": ">=0.76.0"
+  },
+  "devDependencies": {
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "@types/react": "^19.2.0",
+    "react": "^19.2.0",
+    "react-native": "^0.85.0",
+    "typescript": "^6.0.2"
+  }
+}
