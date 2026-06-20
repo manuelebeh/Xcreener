@@ -12,6 +12,7 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Web | TanStack Start, Nitro, Tailwind v4 |
 | Mobile | Expo SDK 56, Expo Router, development builds |
 | Design system | `packages/design-tokens` + `packages/ui` (web) + `packages/ui-native` (RN) |
+| Editor core | `packages/editor-core` — layout, presets, annotations (shared desktop + mobile) |
 | Lint / format | Biome (not ESLint/Prettier) |
 | State | Zustand per module |
 | Local DB | `@tauri-apps/plugin-sql` (SQLite) |
@@ -24,6 +25,7 @@ apps/desktop/          Tauri app (@snapglow/desktop)
 apps/web/              Landing (@snapglow/web)
 apps/mobile/           Expo app (@snapglow/mobile)
 packages/design-tokens/  DTCG tokens → CSS + tokens.native
+packages/editor-core/    Shared editor logic (layout, presets, annotations)
 packages/ui/           Shared React web components + Storybook
 packages/ui-native/    Shared React Native components
 packages/              biome-config, typescript-config
@@ -71,6 +73,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 1.5** : redaction on-device (OCR macOS/Windows + détecteurs regex), `RedactionBar`, masquage → `BlurAnnotation` ; export WYSIWYG PNG/JPG/WebP, clipboard (`Image.fromBytes` + `image-png`), drag-out (`ExportBar`)
 - **Sprint 1.6** : historique 30 captures (`modules/history/`, `db/captures.ts`, PNG + miniatures WebP), route `/history`, E2E natif `capture-beautify-export`, perf/stress tests, builds beta unsigned (voir `release-signing.md` §5) ; polish UX P1-037 (`design.md`, Feature Stack editor, warm tokens, `AppTopNav`)
 - **Sprint 1b.1** : app mobile Expo (`apps/mobile/`), share import iOS/Android (`expo-share-intent`), `@snapglow/ui-native` + `tokens.native`, dev builds (`dev:mobile`)
+- **Sprint 1b.2** : `@snapglow/editor-core`, éditeur Skia mobile (presets, annotations tactiles), export Photos + share sheet (`modules/export/`)
 
 ## Agent conventions
 
