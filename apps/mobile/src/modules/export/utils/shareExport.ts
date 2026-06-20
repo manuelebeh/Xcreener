@@ -9,10 +9,7 @@ async function assertShareableFile(fileUri: string): Promise<boolean> {
   return info.exists && info.size >= MIN_EXPORT_BYTES;
 }
 
-export async function shareExport(
-  fileUri: string,
-  format: 'png' | 'jpg'
-): Promise<boolean> {
+export async function shareExport(fileUri: string, format: 'png' | 'jpg'): Promise<boolean> {
   if (!(await assertShareableFile(fileUri))) {
     return false;
   }

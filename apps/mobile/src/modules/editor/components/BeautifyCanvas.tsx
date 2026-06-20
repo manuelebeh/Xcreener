@@ -20,13 +20,14 @@ import {
 import {
   type Annotation,
   computeLayout,
+  fitGpuTextureSize,
   fitPreviewSize,
   getGradientPreset,
   getResizeHandles,
   type RenderInput,
 } from '@snapglow/editor-core';
 import { forwardRef, useImperativeHandle, useMemo } from 'react';
-import { View } from 'react-native';
+import { PixelRatio, View } from 'react-native';
 
 export interface BeautifyCanvasHandle {
   makeSnapshot: () => Promise<SkImage | null>;
@@ -283,9 +284,16 @@ export const BeautifyCanvas = forwardRef<BeautifyCanvasHandle, BeautifyCanvasPro
     const image = useImage(imageUri);
     const layout = useMemo(() => computeLayout(input), [input]);
 
+    const pixelRatio = PixelRatio.get();
+
     const displaySize = useMemo(() => {
       if (exportMode) {
-        return { width: layout.canvasWidth, height: layout.canvasHeight };
+        return fitGpuTextureSize(
+          layout.canvasWidth,
+          layout.canvasHeight,
+          undefined,
+          pixelRatio
+        );
       }
       return fitPreviewSize(
         layout.canvasWidth,
@@ -293,7 +301,14 @@ export const BeautifyCanvas = forwardRef<BeautifyCanvasHandle, BeautifyCanvasPro
         containerWidth,
         containerHeight
       );
-    }, [containerHeight, containerWidth, exportMode, layout.canvasHeight, layout.canvasWidth]);
+    }, [
+      containerHeight,
+      containerWidth,
+      exportMode,
+      layout.canvasHeight,
+      layout.canvasWidth,
+      pixelRatio,
+    ]);
 
     const displayScale = layout.canvasWidth > 0 ? displaySize.width / layout.canvasWidth : 1;
 
@@ -315,7 +330,7 @@ export const BeautifyCanvas = forwardRef<BeautifyCanvasHandle, BeautifyCanvasPro
 
     return (
       <Canvas ref={canvasRef} style={{ width: displaySize.width, height: displaySize.height }}>
-        <Group transform={exportMode ? undefined : [{ scale: displayScale }]}>
+        <Group transform={displayScale !== 1 ? [{ scale: displayScale }] : undefined}>
           <SceneContent input={input} image={image} />
         </Group>
       </Canvas>

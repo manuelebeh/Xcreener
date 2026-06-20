@@ -1,5 +1,7 @@
 import type { ExpoConfig } from 'expo/config';
 
+const isProduction = process.env.APP_VARIANT === 'production';
+
 const config: ExpoConfig = {
   name: 'SnapGlow',
   slug: 'snapglow',
@@ -11,6 +13,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: true,
     bundleIdentifier: 'com.snapglow.app',
+    buildNumber: '1',
     infoPlist: {
       NSPhotoLibraryAddUsageDescription: 'SnapGlow saves edited screenshots to your photo library.',
       NSPhotoLibraryUsageDescription: 'SnapGlow saves edited screenshots to your photo library.',
@@ -18,6 +21,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'com.snapglow.app',
+    versionCode: 1,
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
       foregroundImage: './assets/images/android-icon-foreground.png',
@@ -33,7 +37,7 @@ const config: ExpoConfig = {
   },
   plugins: [
     'expo-router',
-    'expo-dev-client',
+    ...(isProduction ? [] : (['expo-dev-client'] as const)),
     'expo-image',
     'expo-sharing',
     [
@@ -63,6 +67,11 @@ const config: ExpoConfig = {
   ],
   experiments: {
     typedRoutes: true,
+  },
+  extra: {
+    eas: {
+      projectId: 'snapglow-mobile-placeholder',
+    },
   },
 };
 

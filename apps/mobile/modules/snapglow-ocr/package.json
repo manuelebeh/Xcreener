@@ -1,0 +1,17 @@
+{
+  "name": "snapglow-ocr",
+  "version": "0.1.0",
+  "description": "On-device OCR for SnapGlow redaction (Vision iOS, ML Kit Android)",
+  "main": "index.ts",
+  "author": "SnapGlow",
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/snapglow/snapglow",
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "expo-modules-core": "~3.0.29"
+  }
+}

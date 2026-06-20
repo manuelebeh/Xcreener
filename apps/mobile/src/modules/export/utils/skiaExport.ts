@@ -1,5 +1,4 @@
 import { ImageFormat, type SkImage } from '@shopify/react-native-skia';
-import type { RenderInput } from '@snapglow/editor-core';
 import {
   documentDirectory,
   EncodingType,
@@ -51,7 +50,7 @@ export async function encodeSnapshotToFile(
   return fileUri;
 }
 
-export function buildExportRenderInput(input: MobileRenderInput | null): RenderInput | null {
+export function buildExportRenderInput(input: MobileRenderInput | null): MobileRenderInput | null {
   if (!input) {
     return null;
   }
