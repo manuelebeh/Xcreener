@@ -1,0 +1,9 @@
+# Never commit the dataset images or trained artifacts (license + size).
+dataset/
+artifacts/
+.venv/
+__pycache__/
+*.pt
+*.tflite
+*.mlmodel
+SOURCES.lock.json
