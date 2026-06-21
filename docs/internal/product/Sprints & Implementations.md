@@ -639,9 +639,17 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **`apps/desktop/src-tauri/src/classification/`** : commande `classify_content_command`, preprocessing 224×224, inférence TFLite (`tract-tflite`) si modèle bundlé, **fallback heuristique** sinon ; latence < 500 ms (test Rust)
 - **`tools/style-classifier/`** : scripts `collect`, `train` (MobileNetV3-Small), `evaluate` (gate ≥ 80 %), `export` (.tflite + .mlmodel) — voir `tools/README.md`
 
+**Dataset (2026-06-21)** — pipeline de constitution livré
+
+- **`tools/style-classifier/sources.json`** : manifeste des sources publiques recherchées et documentées (license + usage commercial) pour les 6 classes
+- **`scripts/fetch_dataset.py`** : télécharge `ui` ([WebUI](https://huggingface.co/datasets/biglab/webui-7k)), `photo` ([Unsplash Lite](https://huggingface.co/datasets/1aurent/unsplash-lite)), `text` ([DocLayNet](https://huggingface.co/datasets/pierreguillou/DocLayNet-base), CDLA-Permissive) → `dataset/raw/<class>/` ; auto-détection colonne image, dedup, normalisation PNG ; écrit `SOURCES.lock.json` (provenance)
+- **`scripts/synthesize.py`** : génère `code`/`terminal`/`diagram` (license-clean) via Pygments + Graphviz (fallback matplotlib/networkx) — smoke test OK (PNG valides)
+- **Conformité normes** : on-device, pas de PII, images non commitées (`.gitignore`), licences tracées — voir [`tools/style-classifier/DATASET.md`](../../../tools/style-classifier/DATASET.md)
+- **Reste à faire (machine réseau + CPU/GPU)** : `pip install -r requirements.txt` → `fetch_dataset.py --limit 1500` → `collect.py` → `train.py` → `evaluate.py` (gate ≥ 80 %) → `export.py`
+
 **En attente (bloquant prod ML)**
 
-- **Dataset interne** : aucune capture annotée sous `tools/style-classifier/dataset/` — entraînement non lancé
+- **Entraînement** : pipeline dataset prêt ; `train.py` / `evaluate.py` non encore exécutés (lancer la collecte ci-dessus)
 - **Artefacts modèle** : `content_classifier.tflite` / `.mlmodel` absents de `apps/desktop/src-tauri/resources/models/` (seul `labels.json`)
 - **Core ML natif macOS** : délègue au TFLite bundlé ; inférence `.mlmodel` directe non câblée
 - **Précision ≥ 80 %** : gate `evaluate.py` non validé sans jeu test
@@ -650,7 +658,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 - [x] Classification on-device sans réseau ; latence < 500 ms (heuristique + pipeline TFLite prêt)
 - [x] Badge "Suggested" + application style en 1 clic (desktop)
-- [ ] Précision acceptable sur jeu de test interne (≥ 80 %) — **bloqué dataset + entraînement AI-001**
+- [ ] Précision acceptable sur jeu de test interne (≥ 80 %) — **pipeline dataset livré (2026-06-21) ; reste l'entraînement AI-001**
 
 ### Sprint 2b.2 (Semaines 29–30) - OCR & Auto-crop
 
