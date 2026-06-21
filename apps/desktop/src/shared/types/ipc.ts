@@ -1,6 +1,14 @@
-export type CaptureType = 'region' | 'window' | 'fullscreen' | 'scroll' | 'menu';
+export type CaptureMediaKind = 'photo' | 'video';
 
-export type CaptureMode = CaptureType | 'idle';
+export type CaptureTargetMode = 'region' | 'window' | 'fullscreen' | 'scroll' | 'menu';
+
+export type CaptureType = CaptureTargetMode | 'record';
+
+export type CaptureRecordOutputFormat = 'gif' | 'mp4';
+
+export type CaptureGifQuality = 'low' | 'medium' | 'high';
+
+export type CaptureMode = CaptureTargetMode | 'idle';
 
 export type CaptureDelaySecs = 0 | 3 | 5 | 10;
 
@@ -55,10 +63,32 @@ export interface CaptureNativeRequest {
 }
 
 export interface CaptureProgressPayload {
-  phase: 'countdown' | 'scroll';
+  phase: 'countdown' | 'scroll' | 'recording';
   remainingSecs?: number;
   current?: number;
   total?: number;
+  elapsedSecs?: number;
+  paused?: boolean;
+  frameCount?: number;
+  maxDurationSecs?: number;
+}
+
+export interface CaptureRecordStartRequest {
+  rect: Rect;
+  outputFormat?: CaptureRecordOutputFormat;
+  maxDurationSecs?: number;
+  /** GIF quality preset; ignored for MP4. */
+  gifQuality?: CaptureGifQuality;
+}
+
+export interface CaptureRecordingCompletePayload {
+  filePath: string;
+  format: CaptureRecordOutputFormat;
+  width: number;
+  height: number;
+  durationMs: number;
+  fileSize: number;
+  thumbnailPng?: number[];
 }
 
 export interface OverlayWebviewLayout {

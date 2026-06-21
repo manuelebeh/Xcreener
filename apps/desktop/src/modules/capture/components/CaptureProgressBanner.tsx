@@ -3,13 +3,13 @@ import { useCaptureStore } from '../store';
 export function CaptureProgressBanner() {
   const progress = useCaptureStore((s) => s.captureProgress);
 
-  if (!progress || progress.phase === 'scroll') {
+  if (!progress || progress.phase === 'scroll' || progress.phase === 'recording') {
     return null;
   }
 
   const label = progress.remainingSecs
     ? `Capturing in ${progress.remainingSecs}s`
-    : 'Capture in progress…';
+    : 'Capture in progress...';
 
   return (
     <div
