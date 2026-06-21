@@ -2,23 +2,36 @@
 
 Offline tooling to fine-tune MobileNetV3-Small for screenshot content classification.
 
-> **Statut (2026-06-20)** : scripts prêts ; **dataset non collecté** → pas de modèle exporté. L'app desktop utilise un classifieur heuristique jusqu'à ce que `export.py` alimente `apps/desktop/src-tauri/resources/models/`.
+> **Statut (2026-06-21)** : scripts prêts **+ pipeline de constitution du dataset** (`fetch_dataset.py`, `synthesize.py`, `sources.json`). Lancer la repro ci-dessous pour générer `dataset/raw/`, entraîner et exporter. Tant que `export.py` n'a pas alimenté `apps/desktop/src-tauri/resources/models/`, l'app desktop utilise le classifieur heuristique.
 
 ## Classes
 
 `code`, `ui`, `terminal`, `photo`, `diagram`, `text`
 
-## Dataset layout
+## Constituer le dataset (sources publiques, license-clean)
 
-Place screenshots under `dataset/raw/<class>/` then split:
+Sources, licences et conformité aux normes : **[`DATASET.md`](DATASET.md)**.
 
 ```bash
 cd tools/style-classifier
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
+# Plan + licences (aucun téléchargement)
+python scripts/fetch_dataset.py --dry-run
+
+# Télécharge ui/photo/text + synthétise code/terminal/diagram → dataset/raw/<class>/
+python scripts/fetch_dataset.py --limit 1500
+
+# Split train/val/test
 python scripts/collect.py --raw-dir dataset/raw --dataset-dir dataset
 ```
+
+`fetch_dataset.py` délègue automatiquement `code`/`terminal`/`diagram` à
+`synthesize.py` (rendu Pygments + Graphviz, license-clean). Pour collecter
+manuellement, placer des images sous `dataset/raw/<class>/` puis lancer
+`collect.py`.
 
 Expected split:
 

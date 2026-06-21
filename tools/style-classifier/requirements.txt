@@ -1,3 +1,13 @@
+# Training (existing)
 torch>=2.2
 torchvision>=0.17
 coremltools>=7.2
+
+# Dataset constitution (fetch_dataset.py + synthesize.py)
+datasets>=2.19
+huggingface_hub>=0.23
+pillow>=10.0
+Pygments>=2.17
+graphviz>=0.20        # diagram synthesis (needs the `dot` system binary)
+networkx>=3.0         # matplotlib fallback for diagrams
+matplotlib>=3.8       # matplotlib fallback for diagrams
