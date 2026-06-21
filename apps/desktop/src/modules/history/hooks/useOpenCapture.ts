@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCapture } from '@/db/captures';
 import { useEditorStore } from '@/modules/editor/store';
 import { decodePngBytesToBitmap } from '@/shared/utils/image';
+import { openPath } from '@/tauri/commands';
 import { readCaptureBytes } from '../utils/captureFiles';
 
 export function useOpenCapture() {
@@ -19,6 +20,11 @@ export function useOpenCapture() {
         const capture = await getCapture(id);
         if (!capture) {
           throw new Error('Capture not found');
+        }
+
+        if (capture.format === 'gif' || capture.format === 'mp4') {
+          await openPath(capture.filepath);
+          return;
         }
 
         const bytes = await readCaptureBytes(capture.filepath);

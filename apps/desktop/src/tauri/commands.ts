@@ -78,6 +78,34 @@ export function stopScrollingCapture() {
   return invoke<void>('stop_scrolling_capture_command');
 }
 
+export function startRegionRecording(
+  request: import('@/shared/types/ipc').CaptureRecordStartRequest
+) {
+  return invoke<void>('start_region_recording_command', { request });
+}
+
+export function pauseRegionRecording() {
+  return invoke<void>('pause_region_recording_command');
+}
+
+export function resumeRegionRecording() {
+  return invoke<void>('resume_region_recording_command');
+}
+
+export function stopRegionRecording() {
+  return invoke<import('@/shared/types/ipc').CaptureRecordingCompletePayload>(
+    'stop_region_recording_command'
+  );
+}
+
+export function cancelRegionRecording() {
+  return invoke<void>('cancel_region_recording_command');
+}
+
+export function openPath(path: string) {
+  return invoke<void>('open_path_command', { path });
+}
+
 export function showLiveCaptureOverlay() {
   return invoke<CaptureOverlayBounds>('show_live_capture_overlay');
 }
@@ -94,7 +122,10 @@ export function classifyContent(imageData: number[]) {
   });
 }
 
-export function recognizeText(imageData: number[], options: import('@/shared/types/ipc').RecognizeTextOptions) {
+export function recognizeText(
+  imageData: number[],
+  options: import('@/shared/types/ipc').RecognizeTextOptions
+) {
   return invoke<import('@/shared/types/ipc').TextLine[]>('recognize_text_command', {
     imageData,
     options,

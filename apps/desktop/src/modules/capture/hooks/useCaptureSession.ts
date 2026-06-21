@@ -3,8 +3,15 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEditorStore } from '@/modules/editor/store';
 import { persistCapture } from '@/modules/history/utils/persistCapture';
-import type { CaptureErrorPayload, CaptureImagePayload, CaptureProgressPayload } from '@/shared/types/ipc';
-import { bytesToImageBitmap } from '@/shared/utils/image';
+import { persistRecording } from '@/modules/history/utils/persistRecording';
+import { saveRecordingFile } from '@/modules/history/utils/saveRecording';
+import type {
+  CaptureErrorPayload,
+  CaptureImagePayload,
+  CaptureProgressPayload,
+  CaptureRecordingCompletePayload,
+} from '@/shared/types/ipc';
+import { hideCaptureOverlay, openPath } from '@/tauri/commands';
 import { useCaptureStore } from '../store';
 
 export function useCaptureSession() {
@@ -20,6 +27,7 @@ export function useCaptureSession() {
     let unlistenImage: (() => void) | undefined;
     let unlistenError: (() => void) | undefined;
     let unlistenProgress: (() => void) | undefined;
+    let unlistenRecording: (() => void) | undefined;
 
     void listen<CaptureProgressPayload>('capture-progress', (event) => {
       setCaptureProgress(event.payload);
@@ -56,6 +64,42 @@ export function useCaptureSession() {
       unlistenImage = fn;
     });
 
+    void listen<CaptureRecordingCompletePayload>('capture-recording-complete', async (event) => {
+      try {
+        setCaptureProgress(null);
+        const payload = event.payload;
+        const savedPath = await saveRecordingFile(
+          payload.filePath,
+          payload.format,
+          `snapglow-recording.${payload.format}`
+        );
+        await persistRecording({
+          sourcePath: payload.filePath,
+          format: payload.format,
+          width: payload.width,
+          height: payload.height,
+          thumbnailPng: payload.thumbnailPng,
+        });
+        await hideCaptureOverlay();
+        setOverlayVisible(false);
+        reset();
+        // Open the finished recording in the OS default player so the user can
+        // immediately watch it. Only when they actually chose a save location.
+        if (savedPath) {
+          await openPath(savedPath).catch(() => undefined);
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        setError(message);
+      }
+    }).then((fn) => {
+      if (cancelled) {
+        fn();
+        return;
+      }
+      unlistenRecording = fn;
+    });
+
     void listen<CaptureErrorPayload>('capture-error', (event) => {
       setCaptureProgress(null);
       setError(event.payload.message);
@@ -74,6 +118,7 @@ export function useCaptureSession() {
       unlistenImage?.();
       unlistenError?.();
       unlistenProgress?.();
+      unlistenRecording?.();
     };
   }, [navigate, reset, setCaptureProgress, setError, setOverlayVisible, setScreenshot]);
 }

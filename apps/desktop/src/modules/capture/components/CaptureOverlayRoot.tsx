@@ -13,6 +13,7 @@ export function CaptureOverlayRoot() {
   const setMonitors = useCaptureStore((s) => s.setMonitors);
   const setWebviewLayout = useCaptureStore((s) => s.setWebviewLayout);
   const setActiveMode = useCaptureStore((s) => s.setActiveMode);
+  const setMediaKind = useCaptureStore((s) => s.setMediaKind);
   const setPreviewUrl = useCaptureStore((s) => s.setPreviewUrl);
   const setLiveOverlay = useCaptureStore((s) => s.setLiveOverlay);
 
@@ -36,11 +37,10 @@ export function CaptureOverlayRoot() {
       setMonitors(event.payload.monitors);
       setLiveOverlay(Boolean(event.payload.liveOverlay));
       setPreviewUrl(
-        event.payload.previewPng?.length
-          ? bytesToObjectUrl(event.payload.previewPng)
-          : null
+        event.payload.previewPng?.length ? bytesToObjectUrl(event.payload.previewPng) : null
       );
       setActiveMode('region');
+      setMediaKind('photo');
     }).then((fn) => {
       unlistenInit = fn;
     });
@@ -58,7 +58,7 @@ export function CaptureOverlayRoot() {
       unlistenInit?.();
       unlistenPresented?.();
     };
-  }, [setActiveMode, setBounds, setLiveOverlay, setMonitors, setPreviewUrl, setWebviewLayout]);
+  }, [setActiveMode, setBounds, setLiveOverlay, setMediaKind, setMonitors, setPreviewUrl, setWebviewLayout]);
 
   useEffect(() => {
     if (progressHudMode) {
@@ -89,7 +89,11 @@ export function CaptureOverlayRoot() {
   }
 
   return (
-    <div className={progressHudMode ? 'h-screen w-screen bg-transparent' : 'h-screen w-screen bg-black'}>
+    <div
+      className={
+        progressHudMode ? 'h-screen w-screen bg-transparent' : 'h-screen w-screen bg-black'
+      }
+    >
       <CaptureOverlay />
     </div>
   );

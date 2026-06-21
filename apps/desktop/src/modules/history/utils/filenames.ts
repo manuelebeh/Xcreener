@@ -13,8 +13,11 @@ function formatTimestamp(date: Date): string {
   return `${year}${month}${day}_${hours}${minutes}${seconds}_${millis}`;
 }
 
-export function generateCaptureFilename(date = new Date()): string {
-  return `capture_${formatTimestamp(date)}.png`;
+export function generateCaptureFilename(
+  date = new Date(),
+  format: 'png' | 'gif' | 'mp4' = 'png'
+): string {
+  return `capture_${formatTimestamp(date)}.${format}`;
 }
 
 export function generateThumbnailFilename(date = new Date()): string {

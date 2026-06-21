@@ -5,14 +5,20 @@ mod validate;
 pub mod platform;
 
 pub mod native;
+pub mod record;
 pub mod scroll;
 pub mod stitch;
 
 pub use types::{
     CaptureErrorPayload, CaptureNativeRequest, CaptureOverlayBounds, CaptureOverlayInitPayload,
-    CaptureProgressPayload, MonitorInfo, OverlayWebviewLayout, Rect, WindowInfo,
+    CaptureProgressPayload, CaptureRecordStartRequest, CaptureRecordingCompletePayload,
+    MonitorInfo, OverlayWebviewLayout, Rect, WindowInfo,
 };
 pub use native::{cancel_live_capture, capture_native};
+pub use record::{
+    cancel_region_recording, pause_region_recording, resume_region_recording,
+    start_region_recording, stop_region_recording,
+};
 pub use scroll::{capture_scrolling_window, request_scroll_capture_stop};
 pub use validate::{validate_monitor_id, validate_region, validate_window_id};
 

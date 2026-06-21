@@ -14,13 +14,16 @@ mod test_support;
 mod tray;
 
 use commands::{
-    cancel_capture_overlay, cancel_live_capture_command, capture_fullscreen, capture_native_command,
-    capture_overlay_ready, capture_region, capture_scrolling_window_command, capture_window,
-    classify_content_command, compress_export_bytes_command, crop_image_command,
-    detect_content_bounds_command, detect_sensitive_data, export_image, get_capture_overlay_bounds,
-    get_setting, get_window_at_point_command, get_overlay_webview_layout, hide_capture_overlay,
-    list_monitors_command, list_windows_command, recognize_text_command, set_setting,
-    show_capture_overlay, show_live_capture_overlay, stop_scrolling_capture_command,
+    cancel_capture_overlay, cancel_live_capture_command, cancel_region_recording_command,
+    capture_fullscreen, capture_native_command, capture_overlay_ready, capture_region,
+    capture_scrolling_window_command, capture_window, classify_content_command,
+    compress_export_bytes_command, crop_image_command, detect_content_bounds_command,
+    detect_sensitive_data, export_image, get_capture_overlay_bounds, get_setting,
+    get_window_at_point_command, get_overlay_webview_layout, hide_capture_overlay,
+    list_monitors_command, list_windows_command, pause_region_recording_command,
+    recognize_text_command, resume_region_recording_command, set_setting, show_capture_overlay,
+    show_live_capture_overlay, start_region_recording_command, stop_region_recording_command,
+    stop_scrolling_capture_command, open_path_command,
 };
 use shortcuts::{
     build_global_shortcut_plugin, init_shortcut_state, register_capture_shortcut,
@@ -85,6 +88,12 @@ pub fn run() {
             capture_scrolling_window_command,
             cancel_live_capture_command,
             stop_scrolling_capture_command,
+            start_region_recording_command,
+            pause_region_recording_command,
+            resume_region_recording_command,
+            stop_region_recording_command,
+            cancel_region_recording_command,
+            open_path_command,
             show_live_capture_overlay,
             list_monitors_command,
             list_windows_command,
