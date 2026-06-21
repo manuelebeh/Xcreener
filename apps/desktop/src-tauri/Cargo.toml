@@ -33,8 +33,14 @@ tempfile = "3"
 imagequant = "4.3"
 png = "0.17"
 webp = "0.3"
+gif = "0.13"
+openh264 = "0.6"
+mp4 = "0.14"
+bytes = "1"
+open = "5"
 
 [target.'cfg(target_os = "macos")'.dependencies]
+screencapturekit = "8"
 objc2 = { version = "0.6", default-features = false, features = ["std"] }
 objc2-app-kit = { version = "0.3", default-features = false, features = ["std", "NSApplication", "NSRunningApplication", "NSWindow"] }
 objc2-core-graphics = { version = "0.3", default-features = false, features = ["std", "CGWindow"] }

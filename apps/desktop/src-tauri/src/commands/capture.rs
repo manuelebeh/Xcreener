@@ -1,10 +1,12 @@
 use crate::capture::{
-    cancel_live_capture, capture_fullscreen as capture_fullscreen_impl,
+    cancel_live_capture, cancel_region_recording, capture_fullscreen as capture_fullscreen_impl,
     capture_native as capture_native_impl, capture_region as capture_region_impl,
     capture_scrolling_window as capture_scrolling_window_impl,
     capture_window as capture_window_impl, get_overlay_bounds, get_window_at_point, list_monitors,
-    list_windows, request_scroll_capture_stop, CaptureNativeRequest, CaptureOverlayBounds,
-    MonitorInfo, WindowInfo,
+    list_windows, pause_region_recording, request_scroll_capture_stop,
+    resume_region_recording, start_region_recording, stop_region_recording,
+    CaptureNativeRequest, CaptureOverlayBounds, CaptureRecordStartRequest,
+    CaptureRecordingCompletePayload, MonitorInfo, WindowInfo,
 };
 use crate::overlay;
 use tauri::AppHandle;
@@ -80,6 +82,41 @@ pub async fn cancel_live_capture_command() -> Result<(), String> {
 pub async fn stop_scrolling_capture_command() -> Result<(), String> {
     request_scroll_capture_stop();
     Ok(())
+}
+
+#[tauri::command]
+pub async fn start_region_recording_command(
+    app: AppHandle,
+    request: CaptureRecordStartRequest,
+) -> Result<(), String> {
+    start_region_recording(&app, request)
+}
+
+#[tauri::command]
+pub async fn pause_region_recording_command() -> Result<(), String> {
+    pause_region_recording()
+}
+
+#[tauri::command]
+pub async fn resume_region_recording_command() -> Result<(), String> {
+    resume_region_recording()
+}
+
+#[tauri::command]
+pub async fn stop_region_recording_command(
+    app: AppHandle,
+) -> Result<CaptureRecordingCompletePayload, String> {
+    stop_region_recording(&app)
+}
+
+#[tauri::command]
+pub async fn cancel_region_recording_command() -> Result<(), String> {
+    cancel_region_recording()
+}
+
+#[tauri::command]
+pub async fn open_path_command(path: String) -> Result<(), String> {
+    open::that(path).map_err(|error| error.to_string())
 }
 
 #[tauri::command]

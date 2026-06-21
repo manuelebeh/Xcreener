@@ -15,6 +15,7 @@ describe('useCaptureStore', () => {
     expect(useCaptureStore.getState()).toMatchObject({
       overlayVisible: false,
       activeMode: 'idle',
+      mediaKind: 'photo',
       delaySecs: 0,
       liveOverlay: false,
       error: null,
@@ -22,7 +23,10 @@ describe('useCaptureStore', () => {
       countdownSecs: null,
       scrollFrame: null,
       scrollFinishing: false,
+      recordingFinishing: false,
       progressHudMode: false,
+      recordingPaused: false,
+      outputFormat: 'gif',
       captureProgress: null,
       previewUrl: null,
     });

@@ -1,11 +1,14 @@
 import { emit, listen } from '@tauri-apps/api/event';
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   CaptureDelaySecs,
+  CaptureMediaKind,
   CaptureMode,
   CaptureNativeRequest,
   CaptureProgressPayload,
+  CaptureRecordStartRequest,
+  CaptureTargetMode,
   Rect,
   WindowInfo,
 } from '@/shared/types/ipc';
@@ -13,14 +16,20 @@ import { cropObjectUrlToPngBytes, getImageDimensionsFromPng } from '@/shared/uti
 import {
   cancelCaptureOverlay,
   cancelLiveCapture,
+  cancelRegionRecording,
   captureNative,
   captureScrollingWindow,
   getWindowAtPoint,
   hideCaptureOverlay,
+  pauseRegionRecording,
+  resumeRegionRecording,
+  startRegionRecording,
+  stopRegionRecording,
   stopScrollingCapture,
 } from '@/tauri/commands';
 import { captureOverlayCursor } from '../captureCursors';
 import { captureToolbarContainerStyle, captureToolbarStyle } from '../captureToolbarPlacement';
+import { useRecordingElapsed } from '../hooks/useRecordingElapsed';
 import { findMonitorAtPoint } from '../findMonitorAtPoint';
 import {
   clientToBounds,
@@ -30,8 +39,9 @@ import {
   viewportRectToBounds,
 } from '../overlayCoordinates';
 import { useCaptureStore } from '../store';
-import { isLiveOverlayMode, needsNativeCapture } from '../utils/captureFlow';
 import { toOverlayRect } from '../toOverlayRect';
+import { isLiveOverlayMode, needsNativeCapture } from '../utils/captureFlow';
+import { normalizeTargetForMediaKind } from '../utils/captureModes';
 import { CaptureCountdown } from './CaptureCountdown';
 import { CaptureProgress } from './CaptureProgress';
 import { CaptureToolbar } from './CaptureToolbar';
@@ -57,6 +67,7 @@ function isWindowSelectionMode(mode: CaptureMode): boolean {
 }
 
 export function CaptureOverlay() {
+  const mediaKind = useCaptureStore((s) => s.mediaKind);
   const activeMode = useCaptureStore((s) => s.activeMode);
   const delaySecs = useCaptureStore((s) => s.delaySecs);
   const liveOverlay = useCaptureStore((s) => s.liveOverlay);
@@ -72,10 +83,18 @@ export function CaptureOverlay() {
   const countdownSecs = useCaptureStore((s) => s.countdownSecs);
   const scrollFrame = useCaptureStore((s) => s.scrollFrame);
   const scrollFinishing = useCaptureStore((s) => s.scrollFinishing);
+  const recordingFinishing = useCaptureStore((s) => s.recordingFinishing);
   const progressHudMode = useCaptureStore((s) => s.progressHudMode);
+  const recordingPaused = useCaptureStore((s) => s.recordingPaused);
+  const outputFormat = useCaptureStore((s) => s.outputFormat);
+  const gifQuality = useCaptureStore((s) => s.gifQuality);
+  const setGifQuality = useCaptureStore((s) => s.setGifQuality);
+  const captureProgress = useCaptureStore((s) => s.captureProgress);
   const setProgressHudMode = useCaptureStore((s) => s.setProgressHudMode);
   const setScrollFinishing = useCaptureStore((s) => s.setScrollFinishing);
+  const setRecordingFinishing = useCaptureStore((s) => s.setRecordingFinishing);
   const setActiveMode = useCaptureStore((s) => s.setActiveMode);
+  const setMediaKind = useCaptureStore((s) => s.setMediaKind);
   const setDelaySecs = useCaptureStore((s) => s.setDelaySecs);
   const setLiveOverlay = useCaptureStore((s) => s.setLiveOverlay);
   const setSelection = useCaptureStore((s) => s.setSelection);
@@ -85,10 +104,29 @@ export function CaptureOverlay() {
   const setCapturing = useCaptureStore((s) => s.setCapturing);
   const setCountdownSecs = useCaptureStore((s) => s.setCountdownSecs);
   const setScrollFrame = useCaptureStore((s) => s.setScrollFrame);
+  const setRecordingPaused = useCaptureStore((s) => s.setRecordingPaused);
+  const setOutputFormat = useCaptureStore((s) => s.setOutputFormat);
+  const setCaptureProgress = useCaptureStore((s) => s.setCaptureProgress);
   const reset = useCaptureStore((s) => s.reset);
+  const finishRecordingRef = useRef<() => Promise<void>>(async () => {});
   const [revealed, setRevealed] = useState(false);
+  const [recordingAnchorMs, setRecordingAnchorMs] = useState<number | null>(null);
   const [viewport, setViewport] = useState<OverlayViewport>(() =>
     getOverlayViewport(bounds, monitors, { webviewLayout })
+  );
+
+  const handleMaxRecordingDuration = useCallback(() => {
+    void finishRecordingRef.current();
+  }, []);
+
+  const maxRecordingSecs = captureProgress?.maxDurationSecs ?? 30;
+  const isVideo = mediaKind === 'video';
+  const recordingElapsedSecs = useRecordingElapsed(
+    progressHudMode && isVideo && !recordingFinishing,
+    recordingPaused,
+    maxRecordingSecs,
+    handleMaxRecordingDuration,
+    recordingAnchorMs
   );
 
   const showPreview = previewUrl && !isLiveOverlayMode(activeMode, liveOverlay);
@@ -167,6 +205,16 @@ export function CaptureOverlay() {
           setScrollFrame(event.payload.current);
         }
       }
+
+      if (event.payload.phase === 'recording') {
+        setCaptureProgress(event.payload);
+        setRecordingPaused(Boolean(event.payload.paused));
+        if (event.payload.elapsedSecs != null) {
+          setRecordingAnchorMs((previous) =>
+            previous ?? Date.now() - event.payload.elapsedSecs! * 1000
+          );
+        }
+      }
     }).then((fn) => {
       unlisten = fn;
     });
@@ -174,7 +222,7 @@ export function CaptureOverlay() {
     return () => {
       unlisten?.();
     };
-  }, [setCountdownSecs, setScrollFrame]);
+  }, [setCountdownSecs, setScrollFrame, setCaptureProgress, setRecordingPaused]);
 
   useEffect(() => {
     let unlisten: (() => void) | undefined;
@@ -279,9 +327,95 @@ export function CaptureOverlay() {
     ]
   );
 
+  const finishRecordCapture = useCallback(
+    async (rect: Rect) => {
+      setError(null);
+      setCapturing(true);
+      setRecordingPaused(false);
+      setCountdownSecs(null);
+      setScrollFrame(null);
+
+      const request: CaptureRecordStartRequest = {
+        rect,
+        outputFormat,
+        gifQuality,
+        // GIFs auto-stop at 8s (short shareable loops); MP4 keeps the full 30s.
+        maxDurationSecs: outputFormat === 'gif' ? 8 : 30,
+      };
+
+      try {
+        await startRegionRecording(request);
+      } catch (failure) {
+        await handleCaptureFailure(failure);
+      }
+    },
+    [
+      gifQuality,
+      handleCaptureFailure,
+      outputFormat,
+      setCapturing,
+      setCountdownSecs,
+      setError,
+      setRecordingPaused,
+      setScrollFrame,
+    ]
+  );
+
+  const finishRecording = useCallback(async () => {
+    if (useCaptureStore.getState().recordingFinishing) {
+      return;
+    }
+
+    setRecordingFinishing(true);
+
+    try {
+      await stopRegionRecording();
+      await hideCaptureOverlay();
+      reset();
+    } catch (failure) {
+      const message = failure instanceof Error ? failure.message : String(failure);
+      if (
+        message.includes('no recording in progress') ||
+        message.includes('already finalized') ||
+        message.includes('recording session not found')
+      ) {
+        return;
+      }
+
+      setRecordingFinishing(false);
+      await handleCaptureFailure(failure);
+    }
+  }, [handleCaptureFailure, reset, setRecordingFinishing]);
+
+  finishRecordingRef.current = finishRecording;
+
+  const handlePauseRecording = useCallback(async () => {
+    try {
+      await pauseRegionRecording();
+      setRecordingPaused(true);
+    } catch (failure) {
+      await handleCaptureFailure(failure);
+    }
+  }, [handleCaptureFailure, setRecordingPaused]);
+
+  const handleResumeRecording = useCallback(async () => {
+    try {
+      await resumeRegionRecording();
+      setRecordingPaused(false);
+    } catch (failure) {
+      await handleCaptureFailure(failure);
+    }
+  }, [handleCaptureFailure, setRecordingPaused]);
+
+  const handleCancelRecording = useCallback(async () => {
+    await cancelRegionRecording();
+    await cancelCaptureOverlay();
+    reset();
+  }, [reset]);
+
   const captureRect = useCallback(
     async (rect: Rect) => {
-      if (needsNativeCapture(activeMode, delaySecs)) {
+      if (needsNativeCapture(activeMode, delaySecs, mediaKind)) {
         await finishNativeCapture({
           kind: 'region',
           rect,
@@ -292,37 +426,29 @@ export function CaptureOverlay() {
 
       await finishPreviewCrop(rect);
     },
-    [activeMode, delaySecs, finishNativeCapture, finishPreviewCrop]
+    [activeMode, delaySecs, finishNativeCapture, finishPreviewCrop, mediaKind]
   );
 
   const handleCancel = useCallback(async () => {
+    if (isCapturing && isVideo) {
+      await handleCancelRecording();
+      return;
+    }
+
     if (isCapturing) {
       await cancelLiveCapture();
     }
     await cancelCaptureOverlay();
     reset();
-  }, [isCapturing, reset]);
+  }, [handleCancelRecording, isCapturing, isVideo, reset]);
 
-  const handleStopScroll = useCallback(async () => {
-    if (useCaptureStore.getState().scrollFinishing) {
-      return;
-    }
-
-    setScrollFinishing(true);
-    await stopScrollingCapture();
-  }, [setScrollFinishing]);
-
-  const handleModeChange = useCallback(
-    (mode: CaptureMode) => {
-      if (mode === 'idle') {
+  const applyTargetModeDefaults = useCallback(
+    (mode: CaptureTargetMode, kind: CaptureMediaKind) => {
+      if (kind === 'video') {
+        setDelaySecs(0);
+        setLiveOverlay(false);
         return;
       }
-
-      setActiveMode(mode);
-      setHoveredWindow(null);
-      setHoveredMonitor(null);
-      setSelection(null);
-      setError(null);
 
       if (mode === 'menu') {
         setDelaySecs(3);
@@ -338,16 +464,67 @@ export function CaptureOverlay() {
 
       setLiveOverlay(false);
     },
+    [setDelaySecs, setLiveOverlay]
+  );
+
+  const handleMediaKindChange = useCallback(
+    (kind: CaptureMediaKind) => {
+      setMediaKind(kind);
+      setHoveredWindow(null);
+      setHoveredMonitor(null);
+      setSelection(null);
+      setError(null);
+
+      const currentTarget =
+        activeMode === 'idle' ? 'region' : (activeMode as CaptureTargetMode);
+      const nextMode = normalizeTargetForMediaKind(currentTarget, kind);
+      setActiveMode(nextMode);
+      applyTargetModeDefaults(nextMode, kind);
+    },
     [
+      activeMode,
+      applyTargetModeDefaults,
       setActiveMode,
-      setDelaySecs,
       setError,
       setHoveredMonitor,
       setHoveredWindow,
-      setLiveOverlay,
+      setMediaKind,
       setSelection,
     ]
   );
+
+  const handleModeChange = useCallback(
+    (mode: CaptureMode) => {
+      if (mode === 'idle') {
+        return;
+      }
+
+      setActiveMode(mode);
+      setHoveredWindow(null);
+      setHoveredMonitor(null);
+      setSelection(null);
+      setError(null);
+      applyTargetModeDefaults(mode, mediaKind);
+    },
+    [
+      applyTargetModeDefaults,
+      mediaKind,
+      setActiveMode,
+      setError,
+      setHoveredMonitor,
+      setHoveredWindow,
+      setSelection,
+    ]
+  );
+
+  const handleStopScroll = useCallback(async () => {
+    if (useCaptureStore.getState().scrollFinishing) {
+      return;
+    }
+
+    setScrollFinishing(true);
+    await stopScrollingCapture();
+  }, [setScrollFinishing]);
 
   const resolveFullscreenMonitor = useCallback(() => {
     if (hoveredMonitor) {
@@ -366,8 +543,14 @@ export function CaptureOverlay() {
       return;
     }
 
-    void captureRect(viewportRectToBounds(selection, bounds, viewport));
-  }, [bounds, captureRect, selection, viewport]);
+    const rect = viewportRectToBounds(selection, bounds, viewport);
+    if (isVideo) {
+      void finishRecordCapture(rect);
+      return;
+    }
+
+    void captureRect(rect);
+  }, [activeMode, bounds, captureRect, finishRecordCapture, isVideo, selection, viewport]);
 
   const handleWindowClick = useCallback(() => {
     if (!hoveredWindow || !isWindowSelectionMode(activeMode) || !bounds) {
@@ -381,7 +564,7 @@ export function CaptureOverlay() {
 
     const rect = toOverlayRect(hoveredWindow, bounds);
 
-    if (needsNativeCapture(activeMode, delaySecs)) {
+    if (needsNativeCapture(activeMode, delaySecs, mediaKind)) {
       void finishNativeCapture({
         kind: 'window',
         windowId: hoveredWindow.id,
@@ -413,7 +596,7 @@ export function CaptureOverlay() {
 
     const rect = toOverlayRect(monitor, bounds);
 
-    if (needsNativeCapture(activeMode, delaySecs)) {
+    if (needsNativeCapture(activeMode, delaySecs, mediaKind)) {
       void finishNativeCapture({
         kind: 'fullscreen',
         monitorId: monitor.id,
@@ -556,7 +739,9 @@ export function CaptureOverlay() {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (progressHudMode && !scrollFinishing) {
+        if (progressHudMode && isVideo) {
+          void handleCancelRecording();
+        } else if (progressHudMode && !scrollFinishing) {
           void handleStopScroll();
         } else if (!progressHudMode) {
           void handleCancel();
@@ -569,14 +754,12 @@ export function CaptureOverlay() {
       }
 
       const canConfirmRegion =
-        (activeMode === 'region' || activeMode === 'menu') && Boolean(selection);
+        (activeMode === 'region' || activeMode === 'menu') &&
+        Boolean(selection);
       const canConfirmScroll = activeMode === 'scroll' && Boolean(hoveredWindow);
       const canConfirmFullscreen = activeMode === 'fullscreen';
 
-      if (
-        event.key === 'Enter' &&
-        (canConfirmRegion || canConfirmScroll || canConfirmFullscreen)
-      ) {
+      if (event.key === 'Enter' && (canConfirmRegion || canConfirmScroll || canConfirmFullscreen)) {
         event.preventDefault();
         handleConfirm();
       }
@@ -584,26 +767,46 @@ export function CaptureOverlay() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [activeMode, handleCancel, handleConfirm, handleStopScroll, hoveredWindow, isCapturing, progressHudMode, scrollFinishing, selection]);
+  }, [
+    activeMode,
+    handleCancel,
+    handleCancelRecording,
+    handleConfirm,
+    handleStopScroll,
+    hoveredWindow,
+    isCapturing,
+    isVideo,
+    progressHudMode,
+    scrollFinishing,
+    selection,
+  ]);
 
   if (!bounds) {
     return null;
   }
 
   if (progressHudMode) {
+    const hudPhase = isVideo ? 'recording' : 'scroll';
     return (
       <div
         data-testid="capture-overlay"
         className="relative h-full w-full overflow-hidden"
         role="status"
-        aria-label="Scrolling capture progress"
+        aria-label={hudPhase === 'recording' ? 'Recording progress' : 'Scrolling capture progress'}
       >
         <CaptureProgress
-          phase="scroll"
+          phase={hudPhase}
           current={scrollFrame}
+          elapsedSecs={hudPhase === 'recording' ? recordingElapsedSecs : null}
+          maxDurationSecs={captureProgress?.maxDurationSecs ?? 30}
+          paused={recordingPaused}
           variant="hud"
-          finishing={scrollFinishing}
-          onDone={() => void handleStopScroll()}
+          finishing={hudPhase === 'recording' ? recordingFinishing : scrollFinishing}
+          onDone={
+            hudPhase === 'recording' ? () => void finishRecording() : () => void handleStopScroll()
+          }
+          onPause={hudPhase === 'recording' ? () => void handlePauseRecording() : undefined}
+          onResume={hudPhase === 'recording' ? () => void handleResumeRecording() : undefined}
         />
       </div>
     );
@@ -667,11 +870,17 @@ export function CaptureOverlay() {
       <div style={toolbarContainerStyle}>
         <div style={toolbarStyle}>
           <CaptureToolbar
+            mediaKind={mediaKind}
             activeMode={activeMode}
             delaySecs={delaySecs}
+            outputFormat={outputFormat}
+            gifQuality={gifQuality}
             isCapturing={isCapturing}
+            onMediaKindChange={handleMediaKindChange}
             onModeChange={handleModeChange}
             onDelayChange={(delay: CaptureDelaySecs) => setDelaySecs(delay)}
+            onOutputFormatChange={setOutputFormat}
+            onGifQualityChange={setGifQuality}
             onCancel={() => void handleCancel()}
             onConfirm={showConfirm ? handleConfirm : undefined}
             confirmDisabled={confirmDisabled}

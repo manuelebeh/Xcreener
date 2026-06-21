@@ -717,17 +717,36 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | AC-005 | Enregistrement de zone d'écran (< 30s) - macOS | P0 | 3j | P1-001 |
-| `[ ]` | AC-006 | Enregistrement de zone d'écran - Windows | P0 | 3j | P1-002 |
-| `[ ]` | AC-007 | Encodage GIF optimisé (< 10MB pour 10s) | P0 | 2j | AC-005 |
-| `[ ]` | AC-008 | Export vidéo MP4 (H.264) | P1 | 2j | AC-005 |
-| `[ ]` | AC-009 | UI : contrôles d'enregistrement (start, stop, pause) | P0 | 1j | AC-005 |
+| `[x]` | AC-005 | Enregistrement de zone d'écran (< 30s) - macOS | P0 | 3j | P1-001 |
+| `[x]` | AC-006 | Enregistrement de zone d'écran - Windows | P0 | 3j | P1-002 |
+| `[x]` | AC-007 | Encodage GIF optimisé (< 10MB pour 10s) | P0 | 2j | AC-005 |
+| `[x]` | AC-008 | Export vidéo MP4 (H.264) | P1 | 2j | AC-005 |
+| `[x]` | AC-009 | UI : contrôles d'enregistrement (start, stop, pause) | P0 | 1j | AC-005 |
+
+**Livraison (2026-06-20, QA validée 2026-06-21)**
+
+- **UI overlay** : toggle Photo / Video ; mode **Record** zone uniquement (fenêtre / écran grisés — `captureModes.ts`) ; toggle GIF / MP4 ; qualité GIF low / medium / high (`CaptureToolbar.tsx`) ; HUD pause / stop / timer (`useRecordingElapsed.ts`, `CaptureProgressBanner.tsx`)
+- **Capture frames**
+  - **macOS** : ScreenCaptureKit streaming ~30 fps, crop région retina (`platform/macos_record.rs`) ; permission Screen Recording requise
+  - **Windows** : polling `capture_region` ~20 fps (50 ms), timestamps par frame (`capture/record/session.rs`) ; adapter `windows_record.rs` (upgrade WGC en backlog)
+- **Frames temporaires** : RGBA horodatées `frame_{index}_{timestamp_ms}.rgba` sous `tempfile` ; durée active (pause exclue) via `control.rs`
+- **Durées** : GIF auto-stop **8 s** (boucles courtes) ; MP4 plafond **30 s**
+- **IPC** : `start_region_recording_command`, `pause_region_recording_command`, `resume_region_recording_command`, `stop_region_recording_command`, `cancel_region_recording_command` ; progress `capture-progress` (`phase: "recording"`) ; complete `capture-recording-complete` ; `open_path_command` (lecteur OS)
+- **GIF** : `encode_gif.rs` — grille 20 fps à partir de timestamps VFR, palette globale `imagequant`, budgets low / medium / high, boucle infinie ; test unitaire < 10 MB / 10 s (qualité low)
+- **MP4** : `encode_mp4.rs` — resampling CFR 12–30 fps (openh264 + mux `mp4`) ; corrige les freezes QuickTime sur contenu statique / pauses
+- **Post-capture** : staging `app_data/recording-staging/` → dialogue sauvegarde (`saveRecording.ts`) → historique (`persistRecording.ts`, `format: gif|mp4`, miniature 1ʳᵉ frame) → ouverture lecteur OS si l’utilisateur choisit un emplacement ; pas d’éditeur
+- **ADR-008**
+
+**Améliorations post-livraison (backlog)**
+
+- Enregistrement fenêtre / plein écran (cibles UI déjà visibles, backend region-only)
+- Windows : `Windows.Graphics.Capture` streaming (remplacer polling xcap)
 
 **Critères de validation**
 
-- [ ] Enregistrement zone < 30 s macOS + Windows
-- [ ] GIF < 10 MB pour 10 s ; export MP4 optionnel
-- [ ] Contrôles start/stop/pause utilisables
+- [x] (2026-06-21) Enregistrement zone GIF (≤ 8 s) + MP4 (≤ 30 s) macOS + Windows — QA manuelle OK
+- [x] GIF < 10 MB pour 10 s (test unitaire Rust, qualité low) ; MP4 lecture fluide (CFR, test Rust gaps statiques)
+- [x] Contrôles start / stop / pause utilisables (HUD overlay) ; post-capture sauvegarde + historique + ouverture lecteur
 
 ### Sprint 2b.5 (Semaines 35–36) - Cloud & Partage
 

@@ -67,10 +67,8 @@ pub fn capture_scrolling_window(app: &AppHandle, target: WindowInfo) -> Result<V
     let _ = app.emit(
         "capture-progress",
         CaptureProgressPayload {
-            phase: "scroll".into(),
-            remaining_secs: None,
             current: Some(0),
-            total: None,
+            ..CaptureProgressPayload::with_phase("scroll")
         },
     );
 
@@ -92,10 +90,8 @@ pub fn capture_scrolling_window(app: &AppHandle, target: WindowInfo) -> Result<V
     let _ = app.emit(
         "capture-progress",
         CaptureProgressPayload {
-            phase: "scroll".into(),
-            remaining_secs: None,
             current: Some(1),
-            total: None,
+            ..CaptureProgressPayload::with_phase("scroll")
         },
     );
 
@@ -146,10 +142,8 @@ pub fn capture_scrolling_window(app: &AppHandle, target: WindowInfo) -> Result<V
         let _ = app.emit(
             "capture-progress",
             CaptureProgressPayload {
-                phase: "scroll".into(),
-                remaining_secs: None,
                 current: Some(iteration),
-                total: None,
+                ..CaptureProgressPayload::with_phase("scroll")
             },
         );
     }

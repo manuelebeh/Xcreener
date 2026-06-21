@@ -278,9 +278,16 @@ Le backend Rust gère tout ce qui nécessite un accès natif à l'OS ou des perf
 | `imagequant` | 4.x | Compression PNG palette (pngquant-style, Sprint 2b.2) |
 | `webp` | 0.3.x | Encodage WebP export (Sprint 2b.2) |
 | `png` | 0.17.x | Encodage PNG indexé post-quantization (Sprint 2b.2) |
-| `tempfile` | 3.x | Fichiers temporaires pour Tesseract CLI (Sprint 2b.2) |
+| `tempfile` | 3.x | Fichiers temporaires (Tesseract CLI Sprint 2b.2 ; frames RGBA enregistrement Sprint 2b.4) |
+| `screencapturekit` | 8.x | Streaming capture région macOS (`platform/macos_record.rs`, Sprint 2b.4) |
+| `gif` | 0.13.x | Encodage GIF animé (`capture/record/encode_gif.rs`, Sprint 2b.4) |
+| `openh264` | 0.6.x | Encodeur H.264 software (`capture/record/encode_mp4.rs`, Sprint 2b.4) |
+| `mp4` | 0.14.x | Mux MP4 / avc1 (`capture/record/encode_mp4.rs`, Sprint 2b.4) |
+| `bytes` | 1.x | Payload samples MP4 (Sprint 2b.4) |
 
 ### 4.3 Commandes Tauri (IPC)
+
+> **État Sprint 2b.4 (QA 2026-06-21) :** en plus du livrable 2b.3 — enregistrement zone GIF ≤ 8 s / MP4 ≤ 30 s (`capture/record/`), SCK macOS + polling Windows, encodage GIF (grille 20 fps, imagequant, qualité low/medium/high) + MP4 H.264 CFR (openh264), overlay Photo/Video + HUD pause/stop, post-capture sauvegarde + historique + `open_path_command`. Détail : [ADR-008](./adr/008-screen-recording.md).
 
 > **État Sprint 2b.3 :** en plus du livrable 2b.2 — capture live **Scroll** (`capture_scrolling_window_command`, `capture/scroll.rs`, `capture/stitch.rs`, `resolve_window`), **Menu** + **Delay** (`capture_native_command`), HUD overlay scroll, `stop_scrolling_capture_command`. Détail : [ADR-007](./adr/007-live-capture-flows.md).
 
@@ -331,6 +338,25 @@ async fn capture_scrolling_window_command(app: AppHandle, window: WindowInfo) ->
 
 #[tauri::command]
 async fn stop_scrolling_capture_command() -> Result<(), String> { ... }
+
+// Screen recording - Sprint 2b.4 (capture/record/, ADR-008)
+#[tauri::command]
+async fn start_region_recording_command(app: AppHandle, request: CaptureRecordStartRequest) -> Result<(), String> { ... }
+
+#[tauri::command]
+async fn pause_region_recording_command() -> Result<(), String> { ... }
+
+#[tauri::command]
+async fn resume_region_recording_command() -> Result<(), String> { ... }
+
+#[tauri::command]
+async fn stop_region_recording_command(app: AppHandle) -> Result<CaptureRecordingCompletePayload, String> { ... }
+
+#[tauri::command]
+async fn cancel_region_recording_command() -> Result<(), String> { ... }
+
+#[tauri::command]
+async fn open_path_command(path: String) -> Result<(), String> { ... }
 
 // Historique - Sprint 1.6 : frontend-only (db/captures.ts + fs plugin, pas de commande Rust)
 ```

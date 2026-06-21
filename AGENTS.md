@@ -81,6 +81,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 2b.1** : `@snapglow/style-suggestion-core`, classification on-device desktop (`classify_content_command`), UI `StyleSuggestionBar`, training tooling (`tools/style-classifier/`) — **modèle ML non entraîné** (pas de dataset ; fallback heuristique)
 - **Sprint 2b.2** : `@snapglow/ocr-core`, OCR copy-text desktop (`recognize_text_command`), UI `TextExtractionBar`, auto-crop (`detect_content_bounds_command`), compression export (`compress_export_bytes_command`)
 - **Sprint 2b.3** : capture scrollante viewport (`capture_scrolling_window_command`, Home + Page Down + stitch), timer différé + mode Menu (`capture_native_command`), HUD progress + `stop_scrolling_capture_command`, ADR-007 — **QA OK**, améliorations stitch en backlog
+- **Sprint 2b.4** : enregistrement zone GIF ≤ 8 s / MP4 ≤ 30 s (`start/pause/resume/stop_region_recording_command`, `capture/record/`), SCK macOS (`macos_record.rs`) + polling Windows, GIF grille 20 fps + imagequant (qualité low/medium/high), MP4 H.264 CFR (`encode_mp4.rs`, openh264), overlay Photo/Video + HUD pause/stop, sauvegarde + historique + lecteur OS (`capture-recording-complete`, `open_path_command`), ADR-008 — **QA OK** macOS/Windows
 
 ## Agent conventions
 

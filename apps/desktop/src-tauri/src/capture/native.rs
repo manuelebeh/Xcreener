@@ -31,10 +31,8 @@ fn run_countdown(app: &AppHandle, delay_secs: u32) -> Result<(), CaptureError> {
         let _ = app.emit(
             "capture-progress",
             CaptureProgressPayload {
-                phase: "countdown".into(),
                 remaining_secs: Some(remaining),
-                current: None,
-                total: None,
+                ..CaptureProgressPayload::with_phase("countdown")
             },
         );
         std::thread::sleep(Duration::from_secs(1));

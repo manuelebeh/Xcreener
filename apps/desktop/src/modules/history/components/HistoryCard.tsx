@@ -51,7 +51,7 @@ export function HistoryCard({
         <div className="space-y-1 px-3 py-2">
           <p className="truncate text-xs font-medium text-foreground">{capture.filename}</p>
           <p className="text-xs text-muted">
-            {formatRelativeTime(capture.createdAt)} ·{' '}
+            {formatRelativeTime(capture.createdAt)} · {capture.format.toUpperCase()} ·{' '}
             {formatCaptureDimensions(capture.width, capture.height)}
           </p>
         </div>
@@ -65,7 +65,11 @@ export function HistoryCard({
           disabled={isOpening}
           onClick={onOpen}
         >
-          {isOpening ? 'Opening…' : 'Open in editor'}
+          {isOpening
+            ? 'Opening…'
+            : capture.format === 'gif' || capture.format === 'mp4'
+              ? 'Open file'
+              : 'Open in editor'}
         </button>
         <button
           type="button"
