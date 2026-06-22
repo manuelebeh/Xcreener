@@ -1,7 +1,8 @@
 use super::control::{
-    active_elapsed_ms, emit_recording_progress, mark_recording_paused, mark_recording_resumed,
-    request_recording_stop, reset_recording_flags, RECORDING_ACTIVE, RECORDING_CANCELLED,
-    RECORDING_FRAME_COUNT, RECORDING_PAUSED,
+    active_elapsed_ms, allocate_frame_index, emit_recording_progress, mark_recording_paused,
+    mark_recording_resumed, record_frame_saved, recording_is_cancelled, request_recording_stop,
+    reset_recording_flags, RECORDING_ACTIVE, RECORDING_CANCELLED, RECORDING_FRAME_COUNT,
+    RECORDING_PAUSED,
 };
 #[cfg(not(target_os = "macos"))]
 use super::control::recording_stop_requested;
@@ -62,9 +63,7 @@ fn capture_loop(
 ) -> Result<(), CaptureError> {
     use std::sync::atomic::Ordering;
 
-    let mut frame_index = 0u32;
-
-    while !recording_stop_requested() && !RECORDING_CANCELLED.load(Ordering::SeqCst) {
+    while !recording_stop_requested() && !recording_is_cancelled() {
         if active_elapsed_ms(started_at) >= max_duration_secs.saturating_mul(1000) {
             request_recording_stop();
             break;
@@ -81,17 +80,17 @@ fn capture_loop(
         // Stamp the frame with its active capture offset (ms, excluding paused time) so
         // encoders reproduce real-time playback rather than assuming a fixed frame rate.
         let timestamp_ms = active_elapsed_ms(started_at);
+        let frame_index = allocate_frame_index();
         let frame_path =
             frames_dir.join(format!("frame_{frame_index:05}_{timestamp_ms:09}.rgba"));
         write_frame_rgba(&frame_path, &rgba)?;
-        frame_index += 1;
-        RECORDING_FRAME_COUNT.store(frame_index, Ordering::SeqCst);
+        record_frame_saved();
         emit_recording_progress(&app, started_at, max_duration_secs);
 
         let step = Duration::from_millis(CAPTURE_INTERVAL_MS);
         let step_start = Instant::now();
         while step_start.elapsed() < step {
-            if recording_stop_requested() || RECORDING_CANCELLED.load(Ordering::SeqCst) {
+            if recording_stop_requested() || recording_is_cancelled() {
                 break;
             }
             if RECORDING_PAUSED.load(Ordering::SeqCst) {

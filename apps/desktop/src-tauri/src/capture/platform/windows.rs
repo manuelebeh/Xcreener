@@ -13,8 +13,8 @@ pub fn focus_xcap_window(window: &xcap::Window) -> Result<(), CaptureError> {
     let window_id = window.id().map_err(|error| CaptureError::Backend(error.to_string()))?;
 
     unsafe {
-        let hwnd = HWND(window_id as isize);
-        if hwnd.0 == 0 {
+        let hwnd = HWND(window_id as usize as *mut std::ffi::c_void);
+        if hwnd.is_invalid() {
             return Ok(());
         }
 
