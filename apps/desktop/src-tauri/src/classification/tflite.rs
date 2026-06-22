@@ -19,11 +19,11 @@ pub fn is_model_available() -> bool {
 }
 
 fn load_model() -> Option<RunnableClassifier> {
-    let path = model_path();
-    if !path.is_file() {
+    if !is_model_available() {
         return None;
     }
 
+    let path = model_path();
     tract_tflite::tflite()
         .model_for_path(&path)
         .ok()?
