@@ -47,12 +47,14 @@ packages/
 ├── cloud-core/             # Shares, expiry, library types (Sprint 2b.5)
 ├── integrations-core/      # Providers OAuth Send to… (Sprint 2b.6)
 ├── team-core/              # Rôles workspace, plans, brand kit (Sprint 3.1–3.2)
+├── marketplace-core/       # Templates marketplace DTOs (Sprint 4.1–4.2)
+├── sync-core/              # Sync cursors, LWW settings (Sprint 4.9–4.10)
+├── i18n/                   # SSOT traductions en/fr/de/ja (Sprint 4.5–4.6)
 ├── biome-config/           # Biome partagé (Sprint 0.1)
-├── typescript-config/
-└── i18n/                   # SSOT traductions (Phase 4, planifié)
+└── typescript-config/
 ```
 
-**Commandes dev (via mise) :** `mise run dev:desktop` → `mise run dev:web` → `mise run dev:mobile` → `mise run dev:api` (ajoutées au fil des phases).
+**Commandes dev (via mise) :** `mise run dev:desktop` → `mise run dev:web` → `mise run dev:mobile` → `mise run dev:api` → `mise run i18n:check` → `mise run blog:validate` (ajoutées au fil des phases).
 
 ---
 
@@ -972,27 +974,121 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 > Objectif : scaler l'acquisition, internationaliser, et créer un écosystème.
 
-### Sprints 4.1–4.8 (Semaines 59–74)
+### Sprint 4.1–4.2 (Semaines 59–62) - Marketplace templates
 
-| Statut | ID | Tâche | Priorité | Période |
-|---|---|---|---|---|
-| `[ ]` | S-001 | Marketplace de templates de beautification (communauté) | P1 | S59–62 |
-| `[ ]` | S-002 | Programme d'affiliés (30% commission, dashboard affilié) | P0 | S59–62 |
-| `[ ]` | S-003 | Localisation FR, DE, JP (UI + marketing) | P0 | S63–66 |
-| `[ ]` | S-004 | Intégrations entreprise avancées (Jira, Confluence, Teams) | P1 | S63–66 |
-| `[ ]` | S-005 | Synchronisation cross-device (captures + settings) | P0 | S67–70 |
-| `[ ]` | S-006 | Content marketing SEO : 2 articles/semaine | P0 | Continu |
-| `[ ]` | S-007 | Expansion Setapp + inclusion dans bundles partenaires | P1 | S67–70 |
-| `[ ]` | S-008 | Optimisation conversion : A/B tests pricing, onboarding, paywall | P0 | S71–74 |
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-001 | ADR-015 + `@snapglow/marketplace-core` + migration `0006` + API `/v1/templates` | P0 | 3j | Phase 3 |
+| `[x]` (2026-06-27) | S4-002 | Web `/marketplace` + desktop `MarketplaceSection` (install preset) | P0 | 2j | S4-001 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-015** : marketplace templates communauté
+- **`@snapglow/marketplace-core`** : `TemplateStyle`, Zod, DTOs
+- **API** : `GET/POST /v1/templates`, `PATCH /v1/templates/:id/moderate`, `GET /v1/templates/admin/pending`
+- **Web** : `/marketplace`, `/marketplace/:slug`
+- **Desktop** : Settings → Marketplace → Install → SQLite `custom_presets`
+
+### Sprint 4.3–4.4 (Semaines 59–62 cont.) - Programme affiliés
+
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-003 | ADR-016 + Rewardful webhook + checkout `client_reference_id` | P0 | 2j | Stripe billing |
+| `[x]` (2026-06-27) | S4-004 | Web `/affiliates` + capture `?via=` cookie + help article | P0 | 1j | S4-003 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-016** : Rewardful + Stripe (30% first-sale)
+- **Web** : `/affiliates`, referral cookie 90j, landing capture
+- **API** : `POST /v1/webhooks/rewardful`, PostHog server capture
+
+### Sprint 4.5–4.6 (Semaines 63–66) - Localisation FR, DE, JP
+
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-005 | ADR-017 + `@snapglow/i18n` (en/fr/de/ja) | P0 | 3j | - |
+| `[x]` (2026-06-27) | S4-006 | Wiring desktop/web/mobile + landing traduite | P0 | 2j | S4-005 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-017** : i18next SSOT
+- **`@snapglow/i18n`** : namespaces `common`, `marketing`, `settings` ; `check:missing-keys`
+- **Apps** : locale setting desktop ; `?lang=` web ; Expo provider mobile
+
+### Sprint 4.7–4.8 (Semaines 63–66 cont.) - Intégrations entreprise
+
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-007 | `@snapglow/integrations-core` Jira/Confluence/Teams | P1 | 3j | ADR-010 |
+| `[x]` (2026-06-27) | S4-008 | API OAuth Atlassian + MS Graph + desktop Send to… | P1 | 3j | S4-007 |
+
+**Livraison (2026-06-27)**
+
+- Providers `jira`, `confluence`, `msteams` dans integrations-core + API + desktop providers
+- Gating **Team Pro** desktop (Settings + export Send to…)
+- Help : `integrations/jira-send-to`, `confluence-send-to`, `microsoft-teams-send-to`
+
+### Sprint 4.9–4.10 (Semaines 67–70) - Sync cross-device
+
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-009 | ADR-018 + `@snapglow/sync-core` + migration `0007` | P0 | 3j | Cloud library |
+| `[x]` (2026-06-27) | S4-010 | Pull sync desktop + settings sync + mobile cloud module | P0 | 3j | S4-009 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-018** : LWW settings, library cursor pull
+- **API** : `GET /v1/sync/library`, `GET/PUT /v1/users/me/settings`, `DELETE /v1/library/:id`
+- **Desktop** : `syncPull.ts`, periodic sync, import cloud library → historique local, Settings sync push
+- **Mobile** : `modules/cloud/` hook library list
+
+### Sprint 4.11–4.12 (Semaines 67–70 cont.) - Setapp + bundles
+
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-011 | `LicenseSource` desktop + détection Setapp stub | P1 | 1j | - |
+| `[x]` (2026-06-27) | S4-012 | Web `/redeem` + `partner_offers.json` | P1 | 1j | - |
+
+### Sprint 4.13–4.14 (Continu + S71–74) - SEO content
+
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-013 | Routes `/blog` + sitemap + JSON-LD | P0 | 2j | - |
+| `[x]` (2026-06-27) | S4-014 | Playbook SEO + 2 articles seed | P0 | 1j | S4-013 |
+
+**Livraison (2026-06-27)**
+
+- **Blog** : `/blog`, `/blog/:slug`, `docs/internal/marketing/seo-playbook.md`
+- **Articles** : Xnapper alternative Windows, beautify social
+
+### Sprint 4.15–4.16 (Semaines 71–74) - A/B tests PostHog
+
+| Statut | ID | Tâche | Priorité | Estimation | Dépendance |
+|---|---|---|---|---|---|
+| `[x]` (2026-06-27) | S4-015 | Experiments pricing/onboarding/paywall (flags + events) | P0 | 2j | PostHog |
+| `[x]` (2026-06-27) | S4-016 | Funnel events desktop + web landing CTA variant | P0 | 1j | S4-015 |
+
+**Livraison (2026-06-27)**
+
+- Flags : `pricing-hero-v1`, `landing-cta-v1`, `team-onboarding-v1`, `paywall-timing-v1`
+- Events : `experiment_exposure`, `onboarding_step_completed`, `paywall_shown`, `paywall_converted`
 
 **Critères de validation (Phase 4)**
 
-- [ ] Marketplace templates live avec soumission communautaire
-- [ ] Programme affiliés opérationnel (tracking + payouts)
-- [ ] UI localisée FR/DE/JP ; landing marketing traduite
-- [ ] Sync cross-device captures + settings fiable
-- [ ] ≥ 2 articles SEO/semaine publiés sur la période
-- [ ] A/B tests pricing/onboarding en cours avec métriques PostHog
+- [x] Marketplace templates live avec soumission communautaire
+- [x] Programme affiliés — code + webhook Rewardful livrés
+- [x] UI localisée FR/DE/JP ; landing marketing traduite
+- [x] Sync cross-device captures + settings fiable (pull + LWW)
+- [x] Infrastructure blog + ≥2 articles seed ; playbook 2/semaine
+- [x] A/B tests pricing/onboarding — flags + events PostHog câblés
+
+**En attente ops / contenu continu (hors code)**
+
+- [ ] Compte Rewardful + env `REWARDFUL_*` en production
+- [ ] Apps OAuth Atlassian + Microsoft Graph (Jira/Confluence/Teams)
+- [ ] Flags PostHog créés dans le dashboard (`pricing-hero-v1`, `paywall-timing-v1`, …)
+- [ ] Soumission Setapp (MacPaw) — stub `LicenseSource` en place
+- [ ] Calendrier éditorial SEO (2 articles/semaine) — 2 articles seed livrés
 
 ---
 

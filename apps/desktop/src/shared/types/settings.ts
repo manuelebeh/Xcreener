@@ -1,6 +1,8 @@
 export type ThemePreference = 'light' | 'dark' | 'system';
 export type OcrEngineMode = 'auto' | 'native' | 'tesseract';
 export type WatermarkPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export type AppLocale = 'en' | 'fr' | 'de' | 'ja';
+export type LicenseSource = 'direct' | 'setapp' | 'appsumo' | 'partner';
 
 export const DEFAULT_CAPTURE_SHORTCUT = 'CmdOrControl+Shift+KeyS';
 
@@ -15,6 +17,9 @@ export interface WatermarkSettings {
 
 export interface AppSettings extends WatermarkSettings {
   theme: ThemePreference;
+  locale: AppLocale;
+  licenseSource: LicenseSource;
+  partnerCode: string;
   captureShortcut: string;
   launchAtLogin: boolean;
   analyticsEnabled: boolean;
@@ -29,6 +34,9 @@ export interface AppSettings extends WatermarkSettings {
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   theme: 'system',
+  locale: 'en',
+  licenseSource: 'direct',
+  partnerCode: '',
   captureShortcut: DEFAULT_CAPTURE_SHORTCUT,
   launchAtLogin: false,
   analyticsEnabled: false,
@@ -49,6 +57,9 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
 
 export const SETTING_KEYS = {
   theme: 'theme',
+  locale: 'locale',
+  licenseSource: 'licenseSource',
+  partnerCode: 'partnerCode',
   captureShortcut: 'captureShortcut',
   launchAtLogin: 'launchAtLogin',
   analyticsEnabled: 'analyticsEnabled',

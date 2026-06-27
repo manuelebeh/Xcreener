@@ -9,6 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AffiliatesRouteImport } from './routes/affiliates'
+import { Route as RedeemRouteImport } from './routes/redeem'
+import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace/index'
+import { Route as MarketplaceSlugRouteImport } from './routes/marketplace/$slug'
 import { Route as HelpIndexRouteImport } from './routes/help/index'
 import { Route as HelpSlugRouteImport } from './routes/help/$slug'
 import { Route as IndexRouteImport } from './routes/index'
@@ -16,6 +23,48 @@ import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as CDocumentIdRouteImport } from './routes/c/$documentId'
 import { Route as ETokenRouteImport } from './routes/e/$token'
 import { Route as STokenRouteImport } from './routes/s/$token'
+
+const AffiliatesRoute = AffiliatesRouteImport.update({
+  id: '/affiliates',
+  path: '/affiliates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const RedeemRoute = RedeemRouteImport.update({
+  id: '/redeem',
+  path: '/redeem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const SitemapXmlRoute = SitemapXmlRouteImport.update({
+  id: '/sitemap/xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const MarketplaceSlugRoute = MarketplaceSlugRouteImport.update({
+  id: '/marketplace/$slug',
+  path: '/marketplace/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 const HelpIndexRoute = HelpIndexRouteImport.update({
   id: '/help/',
@@ -61,70 +110,119 @@ const ETokenRoute = ETokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/affiliates': typeof AffiliatesRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog': typeof BlogIndexRoute
   '/c/$documentId': typeof CDocumentIdRoute
   '/e/$token': typeof ETokenRoute
   '/help/$slug': typeof HelpSlugRoute
   '/help': typeof HelpIndexRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace': typeof MarketplaceIndexRoute
+  '/redeem': typeof RedeemRoute
   '/s/$token': typeof STokensRoute
+  '/sitemap.xml': typeof SitemapXmlRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/affiliates': typeof AffiliatesRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog': typeof BlogIndexRoute
   '/c/$documentId': typeof CDocumentIdRoute
   '/e/$token': typeof ETokenRoute
   '/help/$slug': typeof HelpSlugRoute
   '/help': typeof HelpIndexRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace': typeof MarketplaceIndexRoute
+  '/redeem': typeof RedeemRoute
   '/s/$token': typeof STokensRoute
+  '/sitemap.xml': typeof SitemapXmlRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/affiliates': typeof AffiliatesRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/c/$documentId': typeof CDocumentIdRoute
   '/e/$token': typeof ETokenRoute
   '/help/$slug': typeof HelpSlugRoute
   '/help/': typeof HelpIndexRoute
+  '/marketplace/$slug': typeof MarketplaceSlugRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
+  '/redeem': typeof RedeemRoute
   '/s/$token': typeof STokensRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/affiliates'
     | '/auth/callback'
+    | '/blog/$slug'
+    | '/blog'
     | '/c/$documentId'
     | '/e/$token'
     | '/help/$slug'
     | '/help'
+    | '/marketplace/$slug'
+    | '/marketplace'
+    | '/redeem'
     | '/s/$token'
+    | '/sitemap.xml'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/affiliates'
     | '/auth/callback'
+    | '/blog/$slug'
+    | '/blog'
     | '/c/$documentId'
     | '/e/$token'
     | '/help/$slug'
     | '/help'
+    | '/marketplace/$slug'
+    | '/marketplace'
+    | '/redeem'
     | '/s/$token'
+    | '/sitemap.xml'
   id:
     | '__root__'
     | '/'
+    | '/affiliates'
     | '/auth/callback'
+    | '/blog/$slug'
+    | '/blog/'
     | '/c/$documentId'
     | '/e/$token'
     | '/help/$slug'
     | '/help/'
+    | '/marketplace/$slug'
+    | '/marketplace/'
+    | '/redeem'
     | '/s/$token'
+    | '/sitemap/xml'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AffiliatesRoute: typeof AffiliatesRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   CDocumentIdRoute: typeof CDocumentIdRoute
   ETokenRoute: typeof ETokenRoute
   HelpSlugRoute: typeof HelpSlugRoute
   HelpIndexRoute: typeof HelpIndexRoute
+  MarketplaceSlugRoute: typeof MarketplaceSlugRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  RedeemRoute: typeof RedeemRoute
   STokensRoute: typeof STokensRoute
+  SitemapXmlRoute: typeof SitemapXmlRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +232,55 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/affiliates': {
+      id: '/affiliates'
+      path: '/affiliates'
+      fullPath: '/affiliates'
+      preLoaderRoute: typeof AffiliatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/redeem': {
+      id: '/redeem'
+      path: '/redeem'
+      fullPath: '/redeem'
+      preLoaderRoute: typeof RedeemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap/xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapXmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/$slug': {
+      id: '/marketplace/$slug'
+      path: '/marketplace/$slug'
+      fullPath: '/marketplace/$slug'
+      preLoaderRoute: typeof MarketplaceSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -183,12 +330,19 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AffiliatesRoute: AffiliatesRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
   CDocumentIdRoute: CDocumentIdRoute,
   ETokenRoute: ETokenRoute,
   HelpSlugRoute: HelpSlugRoute,
   HelpIndexRoute: HelpIndexRoute,
+  MarketplaceSlugRoute: MarketplaceSlugRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
+  RedeemRoute: RedeemRoute,
   STokensRoute: STokensRoute,
+  SitemapXmlRoute: SitemapXmlRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -110,6 +110,12 @@ function planFromPriceId(priceId: string): WorkspacePlan | null {
   return null;
 }
 
+function subscriptionPeriodEnd(subscription: Stripe.Subscription): Date | null {
+  const end = (subscription as Stripe.Subscription & { current_period_end?: number })
+    .current_period_end;
+  return end ? new Date(end * 1000) : null;
+}
+
 export async function registerBillingRoutes(app: FastifyInstance, options: BillingRouteOptions) {
   const stripe = options.stripe ?? getStripeClient();
 
@@ -149,7 +155,7 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
         return reply.code(403).send({ error: 'Forbidden' });
       }
 
-      const body = request.body as { plan?: WorkspacePlan };
+      const body = request.body as { plan?: WorkspacePlan; referral?: string };
       const plan = body.plan ?? 'team_starter';
       if (plan !== 'team_starter' && plan !== 'team_pro') {
         return reply.code(400).send({ error: 'Invalid plan' });
@@ -188,15 +194,18 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
         customerId = customer.id;
       }
 
+      const referral = typeof body.referral === 'string' ? body.referral.trim() : '';
+
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         customer: customerId,
         line_items: [{ price: priceId, quantity: Math.max(1, memberCount) }],
         success_url: `${env.WEB_PUBLIC_URL}/settings?billing=success`,
         cancel_url: `${env.WEB_PUBLIC_URL}/settings?billing=cancel`,
-        metadata: { workspaceId, plan },
+        client_reference_id: referral || undefined,
+        metadata: { workspaceId, plan, ...(referral ? { referral } : {}) },
         subscription_data: {
-          metadata: { workspaceId, plan },
+          metadata: { workspaceId, plan, ...(referral ? { referral } : {}) },
         },
       });
 
@@ -294,9 +303,7 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
               | 'trialing'
               | 'incomplete',
             seatCount: subscription.items.data[0]?.quantity ?? 1,
-            currentPeriodEnd: subscription.currentPeriodEnd
-              ? new Date(subscription.currentPeriodEnd * 1000)
-              : null,
+            currentPeriodEnd: subscriptionPeriodEnd(subscription),
           });
         }
         break;
@@ -338,9 +345,7 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
               | 'trialing'
               | 'incomplete',
             seatCount: subscription.items.data[0]?.quantity ?? 1,
-            currentPeriodEnd: subscription.currentPeriodEnd
-              ? new Date(subscription.currentPeriodEnd * 1000)
-              : null,
+            currentPeriodEnd: subscriptionPeriodEnd(subscription),
           });
         }
         break;

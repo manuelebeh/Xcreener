@@ -1,10 +1,26 @@
-export type IntegrationProvider = 'slack' | 'notion' | 'linear' | 'github';
+export type IntegrationProvider =
+  | 'slack'
+  | 'notion'
+  | 'linear'
+  | 'github'
+  | 'jira'
+  | 'confluence'
+  | 'msteams';
 
 export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
   'slack',
   'notion',
   'linear',
   'github',
+  'jira',
+  'confluence',
+  'msteams',
+];
+
+export const ENTERPRISE_INTEGRATION_PROVIDERS: IntegrationProvider[] = [
+  'jira',
+  'confluence',
+  'msteams',
 ];
 
 export const INTEGRATION_LABELS: Record<IntegrationProvider, string> = {
@@ -12,6 +28,9 @@ export const INTEGRATION_LABELS: Record<IntegrationProvider, string> = {
   notion: 'Notion',
   linear: 'Linear',
   github: 'GitHub',
+  jira: 'Jira',
+  confluence: 'Confluence',
+  msteams: 'Microsoft Teams',
 };
 
 export const INTEGRATION_SCOPES: Record<IntegrationProvider, string> = {
@@ -19,6 +38,9 @@ export const INTEGRATION_SCOPES: Record<IntegrationProvider, string> = {
   notion: 'read,update,insert',
   linear: 'read,write,issues:create',
   github: 'repo',
+  jira: 'read:jira-work write:jira-work read:me offline_access',
+  confluence: 'read:confluence-content.all write:confluence-content.all offline_access',
+  msteams: 'ChannelMessage.Send Channel.ReadBasic.All offline_access',
 };
 
 export const INTEGRATION_REDIRECT_URI = 'snapglow://integrations/callback';
@@ -29,6 +51,7 @@ export interface IntegrationConnection {
   accountLabel?: string;
   teamId?: string;
   workspaceId?: string;
+  cloudId?: string;
 }
 
 export interface SendToIntegrationInput {
@@ -55,4 +78,8 @@ export interface ExchangeIntegrationTokenResponse {
 
 export function isIntegrationProvider(value: string): value is IntegrationProvider {
   return (INTEGRATION_PROVIDERS as readonly string[]).includes(value);
+}
+
+export function isEnterpriseIntegrationProvider(value: IntegrationProvider): boolean {
+  return (ENTERPRISE_INTEGRATION_PROVIDERS as readonly string[]).includes(value);
 }

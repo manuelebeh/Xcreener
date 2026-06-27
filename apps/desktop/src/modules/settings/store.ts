@@ -4,6 +4,7 @@ import { DEFAULT_APP_SETTINGS } from '@/shared/types/settings';
 
 interface SettingsState extends AppSettings {
   setTheme: (theme: ThemePreference) => void;
+  setLocale: (locale: AppSettings['locale']) => void;
   setCaptureShortcut: (captureShortcut: string) => void;
   setLaunchAtLogin: (launchAtLogin: boolean) => void;
   setAnalyticsEnabled: (analyticsEnabled: boolean) => void;
@@ -19,12 +20,15 @@ interface SettingsState extends AppSettings {
   setWatermarkPosition: (watermarkPosition: WatermarkPosition) => void;
   setWatermarkOpacity: (watermarkOpacity: number) => void;
   setUseTeamBrandKit: (useTeamBrandKit: boolean) => void;
+  setLicenseSource: (licenseSource: AppSettings['licenseSource']) => void;
+  setPartnerCode: (partnerCode: string) => void;
   hydrate: (settings: Partial<AppSettings>) => void;
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
   ...DEFAULT_APP_SETTINGS,
   setTheme: (theme) => set({ theme }),
+  setLocale: (locale) => set({ locale }),
   setCaptureShortcut: (captureShortcut) => set({ captureShortcut }),
   setLaunchAtLogin: (launchAtLogin) => set({ launchAtLogin }),
   setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
@@ -40,5 +44,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setWatermarkPosition: (watermarkPosition) => set({ watermarkPosition }),
   setWatermarkOpacity: (watermarkOpacity) => set({ watermarkOpacity }),
   setUseTeamBrandKit: (useTeamBrandKit) => set({ useTeamBrandKit }),
+  setLicenseSource: (licenseSource) => set({ licenseSource }),
+  setPartnerCode: (partnerCode) => set({ partnerCode }),
   hydrate: (settings) => set((state) => ({ ...state, ...settings })),
 }));
