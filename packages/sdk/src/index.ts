@@ -3,6 +3,7 @@ import type {
   CaptureResponse,
   ExportCaptureResponse,
   ExportFormat,
+  PublishCaptureResponse,
 } from '@snapglow/api-core';
 import type { CollabDocumentState } from '@snapglow/collab-core';
 
@@ -82,6 +83,7 @@ export class SnapGlowClient {
     beautify: (id: string, config: CollabDocumentState, opts?: { title?: string; tags?: string[] }) =>
       this.beautifyCapture(id, config, opts),
     export: (id: string, opts?: ExportCaptureOptions) => this.exportCapture(id, opts),
+    publish: (id: string) => this.publishCapture(id),
     delete: (id: string) => this.deleteCapture(id),
   };
 
@@ -175,6 +177,12 @@ export class SnapGlowClient {
         format: opts?.format ?? 'png',
         quality: opts?.quality,
       }),
+    });
+  }
+
+  private async publishCapture(id: string): Promise<PublishCaptureResponse> {
+    return this.request<PublishCaptureResponse>(`/v1/public/captures/${id}/publish`, {
+      method: 'POST',
     });
   }
 

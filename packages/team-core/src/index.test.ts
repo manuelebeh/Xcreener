@@ -8,6 +8,8 @@ import {
   isPaidPlan,
   MAX_MEMBERS_TEAM_STARTER,
   maxMembersForPlan,
+  parseUsagePeriod,
+  usagePeriodDays,
 } from './index';
 
 describe('team-core permissions', () => {
@@ -16,6 +18,7 @@ describe('team-core permissions', () => {
     expect(can('admin', 'invitations:create')).toBe(true);
     expect(can('admin', 'billing:manage')).toBe(true);
     expect(can('admin', 'sso:manage')).toBe(true);
+    expect(can('admin', 'usage:read')).toBe(true);
   });
 
   it('restricts editor to read-only team actions', () => {
@@ -23,6 +26,7 @@ describe('team-core permissions', () => {
     expect(can('editor', 'brand-kit:read')).toBe(true);
     expect(can('editor', 'invitations:create')).toBe(false);
     expect(can('editor', 'billing:manage')).toBe(false);
+    expect(can('editor', 'usage:read')).toBe(false);
     expect(can('editor', 'collab:edit')).toBe(true);
     expect(can('editor', 'comments:create')).toBe(true);
   });
@@ -78,5 +82,20 @@ describe('team-core role hierarchy', () => {
     expect(hasMinRole('admin', 'viewer')).toBe(true);
     expect(hasMinRole('viewer', 'admin')).toBe(false);
     expect(hasMinRole('editor', 'editor')).toBe(true);
+  });
+});
+
+describe('team-core usage periods', () => {
+  it('parses usage period query values', () => {
+    expect(parseUsagePeriod('7d')).toBe('7d');
+    expect(parseUsagePeriod('90d')).toBe('90d');
+    expect(parseUsagePeriod(undefined)).toBe('30d');
+    expect(parseUsagePeriod('invalid')).toBe('30d');
+  });
+
+  it('returns day counts for usage periods', () => {
+    expect(usagePeriodDays('7d')).toBe(7);
+    expect(usagePeriodDays('30d')).toBe(30);
+    expect(usagePeriodDays('90d')).toBe(90);
   });
 });

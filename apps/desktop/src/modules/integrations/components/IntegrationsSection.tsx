@@ -39,6 +39,11 @@ export function IntegrationsSection() {
         {INTEGRATION_PROVIDERS.map((provider) => {
           const connection = connections.find((item) => item.provider === provider);
           const isConnected = connection?.connected ?? false;
+          const statusLabel = isConnected
+            ? (connection?.accountLabel ?? 'Connected')
+            : configured
+              ? 'Not connected'
+              : 'Unavailable — OAuth not configured on API';
           return (
             <div
               key={provider}
@@ -46,9 +51,7 @@ export function IntegrationsSection() {
             >
               <div>
                 <p className="text-sm font-medium text-foreground">{INTEGRATION_LABELS[provider]}</p>
-                <p className="text-xs text-muted">
-                  {isConnected ? (connection?.accountLabel ?? 'Connected') : 'Not connected'}
-                </p>
+                <p className="text-xs text-muted">{statusLabel}</p>
               </div>
               {isConnected ? (
                 <Button

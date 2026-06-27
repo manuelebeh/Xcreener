@@ -66,4 +66,30 @@ describe('SnapGlowClient', () => {
 
     await expect(client.captures.get('missing')).rejects.toBeInstanceOf(ApiError);
   });
+
+  it('publishes a capture as embed share', async () => {
+    const fetchImpl = vi.fn(async () =>
+      Response.json(
+        {
+          token: 'abc123',
+          shareUrl: 'https://snapglow.app/s/abc123',
+          embedUrl: 'https://snapglow.app/e/abc123',
+          expiresAt: null,
+        },
+        { status: 201 }
+      )
+    );
+
+    const client = new SnapGlowClient({
+      apiKey: 'sg_live_testsecret',
+      fetchImpl,
+    });
+
+    const result = await client.captures.publish('cap-1');
+    expect(result.embedUrl).toContain('/e/');
+    expect(fetchImpl).toHaveBeenCalledWith(
+      expect.stringContaining('/v1/public/captures/cap-1/publish'),
+      expect.objectContaining({ method: 'POST' })
+    );
+  });
 });

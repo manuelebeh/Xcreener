@@ -127,6 +127,7 @@ export const shares = pgTable(
     storageKey: text('storage_key').notNull(),
     mimeType: text('mime_type').notNull(),
     byteSize: bigint('byte_size', { mode: 'number' }).notNull(),
+    title: text('title'),
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },

@@ -120,6 +120,20 @@ components:
           type: integer
         height:
           type: integer
+    PublishResponse:
+      type: object
+      required: [token, shareUrl, embedUrl, expiresAt]
+      properties:
+        token:
+          type: string
+        shareUrl:
+          type: string
+          format: uri
+        embedUrl:
+          type: string
+          format: uri
+        expiresAt:
+          type: 'null'
     ApiKeyResponse:
       type: object
       required: [id, name, keyPrefix, createdAt, lastUsedAt, revokedAt]
@@ -304,6 +318,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExportResponse'
+  /v1/public/captures/{id}/publish:
+    post:
+      summary: Publish capture as permanent embed share
+      operationId: publishCapture
+      tags: [Captures]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '201':
+          description: Published embed URLs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublishResponse'
   /v1/workspaces/{id}/api-keys:
     get:
       summary: List workspace API keys

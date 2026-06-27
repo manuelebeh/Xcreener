@@ -23,6 +23,7 @@ import {
   updateMemberRole,
   updateWorkspace,
 } from './api';
+import { openBillingPortal as openBillingPortalUrl } from './auth-invite';
 import { cacheBrandKit, loadCachedBrandKit } from './brandKitCache';
 
 interface TeamState {
@@ -45,6 +46,7 @@ interface TeamState {
   removeTeamMember: (userId: string) => Promise<void>;
   refreshBilling: () => Promise<void>;
   startCheckout: (plan: 'team_starter' | 'team_pro') => Promise<void>;
+  openBillingPortal: () => Promise<void>;
   refreshBrandKit: () => Promise<void>;
   saveBrandKit: (config: Pick<BrandKitConfig, 'colors' | 'fonts' | 'watermark'>) => Promise<void>;
   enableTeamSso: () => Promise<void>;
@@ -179,6 +181,14 @@ export const useTeamStore = create<TeamState>((set, get) => ({
     }
     const session = await createCheckoutSession(workspaceId, plan);
     window.open(session.url, '_blank');
+  },
+
+  openBillingPortal: async () => {
+    const workspaceId = get().activeWorkspaceId;
+    if (!workspaceId) {
+      throw new Error('No active workspace');
+    }
+    await openBillingPortalUrl(workspaceId);
   },
 
   refreshBrandKit: async () => {

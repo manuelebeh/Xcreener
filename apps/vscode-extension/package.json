@@ -1,0 +1,70 @@
+{
+  "name": "snapglow-vscode",
+  "displayName": "SnapGlow",
+  "description": "Capture code from the editor, beautify with SnapGlow, and export to clipboard.",
+  "version": "0.1.0",
+  "publisher": "snapglow",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/snapglow/screen-cut",
+    "directory": "apps/vscode-extension"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other", "Snippets"],
+  "activationEvents": ["onCommand:snapglow.configureApiKey", "onCommand:snapglow.captureEditor", "onCommand:snapglow.captureAndBeautify"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "snapglow.configureApiKey",
+        "title": "SnapGlow: Configure API Key"
+      },
+      {
+        "command": "snapglow.captureEditor",
+        "title": "SnapGlow: Capture Editor"
+      },
+      {
+        "command": "snapglow.captureAndBeautify",
+        "title": "SnapGlow: Capture & Beautify"
+      }
+    ],
+    "configuration": {
+      "title": "SnapGlow",
+      "properties": {
+        "snapglow.baseUrl": {
+          "type": "string",
+          "default": "https://api.snapglow.app",
+          "description": "SnapGlow API base URL"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --external:@napi-rs/canvas --external:@napi-rs/canvas-darwin-arm64 --external:@napi-rs/canvas-darwin-x64 --external:@napi-rs/canvas-linux-x64-gnu --external:@napi-rs/canvas-linux-arm64-gnu --external:@napi-rs/canvas-win32-x64-msvc --format=cjs --platform=node",
+    "watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch",
+    "package": "pnpm run build && vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.80",
+    "@snapglow/plugin-core": "workspace:*",
+    "@snapglow/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "@types/node": "^22.10.2",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.6.0",
+    "esbuild": "^0.25.0",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.4"
+  }
+}

@@ -34,6 +34,11 @@ export interface PublicShareResponse {
   byteSize: number;
   expiresAt: string | null;
   assetUrl: string;
+  title?: string | null;
+}
+
+export interface PublicEmbedResponse extends PublicShareResponse {
+  title: string | null;
 }
 
 export function isShareExpiry(value: string): value is ShareExpiry {

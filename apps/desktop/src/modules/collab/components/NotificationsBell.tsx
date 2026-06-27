@@ -12,8 +12,12 @@ export function NotificationsBell() {
   useEffect(() => {
     void fetchNotifications()
       .then(setNotifications)
-      .catch(() => {
-        // ignore when signed out
+      .catch((fetchError) => {
+        useCollabStore
+          .getState()
+          .setStatusMessage(
+            fetchError instanceof Error ? fetchError.message : 'Could not load notifications'
+          );
       });
   }, [setNotifications]);
 

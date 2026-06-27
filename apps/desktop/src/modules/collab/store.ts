@@ -10,6 +10,7 @@ interface CollabState {
   documentId: string | null;
   document: CollabDocumentResponse | null;
   connected: boolean;
+  reconnecting: boolean;
   readOnly: boolean;
   participants: ParticipantPresence[];
   remoteCursors: ParticipantPresence[];
@@ -21,6 +22,7 @@ interface CollabState {
   setDocument: (document: CollabDocumentResponse | null) => void;
   setDocumentId: (documentId: string | null) => void;
   setConnected: (connected: boolean) => void;
+  setReconnecting: (reconnecting: boolean) => void;
   setReadOnly: (readOnly: boolean) => void;
   setParticipants: (participants: ParticipantPresence[]) => void;
   upsertParticipant: (participant: ParticipantPresence) => void;
@@ -42,6 +44,7 @@ export const useCollabStore = create<CollabState>((set) => ({
   documentId: null,
   document: null,
   connected: false,
+  reconnecting: false,
   readOnly: false,
   participants: [],
   remoteCursors: [],
@@ -52,7 +55,9 @@ export const useCollabStore = create<CollabState>((set) => ({
   statusMessage: null,
   setDocument: (document) => set({ document }),
   setDocumentId: (documentId) => set({ documentId }),
-  setConnected: (connected) => set({ connected }),
+  setConnected: (connected) =>
+    set({ connected, ...(connected ? { reconnecting: false } : {}) }),
+  setReconnecting: (reconnecting) => set({ reconnecting }),
   setReadOnly: (readOnly) => set({ readOnly }),
   setParticipants: (participants) => set({ participants, remoteCursors: participants }),
   upsertParticipant: (participant) =>
@@ -93,6 +98,7 @@ export const useCollabStore = create<CollabState>((set) => ({
       documentId: null,
       document: null,
       connected: false,
+      reconnecting: false,
       readOnly: false,
       participants: [],
       remoteCursors: [],

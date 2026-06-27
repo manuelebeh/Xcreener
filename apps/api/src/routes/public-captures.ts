@@ -4,6 +4,7 @@ import {
   type CaptureResponse,
   type ExportCaptureResponse,
   exportCaptureSchema,
+  type PublishCaptureResponse,
 } from '@snapglow/api-core';
 import {
   ALLOWED_SHARE_MIME_TYPES,
@@ -14,7 +15,9 @@ import { type CollabDocumentState, defaultCollabDocumentState } from '@snapglow/
 import { and, desc, eq, ilike, lt, or, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
+import { customAlphabet } from 'nanoid';
 import * as schema from '../db/schema';
+import { env } from '../env';
 import { authenticateApiKey, sendRateLimitReply } from '../plugins/api-key-auth';
 import {
   checkApiExportRateLimit,
@@ -23,6 +26,8 @@ import {
 } from '../services/redis';
 import { loadBrandKitLogo, renderCaptureExport } from '../services/render';
 import type { StorageService } from '../services/storage';
+
+const createShareToken = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 12);
 
 interface PublicCaptureRouteOptions {
   db: PostgresJsDatabase<typeof schema>;
@@ -83,6 +88,46 @@ async function getBrandKitForWorkspace(db: PostgresJsDatabase<typeof schema>, wo
     .where(eq(schema.brandKits.workspaceId, workspaceId))
     .limit(1);
   return rows[0] ?? null;
+}
+
+async function ensureCaptureExport(
+  db: PostgresJsDatabase<typeof schema>,
+  storage: StorageService,
+  capture: schema.ApiCapture,
+  workspaceId: string,
+  format: 'png' | 'jpg' | 'webp' = 'png'
+): Promise<{ exportKey: string; mimeType: string; byteSize: number }> {
+  if (capture.exportStorageKey) {
+    const buffer = await storage.getObject(capture.exportStorageKey);
+    return {
+      exportKey: capture.exportStorageKey,
+      mimeType: capture.exportStorageKey.endsWith('.jpg') ? 'image/jpeg' : 'image/png',
+      byteSize: buffer.byteLength,
+    };
+  }
+
+  const screenshotBuffer = await storage.getObject(capture.storageKey);
+  const brandKit = await getBrandKitForWorkspace(db, workspaceId);
+  const logoBuffer = await loadBrandKitLogo(storage, brandKit?.logoStorageKey);
+
+  const rendered = await renderCaptureExport({
+    documentState: capture.documentState,
+    screenshotBuffer,
+    format,
+    quality: undefined,
+    brandKitWatermark: brandKit?.watermark,
+    brandKitLogoBuffer: logoBuffer,
+  });
+
+  const exportKey = `api-captures/${workspaceId}/${capture.id}/export.${format}`;
+  await storage.uploadObject(exportKey, rendered.buffer, rendered.mimeType);
+
+  await db
+    .update(schema.apiCaptures)
+    .set({ exportStorageKey: exportKey, updatedAt: new Date() })
+    .where(eq(schema.apiCaptures.id, capture.id));
+
+  return { exportKey, mimeType: rendered.mimeType, byteSize: rendered.buffer.byteLength };
 }
 
 export async function registerPublicCaptureRoutes(
@@ -363,6 +408,86 @@ export async function registerPublicCaptureRoutes(
     };
 
     return response;
+  });
+
+  app.post('/v1/public/captures/:id/publish', { preHandler: apiKeyAuth }, async (request, reply) => {
+    const apiKey = request.apiKey;
+    const workspaceId = request.apiWorkspaceId;
+    const { id } = request.params as { id: string };
+    if (!apiKey || !workspaceId) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+
+    const generalLimit = await checkApiGeneralRateLimit(apiKey.id);
+    if (!generalLimit.allowed) {
+      return sendRateLimitReply(reply, generalLimit.retryAfterSec);
+    }
+
+    const exportLimit = await checkApiExportRateLimit(apiKey.id);
+    if (!exportLimit.allowed) {
+      return sendRateLimitReply(reply, exportLimit.retryAfterSec);
+    }
+
+    const rows = await options.db
+      .select()
+      .from(schema.apiCaptures)
+      .where(and(eq(schema.apiCaptures.id, id), eq(schema.apiCaptures.workspaceId, workspaceId)))
+      .limit(1);
+
+    const capture = rows[0];
+    if (!capture) {
+      return reply.code(404).send({ error: 'Capture not found' });
+    }
+
+    const keyRows = await options.db
+      .select({ createdBy: schema.apiKeys.createdBy })
+      .from(schema.apiKeys)
+      .where(eq(schema.apiKeys.id, apiKey.id))
+      .limit(1);
+
+    const keyOwner = keyRows[0];
+    if (!keyOwner) {
+      return reply.code(500).send({ error: 'API key not found' });
+    }
+
+    const exported = await ensureCaptureExport(
+      options.db,
+      options.storage,
+      capture,
+      workspaceId
+    );
+
+    const exportBuffer = await options.storage.getObject(exported.exportKey);
+    const token = createShareToken();
+    const shareStorageKey = `shares/${keyOwner.createdBy}/${token}`;
+    await options.storage.uploadObject(shareStorageKey, exportBuffer, exported.mimeType);
+
+    const [share] = await options.db
+      .insert(schema.shares)
+      .values({
+        userId: keyOwner.createdBy,
+        workspaceId,
+        token,
+        storageKey: shareStorageKey,
+        mimeType: exported.mimeType,
+        byteSize: exported.byteSize,
+        title: capture.title,
+        expiresAt: null,
+      })
+      .returning();
+
+    if (!share) {
+      return reply.code(500).send({ error: 'Failed to publish capture' });
+    }
+
+    const response: PublishCaptureResponse = {
+      token: share.token,
+      shareUrl: `${env.WEB_PUBLIC_URL}/s/${share.token}`,
+      embedUrl: `${env.WEB_PUBLIC_URL}/e/${share.token}`,
+      expiresAt: null,
+    };
+
+    return reply.code(201).send(response);
   });
 
   app.delete('/v1/public/captures/:id', { preHandler: apiKeyAuth }, async (request, reply) => {

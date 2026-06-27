@@ -3,10 +3,12 @@ import { COLLAB_PRESENCE_THROTTLE_MS } from '@snapglow/collab-core';
 import { getCollabWsUrl } from './api';
 
 type MessageHandler = (message: CollabServerMessage) => void;
+type ConnectionHandler = (state: 'connected' | 'disconnected' | 'reconnecting') => void;
 
 export class CollabWebSocketClient {
   private socket: WebSocket | null = null;
   private handlers = new Set<MessageHandler>();
+  private connectionHandlers = new Set<ConnectionHandler>();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private presenceTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingPresence: Omit<ParticipantPresence, 'userId' | 'email' | 'displayName' | 'color'> | null =
@@ -17,6 +19,17 @@ export class CollabWebSocketClient {
   onMessage(handler: MessageHandler): () => void {
     this.handlers.add(handler);
     return () => this.handlers.delete(handler);
+  }
+
+  onConnectionChange(handler: ConnectionHandler): () => void {
+    this.connectionHandlers.add(handler);
+    return () => this.connectionHandlers.delete(handler);
+  }
+
+  private emitConnection(state: 'connected' | 'disconnected' | 'reconnecting'): void {
+    for (const handler of this.connectionHandlers) {
+      handler(state);
+    }
   }
 
   connect(documentId: string, token: string): void {
@@ -83,7 +96,9 @@ export class CollabWebSocketClient {
     });
 
     socket.addEventListener('close', () => {
+      this.emitConnection('disconnected');
       if (this.documentId && this.token) {
+        this.emitConnection('reconnecting');
         this.reconnectTimer = setTimeout(() => this.openSocket(), 1500);
       }
     });

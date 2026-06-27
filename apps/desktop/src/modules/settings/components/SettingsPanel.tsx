@@ -7,6 +7,8 @@ import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/useGlobalShortcut';
 import { CloudAuthSection } from '@/modules/cloud/components/CloudAuthSection';
 import { TeamSection } from '@/modules/team/components/TeamSection';
+import { TeamOnboardingWizard } from '@/modules/team/components/TeamOnboardingWizard';
+import { loadTeamOnboardingState } from '@/modules/team/onboarding';
 import { IntegrationsSection } from '@/modules/integrations/components/IntegrationsSection';
 import { isValidCaptureShortcut, normalizeCaptureShortcut } from '@/shared/lib/shortcut';
 import type { OcrEngineMode, ThemePreference } from '@/shared/types/settings';
@@ -40,6 +42,10 @@ export function SettingsPanel() {
   const [shortcutSaved, setShortcutSaved] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<string | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState<
+    import('@/modules/team/onboarding').TeamOnboardingStep
+  >('welcome');
 
   async function handleThemeChange(value: ThemePreference) {
     setTheme(value);
@@ -286,7 +292,34 @@ export function SettingsPanel() {
 
       <CloudAuthSection />
 
+      <div className="rounded-md border border-border p-3">
+        <p className="m-0 text-sm font-medium">Team setup guide</p>
+        <p className="mt-1 text-xs text-muted">
+          Walk through workspace creation, billing, brand kit, and invites.
+        </p>
+        <Button
+          type="button"
+          size="sm"
+          className="mt-2"
+          onClick={() => {
+            void loadTeamOnboardingState().then((state) => {
+              setOnboardingStep(state.step);
+              setOnboardingOpen(true);
+            });
+          }}
+        >
+          Open setup guide
+        </Button>
+      </div>
+
       <TeamSection />
+
+      <TeamOnboardingWizard
+        open={onboardingOpen}
+        initialStep={onboardingStep}
+        onClose={() => setOnboardingOpen(false)}
+        onCompleted={() => setOnboardingOpen(false)}
+      />
 
       <IntegrationsSection />
 

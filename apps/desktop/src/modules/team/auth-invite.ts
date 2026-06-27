@@ -1,6 +1,7 @@
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { getValidAccessToken, startAuthLoginWithOrganization } from '@/modules/cloud/auth';
 import { useCloudAuthStore } from '@/modules/cloud/store';
+import { createBillingPortalSession } from './api';
 import { useTeamStore } from './store';
 
 export function parseTeamInviteUrl(url: string): string | null {
@@ -42,6 +43,7 @@ export async function flushPendingTeamInvite(): Promise<void> {
   await useTeamStore.getState().acceptInviteToken(token);
 }
 
-export async function openBillingPortal(customerId: string): Promise<void> {
-  await openUrl(`https://dashboard.stripe.com/test/customers/${customerId}`);
+export async function openBillingPortal(workspaceId: string): Promise<void> {
+  const session = await createBillingPortalSession(workspaceId);
+  await openUrl(session.url);
 }

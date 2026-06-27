@@ -1,0 +1,9 @@
+{
+  "extends": "@snapglow/typescript-config/base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node", "vscode"]
+  },
+  "include": ["src"]
+}
