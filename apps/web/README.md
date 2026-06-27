@@ -1,5 +1,18 @@
 Welcome to your new TanStack Start app! 
 
+# SnapGlow Web (`@snapglow/web`)
+
+Marketing landing (TanStack Start + Nitro) and **public share viewer** for cloud links (Sprint 2b.5).
+
+| Route | Purpose |
+|-------|---------|
+| `/` | Landing page |
+| `/s/:token` | Public viewer for shared captures (SSR loader → `apps/api`) |
+
+Env: copy `.env.example` → `.env.local` (`API_URL` for SSR, `VITE_API_URL` optional client-side).
+
+Dev: `mise run dev:web` (port 3000). API must be running for share viewer (`mise run dev:api`).
+
 # Getting Started
 
 To run this application:

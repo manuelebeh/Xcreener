@@ -760,16 +760,25 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | CL-001 | Setup backend API (Fastify) + PostgreSQL + Redis ; ajouter `dev:api` dans `mise.toml` | P0 | 3j | - |
-| `[ ]` | CL-002 | Setup stockage fichiers (Cloudflare R2) | P0 | 2j | CL-001 |
-| `[ ]` | CL-003 | Système d'authentification (Clerk/Auth0 - OAuth2) | P0 | 2j | CL-001 |
-| `[ ]` | CL-004 | Upload automatique + génération de lien partageable | P0 | 2j | CL-002 |
-| `[ ]` | CL-005 | Page de visualisation publique du lien partagé | P0 | 2j | CL-004 |
-| `[ ]` | CL-006 | Expiration configurable des liens (1h, 24h, 7j, permanent) | P1 | 1j | CL-004 |
+| `[x]` (2026-06-27) | CL-001 | Setup backend API (Fastify) + PostgreSQL + Redis ; ajouter `dev:api` dans `mise.toml` | P0 | 3j | - |
+| `[x]` (2026-06-27) | CL-002 | Setup stockage fichiers (Cloudflare R2) | P0 | 2j | CL-001 |
+| `[x]` (2026-06-27) | CL-003 | Système d'authentification (Clerk/Auth0 - OAuth2) | P0 | 2j | CL-001 |
+| `[x]` (2026-06-27) | CL-004 | Upload automatique + génération de lien partageable | P0 | 2j | CL-002 |
+| `[x]` (2026-06-27) | CL-005 | Page de visualisation publique du lien partagé | P0 | 2j | CL-004 |
+| `[x]` (2026-06-27) | CL-006 | Expiration configurable des liens (1h, 24h, 7j, permanent) | P1 | 1j | CL-004 |
+
+**Livraison (2026-06-27)**
+
+- **`apps/api`** : Fastify 5, Drizzle/Postgres, Redis rate limit, MinIO dev / R2 prod (`StorageService`), Auth0 JWT (JWKS), `POST/GET /v1/shares`, `GET /health`, docker-compose, `mise run dev:api`
+- **`packages/cloud-core`** : types partagés, expiry helpers, tests Vitest
+- **Desktop** : `modules/cloud/` Auth0 PKCE + deep link `snapglow://auth/callback`, Settings sign-in, ExportBar **Share link** (consentement dialog + expiry select + clipboard)
+- **Web** : route `/s/$token` viewer SSR (image/vidéo, OG image, 404/410)
+- **ADR-009**, `.agents/rules/api.md`
 
 **Reporté**
 
 - **Terraform GCP + Docker infra** - infra cloud gérée manuellement ou via PaaS en premier temps.
+- **Mobile cloud share** (API prête)
 
 **Critères de validation**
 

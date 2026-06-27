@@ -13,6 +13,8 @@ format = "pnpm turbo format"
 "dev:mobile" = "pnpm --filter @snapglow/mobile dev"
 "dev:mobile:ios" = "pnpm --filter @snapglow/mobile ios"
 "dev:mobile:android" = "pnpm --filter @snapglow/mobile android"
+"api:infra" = "docker compose -f apps/api/docker-compose.yml up -d"
+"dev:api" = { depends = ["api:infra"], run = "pnpm --filter @snapglow/api dev" }
 "build:mobile:preview" = "pnpm --filter @snapglow/mobile exec eas build --profile preview --platform all"
 "build:mobile:production" = "pnpm --filter @snapglow/mobile exec eas build --profile production --platform all"
 "tokens:build" = "pnpm --filter @snapglow/design-tokens build"

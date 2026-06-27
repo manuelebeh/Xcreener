@@ -7,7 +7,7 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Area | Choice |
 |------|--------|
 | Monorepo | pnpm workspaces + Turborepo |
-| Dev CLI | [mise](https://mise.jdx.dev/) - `dev:desktop`, `dev:web`, `dev:mobile`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
+| Dev CLI | [mise](https://mise.jdx.dev/) - `dev:desktop`, `dev:web`, `dev:mobile`, `dev:api`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
 | Desktop | Tauri v2, React 19, Vite, TypeScript |
 | Web | TanStack Start, Nitro, Tailwind v4 |
 | Mobile | Expo SDK 56, Expo Router, development builds |
@@ -22,8 +22,10 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 
 ```
 apps/desktop/          Tauri app (@snapglow/desktop)
-apps/web/              Landing (@snapglow/web)
+apps/web/              Landing + public share viewer (@snapglow/web)
 apps/mobile/           Expo app (@snapglow/mobile)
+apps/api/              Fastify API — cloud shares (@snapglow/api)
+packages/cloud-core/   Share types, expiry helpers (api + web + desktop)
 packages/design-tokens/  DTCG tokens → CSS + tokens.native
 packages/editor-core/    Shared editor logic (layout, presets, annotations)
 packages/redaction-core/ Shared on-device detectors + mapRegionToLayout (desktop + mobile)
@@ -44,6 +46,7 @@ mise run tokens:build   # before first dev if tokens dist missing
 mise run dev:desktop    # Tauri dev
 mise run dev:web        # Landing (port 3000)
 mise run dev:mobile     # Expo dev client
+mise run dev:api        # Fastify + Postgres + Redis + MinIO (see apps/api/.env.example)
 mise run storybook      # UI components (port 6006)
 mise run lint
 mise run typecheck
@@ -60,7 +63,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 
 ## Architecture
 
-- **Modules:** `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings}/`
+- **Modules:** `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings,cloud}/`
 - **ADR-001:** monorepo + modules
 - **ADR-002:** design tokens + UI + web
 - **Design system (desktop):** `design.md` - layout, typography, tokens mapping (Hallmark locked, Sprint 1.6)
@@ -82,6 +85,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 2b.2** : `@snapglow/ocr-core`, OCR copy-text desktop (`recognize_text_command`), UI `TextExtractionBar`, auto-crop (`detect_content_bounds_command`), compression export (`compress_export_bytes_command`)
 - **Sprint 2b.3** : capture scrollante viewport (`capture_scrolling_window_command`, Home + Page Down + stitch), timer différé + mode Menu (`capture_native_command`), HUD progress + `stop_scrolling_capture_command`, ADR-007 — **QA OK**, améliorations stitch en backlog
 - **Sprint 2b.4** : enregistrement zone GIF ≤ 8 s / MP4 ≤ 30 s (`start/pause/resume/stop_region_recording_command`, `capture/record/`), SCK macOS (`macos_record.rs`) + polling Windows, GIF grille 20 fps + imagequant (qualité low/medium/high), MP4 H.264 CFR (`encode_mp4.rs`, openh264), overlay Photo/Video + HUD pause/stop, sauvegarde + historique + lecteur OS (`capture-recording-complete`, `open_path_command`), ADR-008 — **QA OK** macOS/Windows
+- **Sprint 2b.5** : `apps/api` Fastify + Postgres + Redis + R2/MinIO ; Auth0 JWT ; upload desktop → lien `/s/:token` ; viewer TanStack Start ; expiration 1h/24h/7j/permanent — `@snapglow/cloud-core`, `modules/cloud/`, ADR-009
 
 ## Agent conventions
 

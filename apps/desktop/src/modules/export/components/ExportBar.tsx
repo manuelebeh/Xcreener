@@ -1,6 +1,12 @@
 import { Button, Label, Select, Slider } from '@snapglow/ui';
+import { SHARE_EXPIRY_LABELS, SHARE_EXPIRY_OPTIONS, type ShareExpiry } from '@snapglow/cloud-core';
+import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { ask } from '@tauri-apps/plugin-dialog';
 import { useCallback, useRef, useState } from 'react';
 import { captureExportCompleted } from '@/integrations/posthog/events';
+import { isCloudConfigured } from '@/modules/cloud/config';
+import { useCloudAuthStore } from '@/modules/cloud/store';
+import { uploadShare } from '@/modules/cloud/uploadShare';
 import { useEditorStore } from '@/modules/editor/store';
 import { useExportRender } from '../hooks/useExportRender';
 import { useExportStore } from '../store';
@@ -12,19 +18,23 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
   const screenshot = useEditorStore((s) => s.screenshot);
   const format = useExportStore((s) => s.format);
   const quality = useExportStore((s) => s.quality);
+  const shareExpiry = useExportStore((s) => s.shareExpiry);
   const isExporting = useExportStore((s) => s.isExporting);
   const lastMessage = useExportStore((s) => s.lastMessage);
   const setFormat = useExportStore((s) => s.setFormat);
   const setQuality = useExportStore((s) => s.setQuality);
+  const setShareExpiry = useExportStore((s) => s.setShareExpiry);
   const setIsExporting = useExportStore((s) => s.setIsExporting);
   const setLastMessage = useExportStore((s) => s.setLastMessage);
+  const isAuthenticated = useCloudAuthStore((s) => s.isAuthenticated);
+  const cloudConfigured = isCloudConfigured();
 
   const { exportImage } = useExportRender();
   const dragBlobRef = useRef<Blob | null>(null);
   const [dragReady, setDragReady] = useState(false);
 
   const runExport = useCallback(
-    async (action: 'save' | 'copy' | 'drag') => {
+    async (action: 'save' | 'copy' | 'drag' | 'share') => {
       if (!screenshot || isExporting) {
         return;
       }
@@ -58,6 +68,37 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
           return;
         }
 
+        if (action === 'share') {
+          if (!isAuthenticated) {
+            setLastMessage('Sign in to SnapGlow cloud in Settings before sharing');
+            return;
+          }
+
+          const confirmed = await ask(
+            'Upload this capture to SnapGlow cloud and create a shareable link?',
+            {
+              title: 'Share to cloud',
+              kind: 'info',
+              okLabel: 'Upload',
+              cancelLabel: 'Cancel',
+            }
+          );
+
+          if (!confirmed) {
+            setLastMessage('Cloud upload cancelled');
+            return;
+          }
+
+          const share = await uploadShare(
+            result.blob,
+            shareExpiry,
+            `snapglow-export.${format}`
+          );
+          await writeText(share.url);
+          setLastMessage(`Share link copied · ${share.url}${compressionMessage}`);
+          return;
+        }
+
         dragBlobRef.current = result.blob;
         setDragReady(true);
         setLastMessage(`Drag the handle to another app${compressionMessage}`);
@@ -68,7 +109,17 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         setIsExporting(false);
       }
     },
-    [exportImage, format, isExporting, quality, screenshot, setIsExporting, setLastMessage]
+    [
+      exportImage,
+      format,
+      isAuthenticated,
+      isExporting,
+      quality,
+      screenshot,
+      setIsExporting,
+      setLastMessage,
+      shareExpiry,
+    ]
   );
 
   const handleDragStart = useCallback(
@@ -92,13 +143,26 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
     return null;
   }
 
+  const shareButton = cloudConfigured ? (
+    <Button
+      type="button"
+      size="sm"
+      variant="secondary"
+      onClick={() => runExport('share')}
+      disabled={isExporting}
+      data-testid="export-share-button"
+    >
+      Share link
+    </Button>
+  ) : null;
+
   const content = (
     <div className="w-full space-y-3" data-testid="export-bar">
       {!embedded ? (
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-foreground">Export</p>
-            <p className="text-xs text-muted">PNG, JPG, WebP · copy · drag-out</p>
+            <p className="text-xs text-muted">PNG, JPG, WebP · copy · drag-out · cloud link</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -130,6 +194,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
             >
               Prepare drag
             </Button>
+            {shareButton}
           </div>
         </div>
       ) : (
@@ -163,6 +228,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
           >
             Prepare drag
           </Button>
+          {shareButton}
         </div>
       )}
 
@@ -194,6 +260,24 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
               onValueChange={(value) => setQuality(value[0] ?? quality)}
               data-testid="export-quality-slider"
             />
+          </div>
+        ) : null}
+
+        {cloudConfigured ? (
+          <div className="space-y-1">
+            <Label htmlFor="share-expiry">Link expiry</Label>
+            <Select
+              id="share-expiry"
+              value={shareExpiry}
+              onChange={(event) => setShareExpiry(event.target.value as ShareExpiry)}
+              data-testid="share-expiry-select"
+            >
+              {SHARE_EXPIRY_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {SHARE_EXPIRY_LABELS[option]}
+                </option>
+              ))}
+            </Select>
           </div>
         ) : null}
       </div>

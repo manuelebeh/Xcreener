@@ -31,7 +31,7 @@ body:
         - Desktop - export
         - Desktop - settings / privacy
         - Desktop - cross-cutting (shell, IPC, SQLite)
-        - Web landing (apps/web - Astro)
+        - Web landing + share viewer (apps/web - TanStack Start)
         - Mobile (apps/mobile - Expo)
         - API / cloud (apps/api - Fastify)
         - Packages (design-tokens, i18n, shared config)
