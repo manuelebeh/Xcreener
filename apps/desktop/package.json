@@ -27,6 +27,7 @@
     "@snapglow/collab-core": "workspace:*",
     "@snapglow/integrations-core": "workspace:*",
     "@snapglow/editor-core": "workspace:*",
+    "@snapglow/render-core": "workspace:*",
     "@snapglow/ocr-core": "workspace:*",
     "@snapglow/redaction-core": "workspace:*",
     "@snapglow/style-suggestion-core": "workspace:*",

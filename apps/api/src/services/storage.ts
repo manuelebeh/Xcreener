@@ -1,5 +1,6 @@
 import {
   CreateBucketCommand,
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
   PutObjectCommand,
@@ -53,5 +54,30 @@ export class StorageService {
       Key: key,
     });
     return getSignedUrl(this.client, command, { expiresIn: expiresInSeconds });
+  }
+
+  async getObject(key: string): Promise<Buffer> {
+    const response = await this.client.send(
+      new GetObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      })
+    );
+
+    if (!response.Body) {
+      throw new Error(`Object not found: ${key}`);
+    }
+
+    const bytes = await response.Body.transformToByteArray();
+    return Buffer.from(bytes);
+  }
+
+  async deleteObject(key: string): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      })
+    );
   }
 }

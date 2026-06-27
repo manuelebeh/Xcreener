@@ -28,8 +28,7 @@ export async function createNotification(
     throw new Error('Failed to create notification');
   }
 
-  const documentId =
-    typeof input.payload.documentId === 'string' ? input.payload.documentId : null;
+  const documentId = typeof input.payload.documentId === 'string' ? input.payload.documentId : null;
   if (documentId) {
     await collabRoomHub.publish(documentId, {
       type: 'notification:created',
@@ -133,9 +132,7 @@ export async function sendCommentNotificationEmails(
     .select({ id: schema.users.id, email: schema.users.email })
     .from(schema.users);
 
-  const mentioned = users.filter(
-    (user) => options.mentionUserIds.includes(user.id) && user.email
-  );
+  const mentioned = users.filter((user) => options.mentionUserIds.includes(user.id) && user.email);
 
   await Promise.all(
     mentioned.map((user) =>
