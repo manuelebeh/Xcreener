@@ -24,8 +24,9 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 apps/desktop/          Tauri app (@snapglow/desktop)
 apps/web/              Landing + public share viewer (@snapglow/web)
 apps/mobile/           Expo app (@snapglow/mobile)
-apps/api/              Fastify API — cloud shares (@snapglow/api)
-packages/cloud-core/   Share types, expiry helpers (api + web + desktop)
+apps/api/              Fastify API — cloud shares + library (@snapglow/api)
+packages/cloud-core/   Share + library types, expiry helpers (api + web + desktop)
+packages/integrations-core/  Integration provider types, OAuth scopes (api + desktop)
 packages/design-tokens/  DTCG tokens → CSS + tokens.native
 packages/editor-core/    Shared editor logic (layout, presets, annotations)
 packages/redaction-core/ Shared on-device detectors + mapRegionToLayout (desktop + mobile)
@@ -86,6 +87,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 2b.3** : capture scrollante viewport (`capture_scrolling_window_command`, Home + Page Down + stitch), timer différé + mode Menu (`capture_native_command`), HUD progress + `stop_scrolling_capture_command`, ADR-007 — **QA OK**, améliorations stitch en backlog
 - **Sprint 2b.4** : enregistrement zone GIF ≤ 8 s / MP4 ≤ 30 s (`start/pause/resume/stop_region_recording_command`, `capture/record/`), SCK macOS (`macos_record.rs`) + polling Windows, GIF grille 20 fps + imagequant (qualité low/medium/high), MP4 H.264 CFR (`encode_mp4.rs`, openh264), overlay Photo/Video + HUD pause/stop, sauvegarde + historique + lecteur OS (`capture-recording-complete`, `open_path_command`), ADR-008 — **QA OK** macOS/Windows
 - **Sprint 2b.5** : `apps/api` Fastify + Postgres + Redis + R2/MinIO ; Auth0 JWT ; upload desktop → lien `/s/:token` ; viewer TanStack Start ; expiration 1h/24h/7j/permanent — `@snapglow/cloud-core`, `modules/cloud/`, ADR-009
+- **Sprint 2b.6** : `@snapglow/integrations-core`, OAuth proxy API, Send to… (Slack/Notion/Linear/GitHub), Library FTS + cloud sync, tags/collections, watermark export — ADR-010
 
 ## Agent conventions
 

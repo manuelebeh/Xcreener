@@ -1,17 +1,24 @@
 import { useCallback } from 'react';
 import { getPresetById } from '@/modules/editor/engine/presets';
+import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/settings/watermark';
+import { useSettingsStore } from '@/modules/settings/store';
 import { useEditorStore } from '@/modules/editor/store';
 import type { RenderInput } from '@/modules/editor/types';
 import { exportRenderInput } from '../utils/canvasExport';
 import type { ExportFormat } from '../utils/formats';
 
-export function buildRenderInputFromStore(): RenderInput | null {
+export async function buildRenderInputFromStore(): Promise<RenderInput | null> {
   const state = useEditorStore.getState();
   if (!state.screenshot) {
     return null;
   }
 
   const frame = getPresetById(state.selectedPresetId, state.customPresets);
+  const settings = useSettingsStore.getState();
+  const watermark = watermarkFromSettings(settings);
+  const watermarkLogo = watermark.enabled
+    ? await loadWatermarkLogoImage(watermark.logoPath)
+    : null;
 
   return {
     screenshot: state.screenshot,
@@ -23,12 +30,14 @@ export function buildRenderInputFromStore(): RenderInput | null {
     transform: state.transform,
     annotations: state.annotations,
     selectedAnnotationId: null,
+    watermark,
+    watermarkLogo,
   };
 }
 
 export function useExportRender() {
   const exportImage = useCallback(async (format: ExportFormat, quality: number) => {
-    const input = buildRenderInputFromStore();
+    const input = await buildRenderInputFromStore();
     if (!input) {
       throw new Error('No screenshot to export');
     }

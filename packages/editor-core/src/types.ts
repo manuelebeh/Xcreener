@@ -70,6 +70,26 @@ export interface ComputedLayout {
   content: LayoutRect;
 }
 
+export type WatermarkPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+
+export interface WatermarkConfig {
+  enabled: boolean;
+  logoPath?: string | null;
+  displayName?: string | null;
+  url?: string | null;
+  position: WatermarkPosition;
+  opacity: number;
+}
+
+export const DEFAULT_WATERMARK: WatermarkConfig = {
+  enabled: true,
+  logoPath: null,
+  displayName: 'SnapGlow',
+  url: null,
+  position: 'bottom-right',
+  opacity: 0.45,
+};
+
 export interface RenderInput {
   screenshot: ScreenshotDimensions;
   background: BackgroundConfig;
@@ -80,6 +100,7 @@ export interface RenderInput {
   transform: ScreenshotTransform;
   annotations: Annotation[];
   selectedAnnotationId: string | null;
+  watermark?: WatermarkConfig;
 }
 
 export const DEFAULT_BORDER_RADIUS = 12;

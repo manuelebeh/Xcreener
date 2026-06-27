@@ -64,3 +64,49 @@ export function isShareExpired(expiresAt: Date | null, now = new Date()): boolea
 export function maxBytesForMime(mimeType: ShareMimeType): number {
   return mimeType === 'video/mp4' ? MAX_SHARE_VIDEO_BYTES : MAX_SHARE_IMAGE_BYTES;
 }
+
+export const ALLOWED_LIBRARY_MIME_TYPES = ALLOWED_SHARE_MIME_TYPES;
+export type LibraryMimeType = ShareMimeType;
+
+export const MAX_LIBRARY_ITEM_BYTES = MAX_SHARE_IMAGE_BYTES;
+
+export interface LibraryItemResponse {
+  id: string;
+  title: string | null;
+  mimeType: string;
+  byteSize: number;
+  ocrText: string | null;
+  tags: string[];
+  localId: string | null;
+  collectionIds: string[];
+  assetUrl: string;
+  createdAt: string;
+}
+
+export interface CreateLibraryItemResponse {
+  id: string;
+  localId: string | null;
+  createdAt: string;
+}
+
+export interface LibrarySearchResponse {
+  items: LibraryItemResponse[];
+  total: number;
+}
+
+export interface CollectionResponse {
+  id: string;
+  name: string;
+  createdAt: string;
+  itemCount: number;
+}
+
+export interface CreateCollectionResponse {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export function maxBytesForLibraryMime(mimeType: LibraryMimeType): number {
+  return maxBytesForMime(mimeType);
+}

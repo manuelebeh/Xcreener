@@ -94,9 +94,9 @@ function createMinimalRenderInput(): RenderInput {
 }
 
 describe('exportRender', () => {
-  it('renders at screenshot dimensions plus padding in free mode', () => {
+  it('renders at screenshot dimensions plus padding in free mode', async () => {
     const input = createMinimalRenderInput();
-    const { width, height } = renderToExportCanvas(input);
+    const { width, height } = await renderToExportCanvas(input);
     expect(width).toBe(448);
     expect(height).toBe(348);
   });
