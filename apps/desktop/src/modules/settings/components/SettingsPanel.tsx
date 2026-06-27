@@ -6,6 +6,7 @@ import { captureTestEvent } from '@/integrations/posthog/events';
 import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/useGlobalShortcut';
 import { CloudAuthSection } from '@/modules/cloud/components/CloudAuthSection';
+import { TeamSection } from '@/modules/team/components/TeamSection';
 import { IntegrationsSection } from '@/modules/integrations/components/IntegrationsSection';
 import { isValidCaptureShortcut, normalizeCaptureShortcut } from '@/shared/lib/shortcut';
 import type { OcrEngineMode, ThemePreference } from '@/shared/types/settings';
@@ -284,6 +285,8 @@ export function SettingsPanel() {
       </div>
 
       <CloudAuthSection />
+
+      <TeamSection />
 
       <IntegrationsSection />
 

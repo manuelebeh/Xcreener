@@ -33,16 +33,23 @@ Chaque sprint se termine par un **récapitulatif indicatif** (livré, en attente
 ```
 apps/
 ├── desktop/     # Tauri v2 - macOS + Windows        (Phase 0–1)
-├── web/         # Landing marketing - TanStack Start + VPS (Sprint 0.2)
+├── web/         # Landing + viewer partage /s/:token (Sprint 0.2, 2b.5)
 ├── mobile/      # React Native Expo - iOS + Android  (Phase 1b)
 └── api/         # Fastify + PostgreSQL + Redis       (Phase 2b)
 packages/
-├── design-tokens/   # SSOT couleurs, spacing (Sprint 0.2) + tokens.native (Sprint 1b.1)
-├── ui/              # Composants React web + Storybook (Sprint 0.2)
-├── ui-native/       # Composants React Native (Sprint 1b.1)
-├── biome-config/    # Biome partagé (Sprint 0.1)
+├── design-tokens/          # SSOT couleurs, spacing (Sprint 0.2) + tokens.native (Sprint 1b.1)
+├── ui/                     # Composants React web + Storybook (Sprint 0.2)
+├── ui-native/              # Composants React Native (Sprint 1b.1)
+├── editor-core/            # Layout, presets, annotations (Sprint 1b.2+)
+├── redaction-core/         # Détecteurs on-device (Sprint 1.5 / 1b.3)
+├── style-suggestion-core/  # Classification contenu → style (Sprint 2b.1)
+├── ocr-core/               # Types OCR + assembly texte (Sprint 2b.2)
+├── cloud-core/             # Shares, expiry, library types (Sprint 2b.5)
+├── integrations-core/      # Providers OAuth Send to… (Sprint 2b.6)
+├── team-core/              # Rôles workspace, plans, brand kit (Sprint 3.1–3.2)
+├── biome-config/           # Biome partagé (Sprint 0.1)
 ├── typescript-config/
-└── i18n/            # SSOT traductions (Phase 4)
+└── i18n/                   # SSOT traductions (Phase 4, planifié)
 ```
 
 **Commandes dev (via mise) :** `mise run dev:desktop` → `mise run dev:web` → `mise run dev:mobile` → `mise run dev:api` (ajoutées au fil des phases).
@@ -782,9 +789,9 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [ ] `mise run dev:api` lance Fastify + Postgres + Redis local
-- [ ] Upload → lien public → page viewer fonctionnels
-- [ ] Expiration liens configurable et respectée
+- [x] `mise run dev:api` lance Fastify + Postgres + Redis local — code livré (docker-compose + mise task)
+- [x] Upload → lien public → page viewer fonctionnels — code livré ; QA E2E manuelle en attente
+- [x] Expiration liens configurable et respectée — code livré ; QA en attente
 
 ### Sprint 2b.6 (Semaines 37–38) - Intégrations & Organisation
 
@@ -834,17 +841,26 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | T-001 | Modèle de données multi-tenant (workspaces, rôles, invitations) | P0 | 4j | CL-001 |
-| `[ ]` | T-002 | UI gestion d'équipe : invitations, rôles (admin/éditeur/viewer) | P0 | 4j | T-001 |
-| `[ ]` | T-003 | Brand kit centralisé : couleurs, polices, logos partagés | P0 | 3j | T-001 |
-| `[ ]` | T-004 | SSO (SAML/OIDC) pour Team Pro | P1 | 3j | CL-003, T-001 |
-| `[ ]` | T-005 | Billing team : intégration Stripe (par siège/mois) | P0 | 3j | T-001 |
+| `[x]` (2026-06-27) | T-001 | Modèle de données multi-tenant (workspaces, rôles, invitations) | P0 | 4j | CL-001 |
+| `[x]` (2026-06-27) | T-002 | UI gestion d'équipe : invitations, rôles (admin/éditeur/viewer) | P0 | 4j | T-001 |
+| `[x]` (2026-06-27) | T-003 | Brand kit centralisé : couleurs, polices, logos partagés | P0 | 3j | T-001 |
+| `[x]` (2026-06-27) | T-004 | SSO (SAML/OIDC) pour Team Pro | P1 | 3j | CL-003, T-001 |
+| `[x]` (2026-06-27) | T-005 | Billing team : intégration Stripe (par siège/mois) | P0 | 3j | T-001 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-011** : multi-tenant, Stripe, SSO Auth0 Organizations, brand kit
+- **`@snapglow/team-core`** : rôles, `can()`, limites plans (`MAX_MEMBERS_TEAM_STARTER=5`)
+- **API** : migration `0002_workspaces.sql`, routes workspaces/members/invitations/brand-kit/billing/sso
+- **Desktop** : `modules/team/` (Settings TeamSection, WorkspaceSwitcher, invite deep link `snapglow://team/invite`, `X-Workspace-Id` on cloud uploads, brand kit fusion on export)
+- **Stripe sandbox** : checkout + webhook handlers ; Customer Portal stub in desktop
+- **SSO** : Auth0 org creation via Management API (optional env) ; PKCE `organization` param when workspace has `auth0_org_id`
 
 **Critères de validation**
 
-- [ ] Workspace créable ; invitations + rôles fonctionnels
-- [ ] Brand kit partagé appliqué aux exports team
-- [ ] Billing Stripe par siège opérationnel (sandbox puis prod)
+- [x] Workspace créable ; invitations + rôles fonctionnels
+- [x] Brand kit partagé appliqué aux exports team (when paid plan + toggle ON)
+- [ ] Billing Stripe par siège opérationnel (sandbox puis prod) — code livré ; QA sandbox manuelle
 
 ### Sprint 3.3–3.4 (Semaines 43–46) - Collaboration temps réel
 

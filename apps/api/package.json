@@ -21,6 +21,7 @@
     "@fastify/sensible": "^6.0.3",
     "@snapglow/cloud-core": "workspace:*",
     "@snapglow/integrations-core": "workspace:*",
+    "@snapglow/team-core": "workspace:*",
     "@t3-oss/env-core": "^0.13.10",
     "drizzle-orm": "^0.44.5",
     "fastify": "^5.6.0",
@@ -28,6 +29,7 @@
     "jose": "^6.1.0",
     "nanoid": "^5.1.5",
     "postgres": "^3.4.7",
+    "stripe": "^18.4.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

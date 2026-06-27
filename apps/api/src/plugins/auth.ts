@@ -9,11 +9,13 @@ export interface AuthUser {
   id: string;
   auth0Sub: string;
   email: string | null;
+  auth0OrgId: string | null;
 }
 
 declare module 'fastify' {
   interface FastifyRequest {
     authUser?: AuthUser;
+    auth0OrgId?: string | null;
   }
 }
 
@@ -44,7 +46,15 @@ export async function authenticateRequest(
     }
 
     const email = typeof payload.email === 'string' ? payload.email : null;
-    request.authUser = { id: '', auth0Sub, email };
+    const auth0OrgId =
+      typeof payload.org_id === 'string'
+        ? payload.org_id
+        : typeof (payload as { orgId?: string }).orgId === 'string'
+          ? (payload as { orgId?: string }).orgId ?? null
+          : null;
+
+    request.authUser = { id: '', auth0Sub, email, auth0OrgId };
+    request.auth0OrgId = auth0OrgId;
   } catch {
     await reply.code(401).send({ error: 'Unauthorized' });
   }
@@ -73,6 +83,7 @@ export async function upsertAuthUser(
         id: updated?.id ?? user.id,
         auth0Sub,
         email: updated?.email ?? email,
+        auth0OrgId: null,
       };
     }
 
@@ -80,6 +91,7 @@ export async function upsertAuthUser(
       id: user.id,
       auth0Sub: user.auth0Sub,
       email: user.email,
+      auth0OrgId: null,
     };
   }
 
@@ -93,5 +105,6 @@ export async function upsertAuthUser(
     id: created.id,
     auth0Sub: created.auth0Sub,
     email: created.email,
+    auth0OrgId: null,
   };
 }

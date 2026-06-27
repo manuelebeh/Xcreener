@@ -1,14 +1,15 @@
 # SnapGlow API (`apps/api`)
 
-Fastify backend for cloud sharing (Sprint 2b.5+) and integrations/library (Sprint 2b.6+).
+Fastify backend for cloud sharing (Sprint 2b.5+), integrations/library (Sprint 2b.6+), and team workspaces (Sprint 3.1–3.2+).
 
 ## Stack
 
 - **Fastify 5** — HTTP API
-- **PostgreSQL + Drizzle** — users, shares, library metadata
+- **PostgreSQL + Drizzle** — users, shares, library metadata, workspaces
 - **Redis** — upload rate limiting, share metadata cache
 - **S3-compatible storage** — MinIO (local), Cloudflare R2 (prod)
-- **Auth0 JWT** — Bearer tokens verified via JWKS
+- **Auth0 JWT** — Bearer tokens verified via JWKS; optional `org_id` claim for SSO
+- **Stripe** — Team seat billing (Checkout + webhooks)
 
 ## Dev
 
@@ -35,11 +36,30 @@ pnpm --filter @snapglow/api db:migrate
 | POST | `/v1/collections` | Bearer JWT | Create collection |
 | PATCH | `/v1/collections/:id` | Bearer JWT | Rename collection |
 | DELETE | `/v1/collections/:id` | Bearer JWT | Delete collection |
+| POST | `/v1/workspaces` | Bearer JWT | Create workspace (creator = admin) |
+| GET | `/v1/workspaces` | Bearer JWT | List user workspaces |
+| GET/PATCH | `/v1/workspaces/:id` | viewer/admin | Workspace detail / rename |
+| GET | `/v1/workspaces/:id/members` | viewer | List members |
+| PATCH | `/v1/workspaces/:id/members/:userId` | admin | Change member role |
+| DELETE | `/v1/workspaces/:id/members/:userId` | admin | Remove member |
+| POST | `/v1/workspaces/:id/invitations` | admin | Create signed invite link |
+| POST | `/v1/invitations/:token/accept` | Bearer JWT | Accept invitation |
+| DELETE | `/v1/workspaces/:id/invitations/:id` | admin | Revoke invitation |
+| GET/PUT | `/v1/workspaces/:id/brand-kit` | viewer/admin | Read / upsert brand kit |
+| POST | `/v1/workspaces/:id/brand-kit/logo` | admin | Multipart logo upload |
+| GET | `/v1/workspaces/:id/billing` | admin | Subscription status |
+| POST | `/v1/workspaces/:id/billing/checkout` | admin | Stripe Checkout session |
+| POST | `/v1/billing/webhook` | Stripe sig | Subscription lifecycle events |
+| GET | `/v1/workspaces/:id/sso` | admin | SSO status |
+| POST | `/v1/workspaces/:id/sso/enable` | admin | Enable Auth0 Organization (Team Pro) |
+
+Optional header `X-Workspace-Id` scopes library/share uploads to a team workspace.
 
 ## Conventions
 
 - Env validated with `@t3-oss/env-core` + Zod (`src/env.ts`)
-- Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`
+- Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`, `@snapglow/team-core`
+- Workspace authz via `requireWorkspaceRole` / `can()` from `@snapglow/team-core`
 - Privacy: uploads only from authenticated clients; explicit consent in desktop UI
 - Integration OAuth secrets live in API env only; access tokens stored on desktop
 - Link expiry: `1h`, `24h`, `7d`, `permanent` (see `packages/cloud-core`)
@@ -48,5 +68,6 @@ pnpm --filter @snapglow/api db:migrate
 
 - Public viewer: `apps/web/src/routes/s/$token.tsx`
 - Desktop upload: `apps/desktop/src/modules/cloud/`
+- Desktop team: `apps/desktop/src/modules/team/`
 - Desktop integrations: `apps/desktop/src/modules/integrations/`
-- ADR: `docs/internal/technical/adr/009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`
+- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`

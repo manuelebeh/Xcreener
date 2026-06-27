@@ -56,8 +56,10 @@ export async function loadAppSettings(): Promise<AppSettings> {
     watermarkUrl,
     watermarkLogoPath,
     watermarkPosition,
-    watermarkOpacity,
-  ] = await Promise.all([
+  watermarkOpacity,
+  activeWorkspaceId,
+  useTeamBrandKit,
+] = await Promise.all([
     getSetting(SETTING_KEYS.theme),
     getSetting(SETTING_KEYS.captureShortcut),
     getSetting(SETTING_KEYS.launchAtLogin),
@@ -73,6 +75,8 @@ export async function loadAppSettings(): Promise<AppSettings> {
     getSetting(SETTING_KEYS.watermarkLogoPath),
     getSetting(SETTING_KEYS.watermarkPosition),
     getSetting(SETTING_KEYS.watermarkOpacity),
+    getSetting(SETTING_KEYS.activeWorkspaceId),
+    getSetting(SETTING_KEYS.useTeamBrandKit),
   ]);
 
   const resolvedTheme =
@@ -116,5 +120,7 @@ export async function loadAppSettings(): Promise<AppSettings> {
     watermarkOpacity: Number.isFinite(resolvedWatermarkOpacity)
       ? resolvedWatermarkOpacity
       : DEFAULT_APP_SETTINGS.watermarkOpacity,
+    activeWorkspaceId: activeWorkspaceId ?? DEFAULT_APP_SETTINGS.activeWorkspaceId,
+    useTeamBrandKit: parseBoolean(useTeamBrandKit, DEFAULT_APP_SETTINGS.useTeamBrandKit),
   };
 }
