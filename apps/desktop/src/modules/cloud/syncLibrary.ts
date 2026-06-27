@@ -2,6 +2,7 @@ import type { LibraryItemResponse } from '@snapglow/cloud-core';
 import { readFile } from '@tauri-apps/plugin-fs';
 import { getValidAccessToken } from './auth';
 import { getApiUrl } from './config';
+import { getWorkspaceHeaders } from '@/modules/team/headers';
 import { useCloudAuthStore } from './store';
 
 export interface SyncLibraryInput {
@@ -49,6 +50,7 @@ export function syncCaptureToLibrary(input: SyncLibraryInput): void {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        ...getWorkspaceHeaders(),
       },
       body: formData,
     });

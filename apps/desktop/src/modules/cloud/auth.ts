@@ -11,6 +11,10 @@ interface PendingLogin {
 let pendingLogin: PendingLogin | null = null;
 
 export async function startAuthLogin(): Promise<void> {
+  await startAuthLoginWithOrganization(null);
+}
+
+export async function startAuthLoginWithOrganization(organization: string | null): Promise<void> {
   const config = getAuth0Config();
   const codeVerifier = createCodeVerifier();
   const codeChallenge = await createCodeChallenge(codeVerifier);
@@ -27,6 +31,10 @@ export async function startAuthLogin(): Promise<void> {
     code_challenge_method: 'S256',
     state,
   });
+
+  if (organization) {
+    params.set('organization', organization);
+  }
 
   await openUrl(`https://${config.domain}/authorize?${params.toString()}`);
 }

@@ -20,6 +20,8 @@ const DEFAULT_SETTING_ENTRIES: Record<string, string> = {
   [SETTING_KEYS.watermarkPosition]: DEFAULT_APP_SETTINGS.watermarkPosition,
   [SETTING_KEYS.watermarkOpacity]: String(DEFAULT_APP_SETTINGS.watermarkOpacity),
   [SETTING_KEYS.watermarkLogoPath]: DEFAULT_APP_SETTINGS.watermarkLogoPath,
+  [SETTING_KEYS.activeWorkspaceId]: DEFAULT_APP_SETTINGS.activeWorkspaceId,
+  [SETTING_KEYS.useTeamBrandKit]: String(DEFAULT_APP_SETTINGS.useTeamBrandKit),
 };
 
 const MIGRATIONS: { version: number; sql: string }[] = [

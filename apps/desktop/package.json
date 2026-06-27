@@ -29,6 +29,7 @@
     "@snapglow/ocr-core": "workspace:*",
     "@snapglow/redaction-core": "workspace:*",
     "@snapglow/style-suggestion-core": "workspace:*",
+    "@snapglow/team-core": "workspace:*",
     "@snapglow/typescript-config": "workspace:*",
     "@snapglow/ui": "workspace:*",
     "@tauri-apps/api": "^2",

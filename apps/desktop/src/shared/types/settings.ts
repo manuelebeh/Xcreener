@@ -23,6 +23,8 @@ export interface AppSettings extends WatermarkSettings {
   smartCompression: boolean;
   ocrEngine: OcrEngineMode;
   ocrLanguages: string;
+  activeWorkspaceId: string;
+  useTeamBrandKit: boolean;
 }
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
@@ -41,6 +43,8 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   watermarkLogoPath: '',
   watermarkPosition: 'bottom-right',
   watermarkOpacity: 45,
+  activeWorkspaceId: '',
+  useTeamBrandKit: true,
 };
 
 export const SETTING_KEYS = {
@@ -59,4 +63,7 @@ export const SETTING_KEYS = {
   watermarkLogoPath: 'watermarkLogoPath',
   watermarkPosition: 'watermarkPosition',
   watermarkOpacity: 'watermarkOpacity',
+  activeWorkspaceId: 'activeWorkspaceId',
+  useTeamBrandKit: 'useTeamBrandKit',
+  brandKitCache: 'brandKitCache',
 } as const;

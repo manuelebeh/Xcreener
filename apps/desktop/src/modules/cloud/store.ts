@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { getCloudAccountLabel, getValidAccessToken, signOutCloud, startAuthLogin } from './auth';
+import { getCloudAccountLabel, getValidAccessToken, signOutCloud } from './auth';
 import { isCloudConfigured } from './config';
 
 interface CloudAuthState {
@@ -38,7 +38,10 @@ export const useCloudAuthStore = create<CloudAuthState>((set) => ({
   signIn: async () => {
     set({ isLoading: true, error: null });
     try {
-      await startAuthLogin();
+      const { getActiveWorkspaceAuth0OrgId } = await import('@/modules/team/store');
+      const organization = getActiveWorkspaceAuth0OrgId();
+      const { startAuthLoginWithOrganization } = await import('./auth');
+      await startAuthLoginWithOrganization(organization);
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : String(error),

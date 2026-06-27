@@ -15,6 +15,7 @@ import { customAlphabet } from 'nanoid';
 import * as schema from '../db/schema';
 import { env } from '../env';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
+import { getActiveWorkspaceId, resolveMembership } from '../plugins/workspace-auth';
 import { cacheShareMetadata, checkUploadRateLimit } from '../services/redis';
 import type { StorageService } from '../services/storage';
 
@@ -72,11 +73,20 @@ export async function registerShareRoutes(app: FastifyInstance, options: ShareRo
     const storageKey = `shares/${user.id}/${token}`;
     await options.storage.uploadObject(storageKey, buffer, mimeType);
 
+    const workspaceId = getActiveWorkspaceId(request);
+    if (workspaceId) {
+      const role = await resolveMembership(options.db, workspaceId, user.id);
+      if (!role) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+    }
+
     const expiresAt = computeExpiresAt(expiresRaw);
     const [share] = await options.db
       .insert(schema.shares)
       .values({
         userId: user.id,
+        workspaceId: workspaceId ?? null,
         token,
         storageKey,
         mimeType,

@@ -18,6 +18,7 @@ interface SettingsState extends AppSettings {
   setWatermarkLogoPath: (watermarkLogoPath: string) => void;
   setWatermarkPosition: (watermarkPosition: WatermarkPosition) => void;
   setWatermarkOpacity: (watermarkOpacity: number) => void;
+  setUseTeamBrandKit: (useTeamBrandKit: boolean) => void;
   hydrate: (settings: Partial<AppSettings>) => void;
 }
 
@@ -38,5 +39,6 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setWatermarkLogoPath: (watermarkLogoPath) => set({ watermarkLogoPath }),
   setWatermarkPosition: (watermarkPosition) => set({ watermarkPosition }),
   setWatermarkOpacity: (watermarkOpacity) => set({ watermarkOpacity }),
+  setUseTeamBrandKit: (useTeamBrandKit) => set({ useTeamBrandKit }),
   hydrate: (settings) => set((state) => ({ ...state, ...settings })),
 }));
