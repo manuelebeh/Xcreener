@@ -1,0 +1,381 @@
+openapi: 3.1.0
+info:
+  title: SnapGlow Public API
+  version: 0.1.0-beta.1
+  description: |
+    REST API for automating screenshot upload, beautification, and export.
+    Requires a Team Pro workspace API key (`Authorization: Bearer sg_live_...`).
+servers:
+  - url: http://localhost:8787
+    description: Local development
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: API key
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    CaptureResponse:
+      type: object
+      required:
+        - id
+        - workspaceId
+        - title
+        - mimeType
+        - byteSize
+        - tags
+        - documentState
+        - screenshotUrl
+        - exportUrl
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        workspaceId:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        mimeType:
+          type: string
+        byteSize:
+          type: integer
+        tags:
+          type: array
+          items:
+            type: string
+        documentState:
+          type: object
+        screenshotUrl:
+          type: string
+          format: uri
+        exportUrl:
+          type: string
+          format: uri
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    CaptureListResponse:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaptureResponse'
+        nextCursor:
+          type: string
+          nullable: true
+    BeautifyRequest:
+      type: object
+      required: [documentState]
+      properties:
+        documentState:
+          type: object
+        title:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+    ExportRequest:
+      type: object
+      required: [format]
+      properties:
+        format:
+          type: string
+          enum: [png, jpg, webp]
+        quality:
+          type: integer
+          minimum: 1
+          maximum: 100
+    ExportResponse:
+      type: object
+      required: [exportUrl, format, byteSize, width, height]
+      properties:
+        exportUrl:
+          type: string
+          format: uri
+        format:
+          type: string
+          enum: [png, jpg, webp]
+        byteSize:
+          type: integer
+        width:
+          type: integer
+        height:
+          type: integer
+    ApiKeyResponse:
+      type: object
+      required: [id, name, keyPrefix, createdAt, lastUsedAt, revokedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        keyPrefix:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+        revokedAt:
+          type: string
+          format: date-time
+          nullable: true
+    CreateApiKeyRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+    CreateApiKeyResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiKeyResponse'
+        - type: object
+          required: [key]
+          properties:
+            key:
+              type: string
+              description: Full API key — shown once only
+paths:
+  /v1/public/captures:
+    post:
+      summary: Upload a screenshot capture
+      operationId: uploadCapture
+      tags: [Captures]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                title:
+                  type: string
+                tags:
+                  type: string
+                  description: JSON array or comma-separated tags
+      responses:
+        '201':
+          description: Capture created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptureResponse'
+        '401':
+          description: Invalid API key
+        '429':
+          description: Rate limit exceeded
+    get:
+      summary: List captures
+      operationId: listCaptures
+      tags: [Captures]
+      parameters:
+        - name: cursor
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 50
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: tag
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Capture list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptureListResponse'
+  /v1/public/captures/{id}:
+    get:
+      summary: Get capture metadata
+      operationId: getCapture
+      tags: [Captures]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Capture details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptureResponse'
+        '404':
+          description: Not found
+    patch:
+      summary: Apply beautify configuration
+      operationId: beautifyCapture
+      tags: [Captures]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BeautifyRequest'
+      responses:
+        '200':
+          description: Updated capture
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptureResponse'
+    delete:
+      summary: Delete capture
+      operationId: deleteCapture
+      tags: [Captures]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+  /v1/public/captures/{id}/export:
+    post:
+      summary: Export beautified capture
+      operationId: exportCapture
+      tags: [Captures]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+      responses:
+        '200':
+          description: Export artifact URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResponse'
+  /v1/workspaces/{id}/api-keys:
+    get:
+      summary: List workspace API keys
+      operationId: listApiKeys
+      tags: [API Keys]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: API keys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApiKeyResponse'
+    post:
+      summary: Create workspace API key
+      operationId: createApiKey
+      tags: [API Keys]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApiKeyRequest'
+      responses:
+        '201':
+          description: API key created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateApiKeyResponse'
+  /v1/workspaces/{id}/api-keys/{keyId}:
+    delete:
+      summary: Revoke API key
+      operationId: revokeApiKey
+      tags: [API Keys]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: keyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Revoked

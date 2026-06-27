@@ -72,6 +72,10 @@ export function isPaidPlan(plan: WorkspacePlan): boolean {
   return plan === 'team_starter' || plan === 'team_pro';
 }
 
+export function hasApiAccess(plan: WorkspacePlan): boolean {
+  return plan === 'team_pro';
+}
+
 export function maxMembersForPlan(plan: WorkspacePlan): number | null {
   switch (plan) {
     case 'free':

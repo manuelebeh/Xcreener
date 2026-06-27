@@ -4,16 +4,19 @@ import sensible from '@fastify/sensible';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import Fastify from 'fastify';
 import type * as schema from './db/schema';
+import { registerCollabWebSocket } from './plugins/collab-ws';
+import { registerOpenApiDocs } from './plugins/openapi-docs';
+import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
+import { registerApiKeyRoutes } from './routes/api-keys';
 import { registerBillingRoutes } from './routes/billing';
 import { registerCollabRoutes } from './routes/collab';
 import { registerCollectionRoutes } from './routes/collections';
 import { registerHealthRoutes } from './routes/health';
 import { registerIntegrationRoutes } from './routes/integrations';
 import { registerLibraryRoutes } from './routes/library';
+import { registerPublicCaptureRoutes } from './routes/public-captures';
 import { registerShareRoutes } from './routes/shares';
 import { registerWorkspaceRoutes } from './routes/workspaces';
-import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
-import { registerCollabWebSocket } from './plugins/collab-ws';
 import { StorageService } from './services/storage';
 
 interface BuildAppOptions {
@@ -52,6 +55,9 @@ export async function buildApp(options: BuildAppOptions) {
   await registerBillingRoutes(app, { db: options.db });
   await registerCollabRoutes(app, { db: options.db, storage });
   await registerCollabWebSocket(app, { db: options.db });
+  await registerApiKeyRoutes(app, { db: options.db });
+  await registerPublicCaptureRoutes(app, { db: options.db, storage });
+  await registerOpenApiDocs(app);
 
   return app;
 }

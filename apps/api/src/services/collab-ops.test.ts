@@ -1,6 +1,6 @@
+import type { CollabDocumentState } from '@snapglow/collab-core';
 import { describe, expect, it } from 'vitest';
 import { applyAnnotationOp } from './collab-ops';
-import type { CollabDocumentState } from '@snapglow/collab-core';
 
 const baseState: CollabDocumentState = {
   screenshotWidth: 800,

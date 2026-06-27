@@ -1,0 +1,30 @@
+{
+  "name": "@snapglow/sdk",
+  "version": "0.1.0-beta.1",
+  "private": false,
+  "type": "module",
+  "description": "Official SnapGlow REST API client",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'source-only package'",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@snapglow/api-core": "workspace:*",
+    "@snapglow/collab-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

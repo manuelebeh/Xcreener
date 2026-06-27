@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   can,
   canAddMember,
+  hasApiAccess,
   hasMinRole,
   isInvitationExpired,
   isPaidPlan,
@@ -32,6 +33,14 @@ describe('team-core permissions', () => {
     expect(can('viewer', 'collab:read')).toBe(true);
     expect(can('viewer', 'collab:edit')).toBe(false);
     expect(can('viewer', 'comments:create')).toBe(true);
+  });
+});
+
+describe('team-core api access', () => {
+  it('grants api access only to team pro', () => {
+    expect(hasApiAccess('team_pro')).toBe(true);
+    expect(hasApiAccess('team_starter')).toBe(false);
+    expect(hasApiAccess('free')).toBe(false);
   });
 });
 

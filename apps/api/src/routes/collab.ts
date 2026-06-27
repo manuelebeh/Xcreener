@@ -1,16 +1,13 @@
-import {
-  ALLOWED_SHARE_MIME_TYPES,
-  type ShareMimeType,
-} from '@snapglow/cloud-core';
+import { ALLOWED_SHARE_MIME_TYPES, type ShareMimeType } from '@snapglow/cloud-core';
 import {
   buildCollabUrl,
-  defaultCollabDocumentState,
-  parseMentionEmails,
   type CollabDocumentResponse,
   type CollabDocumentState,
   type CommentResponse,
   type CreateCollabDocumentResponse,
+  defaultCollabDocumentState,
   type NotificationResponse,
+  parseMentionEmails,
 } from '@snapglow/collab-core';
 import { can, isPaidPlan, type WorkspaceRole } from '@snapglow/team-core';
 import { and, desc, eq, isNull } from 'drizzle-orm';
@@ -231,62 +228,70 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
     return reply.code(201).send(response);
   });
 
-  app.get('/v1/collab/documents/:id', { preHandler: authenticateRequest }, async (request, reply) => {
-    const authUser = request.authUser;
-    if (!authUser) {
-      return reply.code(401).send({ error: 'Unauthorized' });
-    }
+  app.get(
+    '/v1/collab/documents/:id',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
 
-    const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
-    const { id } = request.params as { id: string };
-    const access = await resolveDocumentAccess(options.db, id, user.id);
-    if (!access) {
-      return reply.code(404).send({ error: 'Document not found' });
-    }
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      const { id } = request.params as { id: string };
+      const access = await resolveDocumentAccess(options.db, id, user.id);
+      if (!access) {
+        return reply.code(404).send({ error: 'Document not found' });
+      }
 
-    return reply.send(await toDocumentResponse(options.db, options.storage, access.doc));
-  });
-
-  app.patch('/v1/collab/documents/:id', { preHandler: authenticateRequest }, async (request, reply) => {
-    const authUser = request.authUser;
-    if (!authUser) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+      return reply.send(await toDocumentResponse(options.db, options.storage, access.doc));
     }
+  );
 
-    const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
-    const { id } = request.params as { id: string };
-    const access = await resolveDocumentAccess(options.db, id, user.id);
-    if (!access) {
-      return reply.code(404).send({ error: 'Document not found' });
-    }
-    if (!can(access.role, 'collab:edit')) {
-      return reply.code(403).send({ error: 'Forbidden' });
-    }
+  app.patch(
+    '/v1/collab/documents/:id',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
 
-    const body = request.body as { documentState?: CollabDocumentState; title?: string };
-    const updates: Partial<typeof schema.collabDocuments.$inferInsert> = {
-      updatedAt: new Date(),
-    };
-    if (body.title !== undefined) {
-      updates.title = body.title;
-    }
-    if (body.documentState) {
-      updates.documentState = body.documentState;
-      updates.version = access.doc.version + 1;
-    }
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      const { id } = request.params as { id: string };
+      const access = await resolveDocumentAccess(options.db, id, user.id);
+      if (!access) {
+        return reply.code(404).send({ error: 'Document not found' });
+      }
+      if (!can(access.role, 'collab:edit')) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
 
-    const [updated] = await options.db
-      .update(schema.collabDocuments)
-      .set(updates)
-      .where(eq(schema.collabDocuments.id, id))
-      .returning();
+      const body = request.body as { documentState?: CollabDocumentState; title?: string };
+      const updates: Partial<typeof schema.collabDocuments.$inferInsert> = {
+        updatedAt: new Date(),
+      };
+      if (body.title !== undefined) {
+        updates.title = body.title;
+      }
+      if (body.documentState) {
+        updates.documentState = body.documentState;
+        updates.version = access.doc.version + 1;
+      }
 
-    if (!updated) {
-      return reply.code(404).send({ error: 'Document not found' });
+      const [updated] = await options.db
+        .update(schema.collabDocuments)
+        .set(updates)
+        .where(eq(schema.collabDocuments.id, id))
+        .returning();
+
+      if (!updated) {
+        return reply.code(404).send({ error: 'Document not found' });
+      }
+
+      return reply.send(await toDocumentResponse(options.db, options.storage, updated));
     }
-
-    return reply.send(await toDocumentResponse(options.db, options.storage, updated));
-  });
+  );
 
   app.post(
     '/v1/collab/documents/:id/link-library',
@@ -554,50 +559,58 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
     return reply.send({ notifications });
   });
 
-  app.patch('/v1/notifications/:id/read', { preHandler: authenticateRequest }, async (request, reply) => {
-    const authUser = request.authUser;
-    if (!authUser) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+  app.patch(
+    '/v1/notifications/:id/read',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      const { id } = request.params as { id: string };
+
+      const [updated] = await options.db
+        .update(schema.notifications)
+        .set({ readAt: new Date() })
+        .where(and(eq(schema.notifications.id, id), eq(schema.notifications.userId, user.id)))
+        .returning();
+
+      if (!updated) {
+        return reply.code(404).send({ error: 'Notification not found' });
+      }
+
+      const response: NotificationResponse = {
+        id: updated.id,
+        type: updated.type,
+        payload: updated.payload ?? {},
+        readAt: updated.readAt?.toISOString() ?? null,
+        createdAt: updated.createdAt.toISOString(),
+      };
+
+      return reply.send(response);
     }
+  );
 
-    const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
-    const { id } = request.params as { id: string };
+  app.post(
+    '/v1/notifications/read-all',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
 
-    const [updated] = await options.db
-      .update(schema.notifications)
-      .set({ readAt: new Date() })
-      .where(and(eq(schema.notifications.id, id), eq(schema.notifications.userId, user.id)))
-      .returning();
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      await options.db
+        .update(schema.notifications)
+        .set({ readAt: new Date() })
+        .where(and(eq(schema.notifications.userId, user.id), isNull(schema.notifications.readAt)));
 
-    if (!updated) {
-      return reply.code(404).send({ error: 'Notification not found' });
+      return reply.code(204).send();
     }
-
-    const response: NotificationResponse = {
-      id: updated.id,
-      type: updated.type,
-      payload: updated.payload ?? {},
-      readAt: updated.readAt?.toISOString() ?? null,
-      createdAt: updated.createdAt.toISOString(),
-    };
-
-    return reply.send(response);
-  });
-
-  app.post('/v1/notifications/read-all', { preHandler: authenticateRequest }, async (request, reply) => {
-    const authUser = request.authUser;
-    if (!authUser) {
-      return reply.code(401).send({ error: 'Unauthorized' });
-    }
-
-    const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
-    await options.db
-      .update(schema.notifications)
-      .set({ readAt: new Date() })
-      .where(and(eq(schema.notifications.userId, user.id), isNull(schema.notifications.readAt)));
-
-    return reply.code(204).send();
-  });
+  );
 }
 
-export { applyAnnotationOp, resolveDocumentAccess, ensurePaidWorkspace };
+export { applyAnnotationOp, ensurePaidWorkspace, resolveDocumentAccess };
