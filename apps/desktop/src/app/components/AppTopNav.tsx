@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Editor', end: true },
-  { to: '/history', label: 'History', end: false },
+  { to: '/history', label: 'Library', end: false },
   { to: '/settings', label: 'Settings', end: false },
 ] as const;
 

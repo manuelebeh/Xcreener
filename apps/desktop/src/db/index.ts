@@ -4,6 +4,7 @@ import {
   SETTING_KEYS,
   type OcrEngineMode,
   type ThemePreference,
+  type WatermarkPosition,
 } from '@/shared/types/settings';
 import { DB_URL, getDb } from './connection';
 import { ensureMigrationsApplied } from './migrate';
@@ -50,6 +51,12 @@ export async function loadAppSettings(): Promise<AppSettings> {
     smartCompression,
     ocrEngine,
     ocrLanguages,
+    watermarkEnabled,
+    watermarkDisplayName,
+    watermarkUrl,
+    watermarkLogoPath,
+    watermarkPosition,
+    watermarkOpacity,
   ] = await Promise.all([
     getSetting(SETTING_KEYS.theme),
     getSetting(SETTING_KEYS.captureShortcut),
@@ -60,6 +67,12 @@ export async function loadAppSettings(): Promise<AppSettings> {
     getSetting(SETTING_KEYS.smartCompression),
     getSetting(SETTING_KEYS.ocrEngine),
     getSetting(SETTING_KEYS.ocrLanguages),
+    getSetting(SETTING_KEYS.watermarkEnabled),
+    getSetting(SETTING_KEYS.watermarkDisplayName),
+    getSetting(SETTING_KEYS.watermarkUrl),
+    getSetting(SETTING_KEYS.watermarkLogoPath),
+    getSetting(SETTING_KEYS.watermarkPosition),
+    getSetting(SETTING_KEYS.watermarkOpacity),
   ]);
 
   const resolvedTheme =
@@ -71,6 +84,16 @@ export async function loadAppSettings(): Promise<AppSettings> {
     ocrEngine && ['auto', 'native', 'tesseract'].includes(ocrEngine)
       ? (ocrEngine as OcrEngineMode)
       : DEFAULT_APP_SETTINGS.ocrEngine;
+
+  const resolvedWatermarkPosition =
+    watermarkPosition &&
+    ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(watermarkPosition)
+      ? (watermarkPosition as WatermarkPosition)
+      : DEFAULT_APP_SETTINGS.watermarkPosition;
+
+  const resolvedWatermarkOpacity = watermarkOpacity
+    ? Number.parseInt(watermarkOpacity, 10)
+    : DEFAULT_APP_SETTINGS.watermarkOpacity;
 
   return {
     theme: resolvedTheme,
@@ -85,5 +108,13 @@ export async function loadAppSettings(): Promise<AppSettings> {
     smartCompression: parseBoolean(smartCompression, DEFAULT_APP_SETTINGS.smartCompression),
     ocrEngine: resolvedOcrEngine,
     ocrLanguages: ocrLanguages ?? DEFAULT_APP_SETTINGS.ocrLanguages,
+    watermarkEnabled: parseBoolean(watermarkEnabled, DEFAULT_APP_SETTINGS.watermarkEnabled),
+    watermarkDisplayName: watermarkDisplayName ?? DEFAULT_APP_SETTINGS.watermarkDisplayName,
+    watermarkUrl: watermarkUrl ?? DEFAULT_APP_SETTINGS.watermarkUrl,
+    watermarkLogoPath: watermarkLogoPath ?? DEFAULT_APP_SETTINGS.watermarkLogoPath,
+    watermarkPosition: resolvedWatermarkPosition,
+    watermarkOpacity: Number.isFinite(resolvedWatermarkOpacity)
+      ? resolvedWatermarkOpacity
+      : DEFAULT_APP_SETTINGS.watermarkOpacity,
   };
 }

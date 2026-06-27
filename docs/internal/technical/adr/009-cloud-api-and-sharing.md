@@ -41,7 +41,8 @@ SnapGlow is privacy-first and local-first. Phase 2b adds **optional cloud sharin
 - Cloud is **opt-in** and **additive**; core capture/editor remain on-device
 - CSP / connect-src updated on desktop for Auth0 + API
 - CI runs api lint/typecheck/test without Docker (mocked storage)
-- Future: R2 lifecycle cleanup cron, client-side encryption, mobile share, CL-012 cloud library
+- Future: R2 lifecycle cleanup cron, client-side encryption, mobile share
+- CL-012 hybrid library delivered in Sprint 2b.6 — see ADR-010
 
 ## Alternatives considered
 

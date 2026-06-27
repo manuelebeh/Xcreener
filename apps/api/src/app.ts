@@ -4,7 +4,10 @@ import sensible from '@fastify/sensible';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import Fastify from 'fastify';
 import type * as schema from './db/schema';
+import { registerCollectionRoutes } from './routes/collections';
 import { registerHealthRoutes } from './routes/health';
+import { registerIntegrationRoutes } from './routes/integrations';
+import { registerLibraryRoutes } from './routes/library';
 import { registerShareRoutes } from './routes/shares';
 import { StorageService } from './services/storage';
 
@@ -15,7 +18,7 @@ interface BuildAppOptions {
 
 export async function buildApp(options: BuildAppOptions) {
   const app = Fastify({
-    logger: true,
+    logger: process.env.NODE_ENV === 'test' ? false : true,
     bodyLimit: 100 * 1024 * 1024,
   });
 
@@ -35,6 +38,9 @@ export async function buildApp(options: BuildAppOptions) {
 
   await registerHealthRoutes(app, { db: options.db });
   await registerShareRoutes(app, { db: options.db, storage });
+  await registerIntegrationRoutes(app);
+  await registerLibraryRoutes(app, { db: options.db, storage });
+  await registerCollectionRoutes(app, { db: options.db });
 
   return app;
 }

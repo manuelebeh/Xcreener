@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AppSettings, ThemePreference } from '@/shared/types/settings';
+import type { AppSettings, ThemePreference, WatermarkPosition } from '@/shared/types/settings';
 import { DEFAULT_APP_SETTINGS } from '@/shared/types/settings';
 
 interface SettingsState extends AppSettings {
@@ -12,6 +12,12 @@ interface SettingsState extends AppSettings {
   setSmartCompression: (smartCompression: boolean) => void;
   setOcrEngine: (ocrEngine: AppSettings['ocrEngine']) => void;
   setOcrLanguages: (ocrLanguages: string) => void;
+  setWatermarkEnabled: (watermarkEnabled: boolean) => void;
+  setWatermarkDisplayName: (watermarkDisplayName: string) => void;
+  setWatermarkUrl: (watermarkUrl: string) => void;
+  setWatermarkLogoPath: (watermarkLogoPath: string) => void;
+  setWatermarkPosition: (watermarkPosition: WatermarkPosition) => void;
+  setWatermarkOpacity: (watermarkOpacity: number) => void;
   hydrate: (settings: Partial<AppSettings>) => void;
 }
 
@@ -26,5 +32,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setSmartCompression: (smartCompression) => set({ smartCompression }),
   setOcrEngine: (ocrEngine) => set({ ocrEngine }),
   setOcrLanguages: (ocrLanguages) => set({ ocrLanguages }),
+  setWatermarkEnabled: (watermarkEnabled) => set({ watermarkEnabled }),
+  setWatermarkDisplayName: (watermarkDisplayName) => set({ watermarkDisplayName }),
+  setWatermarkUrl: (watermarkUrl) => set({ watermarkUrl }),
+  setWatermarkLogoPath: (watermarkLogoPath) => set({ watermarkLogoPath }),
+  setWatermarkPosition: (watermarkPosition) => set({ watermarkPosition }),
+  setWatermarkOpacity: (watermarkOpacity) => set({ watermarkOpacity }),
   hydrate: (settings) => set((state) => ({ ...state, ...settings })),
 }));

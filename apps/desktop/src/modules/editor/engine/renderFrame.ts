@@ -6,6 +6,8 @@ import { drawBlurMasks } from './drawBlurMasks';
 import { drawScreenshot } from './drawScreenshot';
 import { drawSelectionHandles } from './drawSelectionHandles';
 import { drawShadow } from './drawShadow';
+import { drawWatermark } from './drawWatermark';
+import { drawWatermark } from './drawWatermark';
 
 export interface RenderResult {
   layout: ComputedLayout;
@@ -15,7 +17,8 @@ export function renderFrame(
   ctx: CanvasRenderingContext2D,
   input: RenderInput,
   pixelRatio = 1,
-  _canvas?: HTMLCanvasElement | OffscreenCanvas
+  _canvas?: HTMLCanvasElement | OffscreenCanvas,
+  watermarkLogo?: CanvasImageSource | null
 ): RenderResult {
   const layout = computeLayout(input);
 
@@ -35,6 +38,10 @@ export function renderFrame(
 
   drawAnnotations(ctx, input.annotations);
 
+  if (input.watermark) {
+    drawWatermark(ctx, input.watermark, layout.canvasWidth, layout.canvasHeight, watermarkLogo);
+  }
+
   if (input.selectedAnnotationId) {
     const selected = input.annotations.find(
       (annotation) => annotation.id === input.selectedAnnotationId
@@ -42,6 +49,10 @@ export function renderFrame(
     if (selected) {
       drawSelectionHandles(ctx, selected);
     }
+  }
+
+  if (input.watermark) {
+    drawWatermark(ctx, layout.canvasWidth, layout.canvasHeight, input.watermark, input.watermarkLogo);
   }
 
   return { layout };

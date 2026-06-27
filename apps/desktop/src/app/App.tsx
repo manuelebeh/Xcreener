@@ -4,6 +4,7 @@ import { CaptureErrorBanner } from '@/modules/capture/components/CaptureErrorBan
 import { CaptureProgressBanner } from '@/modules/capture/components/CaptureProgressBanner';
 import { useCaptureSession } from '@/modules/capture/hooks/useCaptureSession';
 import { useCloudAuthListener } from '@/modules/cloud/hooks/useCloudAuthListener';
+import { useIntegrationsListener } from '@/modules/integrations/hooks/useIntegrationsListener';
 import { AppTopNav } from './components/AppTopNav';
 import { useTrayNavigation } from './hooks/useTrayNavigation';
 import { AppProviders } from './providers';
@@ -15,6 +16,7 @@ function AppShell() {
   useTrayNavigation();
   useCaptureSession();
   useCloudAuthListener();
+  useIntegrationsListener();
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">

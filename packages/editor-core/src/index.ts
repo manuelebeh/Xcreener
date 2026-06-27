@@ -86,10 +86,13 @@ export type {
   ScreenshotDimensions,
   ScreenshotTransform,
   ShadowConfig,
+  WatermarkConfig,
+  WatermarkPosition,
 } from './types';
 export {
   DEFAULT_BACKGROUND,
   DEFAULT_BORDER_RADIUS,
   DEFAULT_SHADOW,
   DEFAULT_TRANSFORM,
+  DEFAULT_WATERMARK,
 } from './types';

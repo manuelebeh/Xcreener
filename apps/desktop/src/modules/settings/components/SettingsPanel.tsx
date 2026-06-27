@@ -5,12 +5,14 @@ import { isAnalyticsActive } from '@/integrations/observability';
 import { captureTestEvent } from '@/integrations/posthog/events';
 import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/useGlobalShortcut';
+import { CloudAuthSection } from '@/modules/cloud/components/CloudAuthSection';
+import { IntegrationsSection } from '@/modules/integrations/components/IntegrationsSection';
 import { isValidCaptureShortcut, normalizeCaptureShortcut } from '@/shared/lib/shortcut';
 import type { OcrEngineMode, ThemePreference } from '@/shared/types/settings';
 import { SETTING_KEYS } from '@/shared/types/settings';
 import { syncAutostart } from '../autostart';
 import { useSettingsStore } from '../store';
-import { CloudAuthSection } from '@/modules/cloud/components/CloudAuthSection';
+import { WatermarkSection } from './WatermarkSection';
 
 export function SettingsPanel() {
   const theme = useSettingsStore((s) => s.theme);
@@ -282,6 +284,10 @@ export function SettingsPanel() {
       </div>
 
       <CloudAuthSection />
+
+      <IntegrationsSection />
+
+      <WatermarkSection />
 
       {!import.meta.env.DEV ? (
         <p className="text-xs text-muted">Analytics are opt-in in production builds.</p>

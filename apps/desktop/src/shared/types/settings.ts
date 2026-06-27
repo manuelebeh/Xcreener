@@ -1,9 +1,19 @@
 export type ThemePreference = 'light' | 'dark' | 'system';
 export type OcrEngineMode = 'auto' | 'native' | 'tesseract';
+export type WatermarkPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 export const DEFAULT_CAPTURE_SHORTCUT = 'CmdOrControl+Shift+KeyS';
 
-export interface AppSettings {
+export interface WatermarkSettings {
+  watermarkEnabled: boolean;
+  watermarkDisplayName: string;
+  watermarkUrl: string;
+  watermarkLogoPath: string;
+  watermarkPosition: WatermarkPosition;
+  watermarkOpacity: number;
+}
+
+export interface AppSettings extends WatermarkSettings {
   theme: ThemePreference;
   captureShortcut: string;
   launchAtLogin: boolean;
@@ -25,6 +35,12 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   smartCompression: true,
   ocrEngine: 'auto',
   ocrLanguages: 'eng',
+  watermarkEnabled: true,
+  watermarkDisplayName: 'SnapGlow',
+  watermarkUrl: '',
+  watermarkLogoPath: '',
+  watermarkPosition: 'bottom-right',
+  watermarkOpacity: 45,
 };
 
 export const SETTING_KEYS = {
@@ -37,4 +53,10 @@ export const SETTING_KEYS = {
   smartCompression: 'smartCompression',
   ocrEngine: 'ocrEngine',
   ocrLanguages: 'ocrLanguages',
+  watermarkEnabled: 'watermarkEnabled',
+  watermarkDisplayName: 'watermarkDisplayName',
+  watermarkUrl: 'watermarkUrl',
+  watermarkLogoPath: 'watermarkLogoPath',
+  watermarkPosition: 'watermarkPosition',
+  watermarkOpacity: 'watermarkOpacity',
 } as const;

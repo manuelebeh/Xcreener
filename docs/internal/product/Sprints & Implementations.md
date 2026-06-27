@@ -790,21 +790,34 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | CL-007 | Intégration Slack (envoi direct depuis l'éditeur) | P0 | 2j | CL-003 |
-| `[ ]` | CL-008 | Intégration Notion | P1 | 2j | CL-003 |
-| `[ ]` | CL-009 | Intégration Linear | P1 | 2j | CL-003 |
-| `[ ]` | CL-010 | Intégration GitHub Issues | P1 | 2j | CL-003 |
-| `[ ]` | CL-011 | Watermark personnalisable (logo, nom, URL) | P1 | 2j | P1-007 |
-| `[ ]` | CL-012 | Bibliothèque de captures avec recherche full-text (OCR) | P0 | 3j | AI-005, P1-034 |
-| `[ ]` | CL-013 | Tags et collections | P1 | 2j | CL-012 |
+| `[x]` (2026-06-27) | CL-007 | Intégration Slack (envoi direct depuis l'éditeur) | P0 | 2j | CL-003 |
+| `[x]` (2026-06-27) | CL-008 | Intégration Notion | P1 | 2j | CL-003 |
+| `[x]` (2026-06-27) | CL-009 | Intégration Linear | P1 | 2j | CL-003 |
+| `[x]` (2026-06-27) | CL-010 | Intégration GitHub Issues | P1 | 2j | CL-003 |
+| `[x]` (2026-06-27) | CL-011 | Watermark personnalisable (logo, nom, URL) | P1 | 2j | P1-007 |
+| `[x]` (2026-06-27) | CL-012 | Bibliothèque de captures avec recherche full-text (OCR) | P0 | 3j | AI-005, P1-034 |
+| `[x]` (2026-06-27) | CL-013 | Tags et collections | P1 | 2j | CL-012 |
 
-**Livrable :** IA on-device, capture scrollante/GIF, cloud avec liens partageables, intégrations.
+**Livraison (2026-06-27)**
+
+- **`packages/integrations-core`** : types providers (Slack, Notion, Linear, GitHub), scopes OAuth, shapes send
+- **`apps/api`** : proxy OAuth `GET/POST /v1/integrations/:provider/*` ; library `POST/GET/PATCH /v1/library`, CRUD `/v1/collections` ; Drizzle `library_items` + `collections` (`drizzle/0001_library.sql`)
+- **Desktop intégrations** : `modules/integrations/` (OAuth via API, tokens SQLite, deep link `snapglow://integrations/callback`), Settings **Integrations**, ExportBar **Send to…** (consentement + picker destination) — Slack channel, Notion page, Linear issue, GitHub issue
+- **Library hybride** : migration SQLite `002_library_ocr.sql` (FTS5 + `ocr_text`), indexation OCR async dans `persistCapture`, UI **Library** (recherche OCR, filtres tag/collection, résultats cloud si Auth0 actif), `syncLibrary.ts`
+- **Watermark** : `WatermarkConfig` (`@snapglow/editor-core`), `drawWatermark.ts`, Settings `WatermarkSection`, inclus export / share / Send to…
+- **ADR-010**, `.agents/rules/api.md`, `apps/api/.env.example` (credentials OAuth par provider)
+
+**Reporté**
+
+- **Mobile** library + intégrations (API prête)
+- **Billing watermark** (toggle stub ; enforcement plan Free/Pro en backlog)
+- **Notion file-upload API** (fallback data-URI ; gros fichiers en backlog)
 
 **Critères de validation**
 
-- [ ] Intégration Slack opérationnelle (envoi depuis éditeur)
-- [ ] Bibliothèque cloud avec recherche OCR
-- [ ] Tags et collections utilisables
+- [ ] Intégration Slack opérationnelle (envoi depuis éditeur) — code livré ; QA OAuth apps requise
+- [ ] Bibliothèque cloud avec recherche OCR — code livré ; QA sync + FTS locale en attente
+- [ ] Tags et collections utilisables — code livré ; QA en attente
 - [ ] Jalon J4 validé (1 000 utilisateurs payants - métrique produit)
 
 ---
