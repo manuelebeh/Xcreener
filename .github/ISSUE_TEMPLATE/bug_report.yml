@@ -19,15 +19,15 @@ body:
       options:
         - Desktop - capture (apps/desktop)
         - Desktop - editor / beautify (apps/desktop)
-        - Desktop - export (apps/desktop)
+        - Desktop - export / cloud share (apps/desktop)
         - Desktop - settings / SQLite (apps/desktop)
         - Desktop - menu bar / system tray / shortcuts
         - Desktop - Tauri / Rust (src-tauri)
         - Monorepo / CI / tooling (mise, Biome, Husky)
         - Documentation
-        - Web (apps/web) - not shipped yet
-        - Mobile (apps/mobile) - not shipped yet
-        - API (apps/api) - not shipped yet
+        - Web (apps/web) - landing + share viewer
+        - Mobile (apps/mobile)
+        - API / cloud (apps/api)
         - Other
     validations:
       required: true

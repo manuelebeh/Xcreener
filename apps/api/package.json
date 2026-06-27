@@ -1,0 +1,42 @@
+{
+  "name": "@snapglow/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "dotenv -e .env.local -- tsx watch src/index.ts",
+    "start": "dotenv -e .env.local -- node --import tsx src/index.ts",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.888.0",
+    "@aws-sdk/s3-request-presigner": "^3.888.0",
+    "@fastify/cors": "^11.1.0",
+    "@fastify/multipart": "^9.2.1",
+    "@fastify/sensible": "^6.0.3",
+    "@snapglow/cloud-core": "workspace:*",
+    "@t3-oss/env-core": "^0.13.10",
+    "drizzle-orm": "^0.44.5",
+    "fastify": "^5.6.0",
+    "ioredis": "^5.7.0",
+    "jose": "^6.1.0",
+    "nanoid": "^5.1.5",
+    "postgres": "^3.4.7",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "@types/node": "^22.10.2",
+    "dotenv-cli": "^11.0.0",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.5",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.4"
+  }
+}

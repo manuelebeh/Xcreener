@@ -10,6 +10,7 @@ import type { OcrEngineMode, ThemePreference } from '@/shared/types/settings';
 import { SETTING_KEYS } from '@/shared/types/settings';
 import { syncAutostart } from '../autostart';
 import { useSettingsStore } from '../store';
+import { CloudAuthSection } from '@/modules/cloud/components/CloudAuthSection';
 
 export function SettingsPanel() {
   const theme = useSettingsStore((s) => s.theme);
@@ -279,6 +280,8 @@ export function SettingsPanel() {
         </label>
         <p className="mt-1 text-xs text-muted">Tesseract language codes joined with +</p>
       </div>
+
+      <CloudAuthSection />
 
       {!import.meta.env.DEV ? (
         <p className="text-xs text-muted">Analytics are opt-in in production builds.</p>
