@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { RemoteCursorsOverlay } from '@/modules/collab/components/RemoteCursorsOverlay';
+import { useCollabPointerPresence } from '@/modules/collab/hooks/useCollabSession';
+import { useCollabStore } from '@/modules/collab/store';
 import { RedactionOverlay } from '@/modules/redaction/components/RedactionOverlay';
 import { TextSelectionOverlay } from '@/modules/text-extraction/components/TextSelectionOverlay';
 import { useSettingsStore } from '@/modules/settings/store';
@@ -71,6 +74,9 @@ export function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [textEditRequest, setTextEditRequest] = useState<TextEditRequest | null>(null);
+  const documentId = useCollabStore((s) => s.documentId);
+  const commentMode = useCollabStore((s) => s.commentMode);
+  const setPendingAnchor = useCollabStore((s) => s.setPendingAnchor);
 
   const frame = useMemo(
     () => (screenshot ? getPresetById(selectedPresetId, customPresets) : null),
@@ -130,6 +136,26 @@ export function Canvas() {
     }
     return displaySize.width / layout.canvasWidth;
   }, [displaySize.width, layout]);
+
+  useCollabPointerPresence(
+    canvasRef,
+    layout?.canvasWidth ?? 0,
+    layout?.canvasHeight ?? 0,
+    displayScale
+  );
+
+  const handleCanvasClick = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!commentMode || !layout) {
+        return;
+      }
+      const rect = event.currentTarget.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / displayScale / layout.canvasWidth;
+      const y = (event.clientY - rect.top) / displayScale / layout.canvasHeight;
+      setPendingAnchor({ x: Math.min(1, Math.max(0, x)), y: Math.min(1, Math.max(0, y)) });
+    },
+    [commentMode, displayScale, layout, setPendingAnchor]
+  );
 
   const handleTextEdit = useCallback((request: TextEditRequest) => {
     setTextEditRequest(request);
@@ -211,6 +237,12 @@ export function Canvas() {
               ref={canvasRef}
               data-testid="editor-canvas"
               className="block h-full w-full touch-none"
+              onClick={handleCanvasClick}
+            />
+            <RemoteCursorsOverlay
+              layoutWidth={layout.canvasWidth}
+              layoutHeight={layout.canvasHeight}
+              displayScale={displayScale}
             />
             <TextEditorOverlay
               request={textEditRequest}

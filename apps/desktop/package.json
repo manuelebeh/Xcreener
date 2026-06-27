@@ -24,6 +24,7 @@
     "@posthog/react": "^1.7.0",
     "@sentry/react": "^10.42.0",
     "@snapglow/cloud-core": "workspace:*",
+    "@snapglow/collab-core": "workspace:*",
     "@snapglow/integrations-core": "workspace:*",
     "@snapglow/editor-core": "workspace:*",
     "@snapglow/ocr-core": "workspace:*",

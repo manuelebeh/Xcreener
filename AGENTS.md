@@ -14,6 +14,7 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Design system | `packages/design-tokens` + `packages/ui` (web) + `packages/ui-native` (RN) |
 | Editor core | `packages/editor-core` — layout, presets, annotations (shared desktop + mobile) |
 | Team core | `packages/team-core` — workspace roles, plans, brand kit types (api + desktop) |
+| Collab core | `packages/collab-core` — WebSocket protocol, comments, notifications (api + desktop + web) |
 | Lint / format | Biome (not ESLint/Prettier) |
 | State | Zustand per module |
 | Local DB | `@tauri-apps/plugin-sql` (SQLite) |
@@ -90,6 +91,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 2b.5** : `apps/api` Fastify + Postgres + Redis + R2/MinIO ; Auth0 JWT ; upload desktop → lien `/s/:token` ; viewer TanStack Start ; expiration 1h/24h/7j/permanent — `@snapglow/cloud-core`, `modules/cloud/`, ADR-009
 - **Sprint 2b.6** : `@snapglow/integrations-core`, OAuth proxy API, Send to… (Slack/Notion/Linear/GitHub), Library FTS + cloud sync, tags/collections, watermark export — ADR-010
 - **Sprint 3.1–3.2** : `@snapglow/team-core`, workspaces/members/invitations API, Stripe seat billing, brand kit, SSO Auth0 Organizations, desktop `modules/team/` — ADR-011
+- **Sprint 3.3–3.4** : `@snapglow/collab-core`, WebSocket collab server, shared annotations + cursors, comments, in-app/email notifications, desktop `modules/collab/`, web `/c/:documentId` — ADR-012
 
 ## Agent conventions
 
