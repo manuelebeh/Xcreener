@@ -1,6 +1,6 @@
 import {
-  computeInvitationExpiresAt,
   type BrandKitConfig,
+  computeInvitationExpiresAt,
   type InvitationResponse,
   isInvitationExpired,
   isMemberLimitReached,
@@ -129,7 +129,10 @@ async function toBrandKitResponse(
   };
 }
 
-export async function registerWorkspaceRoutes(app: FastifyInstance, options: WorkspaceRouteOptions) {
+export async function registerWorkspaceRoutes(
+  app: FastifyInstance,
+  options: WorkspaceRouteOptions
+) {
   app.decorate('db', options.db);
 
   app.post('/v1/workspaces', { preHandler: authenticateRequest }, async (request, reply) => {
@@ -442,72 +445,80 @@ export async function registerWorkspaceRoutes(app: FastifyInstance, options: Wor
     }
   );
 
-  app.post('/v1/invitations/:token/accept', { preHandler: authenticateRequest }, async (request, reply) => {
-    const authUser = request.authUser;
-    if (!authUser) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+  app.post(
+    '/v1/invitations/:token/accept',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+
+      const { token } = request.params as { token: string };
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+
+      const invitationRows = await options.db
+        .select()
+        .from(schema.invitations)
+        .where(eq(schema.invitations.token, token))
+        .limit(1);
+      const invitation = invitationRows[0];
+
+      if (!invitation) {
+        return reply.code(404).send({ error: 'Invitation not found' });
+      }
+
+      if (invitation.acceptedAt) {
+        return reply.code(409).send({ error: 'Invitation already accepted' });
+      }
+
+      if (isInvitationExpired(invitation.expiresAt)) {
+        return reply.code(410).send({ error: 'Invitation expired' });
+      }
+
+      if (invitation.email && user.email?.toLowerCase() !== invitation.email.toLowerCase()) {
+        return reply.code(403).send({ error: 'Email does not match invitation' });
+      }
+
+      const existingMembership = await resolveMembership(
+        options.db,
+        invitation.workspaceId,
+        user.id
+      );
+      if (existingMembership) {
+        return reply.code(409).send({ error: 'Already a workspace member' });
+      }
+
+      const workspaceRows = await options.db
+        .select()
+        .from(schema.workspaces)
+        .where(eq(schema.workspaces.id, invitation.workspaceId))
+        .limit(1);
+      const workspace = workspaceRows[0];
+      if (!workspace) {
+        return reply.code(404).send({ error: 'Workspace not found' });
+      }
+
+      const memberCount = await countWorkspaceMembers(options.db, invitation.workspaceId);
+      if (isMemberLimitReached(workspace.plan, memberCount)) {
+        return reply.code(403).send({ error: 'Member limit reached for workspace plan' });
+      }
+
+      await options.db.insert(schema.workspaceMembers).values({
+        workspaceId: invitation.workspaceId,
+        userId: user.id,
+        role: invitation.role,
+      });
+
+      await options.db
+        .update(schema.invitations)
+        .set({ acceptedAt: new Date() })
+        .where(eq(schema.invitations.id, invitation.id));
+
+      const response = await toWorkspaceResponse(options.db, workspace, invitation.role);
+      return reply.send(response);
     }
-
-    const { token } = request.params as { token: string };
-    const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
-
-    const invitationRows = await options.db
-      .select()
-      .from(schema.invitations)
-      .where(eq(schema.invitations.token, token))
-      .limit(1);
-    const invitation = invitationRows[0];
-
-    if (!invitation) {
-      return reply.code(404).send({ error: 'Invitation not found' });
-    }
-
-    if (invitation.acceptedAt) {
-      return reply.code(409).send({ error: 'Invitation already accepted' });
-    }
-
-    if (isInvitationExpired(invitation.expiresAt)) {
-      return reply.code(410).send({ error: 'Invitation expired' });
-    }
-
-    if (invitation.email && user.email?.toLowerCase() !== invitation.email.toLowerCase()) {
-      return reply.code(403).send({ error: 'Email does not match invitation' });
-    }
-
-    const existingMembership = await resolveMembership(options.db, invitation.workspaceId, user.id);
-    if (existingMembership) {
-      return reply.code(409).send({ error: 'Already a workspace member' });
-    }
-
-    const workspaceRows = await options.db
-      .select()
-      .from(schema.workspaces)
-      .where(eq(schema.workspaces.id, invitation.workspaceId))
-      .limit(1);
-    const workspace = workspaceRows[0];
-    if (!workspace) {
-      return reply.code(404).send({ error: 'Workspace not found' });
-    }
-
-    const memberCount = await countWorkspaceMembers(options.db, invitation.workspaceId);
-    if (isMemberLimitReached(workspace.plan, memberCount)) {
-      return reply.code(403).send({ error: 'Member limit reached for workspace plan' });
-    }
-
-    await options.db.insert(schema.workspaceMembers).values({
-      workspaceId: invitation.workspaceId,
-      userId: user.id,
-      role: invitation.role,
-    });
-
-    await options.db
-      .update(schema.invitations)
-      .set({ acceptedAt: new Date() })
-      .where(eq(schema.invitations.id, invitation.id));
-
-    const response = await toWorkspaceResponse(options.db, workspace, invitation.role);
-    return reply.send(response);
-  });
+  );
 
   app.get(
     '/v1/workspaces/:id/brand-kit',
@@ -710,7 +721,8 @@ export async function registerWorkspaceRoutes(app: FastifyInstance, options: Wor
       const org = await createAuth0Organization(workspace.name, workspace.slug);
       if (!org) {
         return reply.code(503).send({
-          error: 'Auth0 Management API not configured. Create an organization manually in Auth0 dashboard.',
+          error:
+            'Auth0 Management API not configured. Create an organization manually in Auth0 dashboard.',
         });
       }
 

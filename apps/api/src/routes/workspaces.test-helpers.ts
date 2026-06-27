@@ -77,7 +77,11 @@ function createMemoryDb(state: MemoryState, whereCapture: Record<string, unknown
       if (selectContext.fields && 'value' in selectContext.fields) {
         return [{ value: rows.length }];
       }
-      if (selectContext.fields && 'role' in selectContext.fields && !('value' in selectContext.fields)) {
+      if (
+        selectContext.fields &&
+        'role' in selectContext.fields &&
+        !('value' in selectContext.fields)
+      ) {
         const mapped = rows.map((row) => ({ role: row.role }));
         return typeof limit === 'number' ? mapped.slice(0, limit) : mapped;
       }
@@ -302,10 +306,7 @@ export function resetMemoryState(): MemoryState {
   };
 }
 
-export async function buildTestApp(
-  state: MemoryState,
-  whereCapture: Record<string, unknown>
-) {
+export async function buildTestApp(state: MemoryState, whereCapture: Record<string, unknown>) {
   const { buildApp } = await import('../app');
   const db = createMemoryDb(state, whereCapture);
   const storage = {

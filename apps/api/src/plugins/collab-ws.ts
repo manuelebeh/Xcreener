@@ -1,11 +1,11 @@
 import websocket from '@fastify/websocket';
 import {
-  COLLAB_WS_PATH,
-  isCollabClientMessage,
-  participantColor,
   type AnnotationOp,
+  COLLAB_WS_PATH,
   type CollabServerMessage,
+  isCollabClientMessage,
   type ParticipantPresence,
+  participantColor,
 } from '@snapglow/collab-core';
 import { can } from '@snapglow/team-core';
 import { eq } from 'drizzle-orm';
@@ -17,9 +17,9 @@ import * as schema from '../db/schema';
 import { env } from '../env';
 import { upsertAuthUser } from '../plugins/auth';
 import { resolveMembership } from '../plugins/workspace-auth';
+import { ensurePaidWorkspace, resolveDocumentAccess } from '../routes/collab';
 import { applyAnnotationOp } from '../services/collab-ops';
 import { collabRoomHub } from '../services/collab-room';
-import { ensurePaidWorkspace, resolveDocumentAccess } from '../routes/collab';
 
 const jwks = createRemoteJWKSet(new URL(`https://${env.AUTH0_DOMAIN}/.well-known/jwks.json`));
 

@@ -1,3 +1,5 @@
+import type { CollabDocumentState } from '@snapglow/collab-core';
+import type { BrandKitColors, BrandKitFonts, BrandKitWatermark } from '@snapglow/team-core';
 import {
   bigint,
   integer,
@@ -10,8 +12,6 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
-import type { BrandKitColors, BrandKitFonts, BrandKitWatermark } from '@snapglow/team-core';
-import type { CollabDocumentState } from '@snapglow/collab-core';
 
 export const workspacePlanEnum = pgEnum('workspace_plan', ['free', 'team_starter', 'team_pro']);
 export const workspaceRoleEnum = pgEnum('workspace_role', ['admin', 'editor', 'viewer']);
@@ -195,7 +195,10 @@ export const collabDocuments = pgTable('collab_documents', {
   screenshotStorageKey: text('screenshot_storage_key').notNull(),
   screenshotMimeType: text('screenshot_mime_type').notNull(),
   screenshotByteSize: bigint('screenshot_byte_size', { mode: 'number' }).notNull(),
-  documentState: jsonb('document_state').$type<CollabDocumentState>().default({} as CollabDocumentState).notNull(),
+  documentState: jsonb('document_state')
+    .$type<CollabDocumentState>()
+    .default({} as CollabDocumentState)
+    .notNull(),
   version: bigint('version', { mode: 'number' }).default(0).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
@@ -229,6 +232,48 @@ export const notifications = pgTable('notifications', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
+export const apiKeys = pgTable(
+  'api_keys',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    keyPrefix: text('key_prefix').notNull(),
+    keyHash: text('key_hash').notNull(),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex('api_keys_key_hash_idx').on(table.keyHash)]
+);
+
+export const apiCaptures = pgTable('api_captures', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  workspaceId: uuid('workspace_id')
+    .notNull()
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
+  apiKeyId: uuid('api_key_id')
+    .notNull()
+    .references(() => apiKeys.id, { onDelete: 'restrict' }),
+  storageKey: text('storage_key').notNull(),
+  exportStorageKey: text('export_storage_key'),
+  documentState: jsonb('document_state')
+    .$type<CollabDocumentState>()
+    .default({} as CollabDocumentState)
+    .notNull(),
+  mimeType: text('mime_type').notNull(),
+  byteSize: bigint('byte_size', { mode: 'number' }).notNull(),
+  title: text('title'),
+  tags: jsonb('tags').$type<string[]>().default([]).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
 export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
@@ -241,3 +286,5 @@ export type Collection = typeof collections.$inferSelect;
 export type CollabDocument = typeof collabDocuments.$inferSelect;
 export type Comment = typeof comments.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
+export type ApiKey = typeof apiKeys.$inferSelect;
+export type ApiCapture = typeof apiCaptures.$inferSelect;

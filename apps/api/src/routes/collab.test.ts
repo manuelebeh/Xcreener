@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { can } from '@snapglow/team-core';
+import { describe, expect, it } from 'vitest';
 
 describe('collab permissions', () => {
   it('allows editors to edit collab', () => {

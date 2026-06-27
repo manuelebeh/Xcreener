@@ -1,0 +1,27 @@
+{
+  "name": "@snapglow/api-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'source-only package'",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@snapglow/collab-core": "workspace:*",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "@types/node": "^22.10.2",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.4"
+  }
+}

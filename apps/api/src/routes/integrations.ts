@@ -1,13 +1,13 @@
 import {
-  INTEGRATION_REDIRECT_URI,
-  INTEGRATION_SCOPES,
   type AuthorizeIntegrationResponse,
   type ExchangeIntegrationTokenResponse,
+  INTEGRATION_REDIRECT_URI,
+  INTEGRATION_SCOPES,
   type IntegrationProvider,
   isIntegrationProvider,
 } from '@snapglow/integrations-core';
-import { customAlphabet } from 'nanoid';
 import type { FastifyInstance } from 'fastify';
+import { customAlphabet } from 'nanoid';
 import { env } from '../env';
 import { authenticateRequest } from '../plugins/auth';
 
@@ -195,48 +195,56 @@ async function exchangeProviderToken(
 }
 
 export async function registerIntegrationRoutes(app: FastifyInstance) {
-  app.get('/v1/integrations/:provider/authorize', { preHandler: authenticateRequest }, async (request, reply) => {
-    const { provider: rawProvider } = request.params as { provider: string };
-    if (!isIntegrationProvider(rawProvider)) {
-      return reply.code(400).send({ error: 'Unknown integration provider' });
+  app.get(
+    '/v1/integrations/:provider/authorize',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const { provider: rawProvider } = request.params as { provider: string };
+      if (!isIntegrationProvider(rawProvider)) {
+        return reply.code(400).send({ error: 'Unknown integration provider' });
+      }
+
+      const config = providerConfig(rawProvider);
+      if (!config) {
+        return reply.code(503).send({ error: 'Integration provider is not configured' });
+      }
+
+      const state = createState();
+      const response: AuthorizeIntegrationResponse = {
+        authorizeUrl: buildAuthorizeUrl(config, state),
+        state,
+      };
+
+      return reply.send(response);
     }
+  );
 
-    const config = providerConfig(rawProvider);
-    if (!config) {
-      return reply.code(503).send({ error: 'Integration provider is not configured' });
+  app.post(
+    '/v1/integrations/:provider/token',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const { provider: rawProvider } = request.params as { provider: string };
+      if (!isIntegrationProvider(rawProvider)) {
+        return reply.code(400).send({ error: 'Unknown integration provider' });
+      }
+
+      const config = providerConfig(rawProvider);
+      if (!config) {
+        return reply.code(503).send({ error: 'Integration provider is not configured' });
+      }
+
+      const body = request.body as { code?: string };
+      if (!body?.code) {
+        return reply.code(400).send({ error: 'Missing authorization code' });
+      }
+
+      try {
+        const tokens = await exchangeProviderToken(rawProvider, config, body.code);
+        return reply.send(tokens);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Token exchange failed';
+        return reply.code(502).send({ error: message });
+      }
     }
-
-    const state = createState();
-    const response: AuthorizeIntegrationResponse = {
-      authorizeUrl: buildAuthorizeUrl(config, state),
-      state,
-    };
-
-    return reply.send(response);
-  });
-
-  app.post('/v1/integrations/:provider/token', { preHandler: authenticateRequest }, async (request, reply) => {
-    const { provider: rawProvider } = request.params as { provider: string };
-    if (!isIntegrationProvider(rawProvider)) {
-      return reply.code(400).send({ error: 'Unknown integration provider' });
-    }
-
-    const config = providerConfig(rawProvider);
-    if (!config) {
-      return reply.code(503).send({ error: 'Integration provider is not configured' });
-    }
-
-    const body = request.body as { code?: string };
-    if (!body?.code) {
-      return reply.code(400).send({ error: 'Missing authorization code' });
-    }
-
-    try {
-      const tokens = await exchangeProviderToken(rawProvider, config, body.code);
-      return reply.send(tokens);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Token exchange failed';
-      return reply.code(502).send({ error: message });
-    }
-  });
+  );
 }

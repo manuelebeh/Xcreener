@@ -115,9 +115,7 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
       localIdField && 'value' in localIdField && typeof localIdField.value === 'string'
         ? localIdField.value
         : null;
-    const tags = parseTagsField(
-      tagsField && 'value' in tagsField ? tagsField.value : undefined
-    );
+    const tags = parseTagsField(tagsField && 'value' in tagsField ? tagsField.value : undefined);
     const collectionIds = parseTagsField(
       collectionIdsField && 'value' in collectionIdsField ? collectionIdsField.value : undefined
     );
@@ -126,7 +124,9 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
       const existing = await options.db
         .select()
         .from(schema.libraryItems)
-        .where(and(eq(schema.libraryItems.userId, user.id), eq(schema.libraryItems.localId, localId)))
+        .where(
+          and(eq(schema.libraryItems.userId, user.id), eq(schema.libraryItems.localId, localId))
+        )
         .limit(1);
       const found = existing[0];
       if (found) {
@@ -216,7 +216,9 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
     }
 
     if (query.tag?.trim()) {
-      conditions.push(sql`${schema.libraryItems.tags} @> ${JSON.stringify([query.tag.trim()])}::jsonb`);
+      conditions.push(
+        sql`${schema.libraryItems.tags} @> ${JSON.stringify([query.tag.trim()])}::jsonb`
+      );
     }
 
     if (query.collection?.trim()) {
@@ -314,7 +316,10 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
     }
 
     if (Object.keys(updates).length > 0) {
-      await options.db.update(schema.libraryItems).set(updates).where(eq(schema.libraryItems.id, id));
+      await options.db
+        .update(schema.libraryItems)
+        .set(updates)
+        .where(eq(schema.libraryItems.id, id));
     }
 
     if (body.collectionIds) {

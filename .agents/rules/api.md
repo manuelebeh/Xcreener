@@ -1,6 +1,6 @@
 # SnapGlow API (`apps/api`)
 
-Fastify backend for cloud sharing (Sprint 2b.5+), integrations/library (Sprint 2b.6+), and team workspaces (Sprint 3.1–3.2+).
+Fastify backend for cloud sharing (Sprint 2b.5+), integrations/library (Sprint 2b.6+), team workspaces (Sprint 3.1–3.2+), and public developer API (Sprint 3.5–3.6+).
 
 ## Stack
 
@@ -9,6 +9,7 @@ Fastify backend for cloud sharing (Sprint 2b.5+), integrations/library (Sprint 2
 - **Redis** — upload rate limiting, share metadata cache
 - **S3-compatible storage** — MinIO (local), Cloudflare R2 (prod)
 - **Auth0 JWT** — Bearer tokens verified via JWKS; optional `org_id` claim for SSO
+- **API keys** — `sg_live_*` Bearer tokens for `/v1/public/*` (Team Pro workspaces)
 - **Stripe** — Team seat billing (Checkout + webhooks)
 
 ## Dev
@@ -62,13 +63,24 @@ pnpm --filter @snapglow/api db:migrate
 | PATCH | `/v1/notifications/:id/read` | Bearer JWT | Mark notification read |
 | POST | `/v1/notifications/read-all` | Bearer JWT | Mark all read |
 | WS | `/v1/collab/ws` | JWT (auth message) | Real-time annotation ops, presence, comment/notification events |
+| GET | `/openapi.json` | No | OpenAPI 3.1 spec (public API) |
+| GET | `/docs` | No | Swagger UI |
+| POST | `/v1/public/captures` | API key | Upload screenshot capture |
+| GET | `/v1/public/captures` | API key | List captures (`cursor`, `limit`, `q`, `tag`) |
+| GET | `/v1/public/captures/:id` | API key | Capture metadata + presigned screenshot URL |
+| PATCH | `/v1/public/captures/:id` | API key | Apply beautify `documentState` |
+| POST | `/v1/public/captures/:id/export` | API key | Server render export (PNG/JPG/WebP) |
+| DELETE | `/v1/public/captures/:id` | API key | Delete capture + blobs |
+| GET/POST | `/v1/workspaces/:id/api-keys` | admin JWT | List / create API keys (Team Pro) |
+| DELETE | `/v1/workspaces/:id/api-keys/:keyId` | admin JWT | Revoke API key |
 
 Optional header `X-Workspace-Id` scopes library/share uploads and collab document creation to a team workspace. Library list with this header returns workspace-scoped items.
 
 ## Conventions
 
 - Env validated with `@t3-oss/env-core` + Zod (`src/env.ts`)
-- Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`, `@snapglow/team-core`, `@snapglow/collab-core`
+- Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`, `@snapglow/team-core`, `@snapglow/collab-core`, `@snapglow/api-core`
+- Server render via `@snapglow/render-core` + `@napi-rs/canvas` for public API export
 - Workspace authz via `requireWorkspaceRole` / `can()` from `@snapglow/team-core`
 - Privacy: uploads only from authenticated clients; explicit consent in desktop UI
 - Integration OAuth secrets live in API env only; access tokens stored on desktop
@@ -82,4 +94,5 @@ Optional header `X-Workspace-Id` scopes library/share uploads and collab documen
 - Desktop collab: `apps/desktop/src/modules/collab/`
 - Web collab: `apps/web/src/routes/c/$documentId.tsx`
 - Desktop integrations: `apps/desktop/src/modules/integrations/`
-- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`
+- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`, `013-public-api.md`
+- SDK: `packages/sdk` (`@snapglow/sdk`)

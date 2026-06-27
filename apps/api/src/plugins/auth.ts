@@ -50,7 +50,7 @@ export async function authenticateRequest(
       typeof payload.org_id === 'string'
         ? payload.org_id
         : typeof (payload as { orgId?: string }).orgId === 'string'
-          ? (payload as { orgId?: string }).orgId ?? null
+          ? ((payload as { orgId?: string }).orgId ?? null)
           : null;
 
     request.authUser = { id: '', auth0Sub, email, auth0OrgId };

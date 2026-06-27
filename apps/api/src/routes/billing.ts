@@ -1,4 +1,8 @@
-import type { BillingStatusResponse, CheckoutSessionResponse, WorkspacePlan } from '@snapglow/team-core';
+import type {
+  BillingStatusResponse,
+  CheckoutSessionResponse,
+  WorkspacePlan,
+} from '@snapglow/team-core';
 import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
@@ -233,7 +237,9 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
         const workspaceId = session.metadata?.workspaceId;
         const plan = session.metadata?.plan as WorkspacePlan | undefined;
         const subscriptionId =
-          typeof session.subscription === 'string' ? session.subscription : session.subscription?.id;
+          typeof session.subscription === 'string'
+            ? session.subscription
+            : session.subscription?.id;
         const customerId =
           typeof session.customer === 'string' ? session.customer : session.customer?.id;
 
@@ -244,7 +250,12 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
           await updateWorkspacePlan(options.db, workspaceId, resolvedPlan, {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
-            status: subscription.status as 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete',
+            status: subscription.status as
+              | 'active'
+              | 'past_due'
+              | 'canceled'
+              | 'trialing'
+              | 'incomplete',
             seatCount: subscription.items.data[0]?.quantity ?? 1,
             currentPeriodEnd: subscription.currentPeriodEnd
               ? new Date(subscription.currentPeriodEnd * 1000)
@@ -283,7 +294,12 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
           await updateWorkspacePlan(options.db, workspaceId, plan, {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscription.id,
-            status: subscription.status as 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete',
+            status: subscription.status as
+              | 'active'
+              | 'past_due'
+              | 'canceled'
+              | 'trialing'
+              | 'incomplete',
             seatCount: subscription.items.data[0]?.quantity ?? 1,
             currentPeriodEnd: subscription.currentPeriodEnd
               ? new Date(subscription.currentPeriodEnd * 1000)
@@ -298,9 +314,7 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
           invoice as Stripe.Invoice & { subscription?: string | Stripe.Subscription | null }
         ).subscription;
         const subscriptionId =
-          typeof invoiceSubscription === 'string'
-            ? invoiceSubscription
-            : invoiceSubscription?.id;
+          typeof invoiceSubscription === 'string' ? invoiceSubscription : invoiceSubscription?.id;
         if (!subscriptionId) {
           break;
         }
@@ -320,4 +334,4 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
   });
 }
 
-export { getStripeClient, updateWorkspacePlan, toBillingStatus };
+export { getStripeClient, toBillingStatus, updateWorkspacePlan };

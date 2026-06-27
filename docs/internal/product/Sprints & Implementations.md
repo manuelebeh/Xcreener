@@ -889,17 +889,26 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | T-010 | Concevoir l'API REST publique (OpenAPI spec) | P0 | 3j | CL-001 |
-| `[ ]` | T-011 | Endpoints : upload, beautify, export, list | P0 | 4j | T-010 |
-| `[ ]` | T-012 | Authentification API (API keys + rate limiting) | P0 | 2j | T-010 |
-| `[ ]` | T-013 | Documentation API interactive (Swagger UI / Redoc) | P0 | 2j | T-010 |
-| `[ ]` | T-014 | SDK JavaScript/TypeScript | P1 | 3j | T-011 |
+| `[x]` (2026-06-27) | T-010 | Concevoir l'API REST publique (OpenAPI spec) | P0 | 3j | CL-001 |
+| `[x]` (2026-06-27) | T-011 | Endpoints : upload, beautify, export, list | P0 | 4j | T-010 |
+| `[x]` (2026-06-27) | T-012 | Authentification API (API keys + rate limiting) | P0 | 2j | T-010 |
+| `[x]` (2026-06-27) | T-013 | Documentation API interactive (Swagger UI / Redoc) | P0 | 2j | T-010 |
+| `[x]` (2026-06-27) | T-014 | SDK JavaScript/TypeScript | P1 | 3j | T-011 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-013** : API publique Team Pro, clés workspace-scoped, rendu serveur WYSIWYG
+- **`@snapglow/api-core`** : DTOs, Zod schemas, helpers clés API, rate limits
+- **`@snapglow/render-core`** : moteur Canvas extrait desktop (browser + Node)
+- **`@snapglow/sdk`** : client HTTP npm beta (`0.1.0-beta.1`)
+- **API** : migration `0004_public_api.sql`, routes `/v1/public/captures/*`, `/v1/workspaces/:id/api-keys`, OpenAPI `/openapi.json`, Swagger UI `/docs`
+- **Export serveur** : `@napi-rs/canvas` + brand kit watermark
 
 **Critères de validation**
 
-- [ ] OpenAPI publiée ; Swagger/Redoc accessible
-- [ ] Endpoints upload/beautify/export/list + rate limiting testés
-- [ ] SDK npm publié (beta)
+- [x] OpenAPI publiée ; Swagger UI accessible — `/openapi.json` + `/docs` (Redoc en backlog)
+- [x] Endpoints upload/beautify/export/list + rate limiting testés — Vitest + Redis scopes
+- [x] SDK npm publié (beta) — `@snapglow/sdk` package publishable ; publish registry en attente
 
 ### Sprint 3.7–3.8 (Semaines 51–54) - Plugins
 
@@ -984,7 +993,7 @@ P0-002 (Tauri setup) ──────┬─── P0-014 (menu bar) ───�
 
 M1-001 (React Native) ────── M1-005 (beautification mobile) ──── M1-009 (redaction mobile)
 
-CL-001 (backend) ──── CL-003 (auth) ──── T-001 (multi-tenant) ──── T-006 (WebSocket)
+CL-001 (backend) ──── CL-003 (auth) ──── T-001 (multi-tenant) ──── T-006 (WebSocket) ──── T-010 (API publique) ──── T-011 (endpoints) ──── T-015+ (plugins)
                  │
                  └──── CL-002 (R2) ──── CL-004 (upload + lien)
 ```
