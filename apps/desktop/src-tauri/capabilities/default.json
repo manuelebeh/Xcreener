@@ -23,6 +23,8 @@
     "clipboard-manager:default",
     "clipboard-manager:allow-write-image",
     "dialog:default",
+    "opener:default",
+    "deep-link:default",
     "fs:default",
     "fs:allow-read-file",
     "fs:allow-write-file",
