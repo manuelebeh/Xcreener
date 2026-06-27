@@ -70,7 +70,10 @@ pnpm --filter @snapglow/api db:migrate
 | GET | `/v1/public/captures/:id` | API key | Capture metadata + presigned screenshot URL |
 | PATCH | `/v1/public/captures/:id` | API key | Apply beautify `documentState` |
 | POST | `/v1/public/captures/:id/export` | API key | Server render export (PNG/JPG/WebP) |
+| POST | `/v1/public/captures/:id/publish` | API key | Permanent embed share (`/e/:token`) |
 | DELETE | `/v1/public/captures/:id` | API key | Delete capture + blobs |
+| GET | `/v1/embeds/:token` | No | Embed metadata + presigned asset (Notion-friendly CSP) |
+| GET | `/v1/workspaces/:id/usage` | admin JWT | Team usage reports (`period=7d\|30d\|90d`) |
 | GET/POST | `/v1/workspaces/:id/api-keys` | admin JWT | List / create API keys (Team Pro) |
 | DELETE | `/v1/workspaces/:id/api-keys/:keyId` | admin JWT | Revoke API key |
 
@@ -89,10 +92,15 @@ Optional header `X-Workspace-Id` scopes library/share uploads and collab documen
 ## Related
 
 - Public viewer: `apps/web/src/routes/s/$token.tsx`
+- Embed viewer: `apps/web/src/routes/e/$token.tsx`
 - Desktop upload: `apps/desktop/src/modules/cloud/`
-- Desktop team: `apps/desktop/src/modules/team/`
+- Desktop team: `apps/desktop/src/modules/team/` (API keys, usage reports)
 - Desktop collab: `apps/desktop/src/modules/collab/`
 - Web collab: `apps/web/src/routes/c/$documentId.tsx`
 - Desktop integrations: `apps/desktop/src/modules/integrations/`
-- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`, `013-public-api.md`
+- VS Code plugin: `apps/vscode-extension/`
+- Figma plugin: `apps/figma-plugin/`
+- Notion embed tool: `apps/notion-embed/`
+- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`, `013-public-api.md`, `014-plugins-and-embeds.md`
 - SDK: `packages/sdk` (`@snapglow/sdk`)
+- Plugin presets: `packages/plugin-core` (`@snapglow/plugin-core`)

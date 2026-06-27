@@ -42,12 +42,20 @@ function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
         <span className="text-lg font-semibold tracking-tight">SnapGlow</span>
-        <a
-          href="#features"
-          className="text-sm font-medium text-muted no-underline hover:text-foreground"
-        >
-          Features
-        </a>
+        <nav className="flex items-center gap-4 text-sm">
+          <a
+            href="/help"
+            className="font-medium text-muted no-underline hover:text-foreground"
+          >
+            Help
+          </a>
+          <a
+            href="#features"
+            className="font-medium text-muted no-underline hover:text-foreground"
+          >
+            Features
+          </a>
+        </nav>
       </header>
 
       <main>

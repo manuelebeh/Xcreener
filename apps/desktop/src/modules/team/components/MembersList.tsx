@@ -1,5 +1,6 @@
-import { Button } from '@snapglow/ui';
+import { Button, Input } from '@snapglow/ui';
 import { can } from '@snapglow/team-core';
+import { useState } from 'react';
 import { useTeamStore } from '../store';
 import { RoleSelect } from './RoleSelect';
 
@@ -8,8 +9,11 @@ export function MembersList() {
     state.workspaces.find((workspace) => workspace.id === state.activeWorkspaceId)
   );
   const members = useTeamStore((state) => state.members);
+  const isLoading = useTeamStore((state) => state.isLoading);
+  const error = useTeamStore((state) => state.error);
   const changeMemberRole = useTeamStore((state) => state.changeMemberRole);
   const removeTeamMember = useTeamStore((state) => state.removeTeamMember);
+  const refreshMembers = useTeamStore((state) => state.refreshMembers);
   const isAdmin = activeWorkspace?.role === 'admin';
 
   if (!activeWorkspace) {
@@ -19,6 +23,12 @@ export function MembersList() {
   return (
     <div className="space-y-2">
       <p className="m-0 text-sm font-medium">Members ({members.length})</p>
+      {isLoading && members.length === 0 ? (
+        <p className="text-xs text-muted">Loading members…</p>
+      ) : null}
+      {!isLoading && members.length === 0 ? (
+        <p className="text-xs text-muted">No members yet. Invite someone to get started.</p>
+      ) : null}
       <ul className="space-y-2">
         {members.map((member) => (
           <li
@@ -58,6 +68,16 @@ export function MembersList() {
           </li>
         ))}
       </ul>
+      {error ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-xs text-destructive" role="alert">
+            {error}
+          </p>
+          <Button type="button" size="sm" variant="secondary" onClick={() => void refreshMembers()}>
+            Retry
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

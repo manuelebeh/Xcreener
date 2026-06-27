@@ -141,6 +141,7 @@ export async function registerShareRoutes(app: FastifyInstance, options: ShareRo
       byteSize: share.byteSize,
       expiresAt: share.expiresAt?.toISOString() ?? null,
       assetUrl,
+      title: share.title,
     };
 
     return reply.send(response);

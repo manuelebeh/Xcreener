@@ -9,10 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HelpIndexRouteImport } from './routes/help/index'
+import { Route as HelpSlugRouteImport } from './routes/help/$slug'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as CDocumentIdRouteImport } from './routes/c/$documentId'
+import { Route as ETokenRouteImport } from './routes/e/$token'
 import { Route as STokenRouteImport } from './routes/s/$token'
+
+const HelpIndexRoute = HelpIndexRouteImport.update({
+  id: '/help/',
+  path: '/help/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const HelpSlugRoute = HelpSlugRouteImport.update({
+  id: '/help/$slug',
+  path: '/help/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -38,16 +53,28 @@ const STokensRoute = STokensRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 
+const ETokenRoute = ETokenRouteImport.update({
+  id: '/e/$token',
+  path: '/e/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/c/$documentId': typeof CDocumentIdRoute
+  '/e/$token': typeof ETokenRoute
+  '/help/$slug': typeof HelpSlugRoute
+  '/help': typeof HelpIndexRoute
   '/s/$token': typeof STokensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/c/$documentId': typeof CDocumentIdRoute
+  '/e/$token': typeof ETokenRoute
+  '/help/$slug': typeof HelpSlugRoute
+  '/help': typeof HelpIndexRoute
   '/s/$token': typeof STokensRoute
 }
 export interface FileRoutesById {
@@ -55,20 +82,48 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/c/$documentId': typeof CDocumentIdRoute
+  '/e/$token': typeof ETokenRoute
+  '/help/$slug': typeof HelpSlugRoute
+  '/help/': typeof HelpIndexRoute
   '/s/$token': typeof STokensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/callback' | '/c/$documentId' | '/s/$token'
+  fullPaths:
+    | '/'
+    | '/auth/callback'
+    | '/c/$documentId'
+    | '/e/$token'
+    | '/help/$slug'
+    | '/help'
+    | '/s/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/callback' | '/c/$documentId' | '/s/$token'
-  id: '__root__' | '/' | '/auth/callback' | '/c/$documentId' | '/s/$token'
+  to:
+    | '/'
+    | '/auth/callback'
+    | '/c/$documentId'
+    | '/e/$token'
+    | '/help/$slug'
+    | '/help'
+    | '/s/$token'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth/callback'
+    | '/c/$documentId'
+    | '/e/$token'
+    | '/help/$slug'
+    | '/help/'
+    | '/s/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
   CDocumentIdRoute: typeof CDocumentIdRoute
+  ETokenRoute: typeof ETokenRoute
+  HelpSlugRoute: typeof HelpSlugRoute
+  HelpIndexRoute: typeof HelpIndexRoute
   STokensRoute: typeof STokensRoute
 }
 
@@ -102,6 +157,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof STokensRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/e/$token': {
+      id: '/e/$token'
+      path: '/e/$token'
+      fullPath: '/e/$token'
+      preLoaderRoute: typeof ETokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help/$slug': {
+      id: '/help/$slug'
+      path: '/help/$slug'
+      fullPath: '/help/$slug'
+      preLoaderRoute: typeof HelpSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help/': {
+      id: '/help/'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -109,6 +185,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthCallbackRoute: AuthCallbackRoute,
   CDocumentIdRoute: CDocumentIdRoute,
+  ETokenRoute: ETokenRoute,
+  HelpSlugRoute: HelpSlugRoute,
+  HelpIndexRoute: HelpIndexRoute,
   STokensRoute: STokensRoute,
 }
 export const routeTree = rootRouteImport

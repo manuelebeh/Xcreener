@@ -13,6 +13,7 @@ import {
 
 export function useCollabSession(documentId: string | null): void {
   const setConnected = useCollabStore((s) => s.setConnected);
+  const setReconnecting = useCollabStore((s) => s.setReconnecting);
   const setReadOnly = useCollabStore((s) => s.setReadOnly);
   const setDocument = useCollabStore((s) => s.setDocument);
   const setParticipants = useCollabStore((s) => s.setParticipants);
@@ -57,6 +58,20 @@ export function useCollabSession(documentId: string | null): void {
       collabClient.connect(documentId, token);
     })();
 
+    const offConnection = collabClient.onConnectionChange((state) => {
+      if (state === 'connected') {
+        setConnected(true);
+        setReconnecting(false);
+      } else if (state === 'reconnecting') {
+        setConnected(false);
+        setReconnecting(true);
+        useCollabStore.getState().setStatusMessage('Reconnecting to collaboration session…');
+      } else {
+        setConnected(false);
+        useCollabStore.getState().setStatusMessage('Collaboration disconnected');
+      }
+    });
+
     const off = collabClient.onMessage((message) => {
       if (message.type === 'auth:ok') {
         setConnected(true);
@@ -93,6 +108,7 @@ export function useCollabSession(documentId: string | null): void {
 
     return () => {
       cancelled = true;
+      offConnection();
       off();
       collabClient.disconnect();
       useCollabStore.getState().reset();
@@ -109,6 +125,7 @@ export function useCollabSession(documentId: string | null): void {
     updateComment,
     removeComment,
     addNotification,
+    setReconnecting,
     setComments,
   ]);
 

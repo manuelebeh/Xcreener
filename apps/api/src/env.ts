@@ -10,6 +10,7 @@ export const env = createEnv({
     AUTH0_DOMAIN: z.string().min(1),
     AUTH0_AUDIENCE: z.string().min(1),
     WEB_PUBLIC_URL: z.string().url(),
+    CORS_ORIGINS: z.string().default(''),
     S3_ENDPOINT: z.string().url(),
     S3_BUCKET: z.string().min(1),
     S3_ACCESS_KEY: z.string().min(1),

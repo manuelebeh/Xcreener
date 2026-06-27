@@ -17,6 +17,7 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Collab core | `packages/collab-core` — WebSocket protocol, comments, notifications (api + desktop + web) |
 | API core | `packages/api-core` — public API DTOs, API key helpers, rate limits (api + sdk) |
 | Render core | `packages/render-core` — shared Canvas beautify/export engine (api + desktop) |
+| Plugin core | `packages/plugin-core` — beautify presets for IDE/design plugins (vscode, figma) |
 | Lint / format | Biome (not ESLint/Prettier) |
 | State | Zustand per module |
 | Local DB | `@tauri-apps/plugin-sql` (SQLite) |
@@ -29,10 +30,14 @@ apps/desktop/          Tauri app (@snapglow/desktop)
 apps/web/              Landing + public share viewer (@snapglow/web)
 apps/mobile/           Expo app (@snapglow/mobile)
 apps/api/              Fastify API — cloud shares + library (@snapglow/api)
+apps/vscode-extension/ VS Code plugin — capture editor + beautify (@snapglow/vscode)
+apps/figma-plugin/     Figma plugin — import/export frames
+apps/notion-embed/     Notion embed tool — OAuth + rich embeds
 packages/cloud-core/   Share + library types, expiry helpers (api + web + desktop)
 packages/collab-core/  WebSocket protocol, comments, notifications (api + desktop + web)
 packages/api-core/     Public API DTOs, API key helpers, rate limits (api + sdk)
 packages/render-core/  Shared Canvas beautify/export engine (api + desktop)
+packages/plugin-core/  Beautify presets for VS Code / Figma plugins
 packages/sdk/          Official REST API client (@snapglow/sdk, npm beta)
 packages/integrations-core/  Integration provider types, OAuth scopes (api + desktop)
 packages/design-tokens/  DTCG tokens → CSS + tokens.native
@@ -99,6 +104,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 3.1–3.2** : `@snapglow/team-core`, workspaces/members/invitations API, Stripe seat billing, brand kit, SSO Auth0 Organizations, desktop `modules/team/` — ADR-011
 - **Sprint 3.3–3.4** : `@snapglow/collab-core`, WebSocket collab server, shared annotations + cursors, comments, in-app/email notifications, desktop `modules/collab/`, web `/c/:documentId` — ADR-012
 - **Sprint 3.5–3.6** : `@snapglow/api-core`, `@snapglow/render-core`, `@snapglow/sdk`, public REST API `/v1/public/captures`, API keys (Team Pro), OpenAPI + Swagger UI, server-side WYSIWYG export — ADR-013
+- **Sprint 3.7–3.8** : `@snapglow/plugin-core`, VS Code / Figma / Notion plugins, team usage reports, embed viewer `/e/:token` — ADR-014
 
 ## Agent conventions
 
