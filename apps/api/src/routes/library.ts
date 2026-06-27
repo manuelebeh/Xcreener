@@ -195,8 +195,19 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
     const query = request.query as { q?: string; tag?: string; collection?: string };
+    const workspaceId = getActiveWorkspaceId(request);
 
-    const conditions = [eq(schema.libraryItems.userId, user.id)];
+    const conditions = [];
+
+    if (workspaceId) {
+      const role = await resolveMembership(options.db, workspaceId, user.id);
+      if (!role) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+      conditions.push(eq(schema.libraryItems.workspaceId, workspaceId));
+    } else {
+      conditions.push(eq(schema.libraryItems.userId, user.id));
+    }
 
     if (query.q?.trim()) {
       conditions.push(
@@ -252,12 +263,22 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
     const rows = await options.db
       .select()
       .from(schema.libraryItems)
-      .where(and(eq(schema.libraryItems.id, id), eq(schema.libraryItems.userId, user.id)))
+      .where(eq(schema.libraryItems.id, id))
       .limit(1);
     const item = rows[0];
 
     if (!item) {
       return reply.code(404).send({ error: 'Library item not found' });
+    }
+
+    if (item.userId !== user.id) {
+      if (!item.workspaceId) {
+        return reply.code(404).send({ error: 'Library item not found' });
+      }
+      const role = await resolveMembership(options.db, item.workspaceId, user.id);
+      if (!role) {
+        return reply.code(404).send({ error: 'Library item not found' });
+      }
     }
 
     return reply.send(await toLibraryItemResponse(options.db, options.storage, item));

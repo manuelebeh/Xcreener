@@ -10,11 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
+import { Route as CDocumentIdRouteImport } from './routes/c/$documentId'
 import { Route as STokenRouteImport } from './routes/s/$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const CDocumentIdRoute = CDocumentIdRouteImport.update({
+  id: '/c/$documentId',
+  path: '/c/$documentId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -26,27 +40,35 @@ const STokensRoute = STokensRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/c/$documentId': typeof CDocumentIdRoute
   '/s/$token': typeof STokensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/c/$documentId': typeof CDocumentIdRoute
   '/s/$token': typeof STokensRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/c/$documentId': typeof CDocumentIdRoute
   '/s/$token': typeof STokensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/s/$token'
+  fullPaths: '/' | '/auth/callback' | '/c/$documentId' | '/s/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/s/$token'
-  id: '__root__' | '/' | '/s/$token'
+  to: '/' | '/auth/callback' | '/c/$documentId' | '/s/$token'
+  id: '__root__' | '/' | '/auth/callback' | '/c/$documentId' | '/s/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  CDocumentIdRoute: typeof CDocumentIdRoute
   STokensRoute: typeof STokensRoute
 }
 
@@ -57,6 +79,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$documentId': {
+      id: '/c/$documentId'
+      path: '/c/$documentId'
+      fullPath: '/c/$documentId'
+      preLoaderRoute: typeof CDocumentIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/s/$token': {
@@ -71,6 +107,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  CDocumentIdRoute: CDocumentIdRoute,
   STokensRoute: STokensRoute,
 }
 export const routeTree = rootRouteImport

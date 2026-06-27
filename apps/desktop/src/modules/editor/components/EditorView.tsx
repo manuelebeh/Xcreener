@@ -1,4 +1,9 @@
 import { ExportBar } from '@/modules/export/components/ExportBar';
+import { CollabBar } from '@/modules/collab/components/CollabBar';
+import { CommentsPanel } from '@/modules/collab/components/CommentsPanel';
+import { NotificationsBell } from '@/modules/collab/components/NotificationsBell';
+import { useCollabStore } from '@/modules/collab/store';
+import { useCollabSession } from '@/modules/collab/hooks/useCollabSession';
 import { AutoCropBar } from '@/modules/auto-crop/components/AutoCropBar';
 import { RedactionBar } from '@/modules/redaction/components/RedactionBar';
 import { useAutoRedaction } from '@/modules/redaction/hooks/useAutoRedaction';
@@ -16,9 +21,14 @@ export function EditorView() {
   useCustomPresetsLoader();
   useAutoRedaction();
   useAutoStyleSuggestion();
+  const documentId = useCollabStore((s) => s.documentId);
+  useCollabSession(documentId);
 
   return (
     <div className="mx-auto w-full max-w-7xl">
+      <div className="mb-3 flex justify-end">
+        <NotificationsBell />
+      </div>
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]">
         <div className="min-w-0 lg:sticky lg:top-4 lg:self-start">
           <section
@@ -57,6 +67,10 @@ export function EditorView() {
             </EditorSection>
             <EditorSection title="Export" testId="export-bar-section">
               <ExportBar embedded />
+            </EditorSection>
+            <EditorSection title="Collaboration" testId="collab-bar-section">
+              <CollabBar embedded />
+              <CommentsPanel />
             </EditorSection>
           </EditorToolsPanel>
         </aside>

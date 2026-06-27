@@ -22,11 +22,16 @@ describe('team-core permissions', () => {
     expect(can('editor', 'brand-kit:read')).toBe(true);
     expect(can('editor', 'invitations:create')).toBe(false);
     expect(can('editor', 'billing:manage')).toBe(false);
+    expect(can('editor', 'collab:edit')).toBe(true);
+    expect(can('editor', 'comments:create')).toBe(true);
   });
 
-  it('restricts viewer similarly to editor', () => {
+  it('restricts viewer to read-only collab', () => {
     expect(can('viewer', 'members:read')).toBe(true);
     expect(can('viewer', 'brand-kit:update')).toBe(false);
+    expect(can('viewer', 'collab:read')).toBe(true);
+    expect(can('viewer', 'collab:edit')).toBe(false);
+    expect(can('viewer', 'comments:create')).toBe(true);
   });
 });
 

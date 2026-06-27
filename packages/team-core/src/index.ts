@@ -14,7 +14,10 @@ export type WorkspaceAction =
   | 'billing:read'
   | 'billing:manage'
   | 'sso:read'
-  | 'sso:manage';
+  | 'sso:manage'
+  | 'collab:read'
+  | 'collab:edit'
+  | 'comments:create';
 
 export const WORKSPACE_ROLES: WorkspaceRole[] = ['admin', 'editor', 'viewer'];
 
@@ -38,9 +41,19 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, ReadonlySet<WorkspaceAction>> = {
     'billing:manage',
     'sso:read',
     'sso:manage',
+    'collab:read',
+    'collab:edit',
+    'comments:create',
   ]),
-  editor: new Set(['workspace:read', 'members:read', 'brand-kit:read']),
-  viewer: new Set(['workspace:read', 'members:read', 'brand-kit:read']),
+  editor: new Set([
+    'workspace:read',
+    'members:read',
+    'brand-kit:read',
+    'collab:read',
+    'collab:edit',
+    'comments:create',
+  ]),
+  viewer: new Set(['workspace:read', 'members:read', 'brand-kit:read', 'collab:read', 'comments:create']),
 };
 
 export function can(role: WorkspaceRole, action: WorkspaceAction): boolean {
