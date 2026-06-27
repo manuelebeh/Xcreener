@@ -5,10 +5,13 @@ import { integrationLabel, useIntegrationsStore } from '../store';
 import {
   listGitHubIssues,
   listGitHubRepos,
+  listJiraIssues,
+  listConfluencePages,
   listLinearIssues,
   listLinearTeams,
   listNotionPages,
   listSlackChannels,
+  listTeamsChannels,
   sendToProvider,
 } from '../sendToIntegration';
 
@@ -70,6 +73,28 @@ export function SendToIntegrationDialog({
         case 'github': {
           const repos = await listGitHubRepos();
           setDestinations(repos.map((repo) => ({ id: repo.fullName, label: repo.fullName })));
+          break;
+        }
+        case 'jira': {
+          const issues = await listJiraIssues();
+          setDestinations(
+            issues.map((issue) => ({ id: issue.id, label: `${issue.key}: ${issue.summary}` }))
+          );
+          break;
+        }
+        case 'confluence': {
+          const pages = await listConfluencePages();
+          setDestinations(pages.map((page) => ({ id: page.id, label: page.title })));
+          break;
+        }
+        case 'msteams': {
+          const channels = await listTeamsChannels();
+          setDestinations(
+            channels.map((channel) => ({
+              id: `${channel.teamId}|${channel.id}`,
+              label: channel.name,
+            }))
+          );
           break;
         }
       }

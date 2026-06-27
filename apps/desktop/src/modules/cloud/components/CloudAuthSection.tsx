@@ -1,4 +1,6 @@
 import { Button } from '@snapglow/ui';
+import { useEffect } from 'react';
+import { pullCloudSync, startPeriodicSync } from '../syncPull';
 import { useCloudAuthStore } from '../store';
 
 export function CloudAuthSection() {
@@ -9,8 +11,16 @@ export function CloudAuthSection() {
   const error = useCloudAuthStore((state) => state.error);
   const lastLibrarySyncAt = useCloudAuthStore((state) => state.lastLibrarySyncAt);
   const librarySyncError = useCloudAuthStore((state) => state.librarySyncError);
+  const lastPulledCount = useCloudAuthStore((state) => state.lastPulledCount);
   const signIn = useCloudAuthStore((state) => state.signIn);
   const signOut = useCloudAuthStore((state) => state.signOut);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+    return startPeriodicSync(60_000);
+  }, [isAuthenticated]);
 
   if (!configured) {
     return (
@@ -58,8 +68,14 @@ export function CloudAuthSection() {
       ) : null}
       {isAuthenticated && lastLibrarySyncAt ? (
         <p className="mt-2 text-xs text-muted">
-          Last library sync: {new Date(lastLibrarySyncAt).toLocaleString()}
+          Last sync: {new Date(lastLibrarySyncAt).toLocaleString()}
+          {lastPulledCount > 0 ? ` · ${lastPulledCount} updates pulled` : ''}
         </p>
+      ) : null}
+      {isAuthenticated ? (
+        <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => void pullCloudSync()}>
+          Sync now
+        </Button>
       ) : null}
       {librarySyncError ? (
         <p className="mt-2 text-xs text-destructive" role="alert">

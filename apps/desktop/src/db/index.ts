@@ -1,4 +1,5 @@
 import {
+  type AppLocale,
   type AppSettings,
   DEFAULT_APP_SETTINGS,
   SETTING_KEYS,
@@ -43,6 +44,9 @@ function parseBoolean(value: string | null, fallback: boolean): boolean {
 export async function loadAppSettings(): Promise<AppSettings> {
   const [
     theme,
+    locale,
+    licenseSource,
+    partnerCode,
     captureShortcut,
     launchAtLogin,
     analyticsEnabled,
@@ -61,6 +65,9 @@ export async function loadAppSettings(): Promise<AppSettings> {
   useTeamBrandKit,
 ] = await Promise.all([
     getSetting(SETTING_KEYS.theme),
+    getSetting(SETTING_KEYS.locale),
+    getSetting(SETTING_KEYS.licenseSource),
+    getSetting(SETTING_KEYS.partnerCode),
     getSetting(SETTING_KEYS.captureShortcut),
     getSetting(SETTING_KEYS.launchAtLogin),
     getSetting(SETTING_KEYS.analyticsEnabled),
@@ -99,8 +106,21 @@ export async function loadAppSettings(): Promise<AppSettings> {
     ? Number.parseInt(watermarkOpacity, 10)
     : DEFAULT_APP_SETTINGS.watermarkOpacity;
 
+  const resolvedLocale =
+    locale && ['en', 'fr', 'de', 'ja'].includes(locale)
+      ? (locale as AppLocale)
+      : DEFAULT_APP_SETTINGS.locale;
+
+  const resolvedLicenseSource =
+    licenseSource && ['direct', 'setapp', 'appsumo', 'partner'].includes(licenseSource)
+      ? (licenseSource as AppSettings['licenseSource'])
+      : DEFAULT_APP_SETTINGS.licenseSource;
+
   return {
     theme: resolvedTheme,
+    locale: resolvedLocale,
+    licenseSource: resolvedLicenseSource,
+    partnerCode: partnerCode ?? DEFAULT_APP_SETTINGS.partnerCode,
     captureShortcut: captureShortcut ?? DEFAULT_APP_SETTINGS.captureShortcut,
     launchAtLogin: parseBoolean(launchAtLogin, DEFAULT_APP_SETTINGS.launchAtLogin),
     analyticsEnabled: parseBoolean(analyticsEnabled, DEFAULT_APP_SETTINGS.analyticsEnabled),

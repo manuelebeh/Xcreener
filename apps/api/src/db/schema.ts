@@ -1,7 +1,9 @@
 import type { CollabDocumentState } from '@snapglow/collab-core';
+import type { TemplateStyle } from '@snapglow/marketplace-core';
 import type { BrandKitColors, BrandKitFonts, BrandKitWatermark } from '@snapglow/team-core';
 import {
   bigint,
+  boolean,
   integer,
   jsonb,
   pgEnum,
@@ -28,6 +30,8 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'mention',
   'invitation',
 ]);
+
+export const templateStatusEnum = pgEnum('template_status', ['pending', 'approved', 'rejected']);
 
 export const users = pgTable(
   'users',
@@ -149,7 +153,10 @@ export const libraryItems = pgTable(
     title: text('title'),
     tags: jsonb('tags').$type<string[]>().default([]).notNull(),
     localId: text('local_id'),
+    syncVersion: integer('sync_version').default(1).notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [uniqueIndex('library_items_user_local_id_idx').on(table.userId, table.localId)]
 );
@@ -253,6 +260,42 @@ export const apiKeys = pgTable(
   (table) => [uniqueIndex('api_keys_key_hash_idx').on(table.keyHash)]
 );
 
+export const userSettings = pgTable(
+  'user_settings',
+  {
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    key: text('key').notNull(),
+    value: jsonb('value').notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.key] })]
+);
+
+export const templateListings = pgTable(
+  'template_listings',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    slug: text('slug').notNull(),
+    title: text('title').notNull(),
+    description: text('description'),
+    authorId: uuid('author_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    status: templateStatusEnum('status').default('pending').notNull(),
+    style: jsonb('style').$type<TemplateStyle>().notNull(),
+    tags: jsonb('tags').$type<string[]>().default([]).notNull(),
+    previewUrl: text('preview_url'),
+    downloadCount: integer('download_count').default(0).notNull(),
+    featured: boolean('featured').default(false).notNull(),
+    rejectionReason: text('rejection_reason'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [uniqueIndex('template_listings_slug_idx').on(table.slug)]
+);
+
 export const apiCaptures = pgTable('api_captures', {
   id: uuid('id').defaultRandom().primaryKey(),
   workspaceId: uuid('workspace_id')
@@ -289,3 +332,4 @@ export type Comment = typeof comments.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type ApiKey = typeof apiKeys.$inferSelect;
 export type ApiCapture = typeof apiCaptures.$inferSelect;
+export type TemplateListing = typeof templateListings.$inferSelect;

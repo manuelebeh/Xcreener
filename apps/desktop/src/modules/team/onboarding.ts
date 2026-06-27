@@ -55,6 +55,21 @@ export async function resetTeamOnboarding(): Promise<void> {
   await setSetting(TEAM_ONBOARDING_KEYS.step, 'welcome');
 }
 
+export function getNextOnboardingStep(
+  current: TeamOnboardingStep,
+  options?: { skipBrandKit?: boolean }
+): TeamOnboardingStep | null {
+  const currentIndex = TEAM_ONBOARDING_STEPS.indexOf(current);
+  if (currentIndex < 0 || currentIndex >= TEAM_ONBOARDING_STEPS.length - 1) {
+    return null;
+  }
+  let next = TEAM_ONBOARDING_STEPS[currentIndex + 1]!;
+  if (options?.skipBrandKit && next === 'brand-kit') {
+    next = TEAM_ONBOARDING_STEPS[currentIndex + 2] ?? next;
+  }
+  return next;
+}
+
 export function getWebHelpUrl(slug: string): string {
   const base = import.meta.env.VITE_WEB_PUBLIC_URL ?? 'http://localhost:3000';
   return `${base.replace(/\/$/, '')}/help/${slug}`;

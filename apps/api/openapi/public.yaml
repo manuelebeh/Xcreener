@@ -412,3 +412,127 @@ paths:
       responses:
         '204':
           description: Revoked
+  /v1/templates:
+    get:
+      summary: List approved marketplace templates
+      operationId: listTemplates
+      tags: [Marketplace]
+      security: []
+      parameters:
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: featured
+          in: query
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Template list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                  total:
+                    type: integer
+  /v1/templates/{slug}:
+    get:
+      summary: Get marketplace template by slug
+      operationId: getTemplate
+      tags: [Marketplace]
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Template details
+        '404':
+          description: Not found
+  /v1/sync/library:
+    get:
+      summary: Pull library changes since cursor (Auth0 JWT)
+      operationId: syncLibrary
+      tags: [Sync]
+      security:
+        - bearerAuth: []
+      description: Requires Auth0 user JWT, not workspace API key.
+      parameters:
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Library sync payload with cursor
+        '401':
+          description: Unauthorized
+  /v1/users/me/settings:
+    get:
+      summary: Pull user settings since cursor (Auth0 JWT)
+      operationId: getUserSettings
+      tags: [Sync]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: since
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Settings patches and cursor
+    put:
+      summary: Push user settings (Auth0 JWT)
+      operationId: putUserSettings
+      tags: [Sync]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [settings]
+              properties:
+                settings:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Updated settings cursor
+  /v1/webhooks/rewardful:
+    post:
+      summary: Rewardful affiliate conversion webhook
+      operationId: rewardfulWebhook
+      tags: [Affiliates]
+      security: []
+      description: HMAC-signed webhook from Rewardful; not for API key clients.
+      responses:
+        '200':
+          description: Accepted
+        '401':
+          description: Invalid signature

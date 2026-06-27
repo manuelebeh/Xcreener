@@ -10,6 +10,7 @@ import { getAllowedCorsOrigins, isOriginAllowed } from './lib/cors';
 import { registerCollabWebSocket } from './plugins/collab-ws';
 import { registerOpenApiDocs } from './plugins/openapi-docs';
 import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
+import { registerAffiliateRoutes } from './routes/affiliates';
 import { registerApiKeyRoutes } from './routes/api-keys';
 import { registerBillingRoutes } from './routes/billing';
 import { registerCollabRoutes } from './routes/collab';
@@ -20,6 +21,8 @@ import { registerIntegrationRoutes } from './routes/integrations';
 import { registerLibraryRoutes } from './routes/library';
 import { registerPublicCaptureRoutes } from './routes/public-captures';
 import { registerShareRoutes } from './routes/shares';
+import { registerSyncRoutes } from './routes/sync';
+import { registerTemplateRoutes } from './routes/templates';
 import { registerWorkspaceRoutes } from './routes/workspaces';
 import { registerWorkspaceUsageRoutes } from './routes/workspace-usage';
 import { StorageService } from './services/storage';
@@ -74,10 +77,13 @@ export async function buildApp(options: BuildAppOptions) {
   await registerWorkspaceRoutes(app, { db: options.db, storage });
   await registerWorkspaceUsageRoutes(app, { db: options.db });
   await registerBillingRoutes(app, { db: options.db });
+  await registerAffiliateRoutes(app);
   await registerCollabRoutes(app, { db: options.db, storage });
   await registerCollabWebSocket(app, { db: options.db });
   await registerApiKeyRoutes(app, { db: options.db });
   await registerPublicCaptureRoutes(app, { db: options.db, storage });
+  await registerTemplateRoutes(app, { db: options.db });
+  await registerSyncRoutes(app, { db: options.db, storage });
   if (env.NODE_ENV !== 'test') {
     await registerOpenApiDocs(app);
   }

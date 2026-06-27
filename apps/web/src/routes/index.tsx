@@ -1,21 +1,9 @@
 import { Button } from '@snapglow/ui';
+import { useTranslation } from '@snapglow/i18n';
 import { createFileRoute } from '@tanstack/react-router';
-
-const features = [
-  {
-    title: 'Capture instantly',
-    description:
-      'Global shortcuts from menu bar or system tray. Any screen, any window, in one keystroke.',
-  },
-  {
-    title: 'Beautify in seconds',
-    description: 'Padding, backgrounds, and polish - no design skills required.',
-  },
-  {
-    title: 'Share with confidence',
-    description: 'Export locally. Your screenshots never leave your machine unless you choose.',
-  },
-] as const;
+import { useEffect } from 'react';
+import { useLandingCtaExperiment, usePricingExperiment } from '#/lib/experiments/useExperiment';
+import { captureReferralFromUrl } from '#/lib/affiliates/referral';
 
 const linkButtonPrimary =
   'inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-base font-medium text-primary-foreground no-underline transition-opacity hover:opacity-90';
@@ -38,16 +26,44 @@ export const Route = createFileRoute('/')({
 });
 
 function LandingPage() {
+  const { t: tc } = useTranslation('common');
+  const { t: tm } = useTranslation('marketing');
+
+  const ctaVariant = useLandingCtaExperiment();
+  const pricingVariant = usePricingExperiment();
+
+  useEffect(() => {
+    captureReferralFromUrl();
+  }, []);
+
+  const features = [
+    { title: tm('featureCaptureTitle'), description: tm('featureCaptureDesc') },
+    { title: tm('featureBeautifyTitle'), description: tm('featureBeautifyDesc') },
+    { title: tm('featureShareTitle'), description: tm('featureShareDesc') },
+  ] as const;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-        <span className="text-lg font-semibold tracking-tight">SnapGlow</span>
+        <span className="text-lg font-semibold tracking-tight">{tc('appName')}</span>
         <nav className="flex items-center gap-4 text-sm">
+          <a
+            href="/marketplace"
+            className="font-medium text-muted no-underline hover:text-foreground"
+          >
+            {tc('marketplace')}
+          </a>
+          <a
+            href="/affiliates"
+            className="font-medium text-muted no-underline hover:text-foreground"
+          >
+            {tc('affiliates')}
+          </a>
           <a
             href="/help"
             className="font-medium text-muted no-underline hover:text-foreground"
           >
-            Help
+            {tc('help')}
           </a>
           <a
             href="#features"
@@ -61,20 +77,21 @@ function LandingPage() {
       <main>
         <section className="mx-auto max-w-5xl px-6 pb-20 pt-12">
           <div className="max-w-2xl">
-            <p className="mb-4 text-sm font-medium text-primary">Privacy-first screenshot app</p>
+            <p className="mb-4 text-sm font-medium text-primary">
+              {pricingVariant === 'highlight_pro' ? tm('taglinePro') : tm('tagline')}
+            </p>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              Screenshots that shine.
+              {pricingVariant === 'highlight_pro' ? tm('heroTitlePro') : tm('heroTitle')}
             </h1>
             <p className="mt-5 text-lg text-muted">
-              Transform any capture into a polished visual in under 5 seconds - without sending your
-              data to the cloud.
+              {pricingVariant === 'highlight_pro' ? tm('heroSubtitlePro') : tm('heroSubtitle')}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="#download" className={linkButtonPrimary}>
-                Download for macOS
+                {ctaVariant === 'trial' ? 'Start free trial' : tm('downloadMac')}
               </a>
               <a href="#features" className={linkButtonSecondary}>
-                See how it works
+                {tm('seeHow')}
               </a>
             </div>
           </div>
@@ -102,10 +119,8 @@ function LandingPage() {
 
         <section id="download" className="border-t border-border py-20">
           <div className="mx-auto max-w-5xl px-6 text-center">
-            <h2 className="text-2xl font-bold">Ready to glow?</h2>
-            <p className="mx-auto mt-3 max-w-md text-muted">
-              Desktop app for macOS and Windows. Local processing, no account required.
-            </p>
+            <h2 className="text-2xl font-bold">{tm('readyTitle')}</h2>
+            <p className="mx-auto mt-3 max-w-md text-muted">{tm('readySubtitle')}</p>
             <div className="mt-8 flex justify-center">
               <a href="https://snapglow.app/download" className={linkButtonPrimary}>
                 Download SnapGlow

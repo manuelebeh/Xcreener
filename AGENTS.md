@@ -18,6 +18,9 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | API core | `packages/api-core` — public API DTOs, API key helpers, rate limits (api + sdk) |
 | Render core | `packages/render-core` — shared Canvas beautify/export engine (api + desktop) |
 | Plugin core | `packages/plugin-core` — beautify presets for IDE/design plugins (vscode, figma) |
+| Marketplace core | `packages/marketplace-core` — community template DTOs (Phase 4) |
+| i18n | `packages/i18n` — SSOT translations en/fr/de/ja (Phase 4) |
+| Sync core | `packages/sync-core` — cross-device sync cursors + settings merge (Phase 4) |
 | Lint / format | Biome (not ESLint/Prettier) |
 | State | Zustand per module |
 | Local DB | `@tauri-apps/plugin-sql` (SQLite) |
@@ -38,6 +41,9 @@ packages/collab-core/  WebSocket protocol, comments, notifications (api + deskto
 packages/api-core/     Public API DTOs, API key helpers, rate limits (api + sdk)
 packages/render-core/  Shared Canvas beautify/export engine (api + desktop)
 packages/plugin-core/  Beautify presets for VS Code / Figma plugins
+packages/marketplace-core/  Community template marketplace DTOs (Phase 4)
+packages/i18n/  SSOT translations en/fr/de/ja (Phase 4)
+packages/sync-core/  Cross-device sync types (Phase 4)
 packages/sdk/          Official REST API client (@snapglow/sdk, npm beta)
 packages/integrations-core/  Integration provider types, OAuth scopes (api + desktop)
 packages/design-tokens/  DTCG tokens → CSS + tokens.native
@@ -105,6 +111,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 3.3–3.4** : `@snapglow/collab-core`, WebSocket collab server, shared annotations + cursors, comments, in-app/email notifications, desktop `modules/collab/`, web `/c/:documentId` — ADR-012
 - **Sprint 3.5–3.6** : `@snapglow/api-core`, `@snapglow/render-core`, `@snapglow/sdk`, public REST API `/v1/public/captures`, API keys (Team Pro), OpenAPI + Swagger UI, server-side WYSIWYG export — ADR-013
 - **Sprint 3.7–3.8** : `@snapglow/plugin-core`, VS Code / Figma / Notion plugins, team usage reports, embed viewer `/e/:token` — ADR-014
+- **Sprint 4.1–4.16 (Phase 4)** : marketplace templates, Rewardful affiliates, i18n FR/DE/JP, enterprise integrations (Jira/Confluence/Teams), cross-device sync, blog/SEO, Setapp/partner redeem, PostHog A/B tests — ADR-015–018
 
 ## Agent conventions
 

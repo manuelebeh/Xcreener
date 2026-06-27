@@ -1,16 +1,25 @@
 import { Button, Label, Select, Slider } from '@snapglow/ui';
 import { SHARE_EXPIRY_LABELS, SHARE_EXPIRY_OPTIONS, type ShareExpiry } from '@snapglow/cloud-core';
 import type { IntegrationProvider } from '@snapglow/integrations-core';
-import { INTEGRATION_LABELS } from '@snapglow/integrations-core';
+import { INTEGRATION_LABELS, isEnterpriseIntegrationProvider } from '@snapglow/integrations-core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { ask } from '@tauri-apps/plugin-dialog';
 import { useCallback, useRef, useState } from 'react';
+import {
+  captureExperimentExposure,
+  capturePaywallShown,
+  getPaywallExperimentVariant,
+} from '@/integrations/posthog/experiments';
 import { captureExportCompleted } from '@/integrations/posthog/events';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { uploadShare } from '@/modules/cloud/uploadShare';
 import { SendToIntegrationDialog } from '@/modules/integrations/components/SendToIntegrationDialog';
 import { useIntegrationsStore } from '@/modules/integrations/store';
+import {
+  hasEnterpriseIntegrationsAccess,
+  hasPremiumAccess,
+} from '@/modules/licensing/premiumAccess';
 import { useEditorStore } from '@/modules/editor/store';
 import { useExportRender } from '../hooks/useExportRender';
 import { useExportStore } from '../store';
@@ -33,7 +42,13 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
   const isAuthenticated = useCloudAuthStore((s) => s.isAuthenticated);
   const cloudConfigured = isCloudConfigured();
   const connections = useIntegrationsStore((s) => s.connections);
-  const connectedIntegrations = connections.filter((item) => item.connected).map((item) => item.provider);
+  const connectedIntegrations = connections
+    .filter((item) => item.connected)
+    .map((item) => item.provider)
+    .filter(
+      (provider) =>
+        !isEnterpriseIntegrationProvider(provider) || hasEnterpriseIntegrationsAccess()
+    );
 
   const { exportImage } = useExportRender();
   const dragBlobRef = useRef<Blob | null>(null);
@@ -45,6 +60,31 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
   const runExport = useCallback(
     async (action: 'save' | 'copy' | 'drag' | 'share' | 'send', provider?: IntegrationProvider) => {
       if (!screenshot || isExporting) {
+        return;
+      }
+
+      const paywallVariant = getPaywallExperimentVariant();
+      captureExperimentExposure('paywall-timing-v1', paywallVariant);
+
+      if (
+        !hasPremiumAccess() &&
+        paywallVariant === 'export_limit_message' &&
+        (action === 'save' || action === 'copy' || action === 'drag' || action === 'share' || action === 'send')
+      ) {
+        capturePaywallShown('export_limit_message');
+        setLastMessage(
+          'Upgrade to Team Starter to export without limits. Open Settings → Team → Billing.'
+        );
+        return;
+      }
+
+      if (
+        action === 'send' &&
+        provider &&
+        isEnterpriseIntegrationProvider(provider) &&
+        !hasEnterpriseIntegrationsAccess()
+      ) {
+        setLastMessage('Jira, Confluence, and Teams require Team Pro.');
         return;
       }
 

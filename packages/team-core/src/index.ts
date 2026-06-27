@@ -78,6 +78,10 @@ export function hasApiAccess(plan: WorkspacePlan): boolean {
   return plan === 'team_pro';
 }
 
+export function hasEnterpriseIntegrationsAccess(plan: WorkspacePlan): boolean {
+  return plan === 'team_pro';
+}
+
 export function maxMembersForPlan(plan: WorkspacePlan): number | null {
   switch (plan) {
     case 'free':
