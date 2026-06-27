@@ -19,6 +19,15 @@ export const env = createEnv({
       .enum(['true', 'false'])
       .default('true')
       .transform((value) => value === 'true'),
+    SLACK_CLIENT_ID: z.string().default(''),
+    SLACK_CLIENT_SECRET: z.string().default(''),
+    NOTION_CLIENT_ID: z.string().default(''),
+    NOTION_CLIENT_SECRET: z.string().default(''),
+    LINEAR_CLIENT_ID: z.string().default(''),
+    LINEAR_CLIENT_SECRET: z.string().default(''),
+    GITHUB_CLIENT_ID: z.string().default(''),
+    GITHUB_CLIENT_SECRET: z.string().default(''),
+    INTEGRATIONS_REDIRECT_URI: z.string().default('snapglow://integrations/callback'),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

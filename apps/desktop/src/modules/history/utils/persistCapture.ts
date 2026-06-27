@@ -1,4 +1,8 @@
-import { insertCapture, pruneCaptures } from '@/db/captures';
+import { insertCapture, pruneCaptures, updateCaptureOcrText } from '@/db/captures';
+import { linesToPlainText } from '@snapglow/ocr-core';
+import { syncCaptureToLibrary } from '@/modules/cloud/syncLibrary';
+import { useSettingsStore } from '@/modules/settings/store';
+import { recognizeText } from '@/tauri/commands';
 import { deleteCaptureFiles, writeCaptureFiles } from './captureFiles';
 import { generateCaptureFilename } from './filenames';
 
@@ -18,6 +22,27 @@ function captureFingerprint(bytes: Uint8Array | number[]): string {
   return `${uint8.length}:${Array.from(sample).join(',')}`;
 }
 
+async function indexCaptureOcr(id: number, pngBytes: Uint8Array): Promise<string | null> {
+  try {
+    const { ocrEngine, ocrLanguages } = useSettingsStore.getState();
+    const lines = await recognizeText(Array.from(pngBytes), {
+      engine: ocrEngine,
+      languages: ocrLanguages
+        .split('+')
+        .map((language) => language.trim())
+        .filter(Boolean),
+    });
+    const text = linesToPlainText(lines).trim();
+    if (text) {
+      await updateCaptureOcrText(id, text);
+    }
+    return text || null;
+  } catch (error) {
+    console.debug('[history] OCR indexing skipped', error);
+    return null;
+  }
+}
+
 async function persistCaptureInternal(input: PersistCaptureInput): Promise<void> {
   const now = new Date();
   const pngBytes = new Uint8Array(input.bytes);
@@ -28,8 +53,9 @@ async function persistCaptureInternal(input: PersistCaptureInput): Promise<void>
     now
   );
 
-  await insertCapture({
-    filename: generateCaptureFilename(now),
+  const filename = generateCaptureFilename(now);
+  const captureId = await insertCapture({
+    filename,
     filepath: capturePath,
     thumbnail: thumbnailPath,
     width: input.width,
@@ -42,6 +68,15 @@ async function persistCaptureInternal(input: PersistCaptureInput): Promise<void>
   await Promise.all(
     removed.map((capture) => deleteCaptureFiles(capture.filepath, capture.thumbnail))
   );
+
+  const ocrText = await indexCaptureOcr(captureId, pngBytes);
+  syncCaptureToLibrary({
+    captureId,
+    filepath: capturePath,
+    filename,
+    mimeType: 'image/png',
+    ocrText,
+  });
 }
 
 export function persistCapture(input: PersistCaptureInput): void {

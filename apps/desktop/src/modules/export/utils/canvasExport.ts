@@ -1,4 +1,5 @@
 import { computeLayout } from '@/modules/editor/engine/computeLayout';
+import { loadWatermarkLogo } from '@/modules/editor/engine/loadWatermarkLogo';
 import { renderFrame } from '@/modules/editor/engine/renderFrame';
 import type { RenderInput } from '@/modules/editor/types';
 import { useSettingsStore } from '@/modules/settings/store';
@@ -69,7 +70,7 @@ export function canvasToBlob(
 
   if (typeof document !== 'undefined') {
     const fallback = createExportCanvas(canvas.width, canvas.height);
-    const ctx = fallback.getContext('2d');
+    const ctx = fallback.getContext('2d') as CanvasRenderingContext2D | null;
     if (!ctx) {
       throw new Error('Failed to get 2d context for export encoding');
     }
@@ -96,11 +97,11 @@ export function getCanvasExportDimensions(canvas: ExportCanvas): {
   };
 }
 
-export function renderToExportCanvas(input: RenderInput): {
+export async function renderToExportCanvas(input: RenderInput): Promise<{
   canvas: ExportCanvas;
   width: number;
   height: number;
-} {
+}> {
   const exportInput: RenderInput = { ...input, selectedAnnotationId: null };
   const layout = computeLayout(exportInput);
 
@@ -111,7 +112,11 @@ export function renderToExportCanvas(input: RenderInput): {
     throw new Error('Failed to get 2d context for export');
   }
 
-  renderFrame(ctx as CanvasRenderingContext2D, exportInput, 1, canvas);
+  const watermarkLogo = exportInput.watermark?.logoPath
+    ? await loadWatermarkLogo(exportInput.watermark.logoPath)
+    : null;
+
+  renderFrame(ctx as CanvasRenderingContext2D, exportInput, 1, canvas, watermarkLogo);
 
   return {
     canvas,
@@ -125,7 +130,7 @@ export async function exportRenderInput(
   format: ExportFormat,
   quality = 100
 ): Promise<{ blob: Blob; width: number; height: number; compressionPercent: number | null }> {
-  const { canvas, width, height } = renderToExportCanvas(input);
+  const { canvas, width, height } = await renderToExportCanvas(input);
   const blob = await canvasToBlob(canvas, format, quality);
   const smartCompression = useSettingsStore.getState().smartCompression;
   const compressed = await maybeCompressExportBlob(blob, format, quality, smartCompression);

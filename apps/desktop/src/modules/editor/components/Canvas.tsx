@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RedactionOverlay } from '@/modules/redaction/components/RedactionOverlay';
 import { TextSelectionOverlay } from '@/modules/text-extraction/components/TextSelectionOverlay';
+import { useSettingsStore } from '@/modules/settings/store';
+import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/settings/watermark';
 import { computeLayout } from '../engine/computeLayout';
 import { fitPreviewSize } from '../engine/fitPreviewSize';
 import { getPresetById } from '../engine/presets';
@@ -29,6 +31,41 @@ export function Canvas() {
   const annotations = useEditorStore((s) => s.annotations);
   const selectedAnnotationId = useEditorStore((s) => s.selectedAnnotationId);
   const activeTool = useEditorStore((s) => s.activeTool);
+  const watermarkSettings = useSettingsStore((s) => ({
+    watermarkEnabled: s.watermarkEnabled,
+    watermarkDisplayName: s.watermarkDisplayName,
+    watermarkUrl: s.watermarkUrl,
+    watermarkLogoPath: s.watermarkLogoPath,
+    watermarkPosition: s.watermarkPosition,
+    watermarkOpacity: s.watermarkOpacity,
+  }));
+
+  const [watermarkLogo, setWatermarkLogo] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const config = watermarkFromSettings(watermarkSettings);
+    if (!config.enabled || !config.logoPath) {
+      setWatermarkLogo(null);
+      return;
+    }
+
+    let cancelled = false;
+    void loadWatermarkLogoImage(config.logoPath)
+      .then((image) => {
+        if (!cancelled) {
+          setWatermarkLogo(image);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setWatermarkLogo(null);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [watermarkSettings]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -55,6 +92,8 @@ export function Canvas() {
       transform,
       annotations,
       selectedAnnotationId,
+      watermark: watermarkFromSettings(watermarkSettings),
+      watermarkLogo,
     };
   }, [
     screenshot,
@@ -66,6 +105,8 @@ export function Canvas() {
     transform,
     annotations,
     selectedAnnotationId,
+    watermarkSettings,
+    watermarkLogo,
   ]);
 
   const layout = useMemo(() => (renderInput ? computeLayout(renderInput) : null), [renderInput]);

@@ -1,0 +1,58 @@
+export type IntegrationProvider = 'slack' | 'notion' | 'linear' | 'github';
+
+export const INTEGRATION_PROVIDERS: IntegrationProvider[] = [
+  'slack',
+  'notion',
+  'linear',
+  'github',
+];
+
+export const INTEGRATION_LABELS: Record<IntegrationProvider, string> = {
+  slack: 'Slack',
+  notion: 'Notion',
+  linear: 'Linear',
+  github: 'GitHub',
+};
+
+export const INTEGRATION_SCOPES: Record<IntegrationProvider, string> = {
+  slack: 'files:write,chat:write,channels:read',
+  notion: 'read,update,insert',
+  linear: 'read,write,issues:create',
+  github: 'repo',
+};
+
+export const INTEGRATION_REDIRECT_URI = 'snapglow://integrations/callback';
+
+export interface IntegrationConnection {
+  provider: IntegrationProvider;
+  connectedAt: string;
+  accountLabel?: string;
+  teamId?: string;
+  workspaceId?: string;
+}
+
+export interface SendToIntegrationInput {
+  provider: IntegrationProvider;
+  blob: Blob;
+  filename: string;
+  mimeType: string;
+  metadata?: Record<string, string>;
+}
+
+export interface AuthorizeIntegrationResponse {
+  authorizeUrl: string;
+  state: string;
+}
+
+export interface ExchangeIntegrationTokenResponse {
+  accessToken: string;
+  refreshToken?: string | null;
+  expiresAt?: string | null;
+  scope?: string;
+  workspaceName?: string | null;
+  metadata?: Record<string, string>;
+}
+
+export function isIntegrationProvider(value: string): value is IntegrationProvider {
+  return (INTEGRATION_PROVIDERS as readonly string[]).includes(value);
+}

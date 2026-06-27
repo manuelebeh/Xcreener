@@ -19,6 +19,7 @@ interface CaptureRow {
   file_size: number;
   preset_used: string | null;
   tags: string | null;
+  ocr_text: string | null;
   created_at: string;
 }
 
@@ -31,6 +32,9 @@ export interface StoredCapture {
   height: number;
   format: string;
   fileSize: number;
+  tags: string[];
+  ocrText: string | null;
+  ocrSnippet?: string | null;
   createdAt: string;
 }
 
@@ -42,9 +46,28 @@ export interface InsertCaptureInput {
   height: number;
   fileSize: number;
   format?: string;
+  tags?: string[];
 }
 
-function rowToStored(row: CaptureRow): StoredCapture {
+function parseTags(raw: string | null): string[] {
+  if (!raw?.trim()) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (Array.isArray(parsed)) {
+      return parsed.filter((item): item is string => typeof item === 'string');
+    }
+  } catch {
+    return raw
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function rowToStored(row: CaptureRow, ocrSnippet?: string | null): StoredCapture {
   return {
     id: row.id,
     filename: row.filename,
@@ -54,15 +77,19 @@ function rowToStored(row: CaptureRow): StoredCapture {
     height: row.height,
     format: row.format,
     fileSize: row.file_size,
+    tags: parseTags(row.tags),
+    ocrText: row.ocr_text,
+    ocrSnippet: ocrSnippet ?? null,
     createdAt: row.created_at,
   };
 }
 
 export async function insertCapture(input: InsertCaptureInput): Promise<number> {
   const db = await getReadyDb();
+  const tagsJson = JSON.stringify(input.tags ?? []);
   const result = await db.execute(
-    `INSERT INTO captures (filename, filepath, thumbnail, width, height, format, file_size)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO captures (filename, filepath, thumbnail, width, height, format, file_size, tags)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       input.filename,
       input.filepath,
@@ -71,6 +98,7 @@ export async function insertCapture(input: InsertCaptureInput): Promise<number> 
       input.height,
       input.format ?? 'png',
       input.fileSize,
+      tagsJson,
     ]
   );
 
@@ -85,20 +113,109 @@ export async function insertCapture(input: InsertCaptureInput): Promise<number> 
   return id;
 }
 
+export async function updateCaptureOcrText(id: number, ocrText: string): Promise<void> {
+  const db = await getReadyDb();
+  await db.execute('UPDATE captures SET ocr_text = ?, updated_at = datetime(\'now\') WHERE id = ?', [
+    ocrText,
+    id,
+  ]);
+}
+
+export async function updateCaptureTags(id: number, tags: string[]): Promise<void> {
+  const db = await getReadyDb();
+  await db.execute('UPDATE captures SET tags = ?, updated_at = datetime(\'now\') WHERE id = ?', [
+    JSON.stringify(tags),
+    id,
+  ]);
+}
+
 export async function listCaptures(limit = DEFAULT_MAX_CAPTURES): Promise<StoredCapture[]> {
   const db = await getReadyDb();
   const rows = await db.select<CaptureRow[]>(
-    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, created_at
+    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
      FROM captures ORDER BY created_at DESC LIMIT ?`,
     [limit]
   );
-  return rows.map(rowToStored);
+  return rows.map((row) => rowToStored(row));
+}
+
+export async function searchCaptures(query: string, limit = DEFAULT_MAX_CAPTURES): Promise<StoredCapture[]> {
+  const trimmed = query.trim();
+  if (!trimmed) {
+    return listCaptures(limit);
+  }
+
+  const db = await getReadyDb();
+  const ftsQuery = trimmed
+    .split(/\s+/)
+    .map((term) => term.replace(/"/g, '""'))
+    .join(' ');
+
+  try {
+    const rows = await db.select<CaptureRow[]>(
+      `SELECT c.id, c.filename, c.filepath, c.thumbnail, c.width, c.height, c.format, c.file_size,
+              c.preset_used, c.tags, c.ocr_text, c.created_at,
+              snippet(captures_fts, 0, '…', '…', '…', 8) AS snippet
+       FROM captures_fts
+       JOIN captures c ON c.id = captures_fts.rowid
+       WHERE captures_fts MATCH ?
+       ORDER BY rank
+       LIMIT ?`,
+      [ftsQuery, limit]
+    );
+
+    return rows.map((row) =>
+      rowToStored(row, (row as CaptureRow & { snippet?: string }).snippet ?? null)
+    );
+  } catch {
+    const like = `%${trimmed.replace(/%/g, '\\%')}%`;
+    const rows = await db.select<CaptureRow[]>(
+      `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
+       FROM captures
+       WHERE ocr_text LIKE ? OR filename LIKE ?
+       ORDER BY created_at DESC
+       LIMIT ?`,
+      [like, like, limit]
+    );
+    return rows.map((row) => rowToStored(row));
+  }
+}
+
+export async function listCapturesByTag(tag: string, limit = DEFAULT_MAX_CAPTURES): Promise<StoredCapture[]> {
+  const db = await getReadyDb();
+  const rows = await db.select<CaptureRow[]>(
+    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
+     FROM captures
+     WHERE tags LIKE ?
+     ORDER BY created_at DESC
+     LIMIT ?`,
+    [`%"${tag.replace(/"/g, '\\"')}"%`, limit]
+  );
+  return rows.map((row) => rowToStored(row));
+}
+
+export async function listCapturesByCollection(
+  collectionId: number,
+  limit = DEFAULT_MAX_CAPTURES
+): Promise<StoredCapture[]> {
+  const db = await getReadyDb();
+  const rows = await db.select<CaptureRow[]>(
+    `SELECT c.id, c.filename, c.filepath, c.thumbnail, c.width, c.height, c.format, c.file_size,
+            c.preset_used, c.tags, c.ocr_text, c.created_at
+     FROM captures c
+     JOIN capture_collections cc ON cc.capture_id = c.id
+     WHERE cc.collection_id = ?
+     ORDER BY c.created_at DESC
+     LIMIT ?`,
+    [collectionId, limit]
+  );
+  return rows.map((row) => rowToStored(row));
 }
 
 export async function getCapture(id: number): Promise<StoredCapture | null> {
   const db = await getReadyDb();
   const rows = await db.select<CaptureRow[]>(
-    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, created_at
+    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
      FROM captures WHERE id = ? LIMIT 1`,
     [id]
   );

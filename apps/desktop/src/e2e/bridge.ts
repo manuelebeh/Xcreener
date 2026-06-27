@@ -13,7 +13,7 @@ export async function e2eExportToPath(
   format: ExportFormat = 'png',
   quality = 95
 ): Promise<{ path: string; width: number; height: number; byteLength: number }> {
-  const input = buildRenderInputFromStore();
+  const input = await buildRenderInputFromStore();
   if (!input) {
     throw new Error('No screenshot to export');
   }

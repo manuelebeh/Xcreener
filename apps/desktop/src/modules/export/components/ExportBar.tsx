@@ -1,5 +1,7 @@
 import { Button, Label, Select, Slider } from '@snapglow/ui';
 import { SHARE_EXPIRY_LABELS, SHARE_EXPIRY_OPTIONS, type ShareExpiry } from '@snapglow/cloud-core';
+import type { IntegrationProvider } from '@snapglow/integrations-core';
+import { INTEGRATION_LABELS } from '@snapglow/integrations-core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { ask } from '@tauri-apps/plugin-dialog';
 import { useCallback, useRef, useState } from 'react';
@@ -7,6 +9,8 @@ import { captureExportCompleted } from '@/integrations/posthog/events';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { uploadShare } from '@/modules/cloud/uploadShare';
+import { SendToIntegrationDialog } from '@/modules/integrations/components/SendToIntegrationDialog';
+import { useIntegrationsStore } from '@/modules/integrations/store';
 import { useEditorStore } from '@/modules/editor/store';
 import { useExportRender } from '../hooks/useExportRender';
 import { useExportStore } from '../store';
@@ -28,13 +32,18 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
   const setLastMessage = useExportStore((s) => s.setLastMessage);
   const isAuthenticated = useCloudAuthStore((s) => s.isAuthenticated);
   const cloudConfigured = isCloudConfigured();
+  const connections = useIntegrationsStore((s) => s.connections);
+  const connectedIntegrations = connections.filter((item) => item.connected).map((item) => item.provider);
 
   const { exportImage } = useExportRender();
   const dragBlobRef = useRef<Blob | null>(null);
   const [dragReady, setDragReady] = useState(false);
+  const [sendProvider, setSendProvider] = useState<IntegrationProvider | null>(null);
+  const [pendingSendBlob, setPendingSendBlob] = useState<Blob | null>(null);
+  const [pendingSendFormat, setPendingSendFormat] = useState<ExportFormat>('png');
 
   const runExport = useCallback(
-    async (action: 'save' | 'copy' | 'drag' | 'share') => {
+    async (action: 'save' | 'copy' | 'drag' | 'share' | 'send', provider?: IntegrationProvider) => {
       if (!screenshot || isExporting) {
         return;
       }
@@ -99,6 +108,33 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
           return;
         }
 
+        if (action === 'send') {
+          if (!provider) {
+            return;
+          }
+
+          const confirmed = await ask(
+            `Send this capture to ${INTEGRATION_LABELS[provider]}? The image leaves this device only for this upload.`,
+            {
+              title: `Send to ${INTEGRATION_LABELS[provider]}`,
+              kind: 'info',
+              okLabel: 'Continue',
+              cancelLabel: 'Cancel',
+            }
+          );
+
+          if (!confirmed) {
+            setLastMessage('Send cancelled');
+            return;
+          }
+
+          setPendingSendBlob(result.blob);
+          setPendingSendFormat(format);
+          setSendProvider(provider);
+          setLastMessage(`Choose a ${INTEGRATION_LABELS[provider]} destination…`);
+          return;
+        }
+
         dragBlobRef.current = result.blob;
         setDragReady(true);
         setLastMessage(`Drag the handle to another app${compressionMessage}`);
@@ -156,6 +192,33 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
     </Button>
   ) : null;
 
+  const sendMenu =
+    connectedIntegrations.length > 0 ? (
+      <div className="relative">
+        <Select
+          id="send-integration-select"
+          defaultValue=""
+          onChange={(event) => {
+            const provider = event.target.value as IntegrationProvider;
+            if (provider) {
+              void runExport('send', provider);
+              event.target.value = '';
+            }
+          }}
+          disabled={isExporting}
+          data-testid="export-send-select"
+          aria-label="Send to integration"
+        >
+          <option value="">Send to…</option>
+          {connectedIntegrations.map((provider) => (
+            <option key={provider} value={provider}>
+              {INTEGRATION_LABELS[provider]}
+            </option>
+          ))}
+        </Select>
+      </div>
+    ) : null;
+
   const content = (
     <div className="w-full space-y-3" data-testid="export-bar">
       {!embedded ? (
@@ -195,6 +258,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
               Prepare drag
             </Button>
             {shareButton}
+            {sendMenu}
           </div>
         </div>
       ) : (
@@ -229,6 +293,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
             Prepare drag
           </Button>
           {shareButton}
+          {sendMenu}
         </div>
       )}
 
@@ -298,6 +363,27 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         <p className="text-xs text-muted" data-testid="export-status-message">
           {lastMessage}
         </p>
+      ) : null}
+
+      {sendProvider && pendingSendBlob ? (
+        <SendToIntegrationDialog
+          provider={sendProvider}
+          exportBlob={pendingSendBlob}
+          filename={`snapglow-export.${pendingSendFormat}`}
+          mimeType={pendingSendBlob.type || 'image/png'}
+          onClose={() => {
+            setSendProvider(null);
+            setPendingSendBlob(null);
+          }}
+          onSent={async (message, url) => {
+            if (url) {
+              await writeText(url);
+              setLastMessage(`${message} · link copied`);
+              return;
+            }
+            setLastMessage(message);
+          }}
+        />
       ) : null}
     </div>
   );

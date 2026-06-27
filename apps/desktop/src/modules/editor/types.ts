@@ -46,6 +46,8 @@ export type BackgroundConfig =
 export interface RenderInput extends Omit<CoreRenderInput, 'background' | 'screenshot'> {
   screenshot: ImageBitmap;
   background: BackgroundConfig;
+  watermark?: CoreRenderInput['watermark'];
+  watermarkLogo?: CanvasImageSource | null;
 }
 
 /** Convert desktop background to core shape for shared layout logic. */
