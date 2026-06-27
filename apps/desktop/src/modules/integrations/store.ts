@@ -53,7 +53,15 @@ export const useIntegrationsStore = create<IntegrationsState>((set) => ({
     }
 
     const tokens = await loadIntegrationTokens();
-    const providers: IntegrationProvider[] = ['slack', 'notion', 'linear', 'github'];
+    const providers: IntegrationProvider[] = [
+      'slack',
+      'notion',
+      'linear',
+      'github',
+      'jira',
+      'confluence',
+      'msteams',
+    ];
     set({
       configured: true,
       connections: providers.map((provider) => toConnectionState(provider, tokens[provider] ?? null)),

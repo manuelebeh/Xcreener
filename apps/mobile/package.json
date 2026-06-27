@@ -18,6 +18,7 @@
     "@snapglow/design-tokens": "workspace:*",
     "@snapglow/editor-core": "workspace:*",
     "@snapglow/redaction-core": "workspace:*",
+    "@snapglow/i18n": "workspace:*",
     "@snapglow/ui-native": "workspace:*",
     "expo": "~56.0.12",
     "expo-constants": "~56.0.18",

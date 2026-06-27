@@ -1,3 +1,4 @@
+import { LOCALE_LABELS, SUPPORTED_LOCALES, useTranslation } from '@snapglow/i18n';
 import { Button, Input, Select } from '@snapglow/ui';
 import { useState } from 'react';
 import { setSetting } from '@/db';
@@ -10,15 +11,18 @@ import { TeamSection } from '@/modules/team/components/TeamSection';
 import { TeamOnboardingWizard } from '@/modules/team/components/TeamOnboardingWizard';
 import { loadTeamOnboardingState } from '@/modules/team/onboarding';
 import { IntegrationsSection } from '@/modules/integrations/components/IntegrationsSection';
+import { MarketplaceSection } from '@/modules/marketplace/components/MarketplaceSection';
 import { isValidCaptureShortcut, normalizeCaptureShortcut } from '@/shared/lib/shortcut';
-import type { OcrEngineMode, ThemePreference } from '@/shared/types/settings';
+import type { AppLocale, OcrEngineMode, ThemePreference } from '@/shared/types/settings';
 import { SETTING_KEYS } from '@/shared/types/settings';
 import { syncAutostart } from '../autostart';
 import { useSettingsStore } from '../store';
 import { WatermarkSection } from './WatermarkSection';
 
 export function SettingsPanel() {
+  const { t } = useTranslation('settings');
   const theme = useSettingsStore((s) => s.theme);
+  const locale = useSettingsStore((s) => s.locale);
   const captureShortcut = useSettingsStore((s) => s.captureShortcut);
   const launchAtLogin = useSettingsStore((s) => s.launchAtLogin);
   const analyticsEnabled = useSettingsStore((s) => s.analyticsEnabled);
@@ -28,6 +32,7 @@ export function SettingsPanel() {
   const ocrEngine = useSettingsStore((s) => s.ocrEngine);
   const ocrLanguages = useSettingsStore((s) => s.ocrLanguages);
   const setTheme = useSettingsStore((s) => s.setTheme);
+  const setLocale = useSettingsStore((s) => s.setLocale);
   const setCaptureShortcut = useSettingsStore((s) => s.setCaptureShortcut);
   const setLaunchAtLogin = useSettingsStore((s) => s.setLaunchAtLogin);
   const setAnalyticsEnabled = useSettingsStore((s) => s.setAnalyticsEnabled);
@@ -46,6 +51,11 @@ export function SettingsPanel() {
   const [onboardingStep, setOnboardingStep] = useState<
     import('@/modules/team/onboarding').TeamOnboardingStep
   >('welcome');
+
+  async function handleLocaleChange(value: AppLocale) {
+    setLocale(value);
+    await setSetting(SETTING_KEYS.locale, value);
+  }
 
   async function handleThemeChange(value: ThemePreference) {
     setTheme(value);
@@ -152,6 +162,23 @@ export function SettingsPanel() {
           <option value="light">Light</option>
           <option value="dark">Dark</option>
         </Select>
+      </label>
+
+      <label htmlFor="locale-select" className="block text-sm font-medium">
+        {t('language')}
+        <Select
+          id="locale-select"
+          value={locale}
+          onChange={(e) => void handleLocaleChange(e.target.value as AppLocale)}
+          className="mt-2"
+        >
+          {SUPPORTED_LOCALES.map((code) => (
+            <option key={code} value={code}>
+              {LOCALE_LABELS[code]}
+            </option>
+          ))}
+        </Select>
+        <p className="mt-1 text-xs text-muted">{t('languageHint')}</p>
       </label>
 
       <div>
@@ -322,6 +349,8 @@ export function SettingsPanel() {
       />
 
       <IntegrationsSection />
+
+      <MarketplaceSection />
 
       <WatermarkSection />
 

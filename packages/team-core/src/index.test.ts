@@ -3,6 +3,7 @@ import {
   can,
   canAddMember,
   hasApiAccess,
+  hasEnterpriseIntegrationsAccess,
   hasMinRole,
   isInvitationExpired,
   isPaidPlan,
@@ -65,6 +66,12 @@ describe('team-core plan limits', () => {
     expect(isPaidPlan('free')).toBe(false);
     expect(isPaidPlan('team_starter')).toBe(true);
     expect(isPaidPlan('team_pro')).toBe(true);
+  });
+
+  it('gates enterprise integrations to team pro', () => {
+    expect(hasEnterpriseIntegrationsAccess('free')).toBe(false);
+    expect(hasEnterpriseIntegrationsAccess('team_starter')).toBe(false);
+    expect(hasEnterpriseIntegrationsAccess('team_pro')).toBe(true);
   });
 });
 

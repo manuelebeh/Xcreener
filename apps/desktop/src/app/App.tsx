@@ -3,6 +3,7 @@ import { registerE2EBridge } from '@/e2e/bridge';
 import { CaptureErrorBanner } from '@/modules/capture/components/CaptureErrorBanner';
 import { CaptureProgressBanner } from '@/modules/capture/components/CaptureProgressBanner';
 import { useCaptureSession } from '@/modules/capture/hooks/useCaptureSession';
+import { useReferralDeepLink } from '@/modules/licensing/hooks/useReferralDeepLink';
 import { useCloudAuthListener } from '@/modules/cloud/hooks/useCloudAuthListener';
 import { useIntegrationsListener } from '@/modules/integrations/hooks/useIntegrationsListener';
 import { AppTopNav } from './components/AppTopNav';
@@ -16,6 +17,7 @@ function AppShell() {
   useTrayNavigation();
   useCaptureSession();
   useCloudAuthListener();
+  useReferralDeepLink();
   useIntegrationsListener();
 
   return (

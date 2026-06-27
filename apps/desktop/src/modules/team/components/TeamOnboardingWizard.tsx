@@ -5,12 +5,18 @@ import { useCallback, useEffect, useState } from 'react';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import {
+  getNextOnboardingStep,
   getWebHelpUrl,
   markTeamOnboardingCompleted,
   saveTeamOnboardingStep,
   TEAM_ONBOARDING_STEPS,
   type TeamOnboardingStep,
 } from '../onboarding';
+import {
+  captureExperimentExposure,
+  captureOnboardingStepCompleted,
+  getOnboardingExperimentVariant,
+} from '@/integrations/posthog/experiments';
 import { useTeamStore } from '../store';
 import { BillingSection } from './BillingSection';
 import { BrandKitSection } from './BrandKitSection';
@@ -53,12 +59,15 @@ export function TeamOnboardingWizard({
     if (open) {
       setStep(initialStep);
       setError(null);
+      const variant = getOnboardingExperimentVariant();
+      captureExperimentExposure('team-onboarding-v1', variant);
     }
   }, [open, initialStep]);
 
   const goTo = useCallback(async (next: TeamOnboardingStep) => {
     setStep(next);
     setError(null);
+    captureOnboardingStepCompleted(next);
     await saveTeamOnboardingStep(next);
   }, []);
 
@@ -292,7 +301,8 @@ export function TeamOnboardingWizard({
                       await goTo('plan');
                       return;
                     }
-                    const next = TEAM_ONBOARDING_STEPS[currentIndex + 1];
+                    const skipBrandKit = getOnboardingExperimentVariant() === 'skip_brand_kit';
+                    const next = getNextOnboardingStep(step, { skipBrandKit });
                     if (next) {
                       await goTo(next);
                     }

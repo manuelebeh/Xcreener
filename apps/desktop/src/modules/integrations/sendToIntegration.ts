@@ -1,16 +1,22 @@
 import type { IntegrationProvider } from '@snapglow/integrations-core';
 import { INTEGRATION_LABELS } from '@snapglow/integrations-core';
 import {
+  listConfluencePages as fetchConfluencePages,
+  sendToConfluencePage,
+} from './providers/confluence';
+import {
   listGitHubIssues as fetchGitHubIssues,
   listGitHubRepos as fetchGitHubRepos,
   sendToGitHubIssue,
 } from './providers/github';
+import { listJiraIssues as fetchJiraIssues, sendToJiraIssue } from './providers/jira';
 import {
   listLinearIssues as fetchLinearIssues,
   listLinearTeams as fetchLinearTeams,
   sendToLinearIssue,
   sendToLinearTeam,
 } from './providers/linear';
+import { listTeamsChannels as fetchTeamsChannels, sendToTeamsChannel } from './providers/msteams';
 import { listNotionPages as fetchNotionPages, sendToNotionPage } from './providers/notion';
 import { listSlackChannels as fetchSlackChannels, sendToSlackChannel } from './providers/slack';
 import { requireIntegrationToken } from './store';
@@ -88,6 +94,51 @@ export async function sendToProvider(input: SendToProviderInput): Promise<{ mess
       });
       return { message: `Sent to ${input.destinationLabel ?? 'GitHub'}`, url };
     }
+    case 'jira': {
+      const cloudId = token.metadata?.cloudId;
+      if (!cloudId) {
+        throw new Error('Jira cloud ID missing — reconnect integration');
+      }
+      const url = await sendToJiraIssue({
+        accessToken: token.accessToken,
+        cloudId,
+        issueId: input.destinationId,
+        blob: input.blob,
+        filename: input.filename,
+        message: title,
+      });
+      return { message: `Attached to ${input.destinationLabel ?? 'Jira issue'}`, url };
+    }
+    case 'confluence': {
+      const cloudId = token.metadata?.cloudId;
+      if (!cloudId) {
+        throw new Error('Confluence cloud ID missing — reconnect integration');
+      }
+      const url = await sendToConfluencePage({
+        accessToken: token.accessToken,
+        cloudId,
+        pageId: input.destinationId,
+        blob: input.blob,
+        filename: input.filename,
+        caption: title,
+      });
+      return { message: `Sent to ${input.destinationLabel ?? 'Confluence'}`, url };
+    }
+    case 'msteams': {
+      const [teamId, channelId] = input.destinationId.split('|');
+      if (!teamId || !channelId) {
+        throw new Error('Invalid Teams channel selection');
+      }
+      const url = await sendToTeamsChannel({
+        accessToken: token.accessToken,
+        teamId,
+        channelId,
+        blob: input.blob,
+        filename: input.filename,
+        message: title,
+      });
+      return { message: `Sent to ${input.destinationLabel ?? 'Teams'}`, url };
+    }
   }
 }
 
@@ -123,4 +174,27 @@ export async function listLinearIssues(teamId: string) {
 export async function listGitHubIssues(repoFullName: string) {
   const token = await requireIntegrationToken('github');
   return fetchGitHubIssues(token.accessToken, repoFullName);
+}
+
+export async function listJiraIssues() {
+  const token = await requireIntegrationToken('jira');
+  const cloudId = token.metadata?.cloudId;
+  if (!cloudId) {
+    throw new Error('Jira cloud ID missing');
+  }
+  return fetchJiraIssues(token.accessToken, cloudId);
+}
+
+export async function listConfluencePages() {
+  const token = await requireIntegrationToken('confluence');
+  const cloudId = token.metadata?.cloudId;
+  if (!cloudId) {
+    throw new Error('Confluence cloud ID missing');
+  }
+  return fetchConfluencePages(token.accessToken, cloudId);
+}
+
+export async function listTeamsChannels() {
+  const token = await requireIntegrationToken('msteams');
+  return fetchTeamsChannels(token.accessToken);
 }

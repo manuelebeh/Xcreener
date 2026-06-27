@@ -22,6 +22,8 @@
     "@snapglow/collab-core": "workspace:*",
     "@snapglow/editor-core": "workspace:*",
     "@snapglow/design-tokens": "workspace:*",
+    "@snapglow/i18n": "workspace:*",
+    "@snapglow/marketplace-core": "workspace:*",
     "@snapglow/ui": "workspace:*",
     "@t3-oss/env-core": "^0.13.10",
     "@tailwindcss/vite": "^4.1.18",

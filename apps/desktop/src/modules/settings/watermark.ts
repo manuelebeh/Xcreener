@@ -1,8 +1,4 @@
 import type { WatermarkConfig } from '@snapglow/editor-core';
-import { convertFileSrc } from '@tauri-apps/api/core';
-import type { AppSettings } from '@/shared/types/settings';
-
-import type { WatermarkConfig } from '@snapglow/editor-core';
 import type { BrandKitConfig } from '@snapglow/team-core';
 import { isPaidPlan } from '@snapglow/team-core';
 import { convertFileSrc } from '@tauri-apps/api/core';

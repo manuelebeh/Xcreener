@@ -68,9 +68,15 @@ importers:
       '@snapglow/integrations-core':
         specifier: workspace:*
         version: link:../../packages/integrations-core
+      '@snapglow/marketplace-core':
+        specifier: workspace:*
+        version: link:../../packages/marketplace-core
       '@snapglow/render-core':
         specifier: workspace:*
         version: link:../../packages/render-core
+      '@snapglow/sync-core':
+        specifier: workspace:*
+        version: link:../../packages/sync-core
       '@snapglow/team-core':
         specifier: workspace:*
         version: link:../../packages/team-core
@@ -159,9 +165,15 @@ importers:
       '@snapglow/editor-core':
         specifier: workspace:*
         version: link:../../packages/editor-core
+      '@snapglow/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@snapglow/integrations-core':
         specifier: workspace:*
         version: link:../../packages/integrations-core
+      '@snapglow/marketplace-core':
+        specifier: workspace:*
+        version: link:../../packages/marketplace-core
       '@snapglow/ocr-core':
         specifier: workspace:*
         version: link:../../packages/ocr-core
@@ -332,6 +344,9 @@ importers:
       '@snapglow/editor-core':
         specifier: workspace:*
         version: link:../../packages/editor-core
+      '@snapglow/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@snapglow/redaction-core':
         specifier: workspace:*
         version: link:../../packages/redaction-core
@@ -503,6 +518,12 @@ importers:
       '@snapglow/editor-core':
         specifier: workspace:*
         version: link:../../packages/editor-core
+      '@snapglow/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@snapglow/marketplace-core':
+        specifier: workspace:*
+        version: link:../../packages/marketplace-core
       '@snapglow/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -677,6 +698,40 @@ importers:
         specifier: ^3.2.4
         version: 3.2.6(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
+  packages/i18n:
+    dependencies:
+      i18next:
+        specifier: ^25.5.2
+        version: 25.10.10(typescript@6.0.3)
+      react-i18next:
+        specifier: ^15.7.3
+        version: 15.7.4(i18next@25.10.10(typescript@6.0.3))(react@19.2.3)(typescript@6.0.3)
+    devDependencies:
+      '@snapglow/biome-config':
+        specifier: workspace:*
+        version: link:../biome-config
+      '@snapglow/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.21
+      '@types/react':
+        specifier: ^19.1.13
+        version: 19.2.17
+      react:
+        specifier: ^19.1.1
+        version: 19.2.3
+      tsx:
+        specifier: ^4.20.5
+        version: 4.22.4
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6(@types/node@22.19.21)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
   packages/integrations-core:
     devDependencies:
       '@snapglow/biome-config':
@@ -691,6 +746,31 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.6(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/marketplace-core:
+    dependencies:
+      '@snapglow/editor-core':
+        specifier: workspace:*
+        version: link:../editor-core
+      zod:
+        specifier: ^4.3.6
+        version: 4.4.3
+    devDependencies:
+      '@snapglow/biome-config':
+        specifier: workspace:*
+        version: link:../biome-config
+      '@snapglow/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.21
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6(@types/node@22.19.21)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/ocr-core:
     dependencies:
@@ -811,6 +891,24 @@ importers:
       vitest:
         specifier: ^3.2.4
         version: 3.2.6(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/sync-core:
+    devDependencies:
+      '@snapglow/biome-config':
+        specifier: workspace:*
+        version: link:../biome-config
+      '@snapglow/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.21
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6(@types/node@22.19.21)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   packages/team-core:
     devDependencies:
@@ -3469,7 +3567,6 @@ packages:
   '@rolldown/binding-darwin-arm64@1.1.1':
     resolution: {integrity: sha512-rRZRPy/Ynb+Mxu0O6tfPldHeDgAn0sRij+IOUy6sFdUlv3hArGW/DloE3GfAxtqpOJuRNgF74Nr5gM4xBeU2jQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [arm64]
     os: [darwin]
 
   '@rolldown/binding-darwin-x64@1.0.3':
@@ -6914,6 +7011,9 @@ packages:
     resolution: {integrity: sha512-Rw/B2DNQaPBICNXEm8balFz9a6WpZrkCGpcWFpy7nCj+NyhSdqXipmfvtmWt9xGfp0wZnBxB+iVpLmQMYt47Tw==}
     engines: {node: ^18.17.0 || >=20.5.0}
 
+  html-parse-stringify@3.0.1:
+    resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
+
   htmlfy@0.8.1:
     resolution: {integrity: sha512-xWROBw9+MEGwxpotll0h672KCaLrKKiCYzsyN8ZgL9cQbVumFnyvsk2JqiB9ELAV1GLj1GG/jxZUjV9OZZi/yQ==}
 
@@ -6945,6 +7045,14 @@ packages:
 
   hyphenate-style-name@1.1.0:
     resolution: {integrity: sha512-WDC/ui2VVRrz3jOVi+XtjqkDjiVjTtFaAGiW37k6b+ohyQ5wYDOGkvCZa8+H0nx3gyvv0+BST9xuOgIyGQ00gw==}
+
+  i18next@25.10.10:
+    resolution: {integrity: sha512-cqUW2Z3EkRx7NqSyywjkgCLK7KLCL6IFVFcONG7nVYIJ3ekZ1/N5jUsihHV6Bq37NfhgtczxJcxduELtjTwkuQ==}
+    peerDependencies:
+      typescript: ^5 || ^6
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
@@ -8280,6 +8388,22 @@ packages:
     peerDependencies:
       react: '>=17.0.0'
 
+  react-i18next@15.7.4:
+    resolution: {integrity: sha512-nyU8iKNrI5uDJch0z9+Y5XEr34b0wkyYj3Rp+tfbahxtlswxSCjcUL9H0nqXo9IR3/t5Y5PKIA3fx3MfUyR9Xw==}
+    peerDependencies:
+      i18next: '>= 23.4.0'
+      react: '>= 16.8.0'
+      react-dom: '*'
+      react-native: '*'
+      typescript: ^5
+    peerDependenciesMeta:
+      react-dom:
+        optional: true
+      react-native:
+        optional: true
+      typescript:
+        optional: true
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -9594,6 +9718,10 @@ packages:
 
   vlq@1.0.1:
     resolution: {integrity: sha512-gQpnTgkubC6hQgdIcRdYGDSDc+SaujOdyesZQMv6JlfQee/9Mp0Qhnys6WxDWvQnL5WZdT7o2Ul187aSt0Rq+w==}
+
+  void-elements@3.1.0:
+    resolution: {integrity: sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==}
+    engines: {node: '>=0.10.0'}
 
   wait-port@1.1.0:
     resolution: {integrity: sha512-3e04qkoN3LxTMLakdqeWth8nih8usyg+sf1Bgdf9wwUkp05iuK1eSY/QpLvscT/+F/gA89+LpUmmgBtesbqI2Q==}
@@ -12721,7 +12849,9 @@ snapshots:
       metro-runtime: 0.84.4
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89':
     optional: true
@@ -16503,6 +16633,10 @@ snapshots:
     dependencies:
       lru-cache: 10.4.3
 
+  html-parse-stringify@3.0.1:
+    dependencies:
+      void-elements: 3.1.0
+
   htmlfy@0.8.1: {}
 
   htmlparser2@10.1.0:
@@ -16547,6 +16681,12 @@ snapshots:
 
   hyphenate-style-name@1.1.0:
     optional: true
+
+  i18next@25.10.10(typescript@6.0.3):
+    dependencies:
+      '@babel/runtime': 7.29.7
+    optionalDependencies:
+      typescript: 6.0.3
 
   iconv-lite@0.6.3:
     dependencies:
@@ -18034,6 +18174,15 @@ snapshots:
     dependencies:
       react: 19.2.3
 
+  react-i18next@15.7.4(i18next@25.10.10(typescript@6.0.3))(react@19.2.3)(typescript@6.0.3):
+    dependencies:
+      '@babel/runtime': 7.29.7
+      html-parse-stringify: 3.0.1
+      i18next: 25.10.10(typescript@6.0.3)
+      react: 19.2.3
+    optionalDependencies:
+      typescript: 6.0.3
+
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
@@ -19446,6 +19595,8 @@ snapshots:
       - yaml
 
   vlq@1.0.1: {}
+
+  void-elements@3.1.0: {}
 
   wait-port@1.1.0:
     dependencies:

@@ -20,6 +20,9 @@ format = "pnpm turbo format"
 "tokens:build" = "pnpm --filter @snapglow/design-tokens build"
 "storybook" = "pnpm --filter @snapglow/ui storybook"
 test = "pnpm turbo test"
+"i18n:check" = "pnpm --filter @snapglow/i18n check:missing-keys"
+"blog:validate" = "node apps/web/scripts/validate-blog-posts.mjs"
+"dev:affiliates" = "pnpm --filter @snapglow/web dev"
 "test:e2e:native" = "pnpm --filter @snapglow/desktop test:e2e:native:ci"
 "load:api" = { depends = ["api:infra"], run = '''
 cd apps/api && \

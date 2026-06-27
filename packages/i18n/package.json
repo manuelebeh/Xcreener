@@ -1,0 +1,34 @@
+{
+  "name": "@snapglow/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo 'source-only package'",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "test": "vitest run",
+    "check:missing-keys": "tsx scripts/check-missing-keys.ts"
+  },
+  "dependencies": {
+    "i18next": "^25.5.2",
+    "react-i18next": "^15.7.3"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.1.13",
+    "react": "^19.1.1",
+    "tsx": "^4.20.5",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.4"
+  }
+}

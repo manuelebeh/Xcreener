@@ -69,6 +69,35 @@ function providerConfig(provider: IntegrationProvider): ProviderOAuthConfig | nu
         clientSecret: env.GITHUB_CLIENT_SECRET,
         scope: INTEGRATION_SCOPES.github,
       };
+    case 'jira':
+    case 'confluence':
+      if (!env.ATLASSIAN_CLIENT_ID || !env.ATLASSIAN_CLIENT_SECRET) {
+        return null;
+      }
+      return {
+        authorizeUrl: 'https://auth.atlassian.com/authorize',
+        tokenUrl: 'https://auth.atlassian.com/oauth/token',
+        clientId: env.ATLASSIAN_CLIENT_ID,
+        clientSecret: env.ATLASSIAN_CLIENT_SECRET,
+        scope: INTEGRATION_SCOPES[provider],
+        extraAuthorizeParams: {
+          audience: 'api.atlassian.com',
+          prompt: 'consent',
+          response_type: 'code',
+        },
+      };
+    case 'msteams':
+      if (!env.MS_TEAMS_CLIENT_ID || !env.MS_TEAMS_CLIENT_SECRET) {
+        return null;
+      }
+      return {
+        authorizeUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+        tokenUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+        clientId: env.MS_TEAMS_CLIENT_ID,
+        clientSecret: env.MS_TEAMS_CLIENT_SECRET,
+        scope: INTEGRATION_SCOPES.msteams,
+        extraAuthorizeParams: { response_type: 'code' },
+      };
   }
 }
 
@@ -139,6 +168,10 @@ async function exchangeProviderToken(
     body.set('grant_type', 'authorization_code');
   }
 
+  if (provider === 'jira' || provider === 'confluence' || provider === 'msteams') {
+    body.set('grant_type', 'authorization_code');
+  }
+
   const response = await fetch(config.tokenUrl, {
     method: 'POST',
     headers: {
@@ -175,6 +208,41 @@ async function exchangeProviderToken(
     const expiresIn = payload.expires_in as number | undefined;
     if (!accessToken) {
       throw new Error('Linear token missing from response');
+    }
+    return {
+      accessToken,
+      refreshToken: (payload.refresh_token as string | undefined) ?? null,
+      expiresAt: expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null,
+    };
+  }
+
+  if (provider === 'jira' || provider === 'confluence') {
+    const accessToken = payload.access_token as string | undefined;
+    const expiresIn = payload.expires_in as number | undefined;
+    if (!accessToken) {
+      throw new Error(`${provider} token missing from response`);
+    }
+
+    const resourcesResponse = await fetch('https://api.atlassian.com/oauth/token/accessible-resources', {
+      headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
+    });
+    const resources = (await resourcesResponse.json()) as Array<{ id: string; name: string; url: string }>;
+    const site = resources[0];
+
+    return {
+      accessToken,
+      refreshToken: (payload.refresh_token as string | undefined) ?? null,
+      expiresAt: expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null,
+      workspaceName: site?.name ?? null,
+      metadata: site ? { cloudId: site.id, siteUrl: site.url } : undefined,
+    };
+  }
+
+  if (provider === 'msteams') {
+    const accessToken = payload.access_token as string | undefined;
+    const expiresIn = payload.expires_in as number | undefined;
+    if (!accessToken) {
+      throw new Error('Microsoft Teams token missing from response');
     }
     return {
       accessToken,

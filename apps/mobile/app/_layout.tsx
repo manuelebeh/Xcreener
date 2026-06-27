@@ -1,3 +1,4 @@
+import { SnapGlowI18nProvider } from '@snapglow/i18n';
 import { ThemeProvider as SnapGlowThemeProvider } from '@snapglow/ui-native';
 import { Stack } from 'expo-router';
 import { ShareIntentProvider } from 'expo-share-intent';
@@ -24,14 +25,16 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ShareIntentProvider>
-        <SnapGlowThemeProvider>
-          <ShareImportListener />
-          <Stack>
-            <Stack.Screen name="index" options={{ title: 'SnapGlow' }} />
-            <Stack.Screen name="import" options={{ title: 'Import' }} />
-            <Stack.Screen name="editor" options={{ title: 'Editor' }} />
-          </Stack>
-        </SnapGlowThemeProvider>
+        <SnapGlowI18nProvider>
+          <SnapGlowThemeProvider>
+            <ShareImportListener />
+            <Stack>
+              <Stack.Screen name="index" options={{ title: 'SnapGlow' }} />
+              <Stack.Screen name="import" options={{ title: 'Import' }} />
+              <Stack.Screen name="editor" options={{ title: 'Editor' }} />
+            </Stack>
+          </SnapGlowThemeProvider>
+        </SnapGlowI18nProvider>
       </ShareIntentProvider>
     </GestureHandlerRootView>
   );
