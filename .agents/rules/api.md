@@ -52,13 +52,23 @@ pnpm --filter @snapglow/api db:migrate
 | POST | `/v1/billing/webhook` | Stripe sig | Subscription lifecycle events |
 | GET | `/v1/workspaces/:id/sso` | admin | SSO status |
 | POST | `/v1/workspaces/:id/sso/enable` | admin | Enable Auth0 Organization (Team Pro) |
+| POST | `/v1/collab/documents` | editor + paid plan | Create collab document (multipart screenshot + state JSON) |
+| GET | `/v1/collab/documents/:id` | viewer | Document + presigned screenshot + collab URL |
+| PATCH | `/v1/collab/documents/:id` | editor | Snapshot `documentState` / title |
+| POST | `/v1/collab/documents/:id/link-library` | editor | Associate `library_item_id` |
+| GET/POST | `/v1/collab/documents/:id/comments` | viewer | List / create threaded comments |
+| PATCH/DELETE | `/v1/collab/documents/:id/comments/:commentId` | author/admin | Update / soft-delete comment |
+| GET | `/v1/notifications` | Bearer JWT | List in-app notifications |
+| PATCH | `/v1/notifications/:id/read` | Bearer JWT | Mark notification read |
+| POST | `/v1/notifications/read-all` | Bearer JWT | Mark all read |
+| WS | `/v1/collab/ws` | JWT (auth message) | Real-time annotation ops, presence, comment/notification events |
 
-Optional header `X-Workspace-Id` scopes library/share uploads to a team workspace.
+Optional header `X-Workspace-Id` scopes library/share uploads and collab document creation to a team workspace. Library list with this header returns workspace-scoped items.
 
 ## Conventions
 
 - Env validated with `@t3-oss/env-core` + Zod (`src/env.ts`)
-- Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`, `@snapglow/team-core`
+- Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`, `@snapglow/team-core`, `@snapglow/collab-core`
 - Workspace authz via `requireWorkspaceRole` / `can()` from `@snapglow/team-core`
 - Privacy: uploads only from authenticated clients; explicit consent in desktop UI
 - Integration OAuth secrets live in API env only; access tokens stored on desktop
@@ -69,5 +79,7 @@ Optional header `X-Workspace-Id` scopes library/share uploads to a team workspac
 - Public viewer: `apps/web/src/routes/s/$token.tsx`
 - Desktop upload: `apps/desktop/src/modules/cloud/`
 - Desktop team: `apps/desktop/src/modules/team/`
+- Desktop collab: `apps/desktop/src/modules/collab/`
+- Web collab: `apps/web/src/routes/c/$documentId.tsx`
 - Desktop integrations: `apps/desktop/src/modules/integrations/`
-- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`
+- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`

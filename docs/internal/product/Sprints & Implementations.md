@@ -866,15 +866,24 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | T-006 | Serveur WebSocket pour collaboration en temps réel | P0 | 4j | CL-001 |
-| `[ ]` | T-007 | Annotations partagées (curseurs multiples, sync) | P0 | 5j | T-006, P1-024 |
-| `[ ]` | T-008 | Système de commentaires sur les captures | P0 | 3j | T-006 |
-| `[ ]` | T-009 | Notifications (in-app + email) sur les commentaires/mentions | P1 | 2j | T-008 |
+| `[x]` (2026-06-27) | T-006 | Serveur WebSocket pour collaboration en temps réel | P0 | 4j | CL-001 |
+| `[x]` (2026-06-27) | T-007 | Annotations partagées (curseurs multiples, sync) | P0 | 5j | T-006, P1-024 |
+| `[x]` (2026-06-27) | T-008 | Système de commentaires sur les captures | P0 | 3j | T-006 |
+| `[x]` (2026-06-27) | T-009 | Notifications (in-app + email) sur les commentaires/mentions | P1 | 2j | T-008 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-012** : WebSocket + Redis pub/sub, collab documents, comments, notifications
+- **`@snapglow/collab-core`** : protocole WS, ops annotations, présence, mentions, DTOs
+- **API** : migration `0003_collab.sql`, routes `/v1/collab/*`, `/v1/notifications`, WS `/v1/collab/ws` ; library workspace read fix
+- **Desktop** : `modules/collab/` (CollabBar, WS sync, remote cursors, CommentsPanel, NotificationsBell)
+- **Web** : `/c/:documentId` éditeur collaboratif + Auth0 PKCE callback `/auth/callback`
+- **Email** : Resend optional (`RESEND_API_KEY`) ; graceful degrade in-app only
 
 **Critères de validation**
 
-- [ ] 2+ utilisateurs annotent simultanément avec sync < 200 ms
-- [ ] Commentaires + notifications email/in-app fonctionnels
+- [ ] 2+ utilisateurs annotent simultanément avec sync < 200 ms — code livré ; QA manuelle requise
+- [ ] Commentaires + notifications email/in-app fonctionnels — code livré ; QA sandbox email requise
 
 ### Sprint 3.5–3.6 (Semaines 47–50) - API publique
 

@@ -11,6 +11,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import type { BrandKitColors, BrandKitFonts, BrandKitWatermark } from '@snapglow/team-core';
+import type { CollabDocumentState } from '@snapglow/collab-core';
 
 export const workspacePlanEnum = pgEnum('workspace_plan', ['free', 'team_starter', 'team_pro']);
 export const workspaceRoleEnum = pgEnum('workspace_role', ['admin', 'editor', 'viewer']);
@@ -20,6 +21,12 @@ export const subscriptionStatusEnum = pgEnum('subscription_status', [
   'canceled',
   'trialing',
   'incomplete',
+]);
+
+export const notificationTypeEnum = pgEnum('notification_type', [
+  'comment',
+  'mention',
+  'invitation',
 ]);
 
 export const users = pgTable(
@@ -173,6 +180,55 @@ export const libraryItemCollections = pgTable(
   (table) => [primaryKey({ columns: [table.libraryItemId, table.collectionId] })]
 );
 
+export const collabDocuments = pgTable('collab_documents', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  workspaceId: uuid('workspace_id')
+    .notNull()
+    .references(() => workspaces.id, { onDelete: 'cascade' }),
+  libraryItemId: uuid('library_item_id').references(() => libraryItems.id, {
+    onDelete: 'set null',
+  }),
+  createdBy: uuid('created_by')
+    .notNull()
+    .references(() => users.id, { onDelete: 'restrict' }),
+  title: text('title'),
+  screenshotStorageKey: text('screenshot_storage_key').notNull(),
+  screenshotMimeType: text('screenshot_mime_type').notNull(),
+  screenshotByteSize: bigint('screenshot_byte_size', { mode: 'number' }).notNull(),
+  documentState: jsonb('document_state').$type<CollabDocumentState>().default({} as CollabDocumentState).notNull(),
+  version: bigint('version', { mode: 'number' }).default(0).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const comments = pgTable('comments', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  documentId: uuid('document_id')
+    .notNull()
+    .references(() => collabDocuments.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  parentId: uuid('parent_id'),
+  body: text('body').notNull(),
+  anchor: jsonb('anchor').$type<{ x: number; y: number } | null>(),
+  mentionUserIds: jsonb('mention_user_ids').$type<string[]>().default([]).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+});
+
+export const notifications = pgTable('notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  type: notificationTypeEnum('type').notNull(),
+  payload: jsonb('payload').$type<Record<string, unknown>>().default({}).notNull(),
+  readAt: timestamp('read_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;
 export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
@@ -182,3 +238,6 @@ export type WorkspaceSubscription = typeof workspaceSubscriptions.$inferSelect;
 export type Share = typeof shares.$inferSelect;
 export type LibraryItem = typeof libraryItems.$inferSelect;
 export type Collection = typeof collections.$inferSelect;
+export type CollabDocument = typeof collabDocuments.$inferSelect;
+export type Comment = typeof comments.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;

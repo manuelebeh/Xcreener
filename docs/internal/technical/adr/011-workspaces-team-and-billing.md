@@ -33,7 +33,7 @@ Permission checks via `can(role, action)` in `team-core`; API enforces with `req
 
 ### Invitations (v1)
 
-- Signed link: nanoid token, 7-day expiry, no transactional email (privacy-first; email in sprint 3.3)
+- Signed link: nanoid token, 7-day expiry; transactional email optional (Resend, Sprint 3.3–3.4 — see ADR-012)
 - Deep link: `snapglow://team/invite?token=…`
 - Accept: `POST /v1/invitations/:token/accept` (authenticated; email match when invitation email set)
 
@@ -81,6 +81,6 @@ Fallback: without Management API credentials, admin sets `auth0_org_id` manually
 
 | Option | Rejected because |
 |--------|------------------|
-| Email invitations v1 | Zero-infra signed links align with privacy-first; email deferred to T-009 |
+| Email invitations v1 | Zero-infra signed links align with privacy-first; transactional email added Sprint 3.3–3.4 (ADR-012, optional Resend) |
 | Custom SAML in API | Auth0 Organizations already chosen in ADR-009 for Phase 3 SSO |
 | Web team dashboard | Desktop-first per sprint scope |
