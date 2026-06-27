@@ -32,7 +32,7 @@ Chaque sprint se termine par un **récapitulatif indicatif** (livré, en attente
 
 ```
 apps/
-├── desktop/     # Tauri v2 - macOS + Windows        (Phase 0–1)
+├── desktop/     # Tauri v2 - macOS + Windows        (Phase 0-1)
 ├── web/         # Landing + viewer partage /s/:token (Sprint 0.2, 2b.5)
 ├── mobile/      # React Native Expo - iOS + Android  (Phase 1b)
 └── api/         # Fastify + PostgreSQL + Redis       (Phase 2b)
@@ -46,10 +46,10 @@ packages/
 ├── ocr-core/               # Types OCR + assembly texte (Sprint 2b.2)
 ├── cloud-core/             # Shares, expiry, library types (Sprint 2b.5)
 ├── integrations-core/      # Providers OAuth Send to… (Sprint 2b.6)
-├── team-core/              # Rôles workspace, plans, brand kit (Sprint 3.1–3.2)
-├── marketplace-core/       # Templates marketplace DTOs (Sprint 4.1–4.2)
-├── sync-core/              # Sync cursors, LWW settings (Sprint 4.9–4.10)
-├── i18n/                   # SSOT traductions en/fr/de/ja (Sprint 4.5–4.6)
+├── team-core/              # Rôles workspace, plans, brand kit (Sprint 3.1-3.2)
+├── marketplace-core/       # Templates marketplace DTOs (Sprint 4.1-4.2)
+├── sync-core/              # Sync cursors, LWW settings (Sprint 4.9-4.10)
+├── i18n/                   # SSOT traductions en/fr/de/ja (Sprint 4.5-4.6)
 ├── biome-config/           # Biome partagé (Sprint 0.1)
 └── typescript-config/
 ```
@@ -61,24 +61,24 @@ packages/
 ## 2. Vue d'ensemble des phases
 
 ```
-PHASE 0 - Fondations          M1–M2     (4 sprints)     Architecture & Setup
-PHASE 1 - MVP Desktop         M2–M5     (6 sprints)     Core macOS + Windows
-PHASE 1b - MVP Mobile         M4–M6     (4 sprints)     iOS + Android
+PHASE 0 - Fondations          M1-M2     (4 sprints)     Architecture & Setup
+PHASE 1 - MVP Desktop         M2-M5     (6 sprints)     Core macOS + Windows
+PHASE 1b - MVP Mobile         M4-M6     (4 sprints)     iOS + Android
 PHASE 2 - Lancement           M6        (2 sprints)     Beta + Product Hunt
-PHASE 2b - IA & Cloud         M7–M9     (6 sprints)     Intelligence + Cloud
-PHASE 3 - Team & B2B          M10–M14   (10 sprints)    Collaboration + API
-PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
+PHASE 2b - IA & Cloud         M7-M9     (6 sprints)     Intelligence + Cloud
+PHASE 3 - Team & B2B          M10-M14   (10 sprints)    Collaboration + API
+PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 ```
 
 **Total estimé : ~40 sprints sur 18 mois**
 
 ---
 
-## 3. PHASE 0 - Fondations (M1–M2)
+## 3. PHASE 0 - Fondations (M1-M2)
 
 > Objectif : poser l'architecture technique, le design system, et l'infrastructure de développement.
 
-### Sprint 0.1 (Semaines 1–2) - Setup & Architecture
+### Sprint 0.1 (Semaines 1-2) - Setup & Architecture
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -139,7 +139,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 | Terraform GCP + Docker infra | Phase 2b+ | **Reporter** |
 | oh-my-agent | - | **Ne pas adopter** |
 
-### Sprint 0.2 (Semaines 3–4) - Design System & Prototype
+### Sprint 0.2 (Semaines 3-4) - Design System & Prototype
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -177,7 +177,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] `mise run dev:web` et `mise run tokens:build` opérationnels
 - [x] Husky retiré ; hooks mise actifs (lint-staged + commitlint)
 
-### Sprint 0.3 (Semaines 5–6) - Infrastructure & Intégration système
+### Sprint 0.3 (Semaines 5-6) - Infrastructure & Intégration système
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -208,7 +208,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Vitest + au moins 1 test unitaire ; Playwright smoke test configuré
 - [x] PostHog + Sentry initialisés (events de test visibles en dashboard avec `VITE_POSTHOG_KEY` / `VITE_SENTRY_DSN` en `.env`)
 
-### Sprint 0.4 (Semaines 7–8) - Polissage Phase 0 & Préparation Phase 1
+### Sprint 0.4 (Semaines 7-8) - Polissage Phase 0 & Préparation Phase 1
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -249,11 +249,11 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 4. PHASE 1 - MVP Desktop (M2–M5)
+## 4. PHASE 1 - MVP Desktop (M2-M5)
 
 > Objectif : livrer les fonctionnalités core de capture + beautification sur macOS et Windows.
 
-### Sprint 1.1 (Semaines 9–10) - Capture d'écran native
+### Sprint 1.1 (Semaines 9-10) - Capture d'écran native
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -286,14 +286,14 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Tests multi-écran / HiDPI passent sur au moins 2 configurations (QA macOS validée ; scale overlay Windows validé en QA manuelle, 2026-06-20)
 - [x] Image capturée affichée dans l'éditeur (pipeline bout-en-bout minimal)
 
-### Sprint 1.2 (Semaines 11–12) - Beautification automatique
+### Sprint 1.2 (Semaines 11-12) - Beautification automatique
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
 | `[x]` (2026-06-16) | P1-007 | Implémenter le moteur de rendu Canvas (fond + capture + ombre) | P0 | 4j | P1-001 |
 | `[x]` (2026-06-16) | P1-008 | Arrière-plans dégradés : bibliothèque de 50+ presets | P0 | 2j | P1-007 |
 | `[x]` (2026-06-16) | P1-009 | Padding intelligent + auto-balance (centrage) | P0 | 2j | P1-007 |
-| `[x]` (2026-06-16) | P1-010 | Coins arrondis configurables (slider 0–32px) | P0 | 1j | P1-007 |
+| `[x]` (2026-06-16) | P1-010 | Coins arrondis configurables (slider 0-32px) | P0 | 1j | P1-007 |
 | `[x]` (2026-06-16) | P1-011 | Ombre portée (intensité, flou, offset, couleur) | P0 | 1j | P1-007 |
 | `[x]` (2026-06-16) | P1-012 | Fond personnalisé (couleur custom + image uploadée) | P1 | 2j | P1-007 |
 
@@ -311,7 +311,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **En attente / reporté**
 
 - **StyleBar inline polie** (P1-017, Sprint 1.3) - `BeautifyPanel` couvre les contrôles fonctionnels du sprint
-- **Profiling perf formel** (< 50–100 ms par frame) - reporté P1-038 ; rendu rAF thread principal suffisant en QA manuelle
+- **Profiling perf formel** (< 50-100 ms par frame) - reporté P1-038 ; rendu rAF thread principal suffisant en QA manuelle
 
 **Critères de validation**
 
@@ -320,7 +320,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Padding, radius et ombre ajustables via UI (`BeautifyPanel`)
 - [x] Fond couleur custom + image upload fonctionnels
 
-### Sprint 1.3 (Semaines 13–14) - Presets, Format & Éditeur inline
+### Sprint 1.3 (Semaines 13-14) - Presets, Format & Éditeur inline
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -336,7 +336,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **Livré (code, 2026-06-16)**
 
 - **Moteur cadre** : `engine/presets.ts` - 5 presets sociaux + ratios 16:9 / 4:3 / 1:1 / libre ; `computeLayout` v2 (mode libre inchangé + dimensions export fixes) ; `ScreenshotTransform` (scale + offset)
-- **Interaction** : `useScreenshotTransform` - drag pointeur + molette zoom (0.5×–3×) sur le canvas
+- **Interaction** : `useScreenshotTransform` - drag pointeur + molette zoom (0.5×-3×) sur le canvas
 - **Presets custom SQLite** : `db/presets.ts` CRUD sur `custom_presets` ; hydratation via `useCustomPresetsLoader`
 - **UI inline** : `EditorView` - Feature Stack (`Canvas` sticky gauche + `EditorToolsPanel` droite) ; sections Format (`PresetBar`) puis Style (`StyleBar`, ex-`BeautifyPanel`, carrousel dégradés, shadow offsetX)
 - **Export prep** : `export/utils/canvasExport.ts` - `canvasToPngBlob` + dimensions bitmap
@@ -349,7 +349,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Drag/zoom capture dans le cadre fluide
 - [x] Barre de style et barre de presets utilisables sans régression perf (rAF inchangé)
 
-### Sprint 1.4 (Semaines 15–16) - Annotations
+### Sprint 1.4 (Semaines 15-16) - Annotations
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -379,7 +379,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Undo/redo ≥ 20 niveaux sans corruption du rendu
 - [x] Annotations incluses à l'export PNG/JPG/WebP (composées dans `renderFrame` → `canvasToPngBlob` WYSIWYG)
 
-### Sprint 1.5 (Semaines 17–18) - Redaction & Export
+### Sprint 1.5 (Semaines 17-18) - Redaction & Export
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -410,7 +410,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Export PNG/JPG/WebP + copier presse-papier + drag-out fonctionnels
 - [x] Masquage via `drawBlurMasks` (blur gaussien) sur régions détectées - pas de fuite de pixels sur le rendu exporté
 
-### Sprint 1.6 (Semaines 19–20) - Historique & Polish MVP
+### Sprint 1.6 (Semaines 19-20) - Historique & Polish MVP
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -461,12 +461,12 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 5. PHASE 1b - MVP Mobile (M4–M6)
+## 5. PHASE 1b - MVP Mobile (M4-M6)
 
 > Objectif : proposer une app compagnon iOS et Android avec parité fonctionnelle sur la beautification.
 > Note : démarrage en parallèle du Sprint 1.4 desktop.
 
-### Sprint 1b.1 (Semaines 15–16) - Setup React Native & Capture mobile
+### Sprint 1b.1 (Semaines 15-16) - Setup React Native & Capture mobile
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -490,7 +490,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **Checklist QA interne (Sprint 1b.1)**
 
 - [x] `mise run dev:mobile` démarre Metro dev client
-- [x] `mise run dev:mobile:ios` — build + install simulateur iPhone 17
+- [x] `mise run dev:mobile:ios` - build + install simulateur iPhone 17
 - [x] Share Photos → SnapGlow → preview `/import` (iOS simulateur / device)
 - [x] Share Galerie → SnapGlow → preview `/import` (Android émulateur / device)
 - [x] Boutons primary/secondary/destructive + thème light/dark sur home
@@ -501,7 +501,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Share Extension / Intent importe une image dans l'app (QA iOS + Android validée)
 - [x] Composants design-tokens rendus correctement sur mobile (`@snapglow/ui-native` + écran showcase)
 
-### Sprint 1b.2 (Semaines 17–18) - Beautification & Presets mobile
+### Sprint 1b.2 (Semaines 17-18) - Beautification & Presets mobile
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -524,7 +524,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Import → `/editor` : beautify + presets + annotations tactiles
 - [x] Save to Photos (permission + enregistrement)
 - [x] Share sheet natif (iOS simulateur : warnings `[Sharing]` console possibles sans blocage)
-- [x] Export pleine résolution layout (complété en 1b.3 — `ExportCanvas` offscreen + `exportMode`)
+- [x] Export pleine résolution layout (complété en 1b.3 - `ExportCanvas` offscreen + `exportMode`)
 
 **Critères de validation**
 
@@ -532,7 +532,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Annotations tactiles utilisables
 - [x] Export Photos + share sheet natif fonctionnels
 
-### Sprint 1b.3 (Semaines 19–20) - Polish & Tests mobile
+### Sprint 1b.3 (Semaines 19-20) - Polish & Tests mobile
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -544,7 +544,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **Livré (code, 2026-06-20)**
 
 - **`@snapglow/redaction-core`** : détecteurs TS (6 kinds), `mapRegionToLayout`, Vitest recall ≥ 90% ; desktop `mapToLayout` refactoré
-- **`modules/snapglow-ocr`** : Expo module natif — Apple Vision (iOS) + ML Kit (Android), OCR downscale max 2048px
+- **`modules/snapglow-ocr`** : Expo module natif - Apple Vision (iOS) + ML Kit (Android), OCR downscale max 2048px
 - **`apps/mobile/src/modules/redaction/`** : `RedactionBar`, `RedactionOverlay`, scan → blur, auto-redact AsyncStorage
 - **Export pleine résolution** : `ExportCanvas` offscreen (`exportMode`) dans `ExportBar`
 - **Docs QA** : `apps/mobile/docs/qa/device-matrix.md` (matrice + perf notes)
@@ -554,9 +554,9 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 - [x] Redaction mobile alignée desktop (on-device)
 - [x] Tests devices réels documentés (matrice OS / modèles)
-- [~] Builds TestFlight + Play Internal Testing uploadés — **EAS prêt ; upload bloqué sans comptes Apple/Google**
+- [~] Builds TestFlight + Play Internal Testing uploadés - **EAS prêt ; upload bloqué sans comptes Apple/Google**
 
-### Sprint 1b.4 (Semaines 21–22) - Soumission & Corrections
+### Sprint 1b.4 (Semaines 21-22) - Soumission & Corrections
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -570,7 +570,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **En attente (soumission manuelle)**
 
 - Comptes développeur Apple ($99/an) et Google Play ($25 one-time).
-- Review store (1–7 jours Apple, 1–3 jours Google en moyenne).
+- Review store (1-7 jours Apple, 1-3 jours Google en moyenne).
 
 **Critères de validation**
 
@@ -584,7 +584,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 > Objectif : beta fermée, feedback, puis lancement public coordonné.
 
-### Sprint 2.1 (Semaines 23–24) - Beta fermée
+### Sprint 2.1 (Semaines 23-24) - Beta fermée
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -601,7 +601,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [ ] 0 bug P0 ouvert en fin de sprint
 - [ ] Landing finalisée (vidéo, pricing, FAQ live)
 
-### Sprint 2.2 (Semaines 25–26) - Lancement public
+### Sprint 2.2 (Semaines 25-26) - Lancement public
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -628,11 +628,11 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 7. PHASE 2b - IA & Cloud (M7–M9)
+## 7. PHASE 2b - IA & Cloud (M7-M9)
 
 > Objectif : ajouter l'intelligence artificielle, les captures avancées, et le cloud.
 
-### Sprint 2b.1 (Semaines 27–28) - Suggestion de style IA
+### Sprint 2b.1 (Semaines 27-28) - Suggestion de style IA
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -646,14 +646,14 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **`@snapglow/style-suggestion-core`** : 6 classes (`code`, `ui`, `terminal`, `photo`, `diagram`, `text`), mapping §8.2 → gradient/solid/blur + ombres, Vitest
 - **`apps/desktop/src/modules/style-suggestion/`** : `StyleSuggestionBar`, scan auto (`autoStyleSuggestion`, défaut ON), Apply 1 clic, fond photo flouté
 - **`apps/desktop/src-tauri/src/classification/`** : commande `classify_content_command`, preprocessing 224×224, inférence TFLite (`tract-tflite`) si modèle bundlé, **fallback heuristique** sinon ; latence < 500 ms (test Rust)
-- **`tools/style-classifier/`** : scripts `collect`, `train` (MobileNetV3-Small), `evaluate` (gate ≥ 80 %), `export` (.tflite + .mlmodel) — voir `tools/README.md`
+- **`tools/style-classifier/`** : scripts `collect`, `train` (MobileNetV3-Small), `evaluate` (gate ≥ 80 %), `export` (.tflite + .mlmodel) - voir `tools/README.md`
 
-**Dataset (2026-06-21)** — pipeline de constitution livré
+**Dataset (2026-06-21)** - pipeline de constitution livré
 
 - **`tools/style-classifier/sources.json`** : manifeste des sources publiques recherchées et documentées (license + usage commercial) pour les 6 classes
 - **`scripts/fetch_dataset.py`** : télécharge `ui` ([WebUI](https://huggingface.co/datasets/biglab/webui-7k)), `photo` ([Unsplash Lite](https://huggingface.co/datasets/1aurent/unsplash-lite)), `text` ([DocLayNet](https://huggingface.co/datasets/pierreguillou/DocLayNet-base), CDLA-Permissive) → `dataset/raw/<class>/` ; auto-détection colonne image, dedup, normalisation PNG ; écrit `SOURCES.lock.json` (provenance)
-- **`scripts/synthesize.py`** : génère `code`/`terminal`/`diagram` (license-clean) via Pygments + Graphviz (fallback matplotlib/networkx) — smoke test OK (PNG valides)
-- **Conformité normes** : on-device, pas de PII, images non commitées (`.gitignore`), licences tracées — voir [`tools/style-classifier/DATASET.md`](../../../tools/style-classifier/DATASET.md)
+- **`scripts/synthesize.py`** : génère `code`/`terminal`/`diagram` (license-clean) via Pygments + Graphviz (fallback matplotlib/networkx) - smoke test OK (PNG valides)
+- **Conformité normes** : on-device, pas de PII, images non commitées (`.gitignore`), licences tracées - voir [`tools/style-classifier/DATASET.md`](../../../tools/style-classifier/DATASET.md)
 - **Reste à faire (machine réseau + CPU/GPU)** : `pip install -r requirements.txt` → `fetch_dataset.py --limit 1500` → `collect.py` → `train.py` → `evaluate.py` (gate ≥ 80 %) → `export.py`
 
 **En attente (bloquant prod ML)**
@@ -667,9 +667,9 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 - [x] Classification on-device sans réseau ; latence < 500 ms (heuristique + pipeline TFLite prêt)
 - [x] Badge "Suggested" + application style en 1 clic (desktop)
-- [ ] Précision acceptable sur jeu de test interne (≥ 80 %) — **pipeline dataset livré (2026-06-21) ; reste l'entraînement AI-001**
+- [ ] Précision acceptable sur jeu de test interne (≥ 80 %) - **pipeline dataset livré (2026-06-21) ; reste l'entraînement AI-001**
 
-### Sprint 2b.2 (Semaines 29–30) - OCR & Auto-crop
+### Sprint 2b.2 (Semaines 29-30) - OCR & Auto-crop
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -690,7 +690,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Notes d'implémentation**
 
-- AI-005 : Tesseract via **CLI système** (`tesseract … tsv`) plutôt que `tesseract.js` WASM — même intent FR-009, meilleure intégration Tauri offline
+- AI-005 : Tesseract via **CLI système** (`tesseract … tsv`) plutôt que `tesseract.js` WASM - même intent FR-009, meilleure intégration Tauri offline
 - AI-006 : Vision déjà utilisée pour redaction ; exposée pour copy-text via `recognize_text_command` (mode `native` / `auto`)
 - Tesseract fallback : `brew install tesseract` (+ langues) sur macOS dev ; variable `TESSDATA_PREFIX` ou `SNAPGLOW_TESSDATA_DIR`
 
@@ -700,7 +700,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - [x] Auto-crop réduit marges vides sans rogner le contenu (tests Rust trim + undo éditeur)
 - [x] Compression réduit taille fichier ≥ 30 % sans perte visible (test Rust `png_compression_reduces_size`)
 
-### Sprint 2b.3 (Semaines 31–32) - Capture scrollante & GIF
+### Sprint 2b.3 (Semaines 31-32) - Capture scrollante & GIF
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -711,7 +711,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code + QA manuelle, 2026-06-20)**
 
-- **ADR-007** : flux live capture (preview crop vs native grab) — [007-live-capture-flows.md](../technical/adr/007-live-capture-flows.md)
+- **ADR-007** : flux live capture (preview crop vs native grab) - [007-live-capture-flows.md](../technical/adr/007-live-capture-flows.md)
 - **Rust** : `capture/native.rs` (`capture_native_command`), `capture/scroll.rs` + `capture/stitch.rs` (`capture_scrolling_window_command`), `resolve_window` (WindowInfo, exclusion fenêtres SnapGlow), scroll plateforme macOS (CGEvent clavier Home / ⌘↑ / Page Down) + Windows (`VK_HOME` / `VK_NEXT`)
 - **Overlay** : modes **Scroll** et **Menu** ; dropdown **Delay** (Off / 3s / 5s / 10s) ; countdown overlay ; HUD flottant scroll (pastille + **Done** + état « Finishing capture… »)
 - **Menu** : overlay live sans preview, délai 3s par défaut, capture region ou fenêtre après countdown
@@ -727,10 +727,10 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [x] (2026-06-20) Capture scrollante macOS + Windows sur pages test (long scroll) — QA manuelle OK ; améliorations stitch prévues
-- [x] (2026-06-20) Timer différé et capture menu ouvert fonctionnels — QA manuelle OK
+- [x] (2026-06-20) Capture scrollante macOS + Windows sur pages test (long scroll) - QA manuelle OK ; améliorations stitch prévues
+- [x] (2026-06-20) Timer différé et capture menu ouvert fonctionnels - QA manuelle OK
 
-### Sprint 2b.4 (Semaines 33–34) - Capture vidéo/GIF
+### Sprint 2b.4 (Semaines 33-34) - Capture vidéo/GIF
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -742,15 +742,15 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Livraison (2026-06-20, QA validée 2026-06-21)**
 
-- **UI overlay** : toggle Photo / Video ; mode **Record** zone uniquement (fenêtre / écran grisés — `captureModes.ts`) ; toggle GIF / MP4 ; qualité GIF low / medium / high (`CaptureToolbar.tsx`) ; HUD pause / stop / timer (`useRecordingElapsed.ts`, `CaptureProgressBanner.tsx`)
+- **UI overlay** : toggle Photo / Video ; mode **Record** zone uniquement (fenêtre / écran grisés - `captureModes.ts`) ; toggle GIF / MP4 ; qualité GIF low / medium / high (`CaptureToolbar.tsx`) ; HUD pause / stop / timer (`useRecordingElapsed.ts`, `CaptureProgressBanner.tsx`)
 - **Capture frames**
   - **macOS** : ScreenCaptureKit streaming ~30 fps, crop région retina (`platform/macos_record.rs`) ; permission Screen Recording requise
   - **Windows** : polling `capture_region` ~20 fps (50 ms), timestamps par frame (`capture/record/session.rs`) ; adapter `windows_record.rs` (upgrade WGC en backlog)
 - **Frames temporaires** : RGBA horodatées `frame_{index}_{timestamp_ms}.rgba` sous `tempfile` ; durée active (pause exclue) via `control.rs`
 - **Durées** : GIF auto-stop **8 s** (boucles courtes) ; MP4 plafond **30 s**
 - **IPC** : `start_region_recording_command`, `pause_region_recording_command`, `resume_region_recording_command`, `stop_region_recording_command`, `cancel_region_recording_command` ; progress `capture-progress` (`phase: "recording"`) ; complete `capture-recording-complete` ; `open_path_command` (lecteur OS)
-- **GIF** : `encode_gif.rs` — grille 20 fps à partir de timestamps VFR, palette globale `imagequant`, budgets low / medium / high, boucle infinie ; test unitaire < 10 MB / 10 s (qualité low)
-- **MP4** : `encode_mp4.rs` — resampling CFR 12–30 fps (openh264 + mux `mp4`) ; corrige les freezes QuickTime sur contenu statique / pauses
+- **GIF** : `encode_gif.rs` - grille 20 fps à partir de timestamps VFR, palette globale `imagequant`, budgets low / medium / high, boucle infinie ; test unitaire < 10 MB / 10 s (qualité low)
+- **MP4** : `encode_mp4.rs` - resampling CFR 12-30 fps (openh264 + mux `mp4`) ; corrige les freezes QuickTime sur contenu statique / pauses
 - **Post-capture** : staging `app_data/recording-staging/` → dialogue sauvegarde (`saveRecording.ts`) → historique (`persistRecording.ts`, `format: gif|mp4`, miniature 1ʳᵉ frame) → ouverture lecteur OS si l’utilisateur choisit un emplacement ; pas d’éditeur
 - **ADR-008**
 
@@ -761,11 +761,11 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [x] (2026-06-21) Enregistrement zone GIF (≤ 8 s) + MP4 (≤ 30 s) macOS + Windows — QA manuelle OK
+- [x] (2026-06-21) Enregistrement zone GIF (≤ 8 s) + MP4 (≤ 30 s) macOS + Windows - QA manuelle OK
 - [x] GIF < 10 MB pour 10 s (test unitaire Rust, qualité low) ; MP4 lecture fluide (CFR, test Rust gaps statiques)
 - [x] Contrôles start / stop / pause utilisables (HUD overlay) ; post-capture sauvegarde + historique + ouverture lecteur
 
-### Sprint 2b.5 (Semaines 35–36) - Cloud & Partage
+### Sprint 2b.5 (Semaines 35-36) - Cloud & Partage
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -791,11 +791,11 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [x] `mise run dev:api` lance Fastify + Postgres + Redis local — code livré (docker-compose + mise task)
-- [x] Upload → lien public → page viewer fonctionnels — code livré ; QA E2E manuelle en attente
-- [x] Expiration liens configurable et respectée — code livré ; QA en attente
+- [x] `mise run dev:api` lance Fastify + Postgres + Redis local - code livré (docker-compose + mise task)
+- [x] Upload → lien public → page viewer fonctionnels - code livré ; QA E2E manuelle en attente
+- [x] Expiration liens configurable et respectée - code livré ; QA en attente
 
-### Sprint 2b.6 (Semaines 37–38) - Intégrations & Organisation
+### Sprint 2b.6 (Semaines 37-38) - Intégrations & Organisation
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -811,7 +811,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 - **`packages/integrations-core`** : types providers (Slack, Notion, Linear, GitHub), scopes OAuth, shapes send
 - **`apps/api`** : proxy OAuth `GET/POST /v1/integrations/:provider/*` ; library `POST/GET/PATCH /v1/library`, CRUD `/v1/collections` ; Drizzle `library_items` + `collections` (`drizzle/0001_library.sql`)
-- **Desktop intégrations** : `modules/integrations/` (OAuth via API, tokens SQLite, deep link `snapglow://integrations/callback`), Settings **Integrations**, ExportBar **Send to…** (consentement + picker destination) — Slack channel, Notion page, Linear issue, GitHub issue
+- **Desktop intégrations** : `modules/integrations/` (OAuth via API, tokens SQLite, deep link `snapglow://integrations/callback`), Settings **Integrations**, ExportBar **Send to…** (consentement + picker destination) - Slack channel, Notion page, Linear issue, GitHub issue
 - **Library hybride** : migration SQLite `002_library_ocr.sql` (FTS5 + `ocr_text`), indexation OCR async dans `persistCapture`, UI **Library** (recherche OCR, filtres tag/collection, résultats cloud si Auth0 actif), `syncLibrary.ts`
 - **Watermark** : `WatermarkConfig` (`@snapglow/editor-core`), `drawWatermark.ts`, Settings `WatermarkSection`, inclus export / share / Send to…
 - **ADR-010**, `.agents/rules/api.md`, `apps/api/.env.example` (credentials OAuth par provider)
@@ -824,9 +824,9 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [ ] Intégration Slack opérationnelle (envoi depuis éditeur) — code livré ; QA OAuth apps requise
-- [ ] Bibliothèque cloud avec recherche OCR — code livré ; QA sync + FTS locale en attente
-- [ ] Tags et collections utilisables — code livré ; QA en attente
+- [ ] Intégration Slack opérationnelle (envoi depuis éditeur) - code livré ; QA OAuth apps requise
+- [ ] Bibliothèque cloud avec recherche OCR - code livré ; QA sync + FTS locale en attente
+- [ ] Tags et collections utilisables - code livré ; QA en attente
 - [ ] Jalon J4 validé (1 000 utilisateurs payants - métrique produit)
 
 ---
@@ -835,11 +835,11 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 ---
 
-## 8. PHASE 3 - Team & B2B (M10–M14)
+## 8. PHASE 3 - Team & B2B (M10-M14)
 
 > Objectif : débloquer le segment B2B avec collaboration, workspaces, et API.
 
-### Sprint 3.1–3.2 (Semaines 39–42) - Workspace & Gestion d'équipe
+### Sprint 3.1-3.2 (Semaines 39-42) - Workspace & Gestion d'équipe
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -862,9 +862,9 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 - [x] Workspace créable ; invitations + rôles fonctionnels
 - [x] Brand kit partagé appliqué aux exports team (when paid plan + toggle ON)
-- [ ] Billing Stripe par siège opérationnel (sandbox puis prod) — code livré ; QA sandbox manuelle
+- [ ] Billing Stripe par siège opérationnel (sandbox puis prod) - code livré ; QA sandbox manuelle
 
-### Sprint 3.3–3.4 (Semaines 43–46) - Collaboration temps réel
+### Sprint 3.3-3.4 (Semaines 43-46) - Collaboration temps réel
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -884,10 +884,10 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [ ] 2+ utilisateurs annotent simultanément avec sync < 200 ms — code livré ; QA manuelle requise
-- [ ] Commentaires + notifications email/in-app fonctionnels — code livré ; QA sandbox email requise
+- [ ] 2+ utilisateurs annotent simultanément avec sync < 200 ms - code livré ; QA manuelle requise
+- [ ] Commentaires + notifications email/in-app fonctionnels - code livré ; QA sandbox email requise
 
-### Sprint 3.5–3.6 (Semaines 47–50) - API publique
+### Sprint 3.5-3.6 (Semaines 47-50) - API publique
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -908,11 +908,11 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [x] OpenAPI publiée ; Swagger UI accessible — `/openapi.json` + `/docs` (Redoc en backlog)
-- [x] Endpoints upload/beautify/export/list + rate limiting testés — Vitest + Redis scopes
-- [x] SDK npm publié (beta) — `@snapglow/sdk` package publishable ; publish registry en attente
+- [x] OpenAPI publiée ; Swagger UI accessible - `/openapi.json` + `/docs` (Redoc en backlog)
+- [x] Endpoints upload/beautify/export/list + rate limiting testés - Vitest + Redis scopes
+- [x] SDK npm publié (beta) - `@snapglow/sdk` package publishable ; publish registry en attente
 
-### Sprint 3.7–3.8 (Semaines 51–54) - Plugins
+### Sprint 3.7-3.8 (Semaines 51-54) - Plugins
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -928,16 +928,16 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **API** : migration `0005_embed_shares.sql`, `POST /v1/public/captures/:id/publish`, `GET /v1/embeds/:token`, `GET /v1/workspaces/:id/usage`
 - **Web** : route `/e/:token` embed-friendly (frame-ancestors Notion, OG metadata)
 - **Desktop** : `ApiKeysSection`, `UsageReportsSection` dans Settings → Team
-- **VS Code** : `apps/vscode-extension` (`snapglow-vscode` 0.1.0) — capture éditeur, beautify/export SDK, CI publish Marketplace (`vscode-v*` tag + `VSCE_PAT`)
-- **Figma** : `apps/figma-plugin` — import selection → beautify, export captures → canvas
-- **Notion** : `apps/notion-embed` — OAuth local tool, insert embed blocks via `/e/:token`
+- **VS Code** : `apps/vscode-extension` (`snapglow-vscode` 0.1.0) - capture éditeur, beautify/export SDK, CI publish Marketplace (`vscode-v*` tag + `VSCE_PAT`)
+- **Figma** : `apps/figma-plugin` - import selection → beautify, export captures → canvas
+- **Notion** : `apps/notion-embed` - OAuth local tool, insert embed blocks via `/e/:token`
 
 **Critères de validation**
 
-- [ ] Plugin VS Code publié sur Marketplace (ou VSIX interne) — package + CI livrés ; publish requiert `VSCE_PAT` + tag `vscode-v*`
-- [x] Rapports d'utilisation team disponibles dans dashboard — Settings → Team → Usage reports (admin)
+- [ ] Plugin VS Code publié sur Marketplace (ou VSIX interne) - package + CI livrés ; publish requiert `VSCE_PAT` + tag `vscode-v*`
+- [x] Rapports d'utilisation team disponibles dans dashboard - Settings → Team → Usage reports (admin)
 
-### Sprint 3.9–3.10 (Semaines 55–58) - Polish & Stabilisation B2B
+### Sprint 3.9-3.10 (Semaines 55-58) - Polish & Stabilisation B2B
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -959,22 +959,22 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 **Critères de validation**
 
-- [ ] API tient 1000+ req/min sans dégradation critique — k6 baseline livré ; QA perf locale requise
+- [ ] API tient 1000+ req/min sans dégradation critique - k6 baseline livré ; QA perf locale requise
 - [x] Audit sécurité documenté ; findings P0 corrigés
 - [x] Help center en ligne ; onboarding team wizard complet
-- [ ] Jalon J5 validé (5 000 utilisateurs actifs) — métrique produit PostHog
+- [ ] Jalon J5 validé (5 000 utilisateurs actifs) - métrique produit PostHog
 
 ---
 
-**Jalon J5 (M12–M14) :** 5 000 utilisateurs actifs. Plans Team lancés.
+**Jalon J5 (M12-M14) :** 5 000 utilisateurs actifs. Plans Team lancés.
 
 ---
 
-## 9. PHASE 4 - Scale (M15–M18)
+## 9. PHASE 4 - Scale (M15-M18)
 
 > Objectif : scaler l'acquisition, internationaliser, et créer un écosystème.
 
-### Sprint 4.1–4.2 (Semaines 59–62) - Marketplace templates
+### Sprint 4.1-4.2 (Semaines 59-62) - Marketplace templates
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -989,7 +989,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **Web** : `/marketplace`, `/marketplace/:slug`
 - **Desktop** : Settings → Marketplace → Install → SQLite `custom_presets`
 
-### Sprint 4.3–4.4 (Semaines 59–62 cont.) - Programme affiliés
+### Sprint 4.3-4.4 (Semaines 59-62 cont.) - Programme affiliés
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -1002,7 +1002,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **Web** : `/affiliates`, referral cookie 90j, landing capture
 - **API** : `POST /v1/webhooks/rewardful`, PostHog server capture
 
-### Sprint 4.5–4.6 (Semaines 63–66) - Localisation FR, DE, JP
+### Sprint 4.5-4.6 (Semaines 63-66) - Localisation FR, DE, JP
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -1015,7 +1015,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **`@snapglow/i18n`** : namespaces `common`, `marketing`, `settings` ; `check:missing-keys`
 - **Apps** : locale setting desktop ; `?lang=` web ; Expo provider mobile
 
-### Sprint 4.7–4.8 (Semaines 63–66 cont.) - Intégrations entreprise
+### Sprint 4.7-4.8 (Semaines 63-66 cont.) - Intégrations entreprise
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -1028,7 +1028,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - Gating **Team Pro** desktop (Settings + export Send to…)
 - Help : `integrations/jira-send-to`, `confluence-send-to`, `microsoft-teams-send-to`
 
-### Sprint 4.9–4.10 (Semaines 67–70) - Sync cross-device
+### Sprint 4.9-4.10 (Semaines 67-70) - Sync cross-device
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -1042,14 +1042,14 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **Desktop** : `syncPull.ts`, periodic sync, import cloud library → historique local, Settings sync push
 - **Mobile** : `modules/cloud/` hook library list
 
-### Sprint 4.11–4.12 (Semaines 67–70 cont.) - Setapp + bundles
+### Sprint 4.11-4.12 (Semaines 67-70 cont.) - Setapp + bundles
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
 | `[x]` (2026-06-27) | S4-011 | `LicenseSource` desktop + détection Setapp stub | P1 | 1j | - |
 | `[x]` (2026-06-27) | S4-012 | Web `/redeem` + `partner_offers.json` | P1 | 1j | - |
 
-### Sprint 4.13–4.14 (Continu + S71–74) - SEO content
+### Sprint 4.13-4.14 (Continu + S71-74) - SEO content
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -1061,7 +1061,7 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 - **Blog** : `/blog`, `/blog/:slug`, `docs/internal/marketing/seo-playbook.md`
 - **Articles** : Xnapper alternative Windows, beautify social
 
-### Sprint 4.15–4.16 (Semaines 71–74) - A/B tests PostHog
+### Sprint 4.15-4.16 (Semaines 71-74) - A/B tests PostHog
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
@@ -1076,19 +1076,19 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 **Critères de validation (Phase 4)**
 
 - [x] Marketplace templates live avec soumission communautaire
-- [x] Programme affiliés — code + webhook Rewardful livrés
+- [x] Programme affiliés - code + webhook Rewardful livrés
 - [x] UI localisée FR/DE/JP ; landing marketing traduite
 - [x] Sync cross-device captures + settings fiable (pull + LWW)
 - [x] Infrastructure blog + ≥2 articles seed ; playbook 2/semaine
-- [x] A/B tests pricing/onboarding — flags + events PostHog câblés
+- [x] A/B tests pricing/onboarding - flags + events PostHog câblés
 
 **En attente ops / contenu continu (hors code)**
 
 - [ ] Compte Rewardful + env `REWARDFUL_*` en production
 - [ ] Apps OAuth Atlassian + Microsoft Graph (Jira/Confluence/Teams)
 - [ ] Flags PostHog créés dans le dashboard (`pricing-hero-v1`, `paywall-timing-v1`, …)
-- [ ] Soumission Setapp (MacPaw) — stub `LicenseSource` en place
-- [ ] Calendrier éditorial SEO (2 articles/semaine) — 2 articles seed livrés
+- [ ] Soumission Setapp (MacPaw) - stub `LicenseSource` en place
+- [ ] Calendrier éditorial SEO (2 articles/semaine) - 2 articles seed livrés
 
 ---
 
@@ -1119,13 +1119,13 @@ CL-001 (backend) ──── CL-003 (auth) ──── T-001 (multi-tenant) �
 
 | Phase | Période | Sprints | Livrable principal | Jalon |
 |---|---|---|---|---|
-| Phase 0 | M1–M2 | 4 | Architecture, design system, CI/CD, landing page | J0 |
-| Phase 1 | M2–M5 | 6 | MVP Desktop : capture + beautification + annotations + redaction + export | J1 |
-| Phase 1b | M4–M6 | 4 | Apps iOS + Android avec parité beautification | J2 |
+| Phase 0 | M1-M2 | 4 | Architecture, design system, CI/CD, landing page | J0 |
+| Phase 1 | M2-M5 | 6 | MVP Desktop : capture + beautification + annotations + redaction + export | J1 |
+| Phase 1b | M4-M6 | 4 | Apps iOS + Android avec parité beautification | J2 |
 | Phase 2 | M6 | 2 | Beta 200 testeurs → lancement Product Hunt + AppSumo | J3 |
-| Phase 2b | M7–M9 | 6 | IA style, OCR, capture scrollante/GIF, cloud + liens partageables | J4 |
-| Phase 3 | M10–M14 | 10 | Workspace team, collaboration, API, plugins, brand kit | J5 |
-| Phase 4 | M15–M18 | 8 | Marketplace, affiliés, i18n, sync cross-device | - |
+| Phase 2b | M7-M9 | 6 | IA style, OCR, capture scrollante/GIF, cloud + liens partageables | J4 |
+| Phase 3 | M10-M14 | 10 | Workspace team, collaboration, API, plugins, brand kit | J5 |
+| Phase 4 | M15-M18 | 8 | Marketplace, affiliés, i18n, sync cross-device | - |
 
 ---
 
