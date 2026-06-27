@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { getCurrent, onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { completeCloudAuthFromUrl, useCloudAuthStore } from '@/modules/cloud/store';
 import { isCloudConfigured } from '@/modules/cloud/config';
+import { flushPendingTeamInvite, handleTeamInviteUrl } from '@/modules/team/auth-invite';
 import { isTauriRuntime } from '@/shared/lib/tauri';
 import { isIntegrationsConfigured } from '../config';
 import { completeIntegrationAuthFromUrl, useIntegrationsStore } from '../store';
@@ -46,8 +47,13 @@ export function useIntegrationsListener() {
 
 async function handleDeepLink(url: string): Promise<void> {
   try {
+    if (await handleTeamInviteUrl(url)) {
+      return;
+    }
+
     if (url.includes('auth/callback')) {
       await completeCloudAuthFromUrl(url);
+      await flushPendingTeamInvite();
       return;
     }
 

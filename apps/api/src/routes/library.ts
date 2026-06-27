@@ -11,6 +11,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import * as schema from '../db/schema';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
+import { getActiveWorkspaceId, resolveMembership } from '../plugins/workspace-auth';
 import type { StorageService } from '../services/storage';
 
 interface LibraryRouteOptions {
@@ -141,10 +142,19 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
     const storageKey = `library/${user.id}/${localId ?? crypto.randomUUID()}`;
     await options.storage.uploadObject(storageKey, buffer, mimeType);
 
+    const workspaceId = getActiveWorkspaceId(request);
+    if (workspaceId) {
+      const role = await resolveMembership(options.db, workspaceId, user.id);
+      if (!role) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+    }
+
     const [item] = await options.db
       .insert(schema.libraryItems)
       .values({
         userId: user.id,
+        workspaceId: workspaceId ?? null,
         storageKey,
         mimeType,
         byteSize: buffer.byteLength,

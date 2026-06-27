@@ -7,7 +7,6 @@ import { drawScreenshot } from './drawScreenshot';
 import { drawSelectionHandles } from './drawSelectionHandles';
 import { drawShadow } from './drawShadow';
 import { drawWatermark } from './drawWatermark';
-import { drawWatermark } from './drawWatermark';
 
 export interface RenderResult {
   layout: ComputedLayout;
@@ -39,7 +38,13 @@ export function renderFrame(
   drawAnnotations(ctx, input.annotations);
 
   if (input.watermark) {
-    drawWatermark(ctx, input.watermark, layout.canvasWidth, layout.canvasHeight, watermarkLogo);
+    drawWatermark(
+      ctx,
+      layout.canvasWidth,
+      layout.canvasHeight,
+      input.watermark,
+      watermarkLogo ?? input.watermarkLogo
+    );
   }
 
   if (input.selectedAnnotationId) {
@@ -49,10 +54,6 @@ export function renderFrame(
     if (selected) {
       drawSelectionHandles(ctx, selected);
     }
-  }
-
-  if (input.watermark) {
-    drawWatermark(ctx, layout.canvasWidth, layout.canvasHeight, input.watermark, input.watermarkLogo);
   }
 
   return { layout };

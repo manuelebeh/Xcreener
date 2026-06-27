@@ -13,6 +13,7 @@ Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack S
 | Mobile | Expo SDK 56, Expo Router, development builds |
 | Design system | `packages/design-tokens` + `packages/ui` (web) + `packages/ui-native` (RN) |
 | Editor core | `packages/editor-core` — layout, presets, annotations (shared desktop + mobile) |
+| Team core | `packages/team-core` — workspace roles, plans, brand kit types (api + desktop) |
 | Lint / format | Biome (not ESLint/Prettier) |
 | State | Zustand per module |
 | Local DB | `@tauri-apps/plugin-sql` (SQLite) |
@@ -88,6 +89,7 @@ Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Releas
 - **Sprint 2b.4** : enregistrement zone GIF ≤ 8 s / MP4 ≤ 30 s (`start/pause/resume/stop_region_recording_command`, `capture/record/`), SCK macOS (`macos_record.rs`) + polling Windows, GIF grille 20 fps + imagequant (qualité low/medium/high), MP4 H.264 CFR (`encode_mp4.rs`, openh264), overlay Photo/Video + HUD pause/stop, sauvegarde + historique + lecteur OS (`capture-recording-complete`, `open_path_command`), ADR-008 — **QA OK** macOS/Windows
 - **Sprint 2b.5** : `apps/api` Fastify + Postgres + Redis + R2/MinIO ; Auth0 JWT ; upload desktop → lien `/s/:token` ; viewer TanStack Start ; expiration 1h/24h/7j/permanent — `@snapglow/cloud-core`, `modules/cloud/`, ADR-009
 - **Sprint 2b.6** : `@snapglow/integrations-core`, OAuth proxy API, Send to… (Slack/Notion/Linear/GitHub), Library FTS + cloud sync, tags/collections, watermark export — ADR-010
+- **Sprint 3.1–3.2** : `@snapglow/team-core`, workspaces/members/invitations API, Stripe seat billing, brand kit, SSO Auth0 Organizations, desktop `modules/team/` — ADR-011
 
 ## Agent conventions
 

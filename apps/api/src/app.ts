@@ -4,11 +4,14 @@ import sensible from '@fastify/sensible';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import Fastify from 'fastify';
 import type * as schema from './db/schema';
+import { registerBillingRoutes } from './routes/billing';
 import { registerCollectionRoutes } from './routes/collections';
 import { registerHealthRoutes } from './routes/health';
 import { registerIntegrationRoutes } from './routes/integrations';
 import { registerLibraryRoutes } from './routes/library';
 import { registerShareRoutes } from './routes/shares';
+import { registerWorkspaceRoutes } from './routes/workspaces';
+import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
 import { StorageService } from './services/storage';
 
 interface BuildAppOptions {
@@ -33,6 +36,8 @@ export async function buildApp(options: BuildAppOptions) {
     },
   });
 
+  registerStripeRawBodyParser(app);
+
   const storage = options.storage ?? new StorageService();
   await storage.ensureBucket();
 
@@ -41,6 +46,8 @@ export async function buildApp(options: BuildAppOptions) {
   await registerIntegrationRoutes(app);
   await registerLibraryRoutes(app, { db: options.db, storage });
   await registerCollectionRoutes(app, { db: options.db });
+  await registerWorkspaceRoutes(app, { db: options.db, storage });
+  await registerBillingRoutes(app, { db: options.db });
 
   return app;
 }
