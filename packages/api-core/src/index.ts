@@ -57,6 +57,13 @@ export interface ExportCaptureResponse {
   height: number;
 }
 
+export interface PublishCaptureResponse {
+  token: string;
+  shareUrl: string;
+  embedUrl: string;
+  expiresAt: null;
+}
+
 const shadowSchema = z.object({
   opacity: z.number(),
   blur: z.number(),

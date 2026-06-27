@@ -7,6 +7,8 @@ export function CloudAuthSection() {
   const accountLabel = useCloudAuthStore((state) => state.accountLabel);
   const isLoading = useCloudAuthStore((state) => state.isLoading);
   const error = useCloudAuthStore((state) => state.error);
+  const lastLibrarySyncAt = useCloudAuthStore((state) => state.lastLibrarySyncAt);
+  const librarySyncError = useCloudAuthStore((state) => state.librarySyncError);
   const signIn = useCloudAuthStore((state) => state.signIn);
   const signOut = useCloudAuthStore((state) => state.signOut);
 
@@ -49,7 +51,19 @@ export function CloudAuthSection() {
       )}
       {error ? (
         <p className="mt-2 text-xs text-destructive" role="alert">
-          {error}
+          {error.includes('PKCE') || error.includes('state')
+            ? 'Sign-in expired or was interrupted. Close the browser tab and try again.'
+            : error}
+        </p>
+      ) : null}
+      {isAuthenticated && lastLibrarySyncAt ? (
+        <p className="mt-2 text-xs text-muted">
+          Last library sync: {new Date(lastLibrarySyncAt).toLocaleString()}
+        </p>
+      ) : null}
+      {librarySyncError ? (
+        <p className="mt-2 text-xs text-destructive" role="alert">
+          Library sync failed: {librarySyncError}
         </p>
       ) : null}
     </div>

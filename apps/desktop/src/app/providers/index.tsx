@@ -2,6 +2,7 @@ import { ThemeProvider } from '@snapglow/ui';
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { initDatabase, loadAppSettings } from '@/db';
 import { hydrateTeamFromSettings } from '@/modules/team/store';
+import { TeamOnboardingHost } from '@/modules/team/components/TeamOnboardingHost';
 import { initObservability } from '@/integrations/observability';
 import { captureAppStarted } from '@/integrations/posthog/events';
 import { PostHogProvider } from '@/integrations/posthog/provider';
@@ -95,6 +96,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <PostHogProvider>
       <ThemeProvider theme={theme} onThemeChange={handleThemeChange}>
+        <TeamOnboardingHost />
         {children}
       </ThemeProvider>
     </PostHogProvider>

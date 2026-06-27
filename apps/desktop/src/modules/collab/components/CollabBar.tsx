@@ -16,9 +16,11 @@ export function CollabBar({ embedded = false }: { embedded?: boolean }) {
   const documentId = useCollabStore((s) => s.documentId);
   const document = useCollabStore((s) => s.document);
   const connected = useCollabStore((s) => s.connected);
+  const reconnecting = useCollabStore((s) => s.reconnecting);
   const participants = useCollabStore((s) => s.participants);
   const statusMessage = useCollabStore((s) => s.statusMessage);
   const setDocumentId = useCollabStore((s) => s.setDocumentId);
+  const startCheckout = useTeamStore((s) => s.startCheckout);
   const isAuthenticated = useCloudAuthStore((s) => s.isAuthenticated);
   const activeWorkspace = useTeamStore((s) =>
     s.workspaces.find((workspace) => workspace.id === s.activeWorkspaceId)
@@ -78,9 +80,25 @@ export function CollabBar({ embedded = false }: { embedded?: boolean }) {
       </div>
 
       {!documentId ? (
-        <Button type="button" onClick={() => void startCollab()} disabled={loading}>
-          {loading ? 'Starting…' : 'Start collaboration'}
-        </Button>
+        <>
+          {activeWorkspace && !isPaidPlan(activeWorkspace.plan) ? (
+            <div className="space-y-2 rounded-md border border-border/80 bg-surface p-3">
+              <p className="m-0 text-xs text-muted">
+                Collaboration requires Team Starter or Team Pro. Upgrade your workspace in Settings →
+                Team.
+              </p>
+              {activeWorkspace.role === 'admin' ? (
+                <Button type="button" size="sm" onClick={() => void startCheckout('team_starter')}>
+                  Upgrade workspace
+                </Button>
+              ) : null}
+            </div>
+          ) : (
+            <Button type="button" onClick={() => void startCollab()} disabled={loading}>
+              {loading ? 'Starting…' : 'Start collaboration'}
+            </Button>
+          )}
+        </>
       ) : (
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="secondary" onClick={() => void copyLink()}>
@@ -91,6 +109,12 @@ export function CollabBar({ embedded = false }: { embedded?: boolean }) {
           </Button>
         </div>
       )}
+
+      {documentId && reconnecting ? (
+        <p className="text-xs text-amber-600" role="status">
+          Reconnecting to session…
+        </p>
+      ) : null}
 
       {statusMessage ? <p className="text-xs text-muted">{statusMessage}</p> : null}
     </div>

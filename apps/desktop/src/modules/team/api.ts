@@ -8,12 +8,13 @@ import type {
   WorkspacePlan,
   WorkspaceResponse,
   WorkspaceRole,
+  WorkspaceUsageResponse,
 } from '@snapglow/team-core';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { getApiUrl } from '@/modules/cloud/config';
 import { getWorkspaceHeaders } from './headers';
 
-async function teamFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function teamFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
     throw new Error('Sign in to SnapGlow cloud to manage teams');
@@ -125,6 +126,14 @@ export async function createCheckoutSession(
   });
 }
 
+export async function createBillingPortalSession(
+  workspaceId: string
+): Promise<CheckoutSessionResponse> {
+  return teamFetch<CheckoutSessionResponse>(`/v1/workspaces/${workspaceId}/billing/portal`, {
+    method: 'POST',
+  });
+}
+
 export async function getBrandKit(workspaceId: string): Promise<BrandKitConfig> {
   return teamFetch<BrandKitConfig>(`/v1/workspaces/${workspaceId}/brand-kit`);
 }
@@ -172,4 +181,11 @@ export async function enableSso(workspaceId: string): Promise<SsoStatusResponse>
   return teamFetch<SsoStatusResponse>(`/v1/workspaces/${workspaceId}/sso/enable`, {
     method: 'POST',
   });
+}
+
+export async function getWorkspaceUsage(
+  workspaceId: string,
+  period: '7d' | '30d' | '90d' = '30d'
+): Promise<WorkspaceUsageResponse> {
+  return teamFetch<WorkspaceUsageResponse>(`/v1/workspaces/${workspaceId}/usage?period=${period}`);
 }

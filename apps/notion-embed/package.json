@@ -1,0 +1,28 @@
+{
+  "name": "@snapglow/notion-embed",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "build": "esbuild public/app.js --bundle --outfile=public/dist/app.js --format=iife --target=es2020",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@snapglow/integrations-core": "workspace:*",
+    "@snapglow/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "@types/node": "^22.10.2",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.20.3",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.4"
+  }
+}

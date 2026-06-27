@@ -914,34 +914,53 @@ PHASE 4 - Scale               M15–M18   (8 sprints)     Marketplace + i18n
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | T-015 | Plugin VS Code : capture depuis l'éditeur + beautification | P0 | 4j | T-011 |
-| `[ ]` | T-016 | Plugin Figma : import/export depuis Figma | P1 | 4j | T-011 |
-| `[ ]` | T-017 | Plugin Notion : embed enrichi dans les pages | P1 | 3j | T-011 |
-| `[ ]` | T-018 | Rapports d'utilisation team (captures/membre, exports, cloud usage) | P1 | 3j | T-001 |
+| `[x]` (2026-06-27) | T-015 | Plugin VS Code : capture depuis l'éditeur + beautification | P0 | 4j | T-011 |
+| `[x]` (2026-06-27) | T-016 | Plugin Figma : import/export depuis Figma | P1 | 4j | T-011 |
+| `[x]` (2026-06-27) | T-017 | Plugin Notion : embed enrichi dans les pages | P1 | 3j | T-011 |
+| `[x]` (2026-06-27) | T-018 | Rapports d'utilisation team (captures/membre, exports, cloud usage) | P1 | 3j | T-001 |
+
+**Livraison (2026-06-27)**
+
+- **ADR-014** : plugins VS Code / Figma / Notion, embed viewer `/e/:token`, usage reports
+- **`@snapglow/plugin-core`** : presets `buildCodeCaptureState`, `buildDesignCaptureState`
+- **API** : migration `0005_embed_shares.sql`, `POST /v1/public/captures/:id/publish`, `GET /v1/embeds/:token`, `GET /v1/workspaces/:id/usage`
+- **Web** : route `/e/:token` embed-friendly (frame-ancestors Notion, OG metadata)
+- **Desktop** : `ApiKeysSection`, `UsageReportsSection` dans Settings → Team
+- **VS Code** : `apps/vscode-extension` (`snapglow-vscode` 0.1.0) — capture éditeur, beautify/export SDK, CI publish Marketplace (`vscode-v*` tag + `VSCE_PAT`)
+- **Figma** : `apps/figma-plugin` — import selection → beautify, export captures → canvas
+- **Notion** : `apps/notion-embed` — OAuth local tool, insert embed blocks via `/e/:token`
 
 **Critères de validation**
 
-- [ ] Plugin VS Code publié sur Marketplace (ou VSIX interne)
-- [ ] Rapports d'utilisation team disponibles dans dashboard
+- [ ] Plugin VS Code publié sur Marketplace (ou VSIX interne) — package + CI livrés ; publish requiert `VSCE_PAT` + tag `vscode-v*`
+- [x] Rapports d'utilisation team disponibles dans dashboard — Settings → Team → Usage reports (admin)
 
 ### Sprint 3.9–3.10 (Semaines 55–58) - Polish & Stabilisation B2B
 
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
-| `[ ]` | T-019 | Tests de charge API (1000+ requêtes/min) | P0 | 2j | T-011 |
-| `[ ]` | T-020 | Audit sécurité (OWASP, pentest basique) | P0 | 3j | Tous T-* |
-| `[ ]` | T-021 | Onboarding team : wizard de setup workspace | P0 | 2j | T-002 |
-| `[ ]` | T-022 | Documentation utilisateur (help center / knowledge base) | P0 | 3j | - |
-| `[ ]` | T-023 | Corrections bugs et polish UX B2B | P0 | 4j | Tous T-* |
+| `[x]` (2026-06-27) | T-019 | Tests de charge API (1000+ requêtes/min) | P0 | 2j | T-011 |
+| `[x]` (2026-06-27) | T-020 | Audit sécurité (OWASP, pentest basique) | P0 | 3j | Tous T-* |
+| `[x]` (2026-06-27) | T-021 | Onboarding team : wizard de setup workspace | P0 | 2j | T-002 |
+| `[x]` (2026-06-27) | T-022 | Documentation utilisateur (help center / knowledge base) | P0 | 3j | - |
+| `[x]` (2026-06-27) | T-023 | Corrections bugs et polish UX B2B | P0 | 4j | Tous T-* |
+
+**Livraison (2026-06-27)**
+
+- **T-019** : k6 scenarios (`apps/api/load/`), seed fixture, `mise run load:api`, CI hebdo `.github/workflows/api-load.yml`, Vitest rate-limit tests
+- **T-020** : `docs/internal/technical/security-audit-2026-06.md`, `@fastify/helmet`, CORS allowlist (`CORS_ORIGINS`), `apps/api/scripts/security-scan.sh`
+- **T-021** : `TeamOnboardingWizard` (7 steps), auto-trigger `TeamOnboardingHost`, relance depuis Settings
+- **T-022** : Help center web `/help` + 11 articles Markdown, lien landing + desktop wizard
+- **T-023** : Stripe Customer Portal API + desktop, rename workspace, empty/error states team/collab/cloud/intégrations, WS reconnect banner
 
 **Livrable :** Plans Team fonctionnels avec collaboration, API, plugins, et brand kit.
 
 **Critères de validation**
 
-- [ ] API tient 1000+ req/min sans dégradation critique
-- [ ] Audit sécurité documenté ; findings P0 corrigés
-- [ ] Help center en ligne ; onboarding team wizard complet
-- [ ] Jalon J5 validé (5 000 utilisateurs actifs)
+- [ ] API tient 1000+ req/min sans dégradation critique — k6 baseline livré ; QA perf locale requise
+- [x] Audit sécurité documenté ; findings P0 corrigés
+- [x] Help center en ligne ; onboarding team wizard complet
+- [ ] Jalon J5 validé (5 000 utilisateurs actifs) — métrique produit PostHog
 
 ---
 

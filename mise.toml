@@ -21,6 +21,15 @@ format = "pnpm turbo format"
 "storybook" = "pnpm --filter @snapglow/ui storybook"
 test = "pnpm turbo test"
 "test:e2e:native" = "pnpm --filter @snapglow/desktop test:e2e:native:ci"
+"load:api" = { depends = ["api:infra"], run = '''
+cd apps/api && \
+  dotenv -e .env.local -- tsx scripts/seed-load-fixture.ts > /tmp/snapglow-load-env.txt && \
+  export $(grep '^LOAD_TEST_' /tmp/snapglow-load-env.txt | xargs) && \
+  k6 run -e BASE_URL="${LOAD_TEST_BASE_URL:-http://localhost:8787}" \
+    -e API_KEY="$LOAD_TEST_API_KEY" \
+    -e CAPTURE_ID="$LOAD_TEST_CAPTURE_ID" \
+    load/scenarios/baseline.js
+''' }
 "build:desktop:prep:mac" = "rustup target add aarch64-apple-darwin x86_64-apple-darwin"
 "build:desktop:prep:windows" = "rustup target add x86_64-pc-windows-msvc"
 pre-commit = "pnpm exec lint-staged"

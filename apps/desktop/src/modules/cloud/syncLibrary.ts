@@ -57,10 +57,15 @@ export function syncCaptureToLibrary(input: SyncLibraryInput): void {
 
     if (!response.ok) {
       const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-      throw new Error(payload?.error ?? `Library sync failed (${response.status})`);
+      const message = payload?.error ?? `Library sync failed (${response.status})`;
+      useCloudAuthStore.getState().setLibrarySyncStatus({ error: message });
+      throw new Error(message);
     }
 
-    void (await response.json()) as { id: string; localId: string | null; createdAt: string };
+    useCloudAuthStore.getState().setLibrarySyncStatus({
+      at: new Date().toISOString(),
+      error: null,
+    });
   });
 }
 

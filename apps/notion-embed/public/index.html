@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SnapGlow — Notion Embed</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 640px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: #111;
+      }
+      label {
+        display: block;
+        margin-bottom: 1rem;
+      }
+      input,
+      select,
+      button {
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        padding: 0.5rem;
+        box-sizing: border-box;
+      }
+      button {
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+      }
+      .capture {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+      }
+      .capture.selected {
+        border-color: #6366f1;
+        background: #eef2ff;
+      }
+      #status {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+        color: #444;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SnapGlow Notion Embed</h1>
+    <p>Insert enriched SnapGlow embeds into Notion pages.</p>
+
+    <button id="connectNotion" type="button">Connect Notion</button>
+
+    <label>
+      SnapGlow API key
+      <input id="apiKey" type="password" placeholder="sg_live_..." />
+    </label>
+    <label>
+      API base URL
+      <input id="baseUrl" type="text" value="http://localhost:8787" />
+    </label>
+
+    <button id="loadCaptures" type="button">Load captures</button>
+
+    <div id="captures"></div>
+
+    <label>
+      Notion page
+      <select id="pageSelect">
+        <option value="">Connect Notion first</option>
+      </select>
+    </label>
+
+    <button id="insertEmbed" type="button" disabled>Insert embed in page</button>
+    <p id="status"></p>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

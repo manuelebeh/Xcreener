@@ -1,7 +1,7 @@
 import { Button } from '@snapglow/ui';
 import { isPaidPlan } from '@snapglow/team-core';
+import { useState } from 'react';
 import { useTeamStore } from '../store';
-import { openBillingPortal } from '../auth-invite';
 
 export function BillingSection() {
   const activeWorkspace = useTeamStore((state) =>
@@ -9,11 +9,35 @@ export function BillingSection() {
   );
   const billing = useTeamStore((state) => state.billing);
   const startCheckout = useTeamStore((state) => state.startCheckout);
+  const openBillingPortal = useTeamStore((state) => state.openBillingPortal);
   const enableTeamSso = useTeamStore((state) => state.enableTeamSso);
   const ssoEnabled = useTeamStore((state) => state.ssoEnabled);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   if (!activeWorkspace || activeWorkspace.role !== 'admin') {
     return null;
+  }
+
+  async function handleCheckout(plan: 'team_starter' | 'team_pro') {
+    setCheckoutError(null);
+    try {
+      await startCheckout(plan);
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : 'Checkout failed');
+    }
+  }
+
+  async function handlePortal() {
+    setPortalLoading(true);
+    setCheckoutError(null);
+    try {
+      await openBillingPortal();
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : 'Could not open billing portal');
+    } finally {
+      setPortalLoading(false);
+    }
   }
 
   return (
@@ -31,14 +55,14 @@ export function BillingSection() {
       ) : null}
       {!isPaidPlan(activeWorkspace.plan) ? (
         <div className="flex flex-wrap gap-2">
-          <Button type="button" size="sm" onClick={() => void startCheckout('team_starter')}>
+          <Button type="button" size="sm" onClick={() => void handleCheckout('team_starter')}>
             Upgrade to Team Starter
           </Button>
           <Button
             type="button"
             size="sm"
             variant="secondary"
-            onClick={() => void startCheckout('team_pro')}
+            onClick={() => void handleCheckout('team_pro')}
           >
             Upgrade to Team Pro
           </Button>
@@ -49,10 +73,16 @@ export function BillingSection() {
           type="button"
           size="sm"
           variant="secondary"
-          onClick={() => void openBillingPortal(billing.stripeCustomerId!)}
+          disabled={portalLoading}
+          onClick={() => void handlePortal()}
         >
-          Open Stripe customer
+          {portalLoading ? 'Opening…' : 'Manage subscription'}
         </Button>
+      ) : null}
+      {checkoutError ? (
+        <p className="text-xs text-destructive" role="alert">
+          {checkoutError}
+        </p>
       ) : null}
       {activeWorkspace.plan === 'team_pro' ? (
         <div>

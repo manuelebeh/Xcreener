@@ -8,10 +8,13 @@ interface CloudAuthState {
   accountLabel: string | null;
   isLoading: boolean;
   error: string | null;
+  lastLibrarySyncAt: string | null;
+  librarySyncError: string | null;
   hydrate: () => Promise<void>;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
   setError: (error: string | null) => void;
+  setLibrarySyncStatus: (status: { at?: string; error?: string | null }) => void;
 }
 
 export const useCloudAuthStore = create<CloudAuthState>((set) => ({
@@ -20,6 +23,8 @@ export const useCloudAuthStore = create<CloudAuthState>((set) => ({
   accountLabel: null,
   isLoading: false,
   error: null,
+  lastLibrarySyncAt: null,
+  librarySyncError: null,
   hydrate: async () => {
     if (!isCloudConfigured()) {
       set({ configured: false, isAuthenticated: false, accountLabel: null });
@@ -54,6 +59,11 @@ export const useCloudAuthStore = create<CloudAuthState>((set) => ({
     set({ isAuthenticated: false, accountLabel: null, error: null });
   },
   setError: (error) => set({ error }),
+  setLibrarySyncStatus: ({ at, error }) =>
+    set((state) => ({
+      lastLibrarySyncAt: at ?? state.lastLibrarySyncAt,
+      librarySyncError: error === undefined ? state.librarySyncError : error,
+    })),
 }));
 
 export async function completeCloudAuthFromUrl(url: string): Promise<void> {

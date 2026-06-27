@@ -1,9 +1,12 @@
 import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
 import multipart from '@fastify/multipart';
 import sensible from '@fastify/sensible';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import Fastify from 'fastify';
 import type * as schema from './db/schema';
+import { env } from './env';
+import { getAllowedCorsOrigins, isOriginAllowed } from './lib/cors';
 import { registerCollabWebSocket } from './plugins/collab-ws';
 import { registerOpenApiDocs } from './plugins/openapi-docs';
 import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
@@ -11,12 +14,14 @@ import { registerApiKeyRoutes } from './routes/api-keys';
 import { registerBillingRoutes } from './routes/billing';
 import { registerCollabRoutes } from './routes/collab';
 import { registerCollectionRoutes } from './routes/collections';
+import { registerEmbedRoutes } from './routes/embeds';
 import { registerHealthRoutes } from './routes/health';
 import { registerIntegrationRoutes } from './routes/integrations';
 import { registerLibraryRoutes } from './routes/library';
 import { registerPublicCaptureRoutes } from './routes/public-captures';
 import { registerShareRoutes } from './routes/shares';
 import { registerWorkspaceRoutes } from './routes/workspaces';
+import { registerWorkspaceUsageRoutes } from './routes/workspace-usage';
 import { StorageService } from './services/storage';
 
 interface BuildAppOptions {
@@ -30,8 +35,22 @@ export async function buildApp(options: BuildAppOptions) {
     bodyLimit: 100 * 1024 * 1024,
   });
 
+  const allowedOrigins = getAllowedCorsOrigins();
+
+  await app.register(helmet, {
+    contentSecurityPolicy: env.NODE_ENV === 'production',
+    crossOriginEmbedderPolicy: false,
+    hsts: env.NODE_ENV === 'production',
+  });
+
   await app.register(cors, {
-    origin: true,
+    origin: (origin, callback) => {
+      if (isOriginAllowed(origin, allowedOrigins)) {
+        callback(null, true);
+        return;
+      }
+      callback(new Error('Origin not allowed by CORS'), false);
+    },
     credentials: true,
   });
   await app.register(sensible);
@@ -48,16 +67,20 @@ export async function buildApp(options: BuildAppOptions) {
 
   await registerHealthRoutes(app, { db: options.db });
   await registerShareRoutes(app, { db: options.db, storage });
+  await registerEmbedRoutes(app, { db: options.db, storage });
   await registerIntegrationRoutes(app);
   await registerLibraryRoutes(app, { db: options.db, storage });
   await registerCollectionRoutes(app, { db: options.db });
   await registerWorkspaceRoutes(app, { db: options.db, storage });
+  await registerWorkspaceUsageRoutes(app, { db: options.db });
   await registerBillingRoutes(app, { db: options.db });
   await registerCollabRoutes(app, { db: options.db, storage });
   await registerCollabWebSocket(app, { db: options.db });
   await registerApiKeyRoutes(app, { db: options.db });
   await registerPublicCaptureRoutes(app, { db: options.db, storage });
-  await registerOpenApiDocs(app);
+  if (env.NODE_ENV !== 'test') {
+    await registerOpenApiDocs(app);
+  }
 
   return app;
 }

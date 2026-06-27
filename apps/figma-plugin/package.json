@@ -1,0 +1,24 @@
+{
+  "name": "@snapglow/figma-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/code.ts --bundle --outfile=dist/code.js --format=iife --target=es2017 --loader:.html=text && esbuild src/ui.ts --bundle --outfile=dist/ui.js --format=iife --target=es2017",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit",
+    "format": "biome check --write .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@snapglow/plugin-core": "workspace:*",
+    "@snapglow/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.119.0",
+    "@snapglow/biome-config": "workspace:*",
+    "@snapglow/typescript-config": "workspace:*",
+    "esbuild": "^0.25.0",
+    "typescript": "^6.0.2",
+    "vitest": "^3.2.4"
+  }
+}

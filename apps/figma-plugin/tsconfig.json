@@ -1,0 +1,7 @@
+{
+  "extends": "@snapglow/typescript-config/base.json",
+  "compilerOptions": {
+    "typeRoots": ["../../node_modules/@figma"]
+  },
+  "include": ["src"]
+}

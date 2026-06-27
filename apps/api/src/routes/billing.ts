@@ -209,6 +209,43 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
     }
   );
 
+  app.post(
+    '/v1/workspaces/:id/billing/portal',
+    { preHandler: [authenticateRequest, requireWorkspaceRole('admin')] },
+    async (request, reply) => {
+      if (!stripe) {
+        return reply.code(503).send({ error: 'Stripe not configured' });
+      }
+
+      const workspaceId = request.workspaceId;
+      if (!workspaceId) {
+        return reply.code(403).send({ error: 'Forbidden' });
+      }
+
+      const subRows = await options.db
+        .select()
+        .from(schema.workspaceSubscriptions)
+        .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId))
+        .limit(1);
+      const customerId = subRows[0]?.stripeCustomerId;
+      if (!customerId) {
+        return reply.code(400).send({ error: 'No Stripe customer for this workspace' });
+      }
+
+      const session = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: `${env.WEB_PUBLIC_URL}/settings?billing=portal`,
+      });
+
+      if (!session.url) {
+        return reply.code(500).send({ error: 'Failed to create billing portal session' });
+      }
+
+      const response: CheckoutSessionResponse = { url: session.url };
+      return reply.send(response);
+    }
+  );
+
   app.post('/v1/billing/webhook', async (request, reply) => {
     if (!stripe || !env.STRIPE_WEBHOOK_SECRET) {
       return reply.code(503).send({ error: 'Stripe webhook not configured' });

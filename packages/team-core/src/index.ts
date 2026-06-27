@@ -17,7 +17,8 @@ export type WorkspaceAction =
   | 'sso:manage'
   | 'collab:read'
   | 'collab:edit'
-  | 'comments:create';
+  | 'comments:create'
+  | 'usage:read';
 
 export const WORKSPACE_ROLES: WorkspaceRole[] = ['admin', 'editor', 'viewer'];
 
@@ -44,6 +45,7 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, ReadonlySet<WorkspaceAction>> = {
     'collab:read',
     'collab:edit',
     'comments:create',
+    'usage:read',
   ]),
   editor: new Set([
     'workspace:read',
@@ -189,6 +191,44 @@ export interface SsoStatusResponse {
   enabled: boolean;
   auth0OrgId: string | null;
   setupUrl: string | null;
+}
+
+export type UsagePeriod = '7d' | '30d' | '90d';
+
+export interface WorkspaceUsageResponse {
+  period: { from: string; to: string };
+  totals: {
+    libraryCaptures: number;
+    shares: number;
+    apiCaptures: number;
+    exportCount: number;
+    storageBytes: number;
+  };
+  byMember: Array<{
+    userId: string;
+    email: string | null;
+    libraryCaptures: number;
+    shares: number;
+    storageBytes: number;
+  }>;
+}
+
+export function parseUsagePeriod(value: string | undefined): UsagePeriod {
+  if (value === '7d' || value === '90d') {
+    return value;
+  }
+  return '30d';
+}
+
+export function usagePeriodDays(period: UsagePeriod): number {
+  switch (period) {
+    case '7d':
+      return 7;
+    case '90d':
+      return 90;
+    default:
+      return 30;
+  }
 }
 
 export const INVITATION_EXPIRY_DAYS = 7;
