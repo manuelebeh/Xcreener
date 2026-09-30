@@ -18,7 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
+          # 24.04: PipeWire 1.0 headers match libspa 0.9 (xcap). jammy 0.3.48 breaks the build.
+          - os: ubuntu-24.04
           - os: windows-latest
 
     runs-on: ${{ matrix.os }}
@@ -38,6 +39,7 @@ jobs:
             libwebkit2gtk-4.1-dev \
             libayatana-appindicator3-dev \
             libpipewire-0.3-dev \
+            libgbm-dev \
             webkit2gtk-driver \
             xvfb
 
