@@ -63,9 +63,9 @@ export function initI18n(locale?: SupportedLocale): typeof i18n {
   return i18n;
 }
 
-export { i18n };
 export { I18nextProvider as I18nProvider, useTranslation } from 'react-i18next';
 export { SnapGlowI18nProvider } from './provider';
+export { i18n };
 
 export function getEnglishResourceKeys(): string[] {
   const keys: string[] = [];

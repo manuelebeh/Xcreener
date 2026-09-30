@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "exports": {
+    ".": "./biome.json",
+    "./biome.json": "./biome.json",
+    "./base": "./biome.json"
+  },
   "files": [
     "biome.json"
   ]
