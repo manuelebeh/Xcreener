@@ -62,7 +62,7 @@ Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `s
 ### Code intelligence
 
 - **CodeGraph** for structural navigation (TS + Rust)
-- **Hallmark** skill for UI polish reviews
+- **impeccable** / **taste-skill** for UI polish reviews (see `.agents/skills/`)
 - Prefer CodeGraph over blind grep for cross-module refactors
 
 ### Related ADRs

@@ -46,7 +46,7 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 - Share import: `expo-share-intent` (iOS Share Extension + Android Intent)
 - Local dev: `mise run dev:mobile` ; native run: `dev:mobile:ios` / `dev:mobile:android`
 - Generated `ios/` / `android/` folders are gitignored; regen via `expo prebuild`
-- Agent rules: [`.agents/rules/mobile.md`](../../../../.agents/rules/mobile.md)
+- Agent rules: [`.cursor/rules/mobile-architecture.mdc`](../../../../.cursor/rules/mobile-architecture.mdc)
 
 ### Mobile editor & export (Sprint 1b.2)
 
