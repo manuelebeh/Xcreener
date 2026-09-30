@@ -33,7 +33,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev webkit2gtk-driver xvfb
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            libpipewire-0.3-dev \
+            webkit2gtk-driver \
+            xvfb
 
       - name: Install msedgedriver (Windows)
         if: runner.os == 'Windows'
@@ -41,7 +47,13 @@ jobs:
         run: |
           cargo install --git https://github.com/chippers/msedgedriver-tool
           & "$HOME/.cargo/bin/msedgedriver-tool.exe"
-          echo "$PWD" >> $env:GITHUB_PATH
+          if (-not (Test-Path "$PWD\msedgedriver.exe")) {
+            throw "msedgedriver.exe was not downloaded into $PWD"
+          }
+          # Match Tauri CI docs: PathInfo.Path, not the PathInfo object stringification.
+          $PWD.Path >> $env:GITHUB_PATH
+          "TAURI_NATIVE_DRIVER=$($PWD.Path)\msedgedriver.exe" >> $env:GITHUB_ENV
+          & "$PWD\msedgedriver.exe" --version
 
       - name: Install dependencies
         run: mise run install
@@ -54,6 +66,9 @@ jobs:
 
       - name: Native integration tests (WebDriver)
         run: mise run test:e2e:native
+        env:
+          # Inherited by msedgedriver → app so WebView2 initializes for session create.
+          TAURI_WEBVIEW_AUTOMATION: "true"
 
   native-e2e-macos:
     name: macOS (Rust + build)

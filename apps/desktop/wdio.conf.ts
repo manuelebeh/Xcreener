@@ -1,3 +1,4 @@
+import { mkdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,6 +18,25 @@ function resolveDebugAppPath() {
   return path.join(desktopDir, 'src-tauri', 'target', 'debug', `snapglow-desktop${ext}`);
 }
 
+function resolveTauriOptions() {
+  const options: {
+    application: string;
+    webviewOptions?: { userDataFolder: string };
+  } = {
+    application: resolveDebugAppPath(),
+  };
+
+  // WebView2 on Windows CI needs a writable user-data folder or msedgedriver
+  // fails with "DevToolsActivePort file doesn't exist" during session create.
+  if (os.platform() === 'win32') {
+    const userDataFolder = path.join(os.tmpdir(), `snapglow-e2e-webview-${process.pid}`);
+    mkdirSync(userDataFolder, { recursive: true });
+    options.webviewOptions = { userDataFolder };
+  }
+
+  return options;
+}
+
 export const config = {
   runner: 'local',
   hostname: '127.0.0.1',
@@ -27,9 +47,7 @@ export const config = {
   capabilities: [
     {
       browserName: 'wry',
-      'tauri:options': {
-        application: resolveDebugAppPath(),
-      },
+      'tauri:options': resolveTauriOptions(),
     },
   ],
   reporters: ['spec'],
