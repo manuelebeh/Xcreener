@@ -78,6 +78,12 @@ pub fn run() {
                         let _ = window_handle.hide();
                     }
                 });
+
+                // WebDriver session create attaches before test hooks run. On Windows,
+                // a never-shown WebView2 often never writes DevToolsActivePort.
+                if std::env::var_os("TAURI_WEBVIEW_AUTOMATION").is_some() {
+                    tray::show_main_window(app.handle());
+                }
             }
 
             Ok(())

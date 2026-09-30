@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,12 +64,44 @@ async function waitForDriver(maxAttempts = 30) {
   );
 }
 
+function resolveNativeDriverArgs() {
+  if (process.platform !== 'win32') {
+    return [];
+  }
+
+  const candidates = [
+    process.env.TAURI_NATIVE_DRIVER,
+    path.join(process.cwd(), 'msedgedriver.exe'),
+    path.join(desktopDir, 'msedgedriver.exe'),
+    path.join(desktopDir, '..', '..', 'msedgedriver.exe'),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    if (candidate && existsSync(candidate)) {
+      return ['--native-driver', candidate];
+    }
+  }
+
+  return [];
+}
+
 async function runWebDriverSuite() {
-  const driver = spawn('tauri-driver', [], {
+  const nativeDriverArgs = resolveNativeDriverArgs();
+  if (process.platform === 'win32' && nativeDriverArgs.length === 0) {
+    console.warn(
+      'msedgedriver.exe not found via TAURI_NATIVE_DRIVER or common paths; relying on PATH'
+    );
+  }
+
+  const driver = spawn('tauri-driver', nativeDriverArgs, {
     cwd: desktopDir,
     stdio: ['ignore', 'pipe', 'pipe'],
     shell: process.platform === 'win32',
     detached: process.platform !== 'win32',
+    env: {
+      ...process.env,
+      TAURI_WEBVIEW_AUTOMATION: 'true',
+    },
   });
 
   let driverOutput = '';
