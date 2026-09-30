@@ -1,6 +1,6 @@
-import * as vscode from 'vscode';
 import { buildCodeCaptureState } from '@snapglow/plugin-core';
 import { SnapGlowClient } from '@snapglow/sdk';
+import * as vscode from 'vscode';
 import { getEditorLines, renderCodeToPng } from './codeRenderer';
 
 const API_KEY_SECRET = 'snapglow.apiKey';
@@ -40,7 +40,9 @@ export async function setApiKey(context: vscode.ExtensionContext): Promise<void>
 }
 
 function getBaseUrl(): string {
-  return vscode.workspace.getConfiguration('snapglow').get<string>('baseUrl') ?? 'http://localhost:8787';
+  return (
+    vscode.workspace.getConfiguration('snapglow').get<string>('baseUrl') ?? 'http://localhost:8787'
+  );
 }
 
 async function createClient(context: vscode.ExtensionContext): Promise<SnapGlowClient | null> {
@@ -127,10 +129,7 @@ export async function captureAndBeautify(context: vscode.ExtensionContext): Prom
       const imageResponse = await fetch(exported.exportUrl);
       const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
-      await vscode.env.clipboard.writeBuffer(
-        'image/png',
-        imageBuffer
-      );
+      await vscode.env.clipboard.writeBuffer('image/png', imageBuffer);
 
       vscode.window.showInformationMessage(
         `SnapGlow: beautified capture copied to clipboard (${exported.width}×${exported.height}).`
@@ -152,8 +151,12 @@ export async function captureEditorToClipboard(context: vscode.ExtensionContext)
 export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('snapglow.configureApiKey', () => setApiKey(context)),
-    vscode.commands.registerCommand('snapglow.captureEditor', () => captureEditorToClipboard(context)),
-    vscode.commands.registerCommand('snapglow.captureAndBeautify', () => captureAndBeautify(context))
+    vscode.commands.registerCommand('snapglow.captureEditor', () =>
+      captureEditorToClipboard(context)
+    ),
+    vscode.commands.registerCommand('snapglow.captureAndBeautify', () =>
+      captureAndBeautify(context)
+    )
   );
 }
 

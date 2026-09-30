@@ -29,8 +29,7 @@ export const marketingEn = {
   featureBeautifyTitle: 'Beautify in seconds',
   featureBeautifyDesc: 'Padding, backgrounds, and polish - no design skills required.',
   featureShareTitle: 'Share with confidence',
-  featureShareDesc:
-    'Export locally. Your screenshots never leave your machine unless you choose.',
+  featureShareDesc: 'Export locally. Your screenshots never leave your machine unless you choose.',
 };
 
 export const settingsEn = {

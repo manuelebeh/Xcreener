@@ -1,10 +1,10 @@
 import type {
-  BackgroundConfig as CoreBackgroundConfig,
+  Annotation,
   ComputedLayout,
+  BackgroundConfig as CoreBackgroundConfig,
   RenderInput as CoreRenderInput,
   WatermarkConfig,
 } from '@snapglow/editor-core';
-import type { Annotation } from '@snapglow/editor-core';
 
 export type RenderBackgroundConfig =
   | Extract<CoreBackgroundConfig, { type: 'gradient' } | { type: 'solid' }>

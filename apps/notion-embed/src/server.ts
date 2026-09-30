@@ -1,6 +1,6 @@
-import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { join, extname } from 'node:path';
+import { createServer } from 'node:http';
+import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SnapGlowClient } from '@snapglow/sdk';
 
@@ -9,7 +9,8 @@ const publicDir = join(__dirname, '../public');
 const PORT = Number(process.env.NOTION_EMBED_PORT ?? 3456);
 const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID ?? '';
 const NOTION_CLIENT_SECRET = process.env.NOTION_CLIENT_SECRET ?? '';
-const REDIRECT_URI = process.env.NOTION_EMBED_REDIRECT_URI ?? `http://localhost:${PORT}/oauth/callback`;
+const REDIRECT_URI =
+  process.env.NOTION_EMBED_REDIRECT_URI ?? `http://localhost:${PORT}/oauth/callback`;
 const WEB_PUBLIC_URL = process.env.WEB_PUBLIC_URL ?? 'http://localhost:3000';
 
 const sessions = new Map<string, { notionToken: string; workspaceName?: string }>();

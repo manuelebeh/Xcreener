@@ -22,8 +22,7 @@ export const marketingDe = {
   downloadMac: 'Für macOS herunterladen',
   seeHow: 'So funktioniert es',
   readyTitle: 'Bereit zum Strahlen?',
-  readySubtitle:
-    'Desktop-App für macOS und Windows. Lokale Verarbeitung, kein Konto erforderlich.',
+  readySubtitle: 'Desktop-App für macOS und Windows. Lokale Verarbeitung, kein Konto erforderlich.',
   featureCaptureTitle: 'Sofort aufnehmen',
   featureCaptureDesc:
     'Globale Tastenkürzel über Menüleiste oder System Tray. Jeder Bildschirm, jedes Fenster.',

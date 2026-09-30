@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  createTemplateSubmissionSchema,
-  slugifyTemplateTitle,
-  templateStyleSchema,
-} from './index';
+import { createTemplateSubmissionSchema, slugifyTemplateTitle, templateStyleSchema } from './index';
 
 describe('marketplace-core', () => {
   it('validates template style', () => {

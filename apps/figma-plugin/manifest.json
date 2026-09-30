@@ -7,6 +7,10 @@
   "editorType": ["figma"],
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": ["https://api.snapglow.app", "http://localhost:8787", "https://*.snapglow.app"]
+    "allowedDomains": [
+      "https://api.snapglow.app",
+      "http://localhost:8787",
+      "https://*.snapglow.app"
+    ]
   }
 }

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { buildCodeCaptureState, buildDesignCaptureState } from '@snapglow/plugin-core';
+import { describe, expect, it } from 'vitest';
 
 describe('plugin-core presets', () => {
   it('exports code and design capture states', () => {

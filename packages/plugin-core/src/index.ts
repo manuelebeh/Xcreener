@@ -1,4 +1,4 @@
-import { defaultCollabDocumentState, type CollabDocumentState } from '@snapglow/collab-core';
+import { type CollabDocumentState, defaultCollabDocumentState } from '@snapglow/collab-core';
 
 export type { CollabDocumentState } from '@snapglow/collab-core';
 

@@ -2,8 +2,8 @@ import type {
   Annotation,
   BackgroundConfig,
   FramePreset,
-  ShadowConfig,
   ScreenshotTransform,
+  ShadowConfig,
 } from '@snapglow/editor-core';
 
 export const COLLAB_WS_PATH = '/v1/collab/ws';
@@ -96,10 +96,19 @@ export type CollabClientMessage =
   | { type: 'auth'; token: string; documentId: string }
   | { type: 'ping' }
   | { type: 'annotation:op'; op: AnnotationOp }
-  | { type: 'presence:update'; presence: Omit<ParticipantPresence, 'userId' | 'email' | 'displayName'> };
+  | {
+      type: 'presence:update';
+      presence: Omit<ParticipantPresence, 'userId' | 'email' | 'displayName'>;
+    };
 
 export type CollabServerMessage =
-  | { type: 'auth:ok'; userId: string; role: string; version: number; participants: ParticipantPresence[] }
+  | {
+      type: 'auth:ok';
+      userId: string;
+      role: string;
+      version: number;
+      participants: ParticipantPresence[];
+    }
   | { type: 'auth:error'; error: string }
   | { type: 'pong' }
   | { type: 'annotation:op'; op: AnnotationOp; userId: string; version: number }
@@ -144,10 +153,7 @@ export function isCollabClientMessage(value: unknown): value is CollabClientMess
   }
   const type = (value as { type: string }).type;
   return (
-    type === 'auth' ||
-    type === 'ping' ||
-    type === 'annotation:op' ||
-    type === 'presence:update'
+    type === 'auth' || type === 'ping' || type === 'annotation:op' || type === 'presence:update'
   );
 }
 

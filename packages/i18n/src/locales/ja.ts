@@ -22,8 +22,7 @@ export const marketingJa = {
   downloadMac: 'macOS版をダウンロード',
   seeHow: '使い方を見る',
   readyTitle: '輝く準備はできましたか？',
-  readySubtitle:
-    'macOSとWindows向けデスクトップアプリ。ローカル処理、アカウント不要。',
+  readySubtitle: 'macOSとWindows向けデスクトップアプリ。ローカル処理、アカウント不要。',
   featureCaptureTitle: '即座にキャプチャ',
   featureCaptureDesc:
     'メニューバーまたはシステムトレイからグローバルショートカット。任意の画面、任意のウィンドウ。',
