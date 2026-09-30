@@ -1,10 +1,10 @@
-import { ExportBar } from '@/modules/export/components/ExportBar';
+import { AutoCropBar } from '@/modules/auto-crop/components/AutoCropBar';
 import { CollabBar } from '@/modules/collab/components/CollabBar';
 import { CommentsPanel } from '@/modules/collab/components/CommentsPanel';
 import { NotificationsBell } from '@/modules/collab/components/NotificationsBell';
-import { useCollabStore } from '@/modules/collab/store';
 import { useCollabSession } from '@/modules/collab/hooks/useCollabSession';
-import { AutoCropBar } from '@/modules/auto-crop/components/AutoCropBar';
+import { useCollabStore } from '@/modules/collab/store';
+import { ExportBar } from '@/modules/export/components/ExportBar';
 import { RedactionBar } from '@/modules/redaction/components/RedactionBar';
 import { useAutoRedaction } from '@/modules/redaction/hooks/useAutoRedaction';
 import { StyleSuggestionBar } from '@/modules/style-suggestion/components/StyleSuggestionBar';

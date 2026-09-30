@@ -1,20 +1,20 @@
 import {
   mergeSettingsPatches,
   type SettingsPatch,
+  SYNCABLE_SETTING_KEYS,
   type SyncLibraryItem,
   type SyncLibraryResponse,
-  SYNCABLE_SETTING_KEYS,
   type UserSettingsResponse,
 } from '@snapglow/sync-core';
+import { setSetting } from '@/db';
 import { getCapture, insertCapture, pruneCaptures } from '@/db/captures';
+import { writeCaptureFiles } from '@/modules/history/utils/captureFiles';
+import { useSettingsStore } from '@/modules/settings/store';
+import { getWorkspaceHeaders } from '@/modules/team/headers';
+import { SETTING_KEYS } from '@/shared/types/settings';
 import { getValidAccessToken } from './auth';
 import { getApiUrl } from './config';
-import { getWorkspaceHeaders } from '@/modules/team/headers';
 import { useCloudAuthStore } from './store';
-import { setSetting } from '@/db';
-import { SETTING_KEYS } from '@/shared/types/settings';
-import { useSettingsStore } from '@/modules/settings/store';
-import { writeCaptureFiles } from '@/modules/history/utils/captureFiles';
 
 const LIBRARY_CURSOR_KEY = 'sync.library.cursor';
 const SETTINGS_CURSOR_KEY = 'sync.settings.cursor';
@@ -65,7 +65,10 @@ async function readImageDimensions(bytes: Uint8Array): Promise<{ width: number; 
   return dimensions;
 }
 
-async function importSyncedLibraryItem(item: SyncLibraryItem, pulledIds: Set<string>): Promise<boolean> {
+async function importSyncedLibraryItem(
+  item: SyncLibraryItem,
+  pulledIds: Set<string>
+): Promise<boolean> {
   if (item.deletedAt || !item.assetUrl) {
     return false;
   }
@@ -209,9 +212,11 @@ export async function pullCloudSync(): Promise<void> {
     if (patch.key === 'theme') store.setTheme(patch.value as typeof store.theme);
     if (patch.key === 'locale') store.setLocale(patch.value as typeof store.locale);
     if (patch.key === 'captureShortcut') store.setCaptureShortcut(String(patch.value));
-    if (patch.key === 'watermarkEnabled') store.setWatermarkEnabled(patch.value === 'true' || patch.value === true);
+    if (patch.key === 'watermarkEnabled')
+      store.setWatermarkEnabled(patch.value === 'true' || patch.value === true);
     if (patch.key === 'watermarkDisplayName') store.setWatermarkDisplayName(String(patch.value));
-    if (patch.key === 'watermarkPosition') store.setWatermarkPosition(patch.value as typeof store.watermarkPosition);
+    if (patch.key === 'watermarkPosition')
+      store.setWatermarkPosition(patch.value as typeof store.watermarkPosition);
     if (patch.key === 'watermarkOpacity') store.setWatermarkOpacity(Number(patch.value));
   }
 }

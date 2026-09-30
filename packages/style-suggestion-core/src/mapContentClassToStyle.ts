@@ -1,5 +1,5 @@
-import type { ContentClass, StyleSuggestion } from './types';
 import { SHADOW_LIGHT, SHADOW_MEDIUM, SHADOW_NONE, SHADOW_STRONG } from './shadows';
+import type { ContentClass, StyleSuggestion } from './types';
 
 const STYLE_BY_CLASS: Record<ContentClass, StyleSuggestion> = {
   code: {

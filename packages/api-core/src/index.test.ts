@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { generateApiKeySecret, hashApiKey, verifyApiKey } from './api-keys';
 import {
   API_KEY_PREFIX,
   apiKeyDisplayPrefix,
   buildApiKeyPlaintext,
-  generateApiKeySecret,
-  hashApiKey,
   isApiKeyPlaintext,
   isExportFormat,
-  verifyApiKey,
 } from './index';
 
 describe('api-core keys', () => {

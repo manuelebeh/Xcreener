@@ -63,7 +63,9 @@ function EmbedViewerPage() {
             controls
             className="max-h-[95vh] max-w-full rounded-lg"
             data-testid="embed-viewer-video"
-          />
+          >
+            <track kind="captions" />
+          </video>
         ) : (
           <img
             src={embed.assetUrl}

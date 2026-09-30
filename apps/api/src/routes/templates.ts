@@ -2,8 +2,8 @@ import {
   createTemplateSubmissionSchema,
   moderateTemplateSchema,
   slugifyTemplateTitle,
-  type TemplateListResponse,
   type TemplateListingResponse,
+  type TemplateListResponse,
 } from '@snapglow/marketplace-core';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -85,7 +85,12 @@ async function ensureUniqueSlug(
 
 export async function registerTemplateRoutes(app: FastifyInstance, options: TemplateRouteOptions) {
   app.get('/v1/templates', async (request, reply) => {
-    const query = request.query as { tag?: string; featured?: string; limit?: string; offset?: string };
+    const query = request.query as {
+      tag?: string;
+      featured?: string;
+      limit?: string;
+      offset?: string;
+    };
     const limit = Math.min(Number.parseInt(query.limit ?? '24', 10) || 24, 100);
     const offset = Number.parseInt(query.offset ?? '0', 10) || 0;
 
@@ -144,7 +149,9 @@ export async function registerTemplateRoutes(app: FastifyInstance, options: Temp
       .set({ downloadCount: listing.downloadCount + 1 })
       .where(eq(schema.templateListings.id, listing.id));
 
-    return reply.send(await toTemplateResponse(options.db, { ...listing, downloadCount: listing.downloadCount + 1 }));
+    return reply.send(
+      await toTemplateResponse(options.db, { ...listing, downloadCount: listing.downloadCount + 1 })
+    );
   });
 
   app.post('/v1/templates', { preHandler: authenticateRequest }, async (request, reply) => {
@@ -159,7 +166,8 @@ export async function registerTemplateRoutes(app: FastifyInstance, options: Temp
     }
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
-    const baseSlug = slugifyTemplateTitle(parsed.data.title) || `template-${nanoid(8).toLowerCase()}`;
+    const baseSlug =
+      slugifyTemplateTitle(parsed.data.title) || `template-${nanoid(8).toLowerCase()}`;
     const slug = await ensureUniqueSlug(options.db, baseSlug);
 
     const inserted = await options.db
@@ -233,23 +241,27 @@ export async function registerTemplateRoutes(app: FastifyInstance, options: Temp
     }
   );
 
-  app.get('/v1/templates/admin/pending', { preHandler: authenticateRequest }, async (request, reply) => {
-    const authUser = request.authUser;
-    if (!authUser) {
-      return reply.code(401).send({ error: 'Unauthorized' });
+  app.get(
+    '/v1/templates/admin/pending',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+
+      if (!isModerator(authUser.auth0Sub)) {
+        return reply.code(403).send({ error: 'Moderator access required' });
+      }
+
+      const rows = await options.db
+        .select()
+        .from(schema.templateListings)
+        .where(eq(schema.templateListings.status, 'pending'))
+        .orderBy(desc(schema.templateListings.createdAt));
+
+      const items = await Promise.all(rows.map((row) => toTemplateResponse(options.db, row)));
+      return reply.send({ items, total: items.length });
     }
-
-    if (!isModerator(authUser.auth0Sub)) {
-      return reply.code(403).send({ error: 'Moderator access required' });
-    }
-
-    const rows = await options.db
-      .select()
-      .from(schema.templateListings)
-      .where(eq(schema.templateListings.status, 'pending'))
-      .orderBy(desc(schema.templateListings.createdAt));
-
-    const items = await Promise.all(rows.map((row) => toTemplateResponse(options.db, row)));
-    return reply.send({ items, total: items.length });
-  });
+  );
 }

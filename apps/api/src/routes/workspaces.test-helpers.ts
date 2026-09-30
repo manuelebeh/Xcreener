@@ -194,6 +194,7 @@ function createMemoryDb(state: MemoryState, whereCapture: Record<string, unknown
 
         return {
           returning: async () => persist(),
+          // biome-ignore lint/suspicious/noThenProperty: drizzle-like thenable mock for tests
           then: (
             onFulfilled: (value: unknown) => unknown,
             onRejected?: (reason: unknown) => unknown
@@ -245,6 +246,7 @@ function createMemoryDb(state: MemoryState, whereCapture: Record<string, unknown
 
           return {
             returning: async () => persist(),
+            // biome-ignore lint/suspicious/noThenProperty: drizzle-like thenable mock for tests
             then: (
               onFulfilled: (value: unknown) => unknown,
               onRejected?: (reason: unknown) => unknown

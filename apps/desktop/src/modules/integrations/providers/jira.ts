@@ -4,10 +4,7 @@ interface JiraIssue {
   summary: string;
 }
 
-export async function listJiraIssues(
-  accessToken: string,
-  cloudId: string
-): Promise<JiraIssue[]> {
+export async function listJiraIssues(accessToken: string, cloudId: string): Promise<JiraIssue[]> {
   const response = await fetch(
     `https://api.atlassian.com/ex/jira/${cloudId}/rest/api/3/search/jql?jql=order+by+updated+DESC&maxResults=25&fields=summary`,
     {

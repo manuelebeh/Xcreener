@@ -1,12 +1,7 @@
-import { create } from 'zustand';
 import type { ContentClass, StyleSuggestion } from '@snapglow/style-suggestion-core';
+import { create } from 'zustand';
 
-export type StyleSuggestionStatus =
-  | 'idle'
-  | 'classifying'
-  | 'ready'
-  | 'error'
-  | 'dismissed';
+export type StyleSuggestionStatus = 'idle' | 'classifying' | 'ready' | 'error' | 'dismissed';
 
 interface StyleSuggestionState {
   status: StyleSuggestionStatus;

@@ -1,5 +1,6 @@
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { getValidAccessToken, startAuthLoginWithOrganization } from '@/modules/cloud/auth';
+import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { createBillingPortalSession } from './api';
 import { useTeamStore } from './store';

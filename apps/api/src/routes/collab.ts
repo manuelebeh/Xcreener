@@ -35,7 +35,7 @@ function isAllowedMimeType(value: string): value is ShareMimeType {
 }
 
 async function toDocumentResponse(
-  db: PostgresJsDatabase<typeof schema>,
+  _db: PostgresJsDatabase<typeof schema>,
   storage: StorageService,
   doc: schema.CollabDocument
 ): Promise<CollabDocumentResponse> {

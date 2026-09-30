@@ -29,8 +29,8 @@ import {
 } from '@/tauri/commands';
 import { captureOverlayCursor } from '../captureCursors';
 import { captureToolbarContainerStyle, captureToolbarStyle } from '../captureToolbarPlacement';
-import { useRecordingElapsed } from '../hooks/useRecordingElapsed';
 import { findMonitorAtPoint } from '../findMonitorAtPoint';
+import { useRecordingElapsed } from '../hooks/useRecordingElapsed';
 import {
   clientToBounds,
   getOverlayViewport,
@@ -137,7 +137,7 @@ export function CaptureOverlay() {
       return;
     }
     setRevealed(true);
-  }, [bounds, previewUrl, liveOverlay, activeMode]);
+  }, []);
 
   useEffect(() => {
     if (!isWindowsOverlay() || !webviewLayout) {
@@ -210,8 +210,8 @@ export function CaptureOverlay() {
         setCaptureProgress(event.payload);
         setRecordingPaused(Boolean(event.payload.paused));
         if (event.payload.elapsedSecs != null) {
-          setRecordingAnchorMs((previous) =>
-            previous ?? Date.now() - event.payload.elapsedSecs! * 1000
+          setRecordingAnchorMs(
+            (previous) => previous ?? Date.now() - event.payload.elapsedSecs! * 1000
           );
         }
       }
@@ -278,7 +278,15 @@ export function CaptureOverlay() {
         await handleCaptureFailure(failure);
       }
     },
-    [bounds, finishCapture, handleCaptureFailure, previewUrl, viewport.height, viewport.width]
+    [
+      bounds,
+      finishCapture,
+      handleCaptureFailure,
+      previewUrl,
+      viewport.height,
+      viewport.width,
+      setError,
+    ]
   );
 
   const finishNativeCapture = useCallback(
@@ -475,8 +483,7 @@ export function CaptureOverlay() {
       setSelection(null);
       setError(null);
 
-      const currentTarget =
-        activeMode === 'idle' ? 'region' : (activeMode as CaptureTargetMode);
+      const currentTarget = activeMode === 'idle' ? 'region' : (activeMode as CaptureTargetMode);
       const nextMode = normalizeTargetForMediaKind(currentTarget, kind);
       setActiveMode(nextMode);
       applyTargetModeDefaults(nextMode, kind);
@@ -550,7 +557,7 @@ export function CaptureOverlay() {
     }
 
     void captureRect(rect);
-  }, [activeMode, bounds, captureRect, finishRecordCapture, isVideo, selection, viewport]);
+  }, [bounds, captureRect, finishRecordCapture, isVideo, selection, viewport]);
 
   const handleWindowClick = useCallback(() => {
     if (!hoveredWindow || !isWindowSelectionMode(activeMode) || !bounds) {
@@ -582,6 +589,7 @@ export function CaptureOverlay() {
     finishPreviewCrop,
     finishScrollCapture,
     hoveredWindow,
+    mediaKind,
   ]);
 
   const handleScreenClick = useCallback(() => {
@@ -613,6 +621,7 @@ export function CaptureOverlay() {
     finishNativeCapture,
     finishPreviewCrop,
     resolveFullscreenMonitor,
+    mediaKind,
   ]);
 
   const handleTargetClick = useCallback(() => {
@@ -754,8 +763,7 @@ export function CaptureOverlay() {
       }
 
       const canConfirmRegion =
-        (activeMode === 'region' || activeMode === 'menu') &&
-        Boolean(selection);
+        (activeMode === 'region' || activeMode === 'menu') && Boolean(selection);
       const canConfirmScroll = activeMode === 'scroll' && Boolean(hoveredWindow);
       const canConfirmFullscreen = activeMode === 'fullscreen';
 

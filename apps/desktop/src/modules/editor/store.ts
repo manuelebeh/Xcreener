@@ -19,7 +19,7 @@ import {
   DEFAULT_TRANSFORM,
 } from './types';
 
-export { DEFAULT_BORDER_RADIUS, DEFAULT_SHADOW, DEFAULT_BACKGROUND } from './types';
+export { DEFAULT_BACKGROUND, DEFAULT_BORDER_RADIUS, DEFAULT_SHADOW } from './types';
 
 function closeBackgroundImage(background: BackgroundConfig): void {
   if (background.type === 'image' && background.source) {

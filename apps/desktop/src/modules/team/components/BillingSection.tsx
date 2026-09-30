@@ -1,5 +1,5 @@
-import { Button } from '@snapglow/ui';
 import { isPaidPlan } from '@snapglow/team-core';
+import { Button } from '@snapglow/ui';
 import { useState } from 'react';
 import { useTeamStore } from '../store';
 
@@ -15,7 +15,7 @@ export function BillingSection() {
   const [portalLoading, setPortalLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
-  if (!activeWorkspace || activeWorkspace.role !== 'admin') {
+  if (activeWorkspace?.role !== 'admin') {
     return null;
   }
 
@@ -86,9 +86,7 @@ export function BillingSection() {
       ) : null}
       {activeWorkspace.plan === 'team_pro' ? (
         <div>
-          <p className="text-xs text-muted">
-            SSO: {ssoEnabled ? 'Enabled' : 'Not configured'}
-          </p>
+          <p className="text-xs text-muted">SSO: {ssoEnabled ? 'Enabled' : 'Not configured'}</p>
           {!ssoEnabled ? (
             <Button type="button" size="sm" className="mt-2" onClick={() => void enableTeamSso()}>
               Enable SSO

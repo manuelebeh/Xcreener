@@ -9,8 +9,7 @@ export function computeRecordingElapsedSecs(
   pauseStartedAtMs: number | null,
   maxDurationSecs?: number
 ): number {
-  const activePauseMs =
-    paused && pauseStartedAtMs != null ? nowMs - pauseStartedAtMs : 0;
+  const activePauseMs = paused && pauseStartedAtMs != null ? nowMs - pauseStartedAtMs : 0;
   const elapsedMs = nowMs - startedAtMs - accumulatedPauseMs - activePauseMs;
   const seconds = Math.max(0, Math.floor(elapsedMs / 1000));
   if (maxDurationSecs != null) {

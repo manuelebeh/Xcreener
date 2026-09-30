@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { decodePngBytesToBitmap } from '@/shared/utils/image';
 import { useEditorStore } from '@/modules/editor/store';
 import { screenshotToPngBytes } from '@/modules/redaction/utils/screenshotToPngBytes';
+import { decodePngBytesToBitmap } from '@/shared/utils/image';
 import { cropImage, detectContentBounds } from '@/tauri/commands';
 import { useAutoCropStore } from '../store';
 

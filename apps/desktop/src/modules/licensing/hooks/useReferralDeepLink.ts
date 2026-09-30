@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
 import { getCurrent, onOpenUrl } from '@tauri-apps/plugin-deep-link';
+import { useEffect } from 'react';
 import { setSetting } from '@/db';
-import { SETTING_KEYS } from '@/shared/types/settings';
-import { isTauriRuntime } from '@/shared/lib/tauri';
 import { useSettingsStore } from '@/modules/settings/store';
+import { isTauriRuntime } from '@/shared/lib/tauri';
+import { SETTING_KEYS } from '@/shared/types/settings';
 
 function parseReferralCode(url: string): string | null {
   try {

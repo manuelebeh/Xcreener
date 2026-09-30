@@ -16,7 +16,6 @@ import type { WebSocket } from 'ws';
 import * as schema from '../db/schema';
 import { env } from '../env';
 import { upsertAuthUser } from '../plugins/auth';
-import { resolveMembership } from '../plugins/workspace-auth';
 import { ensurePaidWorkspace, resolveDocumentAccess } from '../routes/collab';
 import { applyAnnotationOp } from '../services/collab-ops';
 import { collabRoomHub } from '../services/collab-room';

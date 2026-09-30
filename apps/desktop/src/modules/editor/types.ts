@@ -30,18 +30,22 @@ export type {
 } from '@snapglow/editor-core';
 
 export {
-  DEFAULT_TOOL_DEFAULTS,
-  HISTORY_MAX,
-  DEFAULT_BACKGROUND,
   DEFAULT_BORDER_RADIUS,
   DEFAULT_SHADOW,
+  DEFAULT_TOOL_DEFAULTS,
   DEFAULT_TRANSFORM,
+  HISTORY_MAX,
 } from '@snapglow/editor-core';
 
 /** Desktop background may hold an ImageBitmap for custom image uploads. */
 export type BackgroundConfig =
   | Extract<CoreBackgroundConfig, { type: 'gradient' } | { type: 'solid' }>
   | { type: 'image'; source: ImageBitmap | null };
+
+export const DEFAULT_BACKGROUND: BackgroundConfig = {
+  type: 'gradient',
+  presetId: 'snapglow-brand',
+};
 
 export interface RenderInput extends Omit<CoreRenderInput, 'background' | 'screenshot'> {
   screenshot: ImageBitmap;

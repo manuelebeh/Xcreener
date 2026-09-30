@@ -115,7 +115,7 @@ export async function insertCapture(input: InsertCaptureInput): Promise<number> 
 
 export async function updateCaptureOcrText(id: number, ocrText: string): Promise<void> {
   const db = await getReadyDb();
-  await db.execute('UPDATE captures SET ocr_text = ?, updated_at = datetime(\'now\') WHERE id = ?', [
+  await db.execute("UPDATE captures SET ocr_text = ?, updated_at = datetime('now') WHERE id = ?", [
     ocrText,
     id,
   ]);
@@ -123,7 +123,7 @@ export async function updateCaptureOcrText(id: number, ocrText: string): Promise
 
 export async function updateCaptureTags(id: number, tags: string[]): Promise<void> {
   const db = await getReadyDb();
-  await db.execute('UPDATE captures SET tags = ?, updated_at = datetime(\'now\') WHERE id = ?', [
+  await db.execute("UPDATE captures SET tags = ?, updated_at = datetime('now') WHERE id = ?", [
     JSON.stringify(tags),
     id,
   ]);
@@ -139,7 +139,10 @@ export async function listCaptures(limit = DEFAULT_MAX_CAPTURES): Promise<Stored
   return rows.map((row) => rowToStored(row));
 }
 
-export async function searchCaptures(query: string, limit = DEFAULT_MAX_CAPTURES): Promise<StoredCapture[]> {
+export async function searchCaptures(
+  query: string,
+  limit = DEFAULT_MAX_CAPTURES
+): Promise<StoredCapture[]> {
   const trimmed = query.trim();
   if (!trimmed) {
     return listCaptures(limit);
@@ -181,7 +184,10 @@ export async function searchCaptures(query: string, limit = DEFAULT_MAX_CAPTURES
   }
 }
 
-export async function listCapturesByTag(tag: string, limit = DEFAULT_MAX_CAPTURES): Promise<StoredCapture[]> {
+export async function listCapturesByTag(
+  tag: string,
+  limit = DEFAULT_MAX_CAPTURES
+): Promise<StoredCapture[]> {
   const db = await getReadyDb();
   const rows = await db.select<CaptureRow[]>(
     `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at

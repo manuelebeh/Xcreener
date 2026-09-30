@@ -6,8 +6,8 @@ import {
   searchCaptures,
 } from '@/db/captures';
 import { listCollections } from '@/db/collections';
-import { searchCloudLibrary } from '@/modules/cloud/syncLibrary';
 import { useCloudAuthStore } from '@/modules/cloud/store';
+import { searchCloudLibrary } from '@/modules/cloud/syncLibrary';
 import { useHistoryStore } from '../store';
 
 export function useHistoryLoader() {
@@ -49,9 +49,7 @@ export function useHistoryLoader() {
         }
 
         const cloudItems =
-          isAuthenticated && sourceFilter !== 'local'
-            ? await searchCloudLibrary(searchQuery)
-            : [];
+          isAuthenticated && sourceFilter !== 'local' ? await searchCloudLibrary(searchQuery) : [];
 
         if (!cancelled) {
           setCaptures(sourceFilter === 'cloud' ? [] : captures);

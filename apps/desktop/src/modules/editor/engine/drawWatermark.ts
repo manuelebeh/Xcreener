@@ -30,7 +30,13 @@ export function drawWatermark(
   const blockWidth = logoSize + (logo && label ? 8 : 0) + textWidth + WATERMARK_PADDING * 2;
   const blockHeight = Math.max(logoSize, 18) + WATERMARK_PADDING * 2;
 
-  const { x, y } = positionOrigin(config.position, canvasWidth, canvasHeight, blockWidth, blockHeight);
+  const { x, y } = positionOrigin(
+    config.position,
+    canvasWidth,
+    canvasHeight,
+    blockWidth,
+    blockHeight
+  );
 
   ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
   ctx.beginPath();

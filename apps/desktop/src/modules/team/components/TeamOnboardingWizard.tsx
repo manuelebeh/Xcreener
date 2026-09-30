@@ -1,7 +1,12 @@
-import { Button, Input } from '@snapglow/ui';
 import { isPaidPlan } from '@snapglow/team-core';
+import { Button, Input } from '@snapglow/ui';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { useCallback, useEffect, useState } from 'react';
+import {
+  captureExperimentExposure,
+  captureOnboardingStepCompleted,
+  getOnboardingExperimentVariant,
+} from '@/integrations/posthog/experiments';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import {
@@ -12,11 +17,6 @@ import {
   TEAM_ONBOARDING_STEPS,
   type TeamOnboardingStep,
 } from '../onboarding';
-import {
-  captureExperimentExposure,
-  captureOnboardingStepCompleted,
-  getOnboardingExperimentVariant,
-} from '@/integrations/posthog/experiments';
 import { useTeamStore } from '../store';
 import { BillingSection } from './BillingSection';
 import { BrandKitSection } from './BrandKitSection';

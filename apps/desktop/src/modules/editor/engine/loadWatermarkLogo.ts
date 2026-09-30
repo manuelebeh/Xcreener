@@ -1,7 +1,9 @@
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { readFile } from '@tauri-apps/plugin-fs';
 
-export async function loadWatermarkLogo(path: string | null | undefined): Promise<CanvasImageSource | null> {
+export async function loadWatermarkLogo(
+  path: string | null | undefined
+): Promise<CanvasImageSource | null> {
   if (!path) {
     return null;
   }

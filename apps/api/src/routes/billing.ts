@@ -9,7 +9,7 @@ import type { FastifyInstance } from 'fastify';
 import Stripe from 'stripe';
 import * as schema from '../db/schema';
 import { env } from '../env';
-import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
+import { authenticateRequest } from '../plugins/auth';
 import { requireWorkspaceRole } from '../plugins/workspace-auth';
 
 interface BillingRouteOptions {

@@ -11,6 +11,7 @@ import type {
   CaptureProgressPayload,
   CaptureRecordingCompletePayload,
 } from '@/shared/types/ipc';
+import { bytesToImageBitmap } from '@/shared/utils/image';
 import { hideCaptureOverlay, openPath } from '@/tauri/commands';
 import { useCaptureStore } from '../store';
 

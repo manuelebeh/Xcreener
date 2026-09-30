@@ -1,8 +1,8 @@
-import { Button, Input } from '@snapglow/ui';
 import { isPaidPlan } from '@snapglow/team-core';
+import { Button, Input } from '@snapglow/ui';
 import { setSetting } from '@/db';
-import { SETTING_KEYS } from '@/shared/types/settings';
 import { useSettingsStore } from '@/modules/settings/store';
+import { SETTING_KEYS } from '@/shared/types/settings';
 import { uploadBrandKitLogo } from '../api';
 import { useTeamStore } from '../store';
 
@@ -81,9 +81,12 @@ export function BrandKitSection() {
         <p className="text-xs text-muted">Brand kit is managed by workspace admins.</p>
       )}
       {isAdmin ? (
-        <label className="block text-xs font-medium">
-          Upload logo
+        <div>
+          <label htmlFor="brand-kit-logo" className="block text-xs font-medium">
+            Upload logo
+          </label>
           <Input
+            id="brand-kit-logo"
             type="file"
             accept="image/png,image/jpeg,image/webp,image/svg+xml"
             className="mt-1"
@@ -97,7 +100,7 @@ export function BrandKitSection() {
               );
             }}
           />
-        </label>
+        </div>
       ) : null}
       {!isAdmin && brandKit?.updatedAt ? (
         <p className="text-xs text-muted">
@@ -105,11 +108,18 @@ export function BrandKitSection() {
         </p>
       ) : null}
       {isAdmin ? (
-        <Button type="button" size="sm" variant="secondary" onClick={() => void saveBrandKit({
-          colors: brandKit?.colors ?? {},
-          fonts: brandKit?.fonts ?? {},
-          watermark: { ...watermark, enabled: true, opacity: watermark.opacity ?? 45 },
-        })}>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={() =>
+            void saveBrandKit({
+              colors: brandKit?.colors ?? {},
+              fonts: brandKit?.fonts ?? {},
+              watermark: { ...watermark, enabled: true, opacity: watermark.opacity ?? 45 },
+            })
+          }
+        >
           Save brand kit
         </Button>
       ) : null}
