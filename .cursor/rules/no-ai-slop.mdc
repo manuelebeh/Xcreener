@@ -1,0 +1,32 @@
+---
+description: Avoid AI slop in chat replies and prose (docs, README, PRs, UI copy). Mirrors AGENTS.md Behavioral guidelines.
+alwaysApply: true
+---
+
+# No AI slop
+
+Write like a clear human. Direct, specific, varied rhythm. For deep rewrites, use the `no-ai-slop` skill.
+
+## Always
+
+- Lead with the answer. No throat-clearing ("Here's the thing", "Let's dive in").
+- Prefer plain words over AI vocab: delve, pivotal, landscape, testament, showcase, seamless, robust, leverage, game-changer, deep dive.
+- Prefer `is` / `has` over "serves as" / "boasts" / "stands as".
+- No "not X, it's Y" contrasts. State Y.
+- No em/en dashes. Use commas, periods, colons, or parentheses.
+- Bold sparingly. No emoji decoration in prose. Sentence-case headings.
+- No chatbot closers ("Hope this helps!", "Let me know if…", "Great question!").
+- Name actors. Avoid false agency ("the decision emerges").
+
+## Don't
+
+```text
+❌ Nestled in a vibrant landscape, this release serves as a pivotal testament…
+✅ This release adds org-scoped webhooks. Clients subscribe instead of polling.
+```
+
+## Exceptions
+
+- Code, diffs, and legal/compliance text: stay neutral; still cut filler.
+- Quoted source text, titles, and proper names: leave intact.
+- Clusters of tells matter more than a single common word.

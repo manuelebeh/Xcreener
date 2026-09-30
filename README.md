@@ -21,7 +21,7 @@ Privacy-first screenshot app — capture, beautify, and share. Local-first; opti
 | `packages/biome-config` | Shared Biome lint/format config |
 | `packages/typescript-config` | Shared TypeScript configs |
 
-See also [`apps/api/README.md`](apps/api/README.md) and [`.agents/rules/api.md`](.agents/rules/api.md).
+See also [`apps/api/README.md`](apps/api/README.md) and [`.cursor/rules/api-architecture.mdc`](.cursor/rules/api-architecture.mdc).
 
 ## Prerequisites
 
@@ -102,7 +102,7 @@ mise run dev:mobile:ios          # first run runs prebuild + simulator
 mise run dev:mobile:android      # requires Android Studio + emulator
 ```
 
-Requires Xcode (iOS) or Android Studio (Android). See [`.agents/rules/mobile.md`](.agents/rules/mobile.md).
+Requires Xcode (iOS) or Android Studio (Android). See [`.cursor/rules/mobile-architecture.mdc`](.cursor/rules/mobile-architecture.mdc).
 
 ## Architecture
 

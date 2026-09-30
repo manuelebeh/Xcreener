@@ -1,7 +1,8 @@
 # Design - SnapGlow
 
-Locked design system (Hallmark pass 4, 2026-06-16). Future Hallmark runs read this
-file first; pages defer to it. Amend intentionally - the file is the rule.
+Locked design system (pass 4, 2026-06-16). Agents and design skills (impeccable /
+taste) read this file first; pages defer to it. Amend intentionally: the file is
+the rule.
 
 **SSOT in code:** `packages/design-tokens/tokens.json` → built to
 `packages/design-tokens/dist/tokens.css` and `dist/tailwind-theme.css`.
@@ -136,5 +137,5 @@ aliases, spacing, radius, typography. Do not duplicate here; edit that file.
   template-neon stops (`#667eea`, `#c471f5`, pure `#000000`).
 - Canvas/render engine may use raw hex for `<input type="color">` - acceptable;
   React chrome must stay on semantic tokens.
-- Hallmark diversification is **inverted** while this file exists - new pages share
+- Visual diversification is **inverted** while this file exists: new pages share
   this system; amend `design.md` for intentional variants, don't override locally.

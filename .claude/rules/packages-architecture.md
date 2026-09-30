@@ -1,0 +1,13 @@
+---
+paths:
+  - "packages/**/*.{ts,tsx,js}"
+---
+
+# packages
+
+- `@snapglow/design-tokens`: sole owner of DTCG tokens. Apps import built CSS / `tokens.native`; do not fork token definitions. Build with `mise run tokens:build`.
+- `@snapglow/ui` / `@snapglow/ui-native`: shared components for web and RN. Keep app routing/auth out of these packages.
+- `*-core` packages (`editor-core`, `redaction-core`, `cloud-core`, `api-core`, …): shared domain logic and DTOs. No Tauri or Expo-specific UI.
+- `@snapglow/sdk`: official REST client. Align types with API contracts; client-only.
+- `@snapglow/biome-config` / `typescript-config`: shared tooling configs.
+- Scope npm names: `@snapglow/*`.
