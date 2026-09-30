@@ -35,6 +35,6 @@ export { drawBlurMasks } from './drawBlurMasks';
 export { drawScreenshot } from './drawScreenshot';
 export { drawShadow } from './drawShadow';
 export { drawWatermark } from './drawWatermark';
-export { renderFrame, type RenderResult } from './renderFrame';
-export type { RenderInput, RenderBackgroundConfig, RenderScreenshotSource } from './types';
+export { type RenderResult, renderFrame } from './renderFrame';
+export type { RenderBackgroundConfig, RenderInput, RenderScreenshotSource } from './types';
 export { toCoreRenderInput } from './types';

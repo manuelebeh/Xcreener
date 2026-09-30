@@ -26,7 +26,7 @@ export const marketingFr = {
     'Application desktop pour macOS et Windows. Traitement local, aucun compte requis.',
   featureCaptureTitle: 'Capture instantanée',
   featureCaptureDesc:
-    'Raccourcis globaux depuis la barre de menu. N\'importe quel écran, n\'importe quelle fenêtre.',
+    "Raccourcis globaux depuis la barre de menu. N'importe quel écran, n'importe quelle fenêtre.",
   featureBeautifyTitle: 'Embellissement en secondes',
   featureBeautifyDesc: 'Marges, arrière-plans et finitions — sans compétences en design.',
   featureShareTitle: 'Partagez en confiance',
@@ -38,5 +38,5 @@ export const settingsFr = {
   title: 'Réglages',
   theme: 'Thème',
   language: 'Langue',
-  languageHint: 'Langue de l\'interface (redémarrage requis pour la barre système)',
+  languageHint: "Langue de l'interface (redémarrage requis pour la barre système)",
 };

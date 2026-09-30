@@ -80,17 +80,17 @@ export class SnapGlowClient {
     upload: (file: Blob | File, opts?: UploadCaptureOptions) => this.uploadCapture(file, opts),
     get: (id: string) => this.getCapture(id),
     list: (params?: ListCapturesParams) => this.listCaptures(params),
-    beautify: (id: string, config: CollabDocumentState, opts?: { title?: string; tags?: string[] }) =>
-      this.beautifyCapture(id, config, opts),
+    beautify: (
+      id: string,
+      config: CollabDocumentState,
+      opts?: { title?: string; tags?: string[] }
+    ) => this.beautifyCapture(id, config, opts),
     export: (id: string, opts?: ExportCaptureOptions) => this.exportCapture(id, opts),
     publish: (id: string) => this.publishCapture(id),
     delete: (id: string) => this.deleteCapture(id),
   };
 
-  private async request<T>(
-    path: string,
-    init: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
     const headers = new Headers(init.headers);
     headers.set('Authorization', `Bearer ${this.apiKey}`);
 

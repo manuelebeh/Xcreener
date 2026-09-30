@@ -1,9 +1,4 @@
-import {
-  initI18n,
-  I18nProvider,
-  resolveLocale,
-  type SupportedLocale,
-} from '@snapglow/i18n';
+import { I18nProvider, initI18n, resolveLocale, type SupportedLocale } from '@snapglow/i18n';
 import { type ReactNode, useEffect } from 'react';
 
 interface SnapGlowI18nProviderProps {

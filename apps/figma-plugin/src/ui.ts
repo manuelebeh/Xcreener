@@ -60,7 +60,12 @@ window.onmessage = (event: MessageEvent) => {
       div.textContent = `${item.title} · ${new Date(item.createdAt).toLocaleDateString()}`;
       div.onclick = () => {
         parent.postMessage(
-          { pluginMessage: { type: 'export-to-canvas', payload: { ...getConfig(), captureId: item.id } } },
+          {
+            pluginMessage: {
+              type: 'export-to-canvas',
+              payload: { ...getConfig(), captureId: item.id },
+            },
+          },
           '*'
         );
       };
