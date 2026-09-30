@@ -1,11 +1,11 @@
+import { participantColor } from '@snapglow/collab-core';
 import {
+  type Annotation,
   computeLayout,
   createAnnotationFromDrag,
   DEFAULT_TOOL_DEFAULTS,
-  type Annotation,
   type EditorTool,
 } from '@snapglow/editor-core';
-import { participantColor } from '@snapglow/collab-core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createComment, fetchCollabDocument, fetchComments, fetchNotifications } from './api';
 import { getValidAccessToken, isWebAuthConfigured, startWebAuthLogin } from './auth';
@@ -211,9 +211,13 @@ export function CollabEditor({ documentId }: { documentId: string }) {
         <header className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs uppercase tracking-wide text-muted">SnapGlow collaboration</p>
-            <h1 className="font-display text-2xl font-semibold">{document.title ?? 'Shared capture'}</h1>
+            <h1 className="font-display text-2xl font-semibold">
+              {document.title ?? 'Shared capture'}
+            </h1>
           </div>
-          <p className="text-sm text-muted">{connected ? `${participants.length} online` : 'Connecting…'}</p>
+          <p className="text-sm text-muted">
+            {connected ? `${participants.length} online` : 'Connecting…'}
+          </p>
         </header>
 
         {!readOnly ? (
@@ -223,7 +227,9 @@ export function CollabEditor({ documentId }: { documentId: string }) {
                 key={tool}
                 type="button"
                 className={`rounded-md border px-3 py-1 text-sm capitalize ${
-                  activeTool === tool ? 'border-foreground bg-foreground text-background' : 'border-border'
+                  activeTool === tool
+                    ? 'border-foreground bg-foreground text-background'
+                    : 'border-border'
                 }`}
                 onClick={() => setActiveTool(tool)}
               >

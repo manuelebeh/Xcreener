@@ -3,9 +3,9 @@ import { RemoteCursorsOverlay } from '@/modules/collab/components/RemoteCursorsO
 import { useCollabPointerPresence } from '@/modules/collab/hooks/useCollabSession';
 import { useCollabStore } from '@/modules/collab/store';
 import { RedactionOverlay } from '@/modules/redaction/components/RedactionOverlay';
-import { TextSelectionOverlay } from '@/modules/text-extraction/components/TextSelectionOverlay';
 import { useSettingsStore } from '@/modules/settings/store';
 import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/settings/watermark';
+import { TextSelectionOverlay } from '@/modules/text-extraction/components/TextSelectionOverlay';
 import { computeLayout } from '../engine/computeLayout';
 import { fitPreviewSize } from '../engine/fitPreviewSize';
 import { getPresetById } from '../engine/presets';
@@ -41,6 +41,7 @@ export function Canvas() {
     watermarkLogoPath: s.watermarkLogoPath,
     watermarkPosition: s.watermarkPosition,
     watermarkOpacity: s.watermarkOpacity,
+    useTeamBrandKit: s.useTeamBrandKit,
   }));
 
   const [watermarkLogo, setWatermarkLogo] = useState<HTMLImageElement | null>(null);
@@ -74,7 +75,7 @@ export function Canvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const [textEditRequest, setTextEditRequest] = useState<TextEditRequest | null>(null);
-  const documentId = useCollabStore((s) => s.documentId);
+  const _documentId = useCollabStore((s) => s.documentId);
   const commentMode = useCollabStore((s) => s.commentMode);
   const setPendingAnchor = useCollabStore((s) => s.setPendingAnchor);
 

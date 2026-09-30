@@ -36,9 +36,7 @@ export const Route = createFileRoute('/s/$token')({
     meta: [
       { title: 'Shared capture — SnapGlow' },
       { name: 'robots', content: 'noindex' },
-      ...(loaderData?.assetUrl
-        ? [{ property: 'og:image', content: loaderData.assetUrl }]
-        : []),
+      ...(loaderData?.assetUrl ? [{ property: 'og:image', content: loaderData.assetUrl }] : []),
     ],
   }),
   component: ShareViewerPage,
@@ -67,7 +65,9 @@ function ShareViewerPage() {
             controls
             className="mx-auto max-h-[80vh] w-full rounded-lg"
             data-testid="share-viewer-video"
-          />
+          >
+            <track kind="captions" />
+          </video>
         ) : (
           <img
             src={share.assetUrl}

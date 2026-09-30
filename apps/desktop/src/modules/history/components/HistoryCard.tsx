@@ -1,7 +1,7 @@
 import { clsx } from 'clsx';
 import { useState } from 'react';
-import type { StoredCollection } from '@/db/collections';
 import type { StoredCapture } from '@/db/captures';
+import type { StoredCollection } from '@/db/collections';
 import { useLocalFileSrc } from '../hooks/useLocalFileSrc';
 import { formatCaptureDimensions, formatRelativeTime } from '../utils/format';
 

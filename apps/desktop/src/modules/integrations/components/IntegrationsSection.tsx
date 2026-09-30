@@ -1,9 +1,9 @@
-import { Button } from '@snapglow/ui';
 import {
   INTEGRATION_LABELS,
   INTEGRATION_PROVIDERS,
   isEnterpriseIntegrationProvider,
 } from '@snapglow/integrations-core';
+import { Button } from '@snapglow/ui';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { hasEnterpriseIntegrationsAccess } from '@/modules/licensing/premiumAccess';
 import { useIntegrationsStore } from '../store';
@@ -38,15 +38,16 @@ export function IntegrationsSection() {
       </p>
 
       {!isAuthenticated ? (
-        <p className="mt-2 text-xs text-muted">Sign in to SnapGlow cloud above before connecting.</p>
+        <p className="mt-2 text-xs text-muted">
+          Sign in to SnapGlow cloud above before connecting.
+        </p>
       ) : null}
 
       <div className="mt-3 space-y-2">
         {INTEGRATION_PROVIDERS.map((provider) => {
           const connection = connections.find((item) => item.provider === provider);
           const isConnected = connection?.connected ?? false;
-          const enterpriseLocked =
-            isEnterpriseIntegrationProvider(provider) && !enterpriseAccess;
+          const enterpriseLocked = isEnterpriseIntegrationProvider(provider) && !enterpriseAccess;
           const statusLabel = isConnected
             ? (connection?.accountLabel ?? 'Connected')
             : enterpriseLocked
@@ -60,7 +61,9 @@ export function IntegrationsSection() {
               className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
             >
               <div>
-                <p className="text-sm font-medium text-foreground">{INTEGRATION_LABELS[provider]}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {INTEGRATION_LABELS[provider]}
+                </p>
                 <p className="text-xs text-muted">{statusLabel}</p>
               </div>
               {isConnected ? (

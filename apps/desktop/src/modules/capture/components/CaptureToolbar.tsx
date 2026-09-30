@@ -5,11 +5,8 @@ import type {
   CaptureMode,
   CaptureRecordOutputFormat,
 } from '@/shared/types/ipc';
+import { isVideoTargetEnabled, targetModesForMediaKind } from '../utils/captureModes';
 import { CaptureDelaySelect } from './CaptureDelaySelect';
-import {
-  isVideoTargetEnabled,
-  targetModesForMediaKind,
-} from '../utils/captureModes';
 
 interface CaptureToolbarProps {
   mediaKind: CaptureMediaKind;
@@ -88,8 +85,7 @@ export function CaptureToolbar({
       </fieldset>
       <span className="capture-hud-divider mx-1 h-5 w-px" aria-hidden="true" />
       {targetModes.map((mode) => {
-        const disabled =
-          isCapturing || (isVideo && !isVideoTargetEnabled(mode.id));
+        const disabled = isCapturing || (isVideo && !isVideoTargetEnabled(mode.id));
         return (
           <button
             key={mode.id}

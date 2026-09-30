@@ -55,8 +55,7 @@ export const useCollabStore = create<CollabState>((set) => ({
   statusMessage: null,
   setDocument: (document) => set({ document }),
   setDocumentId: (documentId) => set({ documentId }),
-  setConnected: (connected) =>
-    set({ connected, ...(connected ? { reconnecting: false } : {}) }),
+  setConnected: (connected) => set({ connected, ...(connected ? { reconnecting: false } : {}) }),
   setReconnecting: (reconnecting) => set({ reconnecting }),
   setReadOnly: (readOnly) => set({ readOnly }),
   setParticipants: (participants) => set({ participants, remoteCursors: participants }),

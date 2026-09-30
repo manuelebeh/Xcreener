@@ -1,7 +1,7 @@
+import { lineId, mapLineToLayout } from '@snapglow/ocr-core';
 import { computeLayout } from '@/modules/editor/engine/computeLayout';
 import { getPresetById } from '@/modules/editor/engine/presets';
 import { useEditorStore } from '@/modules/editor/store';
-import { lineId, mapLineToLayout } from '@snapglow/ocr-core';
 import { useTextExtraction } from '../hooks/useTextExtraction';
 import { useTextExtractionStore } from '../store';
 

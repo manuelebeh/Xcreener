@@ -10,6 +10,7 @@ export function setReferralCookie(code: string): void {
     return;
   }
   const maxAge = REF_MAX_AGE_DAYS * 24 * 60 * 60;
+  // biome-ignore lint/suspicious/noDocumentCookie: first-party affiliate attribution cookie
   document.cookie = `${REF_COOKIE}=${encodeURIComponent(code.trim())}; path=/; max-age=${maxAge}; SameSite=Lax`;
 }
 

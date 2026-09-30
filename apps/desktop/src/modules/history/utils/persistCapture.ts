@@ -1,5 +1,5 @@
-import { insertCapture, pruneCaptures, updateCaptureOcrText } from '@/db/captures';
 import { linesToPlainText } from '@snapglow/ocr-core';
+import { insertCapture, pruneCaptures, updateCaptureOcrText } from '@/db/captures';
 import { syncCaptureToLibrary } from '@/modules/cloud/syncLibrary';
 import { useSettingsStore } from '@/modules/settings/store';
 import { recognizeText } from '@/tauri/commands';

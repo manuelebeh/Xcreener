@@ -31,11 +31,7 @@ export function CollectionsSidebar({
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-medium text-foreground">Collections</p>
           {(activeCollectionId !== null || activeTag) && (
-            <button
-              type="button"
-              className="text-xs text-primary"
-              onClick={onClearFilters}
-            >
+            <button type="button" className="text-xs text-primary" onClick={onClearFilters}>
               Clear
             </button>
           )}

@@ -1,4 +1,3 @@
-import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import type { CollabDocumentState } from '@snapglow/collab-core';
 import { z } from 'zod';
 
@@ -127,26 +126,6 @@ export const exportCaptureSchema = z.object({
 export const createApiKeySchema = z.object({
   name: z.string().trim().min(1).max(100),
 });
-
-const SCRYPT_SALT = 'snapglow-api-key-v1';
-
-export function hashApiKey(plaintext: string): string {
-  return scryptSync(plaintext, SCRYPT_SALT, 64).toString('hex');
-}
-
-export function verifyApiKey(plaintext: string, storedHash: string): boolean {
-  const computed = hashApiKey(plaintext);
-  const a = Buffer.from(computed, 'hex');
-  const b = Buffer.from(storedHash, 'hex');
-  if (a.length !== b.length) {
-    return false;
-  }
-  return timingSafeEqual(a, b);
-}
-
-export function generateApiKeySecret(): string {
-  return randomBytes(32).toString('base64url');
-}
 
 export function buildApiKeyPlaintext(secret: string): string {
   return `${API_KEY_PREFIX}${secret}`;

@@ -140,6 +140,7 @@ export function WatermarkSection() {
         </div>
 
         <div>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: Slider is a custom control without native id */}
           <label className="block text-sm font-medium">Opacity ({watermarkOpacity}%)</label>
           <Slider
             min={10}

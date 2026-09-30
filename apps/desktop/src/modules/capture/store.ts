@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import type {
   CaptureDelaySecs,
+  CaptureGifQuality,
   CaptureMediaKind,
   CaptureMode,
   CaptureOverlayBounds,
-  CaptureGifQuality,
   CaptureProgressPayload,
   CaptureRecordOutputFormat,
   MonitorInfo,

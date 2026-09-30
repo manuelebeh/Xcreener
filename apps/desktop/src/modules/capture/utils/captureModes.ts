@@ -23,7 +23,7 @@ export function targetModesForMediaKind(mediaKind: CaptureMediaKind) {
   return mediaKind === 'video' ? VIDEO_TARGET_MODES : PHOTO_TARGET_MODES;
 }
 
-export function defaultTargetForMediaKind(mediaKind: CaptureMediaKind): CaptureTargetMode {
+export function defaultTargetForMediaKind(_mediaKind: CaptureMediaKind): CaptureTargetMode {
   return 'region';
 }
 

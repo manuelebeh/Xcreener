@@ -22,15 +22,21 @@ function parseFrontmatter(raw: string): { meta: Record<string, string>; body: st
     return { meta: {}, body: raw };
   }
 
+  const frontmatter = match[1];
+  const bodyContent = match[2];
+  if (frontmatter === undefined || bodyContent === undefined) {
+    return { meta: {}, body: raw };
+  }
+
   const meta: Record<string, string> = {};
-  for (const line of match[1]!.split('\n')) {
+  for (const line of frontmatter.split('\n')) {
     const idx = line.indexOf(':');
     if (idx > 0) {
       meta[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
     }
   }
 
-  return { meta, body: match[2]!.trim() };
+  return { meta, body: bodyContent.trim() };
 }
 
 function pathToSlug(path: string): string {

@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
 import {
   MIN_CLASSIFICATION_CONFIDENCE,
   mapContentClassToStyle,
 } from '@snapglow/style-suggestion-core';
+import { useCallback } from 'react';
 import { useEditorStore } from '@/modules/editor/store';
 import { screenshotToPngBytes } from '@/modules/redaction/utils/screenshotToPngBytes';
 import { classifyContent } from '@/tauri/commands';

@@ -1,5 +1,5 @@
-import { compressExportBytes } from '@/tauri/commands';
 import { bytesToBlob } from '@/shared/utils/image';
+import { compressExportBytes } from '@/tauri/commands';
 import type { ExportFormat } from './formats';
 
 export async function maybeCompressExportBlob(

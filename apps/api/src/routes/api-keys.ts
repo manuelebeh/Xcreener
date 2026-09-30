@@ -4,9 +4,8 @@ import {
   buildApiKeyPlaintext,
   type CreateApiKeyResponse,
   createApiKeySchema,
-  generateApiKeySecret,
-  hashApiKey,
 } from '@snapglow/api-core';
+import { generateApiKeySecret, hashApiKey } from '@snapglow/api-core/api-keys';
 import { hasApiAccess } from '@snapglow/team-core';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';

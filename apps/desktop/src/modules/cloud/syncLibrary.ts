@@ -1,8 +1,8 @@
 import type { LibraryItemResponse } from '@snapglow/cloud-core';
 import { readFile } from '@tauri-apps/plugin-fs';
+import { getWorkspaceHeaders } from '@/modules/team/headers';
 import { getValidAccessToken } from './auth';
 import { getApiUrl } from './config';
-import { getWorkspaceHeaders } from '@/modules/team/headers';
 import { useCloudAuthStore } from './store';
 
 export interface SyncLibraryInput {

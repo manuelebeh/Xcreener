@@ -21,10 +21,7 @@ function urlEntry(path: string, lastmod?: string): string {
   const alternates = localizedUrls(path);
   const defaultLoc = alternates[0]?.loc ?? `${BASE}${path}`;
   const altLinks = alternates
-    .map(
-      (alt) =>
-        `    <xhtml:link rel="alternate" hreflang="${alt.hreflang}" href="${alt.loc}" />`
-    )
+    .map((alt) => `    <xhtml:link rel="alternate" hreflang="${alt.hreflang}" href="${alt.loc}" />`)
     .join('\n');
   const lastmodTag = lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : '';
 
@@ -41,7 +38,6 @@ export const Route = createFileRoute('/sitemap.xml')({
         const staticPaths = ['/', '/help', '/marketplace', '/affiliates', '/blog', '/redeem'];
         const helpSlugs = getHelpArticles().map((a) => `/help/${a.slug}`);
         const blogPosts = getBlogPosts();
-        const blogSlugs = blogPosts.map((p) => `/blog/${p.slug}`);
 
         const entries = [
           ...staticPaths.map((path) => urlEntry(path)),

@@ -1,9 +1,9 @@
-import { Button } from '@snapglow/ui';
 import { useTranslation } from '@snapglow/i18n';
+import { Button } from '@snapglow/ui';
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { useLandingCtaExperiment, usePricingExperiment } from '#/lib/experiments/useExperiment';
 import { captureReferralFromUrl } from '#/lib/affiliates/referral';
+import { useLandingCtaExperiment, usePricingExperiment } from '#/lib/experiments/useExperiment';
 
 const linkButtonPrimary =
   'inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-base font-medium text-primary-foreground no-underline transition-opacity hover:opacity-90';
@@ -59,16 +59,10 @@ function LandingPage() {
           >
             {tc('affiliates')}
           </a>
-          <a
-            href="/help"
-            className="font-medium text-muted no-underline hover:text-foreground"
-          >
+          <a href="/help" className="font-medium text-muted no-underline hover:text-foreground">
             {tc('help')}
           </a>
-          <a
-            href="#features"
-            className="font-medium text-muted no-underline hover:text-foreground"
-          >
+          <a href="#features" className="font-medium text-muted no-underline hover:text-foreground">
             Features
           </a>
         </nav>

@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
 import type { TemplateListingResponse } from '@snapglow/marketplace-core';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { fetchTemplateBySlug } from '#/lib/marketplace/fetchTemplates';
 
 export const Route = createFileRoute('/marketplace/$slug')({
@@ -12,14 +12,11 @@ export const Route = createFileRoute('/marketplace/$slug')({
           name: 'description',
           content: template?.description ?? 'Community beautification template for SnapGlow.',
         },
-        ...(template?.previewUrl
-          ? [{ property: 'og:image', content: template.previewUrl }]
-          : []),
+        ...(template?.previewUrl ? [{ property: 'og:image', content: template.previewUrl }] : []),
       ],
     };
   },
-  loader: async ({ params }): Promise<TemplateListingResponse> =>
-    fetchTemplateBySlug(params.slug),
+  loader: async ({ params }): Promise<TemplateListingResponse> => fetchTemplateBySlug(params.slug),
   component: MarketplaceDetailPage,
 });
 
@@ -39,9 +36,7 @@ function MarketplaceDetailPage() {
 
       <main className="mx-auto max-w-3xl px-6 pb-16">
         <h1 className="font-display text-3xl font-bold tracking-tight">{template.title}</h1>
-        {template.description ? (
-          <p className="mt-2 text-muted">{template.description}</p>
-        ) : null}
+        {template.description ? <p className="mt-2 text-muted">{template.description}</p> : null}
 
         {template.previewUrl ? (
           <img

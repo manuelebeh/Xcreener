@@ -1,7 +1,12 @@
 import { openUrl } from '@tauri-apps/plugin-opener';
-import { createCodeChallenge, createCodeVerifier, createOAuthState } from './pkce';
 import { getAuth0Config } from './config';
-import { clearAuthTokens, loadAuthTokens, saveAuthTokens, type StoredAuthTokens } from './tokenStorage';
+import { createCodeChallenge, createCodeVerifier, createOAuthState } from './pkce';
+import {
+  clearAuthTokens,
+  loadAuthTokens,
+  type StoredAuthTokens,
+  saveAuthTokens,
+} from './tokenStorage';
 
 interface PendingLogin {
   codeVerifier: string;

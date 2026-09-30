@@ -79,7 +79,14 @@ export function drawAnnotations(ctx: CanvasRenderingContext2D, annotations: Anno
         ctx.moveTo(annotation.x1, annotation.y1);
         ctx.lineTo(annotation.x2, annotation.y2);
         ctx.stroke();
-        drawArrowHead(ctx, annotation.x1, annotation.y1, annotation.x2, annotation.y2, annotation.strokeWidth);
+        drawArrowHead(
+          ctx,
+          annotation.x1,
+          annotation.y1,
+          annotation.x2,
+          annotation.y2,
+          annotation.strokeWidth
+        );
         break;
       case 'text':
         ctx.font = `${annotation.fontSize}px ${annotation.fontFamily}`;

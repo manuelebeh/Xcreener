@@ -29,6 +29,7 @@ function HelpArticlePage() {
       {article.description ? <p className="mt-2 text-muted">{article.description}</p> : null}
       <div
         className="prose-help mt-8 max-w-none"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: trusted local markdown content
         dangerouslySetInnerHTML={{ __html: renderSimpleMarkdown(article.body) }}
       />
     </HelpLayout>

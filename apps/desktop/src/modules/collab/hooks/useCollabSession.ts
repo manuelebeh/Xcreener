@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useEffect, useRef } from 'react';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { useEditorStore } from '@/modules/editor/store';
-import { fetchComments, fetchCollabDocument } from '../api';
+import { fetchCollabDocument, fetchComments } from '../api';
 import { collabClient } from '../client';
 import { useCollabStore } from '../store';
 import {
@@ -145,7 +145,6 @@ export function useCollabSession(documentId: string | null): void {
       return;
     }
     collabClient.updatePresence({
-      color: '#6366f1',
       cursorX: null,
       cursorY: null,
       selectedAnnotationId,
@@ -176,7 +175,6 @@ export function useCollabPointerPresence(
         return;
       }
       collabClient.updatePresence({
-        color: '#6366f1',
         cursorX: x / layoutWidth,
         cursorY: y / layoutHeight,
         selectedAnnotationId: useEditorStore.getState().selectedAnnotationId,

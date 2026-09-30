@@ -1,8 +1,8 @@
 import {
   parseUsagePeriod,
   type UsagePeriod,
-  type WorkspaceUsageResponse,
   usagePeriodDays,
+  type WorkspaceUsageResponse,
 } from '@snapglow/team-core';
 import { and, eq, gte, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -64,9 +64,7 @@ export async function registerWorkspaceUsageRoutes(
         })
         .from(schema.shares)
         .innerJoin(schema.users, eq(schema.shares.userId, schema.users.id))
-        .where(
-          and(eq(schema.shares.workspaceId, workspaceId), gte(schema.shares.createdAt, from))
-        )
+        .where(and(eq(schema.shares.workspaceId, workspaceId), gte(schema.shares.createdAt, from)))
         .groupBy(schema.shares.userId, schema.users.email);
 
       const [apiCaptureStats] = await options.db
@@ -101,9 +99,7 @@ export async function registerWorkspaceUsageRoutes(
           bytes: sql<number>`coalesce(sum(${schema.shares.byteSize}), 0)::int`,
         })
         .from(schema.shares)
-        .where(
-          and(eq(schema.shares.workspaceId, workspaceId), gte(schema.shares.createdAt, from))
-        );
+        .where(and(eq(schema.shares.workspaceId, workspaceId), gte(schema.shares.createdAt, from)));
 
       const memberMap = new Map<
         string,

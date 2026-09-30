@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { isLiveOverlayMode, needsNativeCapture } from './captureFlow';
 import {
   isVideoTargetEnabled,
   normalizeTargetForMediaKind,
   targetModesForMediaKind,
 } from './captureModes';
-import { isLiveOverlayMode, needsNativeCapture } from './captureFlow';
 
 describe('captureModes', () => {
   it('lists photo and video target modes', () => {

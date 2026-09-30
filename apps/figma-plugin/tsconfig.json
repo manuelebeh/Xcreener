@@ -1,7 +1,8 @@
 {
   "extends": "@snapglow/typescript-config/base.json",
   "compilerOptions": {
-    "typeRoots": ["../../node_modules/@figma"]
+    "lib": ["ES2022", "DOM"],
+    "types": ["@figma/plugin-typings"]
   },
   "include": ["src"]
 }

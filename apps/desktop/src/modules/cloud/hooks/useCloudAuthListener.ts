@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { getCurrent, onOpenUrl } from '@tauri-apps/plugin-deep-link';
+import { useEffect } from 'react';
 import { isTauriRuntime } from '@/shared/lib/tauri';
 import { isCloudConfigured } from '../config';
 import { completeCloudAuthFromUrl, useCloudAuthStore } from '../store';
@@ -22,7 +22,9 @@ export function useCloudAuthListener() {
         try {
           await completeCloudAuthFromUrl(url);
         } catch (error) {
-          useCloudAuthStore.getState().setError(error instanceof Error ? error.message : String(error));
+          useCloudAuthStore
+            .getState()
+            .setError(error instanceof Error ? error.message : String(error));
           useCloudAuthStore.setState({ isLoading: false });
         }
       }

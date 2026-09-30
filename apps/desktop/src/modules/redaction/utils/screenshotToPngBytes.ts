@@ -3,7 +3,10 @@ import { canvasToPngBlob, createExportCanvas } from '@/modules/export/utils/canv
 export async function screenshotToPngBytes(screenshot: ImageBitmap): Promise<number[]> {
   const canvas = createExportCanvas(screenshot.width, screenshot.height);
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d') as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D
+    | null;
   if (!ctx) {
     throw new Error('Failed to create screenshot export context');
   }

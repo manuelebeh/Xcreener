@@ -1,5 +1,5 @@
-import { getSetting, setSetting } from '@/db';
 import type { IntegrationProvider } from '@snapglow/integrations-core';
+import { getSetting, setSetting } from '@/db';
 
 export interface StoredIntegrationToken {
   accessToken: string;

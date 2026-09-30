@@ -1,7 +1,7 @@
 import type { CreateShareResponse, ShareExpiry } from '@snapglow/cloud-core';
+import { getWorkspaceHeaders } from '@/modules/team/headers';
 import { getValidAccessToken } from './auth';
 import { getApiUrl } from './config';
-import { getWorkspaceHeaders } from '@/modules/team/headers';
 
 export async function uploadShare(
   blob: Blob,

@@ -35,7 +35,7 @@ async function importSelection(config: { apiKey: string; baseUrl: string }) {
   const bytes = await node.exportAsync(exportSettings);
   const client = new SnapGlowClient({ apiKey: config.apiKey, baseUrl: config.baseUrl });
 
-  const blob = new Blob([bytes], { type: 'image/png' });
+  const blob = new Blob([Uint8Array.from(bytes)], { type: 'image/png' });
   const uploaded = await client.captures.upload(blob, {
     title: node.name,
     tags: ['figma'],

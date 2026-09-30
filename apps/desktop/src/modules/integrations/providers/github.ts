@@ -28,18 +28,25 @@ export async function listGitHubIssues(
   accessToken: string,
   repoFullName: string
 ): Promise<GitHubIssueSummary[]> {
-  const response = await fetch(`https://api.github.com/repos/${repoFullName}/issues?state=open&per_page=20`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: 'application/vnd.github+json',
-    },
-  });
+  const response = await fetch(
+    `https://api.github.com/repos/${repoFullName}/issues?state=open&per_page=20`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/vnd.github+json',
+      },
+    }
+  );
 
   if (!response.ok) {
     throw new Error('Failed to list GitHub issues');
   }
 
-  const payload = (await response.json()) as Array<{ number: number; title: string; pull_request?: unknown }>;
+  const payload = (await response.json()) as Array<{
+    number: number;
+    title: string;
+    pull_request?: unknown;
+  }>;
   return payload
     .filter((issue) => !issue.pull_request)
     .map((issue) => ({ number: issue.number, title: issue.title }));

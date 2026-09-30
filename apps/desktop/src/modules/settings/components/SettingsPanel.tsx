@@ -7,11 +7,11 @@ import { captureTestEvent } from '@/integrations/posthog/events';
 import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/useGlobalShortcut';
 import { CloudAuthSection } from '@/modules/cloud/components/CloudAuthSection';
-import { TeamSection } from '@/modules/team/components/TeamSection';
-import { TeamOnboardingWizard } from '@/modules/team/components/TeamOnboardingWizard';
-import { loadTeamOnboardingState } from '@/modules/team/onboarding';
 import { IntegrationsSection } from '@/modules/integrations/components/IntegrationsSection';
 import { MarketplaceSection } from '@/modules/marketplace/components/MarketplaceSection';
+import { TeamOnboardingWizard } from '@/modules/team/components/TeamOnboardingWizard';
+import { TeamSection } from '@/modules/team/components/TeamSection';
+import { loadTeamOnboardingState } from '@/modules/team/onboarding';
 import { isValidCaptureShortcut, normalizeCaptureShortcut } from '@/shared/lib/shortcut';
 import type { AppLocale, OcrEngineMode, ThemePreference } from '@/shared/types/settings';
 import { SETTING_KEYS } from '@/shared/types/settings';
@@ -48,9 +48,8 @@ export function SettingsPanel() {
   const [updateStatus, setUpdateStatus] = useState<string | null>(null);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState<
-    import('@/modules/team/onboarding').TeamOnboardingStep
-  >('welcome');
+  const [onboardingStep, setOnboardingStep] =
+    useState<import('@/modules/team/onboarding').TeamOnboardingStep>('welcome');
 
   async function handleLocaleChange(value: AppLocale) {
     setLocale(value);

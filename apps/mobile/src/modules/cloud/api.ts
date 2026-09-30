@@ -8,9 +8,7 @@ export interface MobileLibraryItem {
   createdAt: string;
 }
 
-export async function fetchMobileLibrary(
-  accessToken: string
-): Promise<MobileLibraryItem[]> {
+export async function fetchMobileLibrary(accessToken: string): Promise<MobileLibraryItem[]> {
   const response = await fetch(`${API_URL}/v1/sync/library`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });

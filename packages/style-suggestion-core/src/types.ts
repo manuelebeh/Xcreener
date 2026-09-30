@@ -1,13 +1,6 @@
 import type { ShadowConfig } from '@snapglow/editor-core';
 
-export const CONTENT_CLASSES = [
-  'code',
-  'ui',
-  'terminal',
-  'photo',
-  'diagram',
-  'text',
-] as const;
+export const CONTENT_CLASSES = ['code', 'ui', 'terminal', 'photo', 'diagram', 'text'] as const;
 
 export type ContentClass = (typeof CONTENT_CLASSES)[number];
 

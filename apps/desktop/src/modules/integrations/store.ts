@@ -64,7 +64,9 @@ export const useIntegrationsStore = create<IntegrationsState>((set) => ({
     ];
     set({
       configured: true,
-      connections: providers.map((provider) => toConnectionState(provider, tokens[provider] ?? null)),
+      connections: providers.map((provider) =>
+        toConnectionState(provider, tokens[provider] ?? null)
+      ),
       error: null,
     });
   },

@@ -23,8 +23,8 @@ import { registerPublicCaptureRoutes } from './routes/public-captures';
 import { registerShareRoutes } from './routes/shares';
 import { registerSyncRoutes } from './routes/sync';
 import { registerTemplateRoutes } from './routes/templates';
-import { registerWorkspaceRoutes } from './routes/workspaces';
 import { registerWorkspaceUsageRoutes } from './routes/workspace-usage';
+import { registerWorkspaceRoutes } from './routes/workspaces';
 import { StorageService } from './services/storage';
 
 interface BuildAppOptions {
@@ -34,7 +34,7 @@ interface BuildAppOptions {
 
 export async function buildApp(options: BuildAppOptions) {
   const app = Fastify({
-    logger: process.env.NODE_ENV === 'test' ? false : true,
+    logger: process.env.NODE_ENV !== 'test',
     bodyLimit: 100 * 1024 * 1024,
   });
 

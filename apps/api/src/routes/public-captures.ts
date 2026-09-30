@@ -410,85 +410,84 @@ export async function registerPublicCaptureRoutes(
     return response;
   });
 
-  app.post('/v1/public/captures/:id/publish', { preHandler: apiKeyAuth }, async (request, reply) => {
-    const apiKey = request.apiKey;
-    const workspaceId = request.apiWorkspaceId;
-    const { id } = request.params as { id: string };
-    if (!apiKey || !workspaceId) {
-      return reply.code(401).send({ error: 'Unauthorized' });
-    }
+  app.post(
+    '/v1/public/captures/:id/publish',
+    { preHandler: apiKeyAuth },
+    async (request, reply) => {
+      const apiKey = request.apiKey;
+      const workspaceId = request.apiWorkspaceId;
+      const { id } = request.params as { id: string };
+      if (!apiKey || !workspaceId) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
 
-    const generalLimit = await checkApiGeneralRateLimit(apiKey.id);
-    if (!generalLimit.allowed) {
-      return sendRateLimitReply(reply, generalLimit.retryAfterSec);
-    }
+      const generalLimit = await checkApiGeneralRateLimit(apiKey.id);
+      if (!generalLimit.allowed) {
+        return sendRateLimitReply(reply, generalLimit.retryAfterSec);
+      }
 
-    const exportLimit = await checkApiExportRateLimit(apiKey.id);
-    if (!exportLimit.allowed) {
-      return sendRateLimitReply(reply, exportLimit.retryAfterSec);
-    }
+      const exportLimit = await checkApiExportRateLimit(apiKey.id);
+      if (!exportLimit.allowed) {
+        return sendRateLimitReply(reply, exportLimit.retryAfterSec);
+      }
 
-    const rows = await options.db
-      .select()
-      .from(schema.apiCaptures)
-      .where(and(eq(schema.apiCaptures.id, id), eq(schema.apiCaptures.workspaceId, workspaceId)))
-      .limit(1);
+      const rows = await options.db
+        .select()
+        .from(schema.apiCaptures)
+        .where(and(eq(schema.apiCaptures.id, id), eq(schema.apiCaptures.workspaceId, workspaceId)))
+        .limit(1);
 
-    const capture = rows[0];
-    if (!capture) {
-      return reply.code(404).send({ error: 'Capture not found' });
-    }
+      const capture = rows[0];
+      if (!capture) {
+        return reply.code(404).send({ error: 'Capture not found' });
+      }
 
-    const keyRows = await options.db
-      .select({ createdBy: schema.apiKeys.createdBy })
-      .from(schema.apiKeys)
-      .where(eq(schema.apiKeys.id, apiKey.id))
-      .limit(1);
+      const keyRows = await options.db
+        .select({ createdBy: schema.apiKeys.createdBy })
+        .from(schema.apiKeys)
+        .where(eq(schema.apiKeys.id, apiKey.id))
+        .limit(1);
 
-    const keyOwner = keyRows[0];
-    if (!keyOwner) {
-      return reply.code(500).send({ error: 'API key not found' });
-    }
+      const keyOwner = keyRows[0];
+      if (!keyOwner) {
+        return reply.code(500).send({ error: 'API key not found' });
+      }
 
-    const exported = await ensureCaptureExport(
-      options.db,
-      options.storage,
-      capture,
-      workspaceId
-    );
+      const exported = await ensureCaptureExport(options.db, options.storage, capture, workspaceId);
 
-    const exportBuffer = await options.storage.getObject(exported.exportKey);
-    const token = createShareToken();
-    const shareStorageKey = `shares/${keyOwner.createdBy}/${token}`;
-    await options.storage.uploadObject(shareStorageKey, exportBuffer, exported.mimeType);
+      const exportBuffer = await options.storage.getObject(exported.exportKey);
+      const token = createShareToken();
+      const shareStorageKey = `shares/${keyOwner.createdBy}/${token}`;
+      await options.storage.uploadObject(shareStorageKey, exportBuffer, exported.mimeType);
 
-    const [share] = await options.db
-      .insert(schema.shares)
-      .values({
-        userId: keyOwner.createdBy,
-        workspaceId,
-        token,
-        storageKey: shareStorageKey,
-        mimeType: exported.mimeType,
-        byteSize: exported.byteSize,
-        title: capture.title,
+      const [share] = await options.db
+        .insert(schema.shares)
+        .values({
+          userId: keyOwner.createdBy,
+          workspaceId,
+          token,
+          storageKey: shareStorageKey,
+          mimeType: exported.mimeType,
+          byteSize: exported.byteSize,
+          title: capture.title,
+          expiresAt: null,
+        })
+        .returning();
+
+      if (!share) {
+        return reply.code(500).send({ error: 'Failed to publish capture' });
+      }
+
+      const response: PublishCaptureResponse = {
+        token: share.token,
+        shareUrl: `${env.WEB_PUBLIC_URL}/s/${share.token}`,
+        embedUrl: `${env.WEB_PUBLIC_URL}/e/${share.token}`,
         expiresAt: null,
-      })
-      .returning();
+      };
 
-    if (!share) {
-      return reply.code(500).send({ error: 'Failed to publish capture' });
+      return reply.code(201).send(response);
     }
-
-    const response: PublishCaptureResponse = {
-      token: share.token,
-      shareUrl: `${env.WEB_PUBLIC_URL}/s/${share.token}`,
-      embedUrl: `${env.WEB_PUBLIC_URL}/e/${share.token}`,
-      expiresAt: null,
-    };
-
-    return reply.code(201).send(response);
-  });
+  );
 
   app.delete('/v1/public/captures/:id', { preHandler: apiKeyAuth }, async (request, reply) => {
     const apiKey = request.apiKey;

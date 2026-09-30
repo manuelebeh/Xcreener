@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import type { TextLine } from '@snapglow/ocr-core';
+import { create } from 'zustand';
 
 export type TextExtractionStatus = 'idle' | 'scanning' | 'ready' | 'error';
 
@@ -33,8 +33,9 @@ export const useTextExtractionStore = create<TextExtractionState>((set, get) => 
   toggleLineSelection: (lineId, range = false) => {
     const { lines, selectedLineIds } = get();
     if (range && selectedLineIds.length > 0) {
-      const ids = lines.map((line) =>
-        `${Math.round(line.x)}:${Math.round(line.y)}:${Math.round(line.width)}:${Math.round(line.height)}:${line.text}`
+      const ids = lines.map(
+        (line) =>
+          `${Math.round(line.x)}:${Math.round(line.y)}:${Math.round(line.width)}:${Math.round(line.height)}:${line.text}`
       );
       const anchor = selectedLineIds[selectedLineIds.length - 1]!;
       const start = ids.indexOf(anchor);
