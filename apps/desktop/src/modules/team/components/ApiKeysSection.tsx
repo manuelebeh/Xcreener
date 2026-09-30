@@ -1,9 +1,9 @@
 import type { ApiKeyResponse, CreateApiKeyResponse } from '@snapglow/api-core';
-import { Button, Input } from '@snapglow/ui';
 import { hasApiAccess } from '@snapglow/team-core';
+import { Button, Input } from '@snapglow/ui';
 import { useCallback, useEffect, useState } from 'react';
-import { useTeamStore } from '../store';
 import { createApiKey, listApiKeys, revokeApiKey } from '../api-keys';
+import { useTeamStore } from '../store';
 
 export function ApiKeysSection() {
   const activeWorkspace = useTeamStore((state) =>
@@ -37,7 +37,7 @@ export function ApiKeysSection() {
     void loadKeys();
   }, [loadKeys]);
 
-  if (!activeWorkspace || activeWorkspace.role !== 'admin') {
+  if (activeWorkspace?.role !== 'admin') {
     return null;
   }
 
@@ -101,12 +101,19 @@ export function ApiKeysSection() {
       {revealedKey ? (
         <div className="space-y-2 rounded-md border border-accent/40 bg-accent/5 p-3">
           <p className="m-0 text-xs font-medium text-foreground">New API key — copy now</p>
-          <code className="block break-all rounded bg-surface px-2 py-1 text-xs">{revealedKey.key}</code>
+          <code className="block break-all rounded bg-surface px-2 py-1 text-xs">
+            {revealedKey.key}
+          </code>
           <div className="flex gap-2">
             <Button type="button" size="sm" onClick={() => void copyRevealedKey()}>
               Copy key
             </Button>
-            <Button type="button" size="sm" variant="secondary" onClick={() => setRevealedKey(null)}>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => setRevealedKey(null)}
+            >
               Dismiss
             </Button>
           </div>
@@ -152,7 +159,12 @@ export function ApiKeysSection() {
                     : ''}
                 </p>
               </div>
-              <Button type="button" size="sm" variant="secondary" onClick={() => void handleRevoke(key.id)}>
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                onClick={() => void handleRevoke(key.id)}
+              >
                 Revoke
               </Button>
             </li>

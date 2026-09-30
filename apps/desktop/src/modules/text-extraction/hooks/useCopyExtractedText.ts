@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
-import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { linesToPlainText, mergeSelectedLines } from '@snapglow/ocr-core';
+import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { useCallback } from 'react';
 import { useTextExtractionStore } from '../store';
 
 export function useCopyExtractedText() {

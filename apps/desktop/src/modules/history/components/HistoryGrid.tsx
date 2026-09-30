@@ -1,5 +1,5 @@
-import type { StoredCollection } from '@/db/collections';
 import type { StoredCapture } from '@/db/captures';
+import type { StoredCollection } from '@/db/collections';
 import { HistoryCard } from './HistoryCard';
 
 interface HistoryGridProps {

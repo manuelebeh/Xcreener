@@ -1,3 +1,4 @@
+import type { DetectionKind } from '@snapglow/redaction-core';
 import { useCallback } from 'react';
 import { captureRedactionTriggered } from '@/integrations/posthog/events';
 import type { BlurAnnotation } from '@/modules/editor/annotations/types';
@@ -9,6 +10,20 @@ import { useRedactionStore } from '../store';
 import type { Detection } from '../types';
 import { mapRegionToLayout } from '../utils/mapToLayout';
 import { screenshotToPngBytes } from '../utils/screenshotToPngBytes';
+
+function toDetectionKind(kind: string): DetectionKind {
+  switch (kind) {
+    case 'email':
+    case 'phone':
+    case 'card':
+    case 'api_key':
+    case 'url':
+    case 'password':
+      return kind;
+    default:
+      return 'url';
+  }
+}
 
 function createDetectionId(): string {
   return crypto.randomUUID();
@@ -70,6 +85,7 @@ export function useRedactionScan() {
       const regions = await detectSensitiveData(bytes);
       const detections = regions.map((region) => ({
         ...region,
+        kind: toDetectionKind(region.kind),
         id: createDetectionId(),
       }));
       setDetections(detections);

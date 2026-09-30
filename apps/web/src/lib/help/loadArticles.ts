@@ -22,15 +22,21 @@ function parseFrontmatter(raw: string): { meta: Record<string, string>; body: st
     return { meta: {}, body: raw };
   }
 
+  const frontmatter = match[1];
+  const bodyContent = match[2];
+  if (frontmatter === undefined || bodyContent === undefined) {
+    return { meta: {}, body: raw };
+  }
+
   const meta: Record<string, string> = {};
-  for (const line of match[1]!.split('\n')) {
+  for (const line of frontmatter.split('\n')) {
     const idx = line.indexOf(':');
     if (idx > 0) {
       meta[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
     }
   }
 
-  return { meta, body: match[2]!.trim() };
+  return { meta, body: bodyContent.trim() };
 }
 
 function pathToSlug(path: string): string {
@@ -75,10 +81,7 @@ export function getHelpCategories(): string[] {
 }
 
 export function renderSimpleMarkdown(markdown: string): string {
-  const escaped = markdown
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  const escaped = markdown.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   return escaped
     .replace(/^### (.+)$/gm, '<h3 class="text-base font-semibold mt-6 mb-2">$1</h3>')
@@ -86,10 +89,7 @@ export function renderSimpleMarkdown(markdown: string): string {
     .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mb-4">$1</h1>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/`([^`]+)`/g, '<code class="rounded bg-surface px-1 py-0.5 text-sm">$1</code>')
-    .replace(
-      /\[([^\]]+)\]\(([^)]+)\)/g,
-      '<a href="$2" class="text-primary underline">$1</a>'
-    )
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline">$1</a>')
     .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc">$1</li>')
     .replace(/(<li[\s\S]*?<\/li>\n?)+/g, (block) => `<ul class="my-3 space-y-1">${block}</ul>`)
     .replace(/^(?!<[hul])(.+)$/gm, '<p class="my-3 text-muted leading-relaxed">$1</p>');

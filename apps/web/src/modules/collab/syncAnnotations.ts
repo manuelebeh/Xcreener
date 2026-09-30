@@ -12,21 +12,30 @@ export function applyRemoteAnnotationOp(op: AnnotationOp): void {
   switch (op.op) {
     case 'add':
       if (op.annotation) {
-        useCollabStore.getState().setAnnotations([...annotations.filter((a) => a.id !== op.annotation?.id), op.annotation]);
+        useCollabStore
+          .getState()
+          .setAnnotations([
+            ...annotations.filter((a) => a.id !== op.annotation?.id),
+            op.annotation,
+          ]);
       }
       break;
     case 'update':
       if (op.annotationId && op.patch) {
-        useCollabStore.getState().setAnnotations(
-          annotations.map((item) =>
-            item.id === op.annotationId ? ({ ...item, ...op.patch } as Annotation) : item
-          )
-        );
+        useCollabStore
+          .getState()
+          .setAnnotations(
+            annotations.map((item) =>
+              item.id === op.annotationId ? ({ ...item, ...op.patch } as Annotation) : item
+            )
+          );
       }
       break;
     case 'remove':
       if (op.annotationId) {
-        useCollabStore.getState().setAnnotations(annotations.filter((item) => item.id !== op.annotationId));
+        useCollabStore
+          .getState()
+          .setAnnotations(annotations.filter((item) => item.id !== op.annotationId));
       }
       break;
     case 'batch':

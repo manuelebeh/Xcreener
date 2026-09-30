@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { getBlogPost, renderSimpleMarkdown, type BlogPost } from '#/lib/blog/loadBlogPosts';
+import { type BlogPost, getBlogPost, renderSimpleMarkdown } from '#/lib/blog/loadBlogPosts';
 
 export const Route = createFileRoute('/blog/$slug')({
   head: ({ loaderData }) => {
@@ -63,6 +63,7 @@ function BlogPostPage() {
         </p>
         <div
           className="prose prose-neutral mt-8 max-w-none dark:prose-invert"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: trusted local markdown content
           dangerouslySetInnerHTML={{ __html: renderSimpleMarkdown(post.body) }}
         />
       </article>

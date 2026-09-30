@@ -69,9 +69,7 @@ export const useTeamStore = create<TeamState>((set, get) => ({
       const workspaces = await listWorkspaces();
       const storedId = get().activeWorkspaceId;
       const activeWorkspaceId =
-        storedId && workspaces.some((workspace) => workspace.id === storedId)
-          ? storedId
-          : null;
+        storedId && workspaces.some((workspace) => workspace.id === storedId) ? storedId : null;
       set({ workspaces, activeWorkspaceId, isLoading: false });
 
       if (activeWorkspaceId) {

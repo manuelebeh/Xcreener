@@ -1,3 +1,5 @@
+import type { CollabDocumentState } from '@snapglow/collab-core';
+import { isPaidPlan } from '@snapglow/team-core';
 import { Button } from '@snapglow/ui';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { useCallback, useState } from 'react';
@@ -5,8 +7,6 @@ import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { useExportRender } from '@/modules/export/hooks/useExportRender';
 import { useTeamStore } from '@/modules/team/store';
-import type { CollabDocumentState } from '@snapglow/collab-core';
-import { isPaidPlan } from '@snapglow/team-core';
 import { createCollabDocument } from '../api';
 import { useCollabStore } from '../store';
 import { buildDocumentStateFromEditor } from '../syncAnnotations';
@@ -71,7 +71,11 @@ export function CollabBar({ embedded = false }: { embedded?: boolean }) {
   }
 
   return (
-    <div className={embedded ? 'space-y-2' : 'rounded-lg border border-border bg-surface p-4 space-y-2'}>
+    <div
+      className={
+        embedded ? 'space-y-2' : 'rounded-lg border border-border bg-surface p-4 space-y-2'
+      }
+    >
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-medium text-foreground">Collaboration</p>
         {connected ? (
@@ -80,25 +84,23 @@ export function CollabBar({ embedded = false }: { embedded?: boolean }) {
       </div>
 
       {!documentId ? (
-        <>
-          {activeWorkspace && !isPaidPlan(activeWorkspace.plan) ? (
-            <div className="space-y-2 rounded-md border border-border/80 bg-surface p-3">
-              <p className="m-0 text-xs text-muted">
-                Collaboration requires Team Starter or Team Pro. Upgrade your workspace in Settings →
-                Team.
-              </p>
-              {activeWorkspace.role === 'admin' ? (
-                <Button type="button" size="sm" onClick={() => void startCheckout('team_starter')}>
-                  Upgrade workspace
-                </Button>
-              ) : null}
-            </div>
-          ) : (
-            <Button type="button" onClick={() => void startCollab()} disabled={loading}>
-              {loading ? 'Starting…' : 'Start collaboration'}
-            </Button>
-          )}
-        </>
+        activeWorkspace && !isPaidPlan(activeWorkspace.plan) ? (
+          <div className="space-y-2 rounded-md border border-border/80 bg-surface p-3">
+            <p className="m-0 text-xs text-muted">
+              Collaboration requires Team Starter or Team Pro. Upgrade your workspace in Settings →
+              Team.
+            </p>
+            {activeWorkspace.role === 'admin' ? (
+              <Button type="button" size="sm" onClick={() => void startCheckout('team_starter')}>
+                Upgrade workspace
+              </Button>
+            ) : null}
+          </div>
+        ) : (
+          <Button type="button" onClick={() => void startCollab()} disabled={loading}>
+            {loading ? 'Starting…' : 'Start collaboration'}
+          </Button>
+        )
       ) : (
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="secondary" onClick={() => void copyLink()}>

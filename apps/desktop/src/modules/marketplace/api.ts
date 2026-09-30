@@ -1,4 +1,4 @@
-import type { TemplateListResponse, TemplateListingResponse } from '@snapglow/marketplace-core';
+import type { TemplateListingResponse, TemplateListResponse } from '@snapglow/marketplace-core';
 import { getApiUrl } from '@/modules/cloud/config';
 
 export async function fetchMarketplaceTemplates(): Promise<TemplateListResponse> {

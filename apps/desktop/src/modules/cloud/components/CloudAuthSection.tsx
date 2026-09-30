@@ -1,7 +1,7 @@
 import { Button } from '@snapglow/ui';
 import { useEffect } from 'react';
-import { pullCloudSync, startPeriodicSync } from '../syncPull';
 import { useCloudAuthStore } from '../store';
+import { pullCloudSync, startPeriodicSync } from '../syncPull';
 
 export function CloudAuthSection() {
   const configured = useCloudAuthStore((state) => state.configured);
@@ -37,8 +37,8 @@ export function CloudAuthSection() {
     <div className="rounded-md border border-border p-3">
       <p className="m-0 text-sm font-medium">Cloud sharing</p>
       <p className="mt-1 text-xs text-muted">
-        Sign in to upload captures and create shareable links. Uploads require your explicit
-        consent from the editor.
+        Sign in to upload captures and create shareable links. Uploads require your explicit consent
+        from the editor.
       </p>
       {isAuthenticated ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -73,7 +73,13 @@ export function CloudAuthSection() {
         </p>
       ) : null}
       {isAuthenticated ? (
-        <Button type="button" variant="ghost" size="sm" className="mt-2" onClick={() => void pullCloudSync()}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-2"
+          onClick={() => void pullCloudSync()}
+        >
           Sync now
         </Button>
       ) : null}

@@ -9,8 +9,10 @@ export class CollabWebSocketClient {
   private handlers = new Set<MessageHandler>();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private presenceTimer: ReturnType<typeof setTimeout> | null = null;
-  private pendingPresence: Omit<ParticipantPresence, 'userId' | 'email' | 'displayName' | 'color'> | null =
-    null;
+  private pendingPresence: Omit<
+    ParticipantPresence,
+    'userId' | 'email' | 'displayName' | 'color'
+  > | null = null;
   private documentId: string | null = null;
   private token: string | null = null;
 
@@ -44,7 +46,9 @@ export class CollabWebSocketClient {
     }
   }
 
-  updatePresence(presence: Omit<ParticipantPresence, 'userId' | 'email' | 'displayName' | 'color'>): void {
+  updatePresence(
+    presence: Omit<ParticipantPresence, 'userId' | 'email' | 'displayName' | 'color'>
+  ): void {
     this.pendingPresence = presence;
     if (this.presenceTimer) {
       return;

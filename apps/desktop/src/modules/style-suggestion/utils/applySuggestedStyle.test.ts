@@ -1,6 +1,5 @@
+import { mapContentClassToStyle, SHADOW_STRONG } from '@snapglow/style-suggestion-core';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { SHADOW_STRONG } from '@snapglow/style-suggestion-core';
-import { mapContentClassToStyle } from '@snapglow/style-suggestion-core';
 import { useEditorStore } from '@/modules/editor/store';
 import { applySuggestedStyle } from '@/modules/style-suggestion/utils/applySuggestedStyle';
 

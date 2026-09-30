@@ -44,7 +44,7 @@ export function UsageReportsSection() {
     void loadUsage();
   }, [loadUsage]);
 
-  if (!activeWorkspace || activeWorkspace.role !== 'admin') {
+  if (activeWorkspace?.role !== 'admin') {
     return null;
   }
 

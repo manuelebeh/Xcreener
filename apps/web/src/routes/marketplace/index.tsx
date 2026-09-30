@@ -37,7 +37,8 @@ function MarketplaceIndexPage() {
       <main className="mx-auto max-w-5xl px-6 pb-16">
         <h1 className="font-display text-3xl font-bold tracking-tight">Template marketplace</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Community beautification presets — install in SnapGlow desktop from Settings → Marketplace.
+          Community beautification presets — install in SnapGlow desktop from Settings →
+          Marketplace.
         </p>
         <p className="mt-1 text-sm text-muted">{total} templates</p>
 

@@ -22,9 +22,7 @@ export function StyleSuggestionBar({ embedded = false }: { embedded?: boolean })
       data-testid="style-suggestion-bar"
     >
       <div className="min-w-0 flex-1">
-        {status === 'classifying' ? (
-          <p className="text-xs text-muted">Analyzing content…</p>
-        ) : null}
+        {status === 'classifying' ? <p className="text-xs text-muted">Analyzing content…</p> : null}
         {status === 'ready' && suggestion ? (
           <p className="text-xs text-foreground">
             <span className="font-medium text-primary">Suggested</span>

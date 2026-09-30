@@ -1,7 +1,7 @@
 import type { AnnotationOp } from '@snapglow/collab-core';
-import { getPresetById } from '@/modules/editor/engine/presets';
 import type { Annotation } from '@/modules/editor/annotations/types';
 import { cloneAnnotations } from '@/modules/editor/annotations/utils';
+import { getPresetById } from '@/modules/editor/engine/presets';
 import { useEditorStore } from '@/modules/editor/store';
 import { collabClient } from './client';
 

@@ -1,10 +1,10 @@
-import { openUrl } from '@tauri-apps/plugin-opener';
 import type { IntegrationProvider } from '@snapglow/integrations-core';
-import { createOAuthState } from '@/modules/cloud/pkce';
+import { openUrl } from '@tauri-apps/plugin-opener';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { getApiUrl } from '@/modules/cloud/config';
+import { createOAuthState } from '@/modules/cloud/pkce';
 import { getIntegrationsRedirectUri, isIntegrationsConfigured } from './config';
-import { saveIntegrationToken, type StoredIntegrationToken } from './tokenStorage';
+import { type StoredIntegrationToken, saveIntegrationToken } from './tokenStorage';
 
 interface PendingIntegrationLogin {
   provider: IntegrationProvider;
@@ -43,7 +43,9 @@ export async function startIntegrationLogin(provider: IntegrationProvider): Prom
   await openUrl(payload.authorizeUrl);
 }
 
-export async function handleIntegrationCallback(url: string): Promise<StoredIntegrationToken | null> {
+export async function handleIntegrationCallback(
+  url: string
+): Promise<StoredIntegrationToken | null> {
   const parsed = new URL(url);
   if (parsed.protocol !== 'snapglow:' || parsed.pathname !== '//integrations/callback') {
     return null;

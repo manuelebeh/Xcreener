@@ -1,7 +1,12 @@
-import { SnapGlowI18nProvider, resolveLocale } from '@snapglow/i18n';
+import { resolveLocale, SnapGlowI18nProvider } from '@snapglow/i18n';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
-import { createRootRouteWithContext, HeadContent, Scripts, useSearch } from '@tanstack/react-router';
+import {
+  createRootRouteWithContext,
+  HeadContent,
+  Scripts,
+  useSearch,
+} from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import PostHogProvider from '../integrations/posthog/provider';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';

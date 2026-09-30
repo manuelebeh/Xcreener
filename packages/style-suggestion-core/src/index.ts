@@ -13,6 +13,6 @@ export type {
 } from './types';
 export {
   CONTENT_CLASSES,
-  MIN_CLASSIFICATION_CONFIDENCE,
   isContentClass,
+  MIN_CLASSIFICATION_CONFIDENCE,
 } from './types';

@@ -1,10 +1,6 @@
-import type {
-  SettingsPatch,
-  SyncLibraryResponse,
-  UserSettingsResponse,
-} from '@snapglow/sync-core';
+import type { SettingsPatch, SyncLibraryResponse, UserSettingsResponse } from '@snapglow/sync-core';
 import { SYNCABLE_SETTING_KEYS } from '@snapglow/sync-core';
-import { and, desc, eq, gt, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, or } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import * as schema from '../db/schema';
@@ -33,10 +29,7 @@ export async function registerSyncRoutes(app: FastifyInstance, options: SyncRout
       .where(
         and(
           eq(schema.libraryItems.userId, user.id),
-          or(
-            gt(schema.libraryItems.updatedAt, since),
-            gt(schema.libraryItems.createdAt, since)
-          )
+          or(gt(schema.libraryItems.updatedAt, since), gt(schema.libraryItems.createdAt, since))
         )
       )
       .orderBy(desc(schema.libraryItems.updatedAt))
@@ -58,8 +51,7 @@ export async function registerSyncRoutes(app: FastifyInstance, options: SyncRout
       }))
     );
 
-    const cursor =
-      items[0]?.updatedAt ?? since.toISOString();
+    const cursor = items[0]?.updatedAt ?? since.toISOString();
 
     const response: SyncLibraryResponse = { items, cursor };
     return reply.send(response);
@@ -119,12 +111,14 @@ export async function registerSyncRoutes(app: FastifyInstance, options: SyncRout
       updatedAt: row.updatedAt.toISOString(),
     }));
 
-    const cursor =
-      settings.length > 0
-        ? settings.reduce((latest, patch) =>
-            new Date(patch.updatedAt) > new Date(latest) ? patch.updatedAt : latest
-          , settings[0]!.updatedAt)
-        : since.toISOString();
+    const firstSetting = settings[0];
+    const cursor = firstSetting
+      ? settings.reduce(
+          (latest, patch) =>
+            new Date(patch.updatedAt) > new Date(latest) ? patch.updatedAt : latest,
+          firstSetting.updatedAt
+        )
+      : since.toISOString();
 
     const response: UserSettingsResponse = { settings, cursor };
     return reply.send(response);

@@ -30,7 +30,9 @@ function RedeemPage() {
       setStatus('Invalid or expired code.');
       return;
     }
-    setStatus(`Code valid for ${match.label}. Open SnapGlow desktop — your license source will be set to ${match.source}.`);
+    setStatus(
+      `Code valid for ${match.label}. Open SnapGlow desktop — your license source will be set to ${match.source}.`
+    );
   }
 
   return (

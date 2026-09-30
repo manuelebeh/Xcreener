@@ -1,12 +1,11 @@
-import { Button, Input, Label, Select } from '@snapglow/ui';
 import type { IntegrationProvider } from '@snapglow/integrations-core';
+import { Button, Input, Label, Select } from '@snapglow/ui';
 import { useCallback, useEffect, useState } from 'react';
-import { integrationLabel, useIntegrationsStore } from '../store';
 import {
+  listConfluencePages,
   listGitHubIssues,
   listGitHubRepos,
   listJiraIssues,
-  listConfluencePages,
   listLinearIssues,
   listLinearTeams,
   listNotionPages,
@@ -14,6 +13,7 @@ import {
   listTeamsChannels,
   sendToProvider,
 } from '../sendToIntegration';
+import { integrationLabel, useIntegrationsStore } from '../store';
 
 interface DestinationOption {
   id: string;
@@ -57,7 +57,9 @@ export function SendToIntegrationDialog({
       switch (provider) {
         case 'slack': {
           const channels = await listSlackChannels();
-          setDestinations(channels.map((channel) => ({ id: channel.id, label: `#${channel.name}` })));
+          setDestinations(
+            channels.map((channel) => ({ id: channel.id, label: `#${channel.name}` }))
+          );
           break;
         }
         case 'notion': {
@@ -129,28 +131,24 @@ export function SendToIntegrationDialog({
       try {
         if (provider === 'linear') {
           const issues = await listLinearIssues(destinationId);
-          setSecondaryDestinations(
-            [
-              { id: '', label: 'Create new issue' },
-              ...issues.map((issue) => ({
-                id: issue.id,
-                label: `${issue.identifier} · ${issue.title}`,
-              })),
-            ]
-          );
+          setSecondaryDestinations([
+            { id: '', label: 'Create new issue' },
+            ...issues.map((issue) => ({
+              id: issue.id,
+              label: `${issue.identifier} · ${issue.title}`,
+            })),
+          ]);
         }
 
         if (provider === 'github') {
           const issues = await listGitHubIssues(destinationId);
-          setSecondaryDestinations(
-            [
-              { id: '', label: 'Create new issue' },
-              ...issues.map((issue) => ({
-                id: String(issue.number),
-                label: `#${issue.number} · ${issue.title}`,
-              })),
-            ]
-          );
+          setSecondaryDestinations([
+            { id: '', label: 'Create new issue' },
+            ...issues.map((issue) => ({
+              id: String(issue.number),
+              label: `#${issue.number} · ${issue.title}`,
+            })),
+          ]);
         }
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : String(loadError));
@@ -197,7 +195,9 @@ export function SendToIntegrationDialog({
     >
       <div className="w-full max-w-md space-y-4 rounded-lg border border-border bg-surface p-4 shadow-lg">
         <header className="space-y-1">
-          <h2 className="text-sm font-semibold text-foreground">Send to {integrationLabel(provider)}</h2>
+          <h2 className="text-sm font-semibold text-foreground">
+            Send to {integrationLabel(provider)}
+          </h2>
           <p className="text-xs text-muted">Choose where to deliver this export.</p>
         </header>
 
@@ -260,7 +260,12 @@ export function SendToIntegrationDialog({
           <Button type="button" variant="secondary" size="sm" onClick={onClose} disabled={sending}>
             Cancel
           </Button>
-          <Button type="button" size="sm" onClick={() => void handleSend()} disabled={sending || loading}>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => void handleSend()}
+            disabled={sending || loading}
+          >
             {sending ? 'Sending…' : 'Send'}
           </Button>
         </div>

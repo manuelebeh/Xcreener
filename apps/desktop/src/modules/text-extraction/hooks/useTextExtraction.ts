@@ -1,9 +1,9 @@
-import { useCallback } from 'react';
 import { lineId } from '@snapglow/ocr-core';
-import { useSettingsStore } from '@/modules/settings/store';
+import { useCallback } from 'react';
 import { useEditorStore } from '@/modules/editor/store';
-import { recognizeText } from '@/tauri/commands';
 import { screenshotToPngBytes } from '@/modules/redaction/utils/screenshotToPngBytes';
+import { useSettingsStore } from '@/modules/settings/store';
+import { recognizeText } from '@/tauri/commands';
 import { useTextExtractionStore } from '../store';
 
 export function useTextExtraction() {

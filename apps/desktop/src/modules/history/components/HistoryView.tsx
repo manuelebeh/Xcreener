@@ -57,19 +57,22 @@ export function HistoryView() {
     [captures, requestDelete]
   );
 
-  const handleAddTag = useCallback(async (capture: StoredCapture, tag: string) => {
-    if (!tag.trim()) {
-      return;
-    }
+  const handleAddTag = useCallback(
+    async (capture: StoredCapture, tag: string) => {
+      if (!tag.trim()) {
+        return;
+      }
 
-    const nextTags = [...new Set([...capture.tags, tag.trim()])];
-    await updateCaptureTags(capture.id, nextTags);
-    useHistoryStore.setState({
-      captures: captures.map((item) =>
-        item.id === capture.id ? { ...item, tags: nextTags } : item
-      ),
-    });
-  }, [captures]);
+      const nextTags = [...new Set([...capture.tags, tag.trim()])];
+      await updateCaptureTags(capture.id, nextTags);
+      useHistoryStore.setState({
+        captures: captures.map((item) =>
+          item.id === capture.id ? { ...item, tags: nextTags } : item
+        ),
+      });
+    },
+    [captures]
+  );
 
   const handleAddToCollection = useCallback(async (captureId: number, collectionId: number) => {
     await addCaptureToCollection(captureId, collectionId);
@@ -118,9 +121,7 @@ export function HistoryView() {
           <Select
             id="library-source"
             value={sourceFilter}
-            onChange={(event) =>
-              setSourceFilter(event.target.value as 'all' | 'local' | 'cloud')
-            }
+            onChange={(event) => setSourceFilter(event.target.value as 'all' | 'local' | 'cloud')}
           >
             <option value="all">All</option>
             <option value="local">Local</option>
@@ -149,7 +150,12 @@ export function HistoryView() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" size="sm" variant="secondary" onClick={() => void handleCreateCollection()}>
+        <Button
+          type="button"
+          size="sm"
+          variant="secondary"
+          onClick={() => void handleCreateCollection()}
+        >
           New collection
         </Button>
         {activeTag ? (
@@ -176,7 +182,10 @@ export function HistoryView() {
       ) : null}
 
       {showNoMatches ? (
-        <div className="rounded-lg border border-dashed border-border px-6 py-10 text-center" data-testid="library-no-matches">
+        <div
+          className="rounded-lg border border-dashed border-border px-6 py-10 text-center"
+          data-testid="library-no-matches"
+        >
           <p className="text-sm font-medium text-foreground">No matches</p>
           <p className="mt-1 text-sm text-muted">Try another query, tag, or collection filter.</p>
         </div>

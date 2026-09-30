@@ -1,10 +1,5 @@
-import {
-  buildApiKeyPlaintext,
-  generateApiKeySecret,
-  hashApiKey,
-  isApiKeyPlaintext,
-  verifyApiKey,
-} from '@snapglow/api-core';
+import { buildApiKeyPlaintext, isApiKeyPlaintext } from '@snapglow/api-core';
+import { generateApiKeySecret, hashApiKey, verifyApiKey } from '@snapglow/api-core/api-keys';
 import { hasApiAccess } from '@snapglow/team-core';
 import { describe, expect, it } from 'vitest';
 

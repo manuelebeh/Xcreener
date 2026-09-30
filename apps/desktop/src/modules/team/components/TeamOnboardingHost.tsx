@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
-import {
-  loadTeamOnboardingState,
-  type TeamOnboardingStep,
-} from '../onboarding';
+import { loadTeamOnboardingState, type TeamOnboardingStep } from '../onboarding';
 import { useTeamStore } from '../store';
 import { TeamOnboardingWizard } from './TeamOnboardingWizard';
 

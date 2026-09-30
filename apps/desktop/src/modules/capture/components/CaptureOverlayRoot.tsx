@@ -58,7 +58,15 @@ export function CaptureOverlayRoot() {
       unlistenInit?.();
       unlistenPresented?.();
     };
-  }, [setActiveMode, setBounds, setLiveOverlay, setMediaKind, setMonitors, setPreviewUrl, setWebviewLayout]);
+  }, [
+    setActiveMode,
+    setBounds,
+    setLiveOverlay,
+    setMediaKind,
+    setMonitors,
+    setPreviewUrl,
+    setWebviewLayout,
+  ]);
 
   useEffect(() => {
     if (progressHudMode) {

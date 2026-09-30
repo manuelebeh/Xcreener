@@ -1,6 +1,5 @@
-import { Button, Input } from '@snapglow/ui';
 import { can } from '@snapglow/team-core';
-import { useState } from 'react';
+import { Button } from '@snapglow/ui';
 import { useTeamStore } from '../store';
 import { RoleSelect } from './RoleSelect';
 

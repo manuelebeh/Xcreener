@@ -58,7 +58,10 @@ export async function deleteCollection(id: number): Promise<void> {
   await db.execute('DELETE FROM collections WHERE id = ?', [id]);
 }
 
-export async function addCaptureToCollection(captureId: number, collectionId: number): Promise<void> {
+export async function addCaptureToCollection(
+  captureId: number,
+  collectionId: number
+): Promise<void> {
   const db = await getReadyDb();
   await db.execute(
     'INSERT OR IGNORE INTO capture_collections (capture_id, collection_id) VALUES (?, ?)',
@@ -71,10 +74,10 @@ export async function removeCaptureFromCollection(
   collectionId: number
 ): Promise<void> {
   const db = await getReadyDb();
-  await db.execute(
-    'DELETE FROM capture_collections WHERE capture_id = ? AND collection_id = ?',
-    [captureId, collectionId]
-  );
+  await db.execute('DELETE FROM capture_collections WHERE capture_id = ? AND collection_id = ?', [
+    captureId,
+    collectionId,
+  ]);
 }
 
 export async function getCaptureCollectionIds(captureId: number): Promise<number[]> {

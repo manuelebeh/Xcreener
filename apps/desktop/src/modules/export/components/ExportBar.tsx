@@ -1,26 +1,26 @@
-import { Button, Label, Select, Slider } from '@snapglow/ui';
 import { SHARE_EXPIRY_LABELS, SHARE_EXPIRY_OPTIONS, type ShareExpiry } from '@snapglow/cloud-core';
 import type { IntegrationProvider } from '@snapglow/integrations-core';
 import { INTEGRATION_LABELS, isEnterpriseIntegrationProvider } from '@snapglow/integrations-core';
+import { Button, Label, Select, Slider } from '@snapglow/ui';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { ask } from '@tauri-apps/plugin-dialog';
 import { useCallback, useRef, useState } from 'react';
+import { captureExportCompleted } from '@/integrations/posthog/events';
 import {
   captureExperimentExposure,
   capturePaywallShown,
   getPaywallExperimentVariant,
 } from '@/integrations/posthog/experiments';
-import { captureExportCompleted } from '@/integrations/posthog/events';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { uploadShare } from '@/modules/cloud/uploadShare';
+import { useEditorStore } from '@/modules/editor/store';
 import { SendToIntegrationDialog } from '@/modules/integrations/components/SendToIntegrationDialog';
 import { useIntegrationsStore } from '@/modules/integrations/store';
 import {
   hasEnterpriseIntegrationsAccess,
   hasPremiumAccess,
 } from '@/modules/licensing/premiumAccess';
-import { useEditorStore } from '@/modules/editor/store';
 import { useExportRender } from '../hooks/useExportRender';
 import { useExportStore } from '../store';
 import { copyExportToClipboard } from '../utils/copyExport';
@@ -46,8 +46,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
     .filter((item) => item.connected)
     .map((item) => item.provider)
     .filter(
-      (provider) =>
-        !isEnterpriseIntegrationProvider(provider) || hasEnterpriseIntegrationsAccess()
+      (provider) => !isEnterpriseIntegrationProvider(provider) || hasEnterpriseIntegrationsAccess()
     );
 
   const { exportImage } = useExportRender();
@@ -69,7 +68,11 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
       if (
         !hasPremiumAccess() &&
         paywallVariant === 'export_limit_message' &&
-        (action === 'save' || action === 'copy' || action === 'drag' || action === 'share' || action === 'send')
+        (action === 'save' ||
+          action === 'copy' ||
+          action === 'drag' ||
+          action === 'share' ||
+          action === 'send')
       ) {
         capturePaywallShown('export_limit_message');
         setLastMessage(
@@ -138,11 +141,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
             return;
           }
 
-          const share = await uploadShare(
-            result.blob,
-            shareExpiry,
-            `snapglow-export.${format}`
-          );
+          const share = await uploadShare(result.blob, shareExpiry, `snapglow-export.${format}`);
           await writeText(share.url);
           setLastMessage(`Share link copied · ${share.url}${compressionMessage}`);
           return;

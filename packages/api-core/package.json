@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./api-keys": "./src/api-keys.ts"
   },
   "scripts": {
     "build": "echo 'source-only package'",

@@ -1,4 +1,5 @@
-import { hashApiKey, isApiKeyPlaintext } from '@snapglow/api-core';
+import { isApiKeyPlaintext } from '@snapglow/api-core';
+import { hashApiKey } from '@snapglow/api-core/api-keys';
 import { hasApiAccess } from '@snapglow/team-core';
 import { and, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';

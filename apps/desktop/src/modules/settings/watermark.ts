@@ -2,20 +2,22 @@ import type { WatermarkConfig } from '@snapglow/editor-core';
 import type { BrandKitConfig } from '@snapglow/team-core';
 import { isPaidPlan } from '@snapglow/team-core';
 import { convertFileSrc } from '@tauri-apps/api/core';
-import type { AppSettings } from '@/shared/types/settings';
-import { useTeamStore } from '@/modules/team/store';
 import { useSettingsStore } from '@/modules/settings/store';
+import { useTeamStore } from '@/modules/team/store';
+import type { AppSettings } from '@/shared/types/settings';
 
-export function watermarkFromSettings(settings: Pick<
-  AppSettings,
-  | 'watermarkEnabled'
-  | 'watermarkDisplayName'
-  | 'watermarkUrl'
-  | 'watermarkLogoPath'
-  | 'watermarkPosition'
-  | 'watermarkOpacity'
-  | 'useTeamBrandKit'
->): WatermarkConfig {
+export function watermarkFromSettings(
+  settings: Pick<
+    AppSettings,
+    | 'watermarkEnabled'
+    | 'watermarkDisplayName'
+    | 'watermarkUrl'
+    | 'watermarkLogoPath'
+    | 'watermarkPosition'
+    | 'watermarkOpacity'
+    | 'useTeamBrandKit'
+  >
+): WatermarkConfig {
   const teamMerged = resolveTeamBrandKitWatermark(settings.useTeamBrandKit);
   if (teamMerged) {
     return teamMerged;

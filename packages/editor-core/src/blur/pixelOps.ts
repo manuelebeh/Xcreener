@@ -1,4 +1,11 @@
-export function pixelateImageData(imageData: ImageData, blockSize: number): void {
+/** DOM ImageData-compatible buffer (avoids requiring DOM lib in every consumer). */
+export interface PixelImageData {
+  data: Uint8ClampedArray;
+  width: number;
+  height: number;
+}
+
+export function pixelateImageData(imageData: PixelImageData, blockSize: number): void {
   const { data, width, height } = imageData;
   const size = Math.max(2, Math.floor(blockSize));
 
@@ -114,7 +121,7 @@ function boxBlurPass(
 }
 
 /** Approximate Gaussian blur via 3 box-blur passes (no Canvas filter API). */
-export function gaussianBlurImageData(imageData: ImageData, radius: number): void {
+export function gaussianBlurImageData(imageData: PixelImageData, radius: number): void {
   const { width, height } = imageData;
   if (width <= 0 || height <= 0) {
     return;

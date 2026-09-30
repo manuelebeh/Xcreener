@@ -1,9 +1,5 @@
+import { clampBlurRect, gaussianBlurImageData, pixelateImageData } from '@snapglow/editor-core';
 import type { Annotation, BlurAnnotation } from '../annotations/types';
-import {
-  clampBlurRect,
-  gaussianBlurImageData,
-  pixelateImageData,
-} from '@snapglow/editor-core';
 
 function getBlurDeviceRect(
   rect: { x: number; y: number; width: number; height: number },

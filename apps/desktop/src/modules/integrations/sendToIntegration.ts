@@ -33,7 +33,9 @@ export interface SendToProviderInput {
   message?: string;
 }
 
-export async function sendToProvider(input: SendToProviderInput): Promise<{ message: string; url?: string }> {
+export async function sendToProvider(
+  input: SendToProviderInput
+): Promise<{ message: string; url?: string }> {
   const token = await requireIntegrationToken(input.provider);
   const title = input.message ?? input.filename;
 

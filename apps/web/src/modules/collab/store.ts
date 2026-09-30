@@ -50,7 +50,10 @@ export const useCollabStore = create<CollabState>((set) => ({
   setParticipants: (participants) => set({ participants }),
   upsertParticipant: (participant) =>
     set((state) => ({
-      participants: [...state.participants.filter((p) => p.userId !== participant.userId), participant],
+      participants: [
+        ...state.participants.filter((p) => p.userId !== participant.userId),
+        participant,
+      ],
     })),
   removeParticipant: (userId) =>
     set((state) => ({ participants: state.participants.filter((p) => p.userId !== userId) })),

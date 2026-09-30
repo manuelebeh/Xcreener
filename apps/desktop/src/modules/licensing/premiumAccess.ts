@@ -1,7 +1,7 @@
 import { isPaidPlan } from '@snapglow/team-core';
+import { isExternalLicense } from '@/modules/licensing/detectLicenseSource';
 import { useSettingsStore } from '@/modules/settings/store';
 import { useTeamStore } from '@/modules/team/store';
-import { isExternalLicense } from '@/modules/licensing/detectLicenseSource';
 
 export function hasPremiumAccess(): boolean {
   const { licenseSource } = useSettingsStore.getState();

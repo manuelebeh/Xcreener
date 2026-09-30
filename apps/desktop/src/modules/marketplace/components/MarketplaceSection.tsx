@@ -2,7 +2,7 @@ import { templateStyleToCustomPresetInput } from '@snapglow/marketplace-core';
 import { Button } from '@snapglow/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { createCustomPreset } from '@/db/presets';
-import { fetchMarketplaceTemplates, fetchMarketplaceTemplate } from '../api';
+import { fetchMarketplaceTemplate, fetchMarketplaceTemplates } from '../api';
 
 export function MarketplaceSection() {
   const [templates, setTemplates] = useState<
@@ -34,7 +34,14 @@ export function MarketplaceSection() {
     try {
       const template = await fetchMarketplaceTemplate(slug);
       const input = templateStyleToCustomPresetInput(template.style, title);
-      await createCustomPreset(input);
+      const background =
+        input.style.background.type === 'image'
+          ? ({ type: 'image', source: null } as const)
+          : input.style.background;
+      await createCustomPreset({
+        ...input,
+        style: { ...input.style, background },
+      });
       setInstallStatus((prev) => ({ ...prev, [slug]: 'installed' }));
     } catch (err) {
       setInstallStatus((prev) => ({
@@ -83,7 +90,7 @@ export function MarketplaceSection() {
               </div>
               <Button
                 type="button"
-                variant={status === 'installed' ? 'secondary' : 'default'}
+                variant={status === 'installed' ? 'secondary' : 'primary'}
                 size="sm"
                 disabled={status === 'installing' || status === 'installed'}
                 onClick={() => void handleInstall(item.slug, item.title)}

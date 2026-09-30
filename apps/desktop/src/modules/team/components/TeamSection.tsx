@@ -2,9 +2,9 @@ import { Button, Input } from '@snapglow/ui';
 import { useEffect, useState } from 'react';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { useTeamStore } from '../store';
+import { ApiKeysSection } from './ApiKeysSection';
 import { BillingSection } from './BillingSection';
 import { BrandKitSection } from './BrandKitSection';
-import { ApiKeysSection } from './ApiKeysSection';
 import { InviteMemberDialog } from './InviteMemberDialog';
 import { MembersList } from './MembersList';
 import { UsageReportsSection } from './UsageReportsSection';
@@ -42,7 +42,9 @@ export function TeamSection() {
     return (
       <div className="rounded-md border border-border p-3">
         <p className="m-0 text-sm font-medium">Team workspace</p>
-        <p className="mt-1 text-xs text-muted">Sign in to cloud sharing to create or join a team.</p>
+        <p className="mt-1 text-xs text-muted">
+          Sign in to cloud sharing to create or join a team.
+        </p>
       </div>
     );
   }

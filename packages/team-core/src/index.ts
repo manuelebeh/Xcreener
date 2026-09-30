@@ -55,7 +55,13 @@ const ROLE_PERMISSIONS: Record<WorkspaceRole, ReadonlySet<WorkspaceAction>> = {
     'collab:edit',
     'comments:create',
   ]),
-  viewer: new Set(['workspace:read', 'members:read', 'brand-kit:read', 'collab:read', 'comments:create']),
+  viewer: new Set([
+    'workspace:read',
+    'members:read',
+    'brand-kit:read',
+    'collab:read',
+    'comments:create',
+  ]),
 };
 
 export function can(role: WorkspaceRole, action: WorkspaceAction): boolean {

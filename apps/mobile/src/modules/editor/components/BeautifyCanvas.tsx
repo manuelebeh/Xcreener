@@ -288,12 +288,7 @@ export const BeautifyCanvas = forwardRef<BeautifyCanvasHandle, BeautifyCanvasPro
 
     const displaySize = useMemo(() => {
       if (exportMode) {
-        return fitGpuTextureSize(
-          layout.canvasWidth,
-          layout.canvasHeight,
-          undefined,
-          pixelRatio
-        );
+        return fitGpuTextureSize(layout.canvasWidth, layout.canvasHeight, undefined, pixelRatio);
       }
       return fitPreviewSize(
         layout.canvasWidth,

@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
 import { getCurrent, onOpenUrl } from '@tauri-apps/plugin-deep-link';
-import { completeCloudAuthFromUrl, useCloudAuthStore } from '@/modules/cloud/store';
+import { useEffect } from 'react';
 import { isCloudConfigured } from '@/modules/cloud/config';
+import { completeCloudAuthFromUrl, useCloudAuthStore } from '@/modules/cloud/store';
 import { flushPendingTeamInvite, handleTeamInviteUrl } from '@/modules/team/auth-invite';
 import { isTauriRuntime } from '@/shared/lib/tauri';
 import { isIntegrationsConfigured } from '../config';

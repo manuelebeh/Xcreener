@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { getPresetById } from '@/modules/editor/engine/presets';
-import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/settings/watermark';
-import { useSettingsStore } from '@/modules/settings/store';
 import { useEditorStore } from '@/modules/editor/store';
 import type { RenderInput } from '@/modules/editor/types';
+import { useSettingsStore } from '@/modules/settings/store';
+import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/settings/watermark';
 import { exportRenderInput } from '../utils/canvasExport';
 import type { ExportFormat } from '../utils/formats';
 
@@ -16,9 +16,7 @@ export async function buildRenderInputFromStore(): Promise<RenderInput | null> {
   const frame = getPresetById(state.selectedPresetId, state.customPresets);
   const settings = useSettingsStore.getState();
   const watermark = watermarkFromSettings(settings);
-  const watermarkLogo = watermark.enabled
-    ? await loadWatermarkLogoImage(watermark.logoPath)
-    : null;
+  const watermarkLogo = watermark.enabled ? await loadWatermarkLogoImage(watermark.logoPath) : null;
 
   return {
     screenshot: state.screenshot,

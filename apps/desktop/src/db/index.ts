@@ -2,8 +2,8 @@ import {
   type AppLocale,
   type AppSettings,
   DEFAULT_APP_SETTINGS,
-  SETTING_KEYS,
   type OcrEngineMode,
+  SETTING_KEYS,
   type ThemePreference,
   type WatermarkPosition,
 } from '@/shared/types/settings';
@@ -60,10 +60,10 @@ export async function loadAppSettings(): Promise<AppSettings> {
     watermarkUrl,
     watermarkLogoPath,
     watermarkPosition,
-  watermarkOpacity,
-  activeWorkspaceId,
-  useTeamBrandKit,
-] = await Promise.all([
+    watermarkOpacity,
+    activeWorkspaceId,
+    useTeamBrandKit,
+  ] = await Promise.all([
     getSetting(SETTING_KEYS.theme),
     getSetting(SETTING_KEYS.locale),
     getSetting(SETTING_KEYS.licenseSource),

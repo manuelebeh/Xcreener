@@ -223,10 +223,17 @@ async function exchangeProviderToken(
       throw new Error(`${provider} token missing from response`);
     }
 
-    const resourcesResponse = await fetch('https://api.atlassian.com/oauth/token/accessible-resources', {
-      headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
-    });
-    const resources = (await resourcesResponse.json()) as Array<{ id: string; name: string; url: string }>;
+    const resourcesResponse = await fetch(
+      'https://api.atlassian.com/oauth/token/accessible-resources',
+      {
+        headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
+      }
+    );
+    const resources = (await resourcesResponse.json()) as Array<{
+      id: string;
+      name: string;
+      url: string;
+    }>;
     const site = resources[0];
 
     return {

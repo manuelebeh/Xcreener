@@ -2,11 +2,8 @@
  * Seeds Team Pro workspace + API key + capture for k6 load tests.
  * Usage: dotenv -e .env.local -- tsx scripts/seed-load-fixture.ts
  */
-import {
-  buildApiKeyPlaintext,
-  generateApiKeySecret,
-  hashApiKey,
-} from '@snapglow/api-core';
+import { buildApiKeyPlaintext } from '@snapglow/api-core';
+import { generateApiKeySecret, hashApiKey } from '@snapglow/api-core/api-keys';
 import { eq } from 'drizzle-orm';
 import { createDb } from '../src/db/migrate';
 import * as schema from '../src/db/schema';

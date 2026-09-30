@@ -5,6 +5,14 @@ import { getEditorLines, renderCodeToPng } from './codeRenderer';
 
 const API_KEY_SECRET = 'snapglow.apiKey';
 
+/** Electron clipboard buffer write is available at runtime but missing from @types/vscode. */
+async function writeClipboardPng(png: Uint8Array): Promise<void> {
+  const clipboard = vscode.env.clipboard as vscode.Clipboard & {
+    writeBuffer(mime: string, value: Uint8Array): Thenable<void>;
+  };
+  await clipboard.writeBuffer('image/png', png);
+}
+
 export async function getApiKey(context: vscode.ExtensionContext): Promise<string | undefined> {
   return context.secrets.get(API_KEY_SECRET);
 }
@@ -129,7 +137,7 @@ export async function captureAndBeautify(context: vscode.ExtensionContext): Prom
       const imageResponse = await fetch(exported.exportUrl);
       const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
-      await vscode.env.clipboard.writeBuffer('image/png', imageBuffer);
+      await writeClipboardPng(imageBuffer);
 
       vscode.window.showInformationMessage(
         `SnapGlow: beautified capture copied to clipboard (${exported.width}×${exported.height}).`
@@ -144,7 +152,7 @@ export async function captureEditorToClipboard(context: vscode.ExtensionContext)
     return;
   }
 
-  await vscode.env.clipboard.writeBuffer('image/png', png);
+  await writeClipboardPng(png);
   vscode.window.showInformationMessage('SnapGlow: editor capture copied to clipboard.');
 }
 
