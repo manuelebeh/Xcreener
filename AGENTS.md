@@ -1,133 +1,138 @@
-# SnapGlow - Agent guide
+# SnapGlow — Agent instructions
 
-Privacy-first screenshot app. Monorepo: **Tauri desktop** (now) → **TanStack Start web** → **Expo mobile** → **Fastify API**.
+Privacy-first screenshot app: capture, beautify, share. Local-first; optional cloud links. Monorepo: pnpm + Turborepo + mise (Node, Rust).
 
-## Stack
+This file is the shared agent guide ([agents.md](https://agents.md/) / AAIF). Tool bridges stay thin; do not copy rules into them.
 
-| Area | Choice |
-|------|--------|
-| Monorepo | pnpm workspaces + Turborepo |
-| Dev CLI | [mise](https://mise.jdx.dev/) - `dev:desktop`, `dev:web`, `dev:mobile`, `dev:api`, `tokens:build`, `storybook`, `lint`, `typecheck`, `test` |
-| Desktop | Tauri v2, React 19, Vite, TypeScript |
-| Web | TanStack Start, Nitro, Tailwind v4 |
-| Mobile | Expo SDK 56, Expo Router, development builds |
-| Design system | `packages/design-tokens` + `packages/ui` (web) + `packages/ui-native` (RN) |
-| Editor core | `packages/editor-core` — layout, presets, annotations (shared desktop + mobile) |
-| Team core | `packages/team-core` — workspace roles, plans, brand kit types (api + desktop) |
-| Collab core | `packages/collab-core` — WebSocket protocol, comments, notifications (api + desktop + web) |
-| API core | `packages/api-core` — public API DTOs, API key helpers, rate limits (api + sdk) |
-| Render core | `packages/render-core` — shared Canvas beautify/export engine (api + desktop) |
-| Plugin core | `packages/plugin-core` — beautify presets for IDE/design plugins (vscode, figma) |
-| Marketplace core | `packages/marketplace-core` — community template DTOs (Phase 4) |
-| i18n | `packages/i18n` — SSOT translations en/fr/de/ja (Phase 4) |
-| Sync core | `packages/sync-core` — cross-device sync cursors + settings merge (Phase 4) |
-| Lint / format | Biome (not ESLint/Prettier) |
-| State | Zustand per module |
-| Local DB | `@tauri-apps/plugin-sql` (SQLite) |
-| Commits | Conventional Commits; mise git hooks (lint-staged + commitlint) |
-
-## Repo map
-
-```
-apps/desktop/          Tauri app (@snapglow/desktop)
-apps/web/              Landing + public share viewer (@snapglow/web)
-apps/mobile/           Expo app (@snapglow/mobile)
-apps/api/              Fastify API — cloud shares + library (@snapglow/api)
-apps/vscode-extension/ VS Code plugin — capture editor + beautify (@snapglow/vscode)
-apps/figma-plugin/     Figma plugin — import/export frames
-apps/notion-embed/     Notion embed tool — OAuth + rich embeds
-packages/cloud-core/   Share + library types, expiry helpers (api + web + desktop)
-packages/collab-core/  WebSocket protocol, comments, notifications (api + desktop + web)
-packages/api-core/     Public API DTOs, API key helpers, rate limits (api + sdk)
-packages/render-core/  Shared Canvas beautify/export engine (api + desktop)
-packages/plugin-core/  Beautify presets for VS Code / Figma plugins
-packages/marketplace-core/  Community template marketplace DTOs (Phase 4)
-packages/i18n/  SSOT translations en/fr/de/ja (Phase 4)
-packages/sync-core/  Cross-device sync types (Phase 4)
-packages/sdk/          Official REST API client (@snapglow/sdk, npm beta)
-packages/integrations-core/  Integration provider types, OAuth scopes (api + desktop)
-packages/design-tokens/  DTCG tokens → CSS + tokens.native
-packages/editor-core/    Shared editor logic (layout, presets, annotations)
-packages/redaction-core/ Shared on-device detectors + mapRegionToLayout (desktop + mobile)
-packages/style-suggestion-core/ Content class → style mapping for AI suggestions (desktop)
-packages/ocr-core/           OCR types + text assembly helpers (desktop copy-text)
-packages/ui/           Shared React web components + Storybook
-packages/ui-native/    Shared React Native components
-packages/              biome-config, typescript-config
-docs/internal/         Product & technical specs
-.agents/rules/         Workflow rules for agents
-```
-
-## Commands
+## Setup commands
 
 ```bash
-mise trust && mise install && mise run install && mise run install-hooks
-mise run tokens:build   # before first dev if tokens dist missing
-mise run dev:desktop    # Tauri dev
-mise run dev:web        # Landing (port 3000)
-mise run dev:mobile     # Expo dev client
-mise run dev:api        # Fastify + Postgres + Redis + MinIO (see apps/api/.env.example)
-mise run storybook      # UI components (port 6006)
-mise run lint
-mise run typecheck
-mise run test
+mise trust
+mise install
+mise run install          # pnpm install
+mise run install-hooks
+mise run tokens:build     # before first dev if tokens dist missing
+
+mise run dev:desktop      # Tauri
+mise run dev:web          # TanStack Start landing (port 3000)
+mise run dev:mobile       # Expo
+mise run dev:api          # Fastify + Postgres + Redis + MinIO
+
+mise run lint && mise run typecheck && mise run test
 ```
 
-Desktop e2e:
-- Playwright smoke UI: `pnpm --filter @snapglow/desktop test:e2e`
-- Native integration: `mise run test:e2e:native` (WebDriver on Linux/Windows; `cargo test` fallback on macOS - [Tauri limitation](https://v2.tauri.app/develop/tests/webdriver/))
+Use `pnpm` only (not `npm` / `yarn`). Prefer root [`mise.toml`](mise.toml) tasks. Add new apps as `dev:*` mise tasks, not ad-hoc root scripts.
 
-Rust: `cd apps/desktop/src-tauri && cargo test`
+## Repository map
 
-Releases: tag `v*` triggers `.github/workflows/release.yml` (draft GitHub Release + updater). See `docs/internal/technical/release-signing.md`.
+| Path | Role |
+|------|------|
+| `apps/desktop` | Tauri 2 + React menu-bar app (`modules/` + IPC) |
+| `apps/web` | TanStack Start landing + public share viewer (`/s/:token`) |
+| `apps/mobile` | Expo SDK 56 + React Native |
+| `apps/api` | Fastify cloud API (shares, Auth0, teams) |
+| `apps/vscode-extension` | VS Code capture + beautify plugin |
+| `apps/figma-plugin` | Figma import/export frames |
+| `apps/notion-embed` | Notion OAuth + embeds |
+| `packages/design-tokens` | DTCG tokens → CSS / native |
+| `packages/ui` / `ui-native` | Shared React / RN components |
+| `packages/*-core` | Shared domain libraries (editor, redaction, cloud, …) |
+| `packages/sdk` | Official REST API client |
+| `docs/` | Product and technical specs (incl. ADRs / sprint history) |
 
-## Architecture
+Path-scoped rules (Cursor): `.cursor/rules/` (architecture + workflow). Claude Code mirrors: `.claude/rules/`. Always-on behavior (Karpathy, no-ai-slop): this file + Cursor `.cursor/rules/` mirrors.
 
-- **Modules:** `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings,cloud}/`
-- **ADR-001:** monorepo + modules
-- **ADR-002:** design tokens + UI + web
-- **Design system (desktop):** `design.md` - layout, typography, tokens mapping (Hallmark locked, Sprint 1.6)
-- **ADR-003:** IPC commands/events
-- **ADR-004:** tray, shortcuts, autostart
-- **ADR-005:** updater, releases, signing roadmap
-- **ADR-006:** native capture overlay
-- Invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite settings
-- **Sprint 1.1** : capture native macOS + Windows validée en QA (zone / fenêtre / écran)
-- **Sprint 1.2** : moteur beautification Canvas 2D (dégradés, padding, radius, ombre, fond custom)
-- **Sprint 1.3** : presets format (sociaux + ratios), drag/zoom (outil Move), `PresetBar` + `StyleBar`, presets custom SQLite
-- **Sprint 1.4** : annotations (texte, formes, highlight, flou manuel), `AnnotationToolbar`, layers 4–5, undo/redo (20 niveaux)
-- **Sprint 1.5** : redaction on-device (OCR macOS/Windows + détecteurs regex), `RedactionBar`, masquage → `BlurAnnotation` ; export WYSIWYG PNG/JPG/WebP, clipboard (`Image.fromBytes` + `image-png`), drag-out (`ExportBar`)
-- **Sprint 1.6** : historique 30 captures (`modules/history/`, `db/captures.ts`, PNG + miniatures WebP), route `/history`, E2E natif `capture-beautify-export`, perf/stress tests, builds beta unsigned (voir `release-signing.md` §5) ; polish UX P1-037 (`design.md`, Feature Stack editor, warm tokens, `AppTopNav`)
-- **Sprint 1b.1** : app mobile Expo (`apps/mobile/`), share import iOS/Android (`expo-share-intent`), `@snapglow/ui-native` + `tokens.native`, dev builds (`dev:mobile`)
-- **Sprint 1b.2** : `@snapglow/editor-core`, éditeur Skia mobile (presets, annotations tactiles), export Photos + share sheet (`modules/export/`) — preview-scaled
-- **Sprint 1b.3** : `@snapglow/redaction-core`, redaction mobile (`snapglow-ocr` Vision/ML Kit, `RedactionBar`), export pleine résolution (`ExportCanvas`), EAS/store prep, matrice QA devices
-- **Sprint 2b.1** : `@snapglow/style-suggestion-core`, classification on-device desktop (`classify_content_command`), UI `StyleSuggestionBar`, training tooling (`tools/style-classifier/`) — **modèle ML non entraîné** (pas de dataset ; fallback heuristique)
-- **Sprint 2b.2** : `@snapglow/ocr-core`, OCR copy-text desktop (`recognize_text_command`), UI `TextExtractionBar`, auto-crop (`detect_content_bounds_command`), compression export (`compress_export_bytes_command`)
-- **Sprint 2b.3** : capture scrollante viewport (`capture_scrolling_window_command`, Home + Page Down + stitch), timer différé + mode Menu (`capture_native_command`), HUD progress + `stop_scrolling_capture_command`, ADR-007 — **QA OK**, améliorations stitch en backlog
-- **Sprint 2b.4** : enregistrement zone GIF ≤ 8 s / MP4 ≤ 30 s (`start/pause/resume/stop_region_recording_command`, `capture/record/`), SCK macOS (`macos_record.rs`) + polling Windows, GIF grille 20 fps + imagequant (qualité low/medium/high), MP4 H.264 CFR (`encode_mp4.rs`, openh264), overlay Photo/Video + HUD pause/stop, sauvegarde + historique + lecteur OS (`capture-recording-complete`, `open_path_command`), ADR-008 — **QA OK** macOS/Windows
-- **Sprint 2b.5** : `apps/api` Fastify + Postgres + Redis + R2/MinIO ; Auth0 JWT ; upload desktop → lien `/s/:token` ; viewer TanStack Start ; expiration 1h/24h/7j/permanent — `@snapglow/cloud-core`, `modules/cloud/`, ADR-009
-- **Sprint 2b.6** : `@snapglow/integrations-core`, OAuth proxy API, Send to… (Slack/Notion/Linear/GitHub), Library FTS + cloud sync, tags/collections, watermark export — ADR-010
-- **Sprint 3.1–3.2** : `@snapglow/team-core`, workspaces/members/invitations API, Stripe seat billing, brand kit, SSO Auth0 Organizations, desktop `modules/team/` — ADR-011
-- **Sprint 3.3–3.4** : `@snapglow/collab-core`, WebSocket collab server, shared annotations + cursors, comments, in-app/email notifications, desktop `modules/collab/`, web `/c/:documentId` — ADR-012
-- **Sprint 3.5–3.6** : `@snapglow/api-core`, `@snapglow/render-core`, `@snapglow/sdk`, public REST API `/v1/public/captures`, API keys (Team Pro), OpenAPI + Swagger UI, server-side WYSIWYG export — ADR-013
-- **Sprint 3.7–3.8** : `@snapglow/plugin-core`, VS Code / Figma / Notion plugins, team usage reports, embed viewer `/e/:token` — ADR-014
-- **Sprint 4.1–4.16 (Phase 4)** : marketplace templates, Rewardful affiliates, i18n FR/DE/JP, enterprise integrations (Jira/Confluence/Teams), cross-device sync, blog/SEO, Setapp/partner redeem, PostHog A/B tests — ADR-015–018
+## Skills
 
-## Agent conventions
+Skills live in **`.agents/skills/`** ([Agent Skills](https://agentskills.io/)). Edit only there. Cursor/Claude bridges are symlinks, not copies.
 
-1. **CodeGraph > grep** for exploring structure across TS and Rust.
-2. **Hallmark** (`.cursor/skills/hallmark/`) for UI/UX polish - read `design.md` first (locked system; conformance, not macrostructure rotation).
-3. **Privacy-first:** no telemetry, no cloud upload without explicit user action.
-4. **Minimal diffs:** match existing patterns; don't add ESLint/Prettier.
-5. **mise** is the dev entry point - add new apps as `dev:*` tasks, not ad-hoc root scripts.
+| Tool | Discovery |
+|------|-----------|
+| **GPT / Codex** | `.agents/skills/` (from repo root) |
+| **Gemini CLI** | `.agents/skills/` (prefer over `.gemini/skills/`) |
+| **GitHub Copilot** | `.agents/skills/` (also accepts `.claude/skills/` / `.github/skills/`; we keep one copy under `.agents`). Extra: `.github/copilot-instructions.md` |
+| **Cursor** | `.cursor/skills/` → `.agents/skills/` |
+| **Claude Code** | `.claude/skills/` → `.agents/skills/` |
 
-## Multi-app roadmap
+Marketing context: `.agents/product-marketing.md`.
 
-| Phase | App | mise task |
-|-------|-----|-----------|
-| 0.1 | desktop | `dev:desktop` |
-| 0.2 | web (TanStack Start) | `dev:web` |
-| 1b | mobile (Expo) | `dev:mobile` |
-| 2b | api (Fastify) | `dev:api` |
+If a skill matches the task, read its `SKILL.md` before improvising. For UI work, read root [`design.md`](design.md) first (locked visual system).
 
-Rules for future surfaces: `.agents/rules/mobile.md` (Expo SDK 56 docs), `api.md` (Phase 2b).
+First-party behavioral skills (always relevant; deep detail on demand):
+
+- [`karpathy-guidelines`](.agents/skills/karpathy-guidelines/) — from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
+- [`no-ai-slop`](.agents/skills/no-ai-slop/) — full rewrite process; always-on core is below
+
+Pinned third-party skills (`skills-lock.json`): [marketingskills](https://github.com/coreyhaines31/marketingskills), [taste-skill](https://github.com/Leonxlnx/taste-skill), [impeccable](https://github.com/pbakaus/impeccable). Update with `npx skills update`.
+
+### CodeGraph
+
+Indexed graph in `.codegraph/`. Prefer `codegraph_explore` / `codegraph explore` over grep when finding or tracing code (TS and Rust). MCP: `.cursor/mcp.json` and `.mcp.json`. After big structural changes: `codegraph sync` (or `codegraph init` on a fresh clone).
+
+## Behavioral guidelines
+
+Always-on for every agent that reads this file (Cursor, Codex, Copilot, Gemini, Claude). Cursor also mirrors them under `.cursor/rules/` (`alwaysApply`). Keep those files in sync when you change this section.
+
+### Karpathy (coding behavior)
+
+Derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876); packaged as [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills). Bias: caution over speed; for trivial tasks, use judgment.
+
+1. **Think before coding** — State assumptions; present interpretations instead of picking silently; push back on overkill; stop and ask when confused.
+2. **Simplicity first** — Minimum code that solves the ask. No speculative features, single-use abstractions, or error handling for impossible cases. If 200 lines could be 50, rewrite.
+3. **Surgical changes** — Touch only what the request requires. Do not drive-by refactor. Clean up only orphans your change created.
+4. **Goal-driven execution** — Turn work into verifiable goals (tests that fail then pass). Multi-step: `step → verify` plan, then loop until checks pass.
+
+### No AI slop (prose and chat)
+
+Write like a clear human. Direct, specific, varied rhythm. For deep rewrites, use the `no-ai-slop` skill.
+
+- Lead with the answer. No throat-clearing ("Here's the thing", "Let's dive in").
+- Prefer plain words over AI vocab: delve, pivotal, landscape, testament, showcase, seamless, robust, leverage, game-changer, deep dive.
+- Prefer `is` / `has` over "serves as" / "boasts" / "stands as".
+- No "not X, it's Y" contrasts. State Y.
+- No em/en dashes. Use commas, periods, colons, or parentheses.
+- Bold sparingly. No emoji decoration in prose. Sentence-case headings.
+- No chatbot closers ("Hope this helps!", "Let me know if…", "Great question!").
+- Name actors. Avoid false agency ("the decision emerges").
+- Code, diffs, legal/compliance: stay neutral; still cut filler. Quoted text, titles, names: leave intact. Clusters of tells matter more than one word.
+
+## Code style
+
+- TypeScript / JS: Biome only (no ESLint/Prettier).
+- Desktop: module-first under `apps/desktop/src/modules/`; invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite settings.
+- Web: TanStack Start; tokens from `@snapglow/design-tokens`; components from `@snapglow/ui`.
+- Mobile: Expo 56; `@snapglow/ui-native` + `tokens.native`; shared logic in `editor-core` / `redaction-core`.
+- API: Fastify; see `.cursor/rules/api-architecture.mdc`.
+- Commits: Conventional Commits; mise hooks (lint-staged + commitlint).
+
+## Boundaries
+
+**Always**
+
+- Privacy-first: no telemetry, no cloud upload without explicit user action.
+- Keep desktop domain code in `modules/`; match existing patterns; minimal diffs.
+- Use mise as the dev entry point.
+- Run `mise run lint` / `typecheck` (and tests for touched surfaces) before calling the work done.
+
+**Ask first**
+
+- Commit / push / force-push.
+- Product name, domains, pricing, or auth provider changes.
+- Large infra, deploy, or DNS work.
+
+**Never**
+
+- Commit secrets or real API keys (`.env*` is gitignored).
+- Invent deploy / DNS / cloud account setup unless asked.
+- Skip path-scoped architecture rules for the app you are editing.
+- Add ESLint/Prettier.
+
+## Docs
+
+[`README.md`](README.md), [`design.md`](design.md), [`docs/internal/`](docs/internal/) (ADRs and sprint history), [`.cursor/rules/`](.cursor/rules/).
+
+## Done checklist
+
+1. Lint / typecheck green on touched packages/apps.
+2. Tests for touched surfaces when behavior changed.
+3. Say what was not verified (Docker down, missing keys, simulator, etc.).

@@ -1,0 +1,15 @@
+---
+description: Architecture rules for apps/mobile (Expo SDK 56)
+globs:
+  - apps/mobile/**/*.{ts,tsx,js,jsx}
+alwaysApply: false
+---
+
+# apps/mobile
+
+- Expo SDK 56 + Expo Router. Development builds only (share intent / OCR need native code; not Expo Go).
+- Design: `@snapglow/ui-native` + `@snapglow/design-tokens` `tokens.native`. Shared edit/redaction via `editor-core` / `redaction-core`.
+- Domain modules under `src/modules/` (capture, editor, export, redaction). Zustand per module.
+- Prefer `npx expo install <pkg>` inside `apps/mobile/` to stay on SDK 56.
+- Dev: `mise run dev:mobile` / `dev:mobile:ios` / `dev:mobile:android`. Rebuild after native module changes.
+- Docs: Expo [SDK 56](https://docs.expo.dev/versions/v56.0.0/), `.agents/rules/mobile.md`, `apps/mobile/AGENTS.md`.
