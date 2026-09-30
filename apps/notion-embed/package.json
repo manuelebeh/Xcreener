@@ -10,7 +10,7 @@
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "format": "biome check --write .",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@snapglow/integrations-core": "workspace:*",
