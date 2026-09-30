@@ -7,8 +7,16 @@ import {
 } from './index';
 
 describe('integrations-core', () => {
-  it('defines four providers with labels and scopes', () => {
-    expect(INTEGRATION_PROVIDERS).toHaveLength(4);
+  it('defines providers with labels and scopes', () => {
+    expect(INTEGRATION_PROVIDERS).toEqual([
+      'slack',
+      'notion',
+      'linear',
+      'github',
+      'jira',
+      'confluence',
+      'msteams',
+    ]);
     for (const provider of INTEGRATION_PROVIDERS) {
       expect(INTEGRATION_LABELS[provider]).toBeTruthy();
       expect(INTEGRATION_SCOPES[provider]).toBeTruthy();
