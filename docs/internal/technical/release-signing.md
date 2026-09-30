@@ -35,7 +35,7 @@ pnpm --filter @snapglow/desktop tauri signer generate -w ~/.tauri/snapglow.key
 
 **Prerequisites:** Apple Developer Program membership ($99/year).
 
-Without these secrets, `build.yml` / `release.yml` produce **unsigned** `.dmg` files (Gatekeeper will block by default).
+Without these secrets, `build.yml` / `release.yml` produce **unsigned** `.dmg` files (Gatekeeper will block by default). Do not export empty `APPLE_*` env vars in CI: Tauri treats them as present and `security import` fails. Uncomment the Apple block in `release.yml` only after the secrets are set.
 
 ## 3. Windows Authenticode
 
@@ -77,7 +77,7 @@ Until Apple Developer ID and Windows Authenticode certificates are provisioned, 
 |--------|---------------------------|-------|
 | `TAURI_SIGNING_PRIVATE_KEY` | Yes (recommended) | Signs `latest.json` + update bundles |
 | `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | If key encrypted | - |
-| `APPLE_*` | No (unsigned macOS) | Add when Developer ID cert is ready |
+| `APPLE_*` | No (unsigned macOS) | Add secrets, then uncomment the Apple block in `release.yml` |
 | Windows `.pfx` / Authenticode | No (unsigned Windows) | See section 3 + commented block in `release.yml` |
 
 ### Trigger a beta release
