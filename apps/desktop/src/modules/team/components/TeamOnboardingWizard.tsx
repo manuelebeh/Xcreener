@@ -265,7 +265,12 @@ export function TeamOnboardingWizard({
             variant="ghost"
             size="sm"
             disabled={currentIndex === 0}
-            onClick={() => void goTo(TEAM_ONBOARDING_STEPS[currentIndex - 1]!)}
+            onClick={() => {
+              const previous = TEAM_ONBOARDING_STEPS[currentIndex - 1];
+              if (previous) {
+                void goTo(previous);
+              }
+            }}
           >
             Back
           </Button>
