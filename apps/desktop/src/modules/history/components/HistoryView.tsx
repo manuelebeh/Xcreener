@@ -93,29 +93,30 @@ export function HistoryView() {
     !loading && !hasResults && (searchQuery.trim() || activeTag || activeCollectionId !== null);
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-4">
+    <div className="mx-auto w-full max-w-5xl space-y-5">
       <header className="space-y-1">
-        <h1 className="font-display text-lg font-semibold text-foreground">Library</h1>
+        <h1 className="text-xl font-semibold text-foreground">Library</h1>
         <p className="text-sm text-muted">
           Local history with OCR search · cloud sync when signed in.
         </p>
       </header>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-1 sm:col-span-2">
-          <label htmlFor="library-search" className="text-xs font-medium text-muted">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="min-w-56 flex-1">
+          <label htmlFor="library-search" className="sr-only">
             Search OCR text
           </label>
           <Input
             id="library-search"
+            type="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Search captures…"
             data-testid="library-search-input"
           />
         </div>
-        <div className="space-y-1">
-          <label htmlFor="library-source" className="text-xs font-medium text-muted">
+        <div>
+          <label htmlFor="library-source" className="sr-only">
             Source
           </label>
           <Select
@@ -123,13 +124,13 @@ export function HistoryView() {
             value={sourceFilter}
             onChange={(event) => setSourceFilter(event.target.value as 'all' | 'local' | 'cloud')}
           >
-            <option value="all">All</option>
+            <option value="all">All sources</option>
             <option value="local">Local</option>
             <option value="cloud">Cloud</option>
           </Select>
         </div>
-        <div className="space-y-1">
-          <label htmlFor="library-collection" className="text-xs font-medium text-muted">
+        <div>
+          <label htmlFor="library-collection" className="sr-only">
             Collection
           </label>
           <Select
@@ -147,9 +148,6 @@ export function HistoryView() {
             ))}
           </Select>
         </div>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
         <Button
           type="button"
           size="sm"
@@ -161,7 +159,7 @@ export function HistoryView() {
         {activeTag ? (
           <button
             type="button"
-            className="rounded-full bg-primary/10 px-2 py-1 text-xs text-primary"
+            className="sg-focus-ring h-8 rounded-md bg-primary/10 px-2.5 text-xs font-medium text-primary"
             onClick={() => setActiveTag(null)}
           >
             Tag: {activeTag} ×
@@ -192,11 +190,8 @@ export function HistoryView() {
       ) : null}
 
       {!loading && !hasResults && !showNoMatches ? (
-        <div
-          className="rounded-lg border border-dashed border-border bg-muted/20 px-6 py-12 text-center"
-          data-testid="history-empty"
-        >
-          <p className="text-sm font-medium text-foreground">No captures yet</p>
+        <div className="px-6 py-20 text-center" data-testid="history-empty">
+          <p className="text-base font-semibold text-foreground">No captures yet</p>
           <p className="mt-1 text-sm text-muted">
             Use Cmd+Shift+S (or Ctrl+Shift+S) to capture your first screenshot.
           </p>
