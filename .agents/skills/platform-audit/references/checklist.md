@@ -51,14 +51,14 @@ Look for: god components/routes/services (`routes/collab.ts` is large), business
 
 For each exposed command and plugin permission: name, inputs, validation, authorization, capability, scope, FS/network/process access, returned data, errors, logging.
 
-Check: which windows can call it (`main` and `capture-overlay` share one capability), overly broad permissions, home directory access, shell, uncontrolled arguments and paths, external navigation, remote content. Principle: a compromised WebView (XSS through rendered content, malicious JS dependency, malicious marketplace template) must get no more than strictly needed. With `withGlobalTauri: true`, any script in the WebView reaches `window.__TAURI__`.
+Check: which windows can call it (`main` uses `default.json`, `capture-overlay` uses `overlay.json`), overly broad permissions, home directory access, shell, uncontrolled arguments and paths, external navigation, remote content. Principle: a compromised WebView (XSS through rendered content, malicious JS dependency, malicious marketplace template) must get no more than strictly needed. With `withGlobalTauri: true`, any script in the WebView reaches `window.__TAURI__`.
 
 ## 4. Tauri / desktop security
 
 - **Capabilities**: minimal, split per window, explicit scopes. `sql:allow-execute` gives the WebView arbitrary SQL on the local DB; `fs:allow-remove` / `allow-write-file` with `$APPDATA`, `$TEMP`, `$TMP` scopes.
 - **Permissions** (opener, deep-link, updater, process, clipboard, global-shortcut, autostart, dialog): why, needed, too broad, attack if the WebView is compromised.
 - **IPC**: Rust-side validation of paths, sizes, formats, IDs; errors leaking paths.
-- **CSP**: every directive; `'unsafe-inline'` styles, `connect-src` including `http://localhost:8787` and many third parties in production builds, asset protocol scope.
+- **CSP**: every directive; `'unsafe-inline'` styles, `connect-src` third parties in production builds and the dev-only `devCsp`, asset protocol scope.
 - **Remote content**: share previews, marketplace templates, collab documents, integration responses rendered in a WebView with IPC access.
 - **Navigation and deep links**: `snapglow://` handlers (cloud auth, integrations callback, referral). Any app can register or call the scheme: state/PKCE checks, replayed callbacks, attacker-crafted links triggering actions.
 - **Screen capture privacy**: macOS screen-recording entitlement, private APIs (`macOSPrivateApi`), overlay windows on all workspaces, captures of other apps' content (passwords, notifications), redaction before upload or share.
@@ -114,7 +114,7 @@ Typing (`tsc` strict?), async error handling in Fastify hooks (early `reply.send
 
 ## 10. Dependencies and supply chain
 
-pnpm, Cargo, Expo/EAS, VS Code Marketplace (`vsce`), Figma, Docker images (`minio/minio:latest`), GitHub Actions, third-party SDKs. CVEs and advisories (reachability), outdated versions, abandoned packages, unpinned versions, duplicates, transitives. Licenses (MIT, Apache, BSD, GPL/LGPL/AGPL, unknown) and implications for distributing desktop/mobile/extension binaries (openh264 codec licensing, tflite models, tesseract). Lockfiles: `--frozen-lockfile` in CI, one package manager (`vscode-extension.yml` uses Node 22 while the repo requires `>=24`).
+pnpm, Cargo, Expo/EAS, VS Code Marketplace (`vsce`), Figma, Docker images (pinned image tags), GitHub Actions, third-party SDKs. CVEs and advisories (reachability), outdated versions, abandoned packages, unpinned versions, duplicates, transitives. Licenses (MIT, Apache, BSD, GPL/LGPL/AGPL, unknown) and implications for distributing desktop/mobile/extension binaries (openh264 codec licensing, tflite models, tesseract). Lockfiles: `--frozen-lockfile` in CI, one package manager (`vscode-extension.yml` uses Node 22 while the repo requires `>=24`).
 
 CI: actions pinned by SHA, per-job `permissions`, secrets (`TAURI_SIGNING_PRIVATE_KEY`, `VSCE_PAT`, `EXPO_TOKEN`), `pull_request_target`, forks, cache poisoning, artifacts, dependency review, release automation.
 
