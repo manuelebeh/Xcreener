@@ -1,75 +1,87 @@
 # Design - SnapGlow
 
-Locked design system (pass 4, 2026-06-16). Agents and design skills (impeccable /
-taste) read this file first; pages defer to it. Amend intentionally: the file is
-the rule.
+Desktop redesign locked 2026-10-13: the category standard, executed with care.
+Agents and design skills (impeccable / taste) read this file first; pages defer
+to it. Amend intentionally: the file is the rule.
 
-**SSOT in code:** `packages/design-tokens/tokens.json` → built to
-`packages/design-tokens/dist/tokens.css` and `dist/tailwind-theme.css`.
-Do not edit generated dist files; change `tokens.json` and run `mise run tokens:build`.
+**Scope:** this describes the desktop app (`apps/desktop`). Web and mobile still
+use the shared amber tokens below until they are redesigned.
+
+**Product truth:** `apps/desktop/PRODUCT.md`. **Direction contract:**
+`apps/desktop/.impeccable/surfaces/src-main-tsx.md`.
+
+**SSOT in code (desktop):** `apps/desktop/src/styles/theme.css`. It overrides the
+shared tokens from `packages/design-tokens/tokens.json` for this app only
+(`--color-*`, `--sg-color-*`, fonts, radii, neutral scale).
 
 ## System
 
-- **Genre** · modern-minimal (utilitarian desktop tool)
-- **Macrostructure** · Feature Stack - sticky canvas left, scrollable tools rail right
-- **Nav** · N1b canonical inline - wordmark + inline links, active pill fill
-- **Theme** · custom (vibe: "warm linen · amber primary · technical")
-- **Axes** · light / mono-display / warm
-- **Tone** · utilitarian - dense tool UI, honest copy, no decorative chrome
+- **Genre** · category standard for photo and screenshot editors (CleanShot X, Pixelmator Pro, Shottr)
+- **Constraint** · stay close to what users already know; no experimental metaphors
+- **Mode** · Operate: the image is the subject, chrome recedes
+- **Theme** · follows the system, light and dark both designed
+- **Tone** · utilitarian, dense, honest copy, no decorative chrome
 
-## Layout (desktop editor)
+## Layout
 
-- **Shell** · top nav (`AppTopNav`) + routed main content
-- **Editor** · `lg:grid-cols-[minmax(0,1fr)_minmax(300px,360px)]`
-  - Left: sticky canvas preview (`lg:sticky lg:top-4`)
-  - Right: unified `EditorToolsPanel`, scrollable (`lg:max-h-[calc(100vh-5.5rem)]`)
-- **Tool order** · Format → Style → Annotations → Sensitive data → **Export** (last)
-- **Section labels** · `text-xs font-medium text-muted` - roman, vertical stack, no uppercase eyebrows
-- **Container** · `max-w-7xl` editor, `max-w-5xl` history
+- **Window** · full-height, no page scroll; default 1120x740, minimum 900x600
+- **Toolbar** · `AppTopNav`: wordmark left, segmented Editor / Library / Settings centered, New capture (Tauri only) and notifications right
+- **Editor** · two columns: stage left, 320 to 340px inspector right
+  - Stage: persistent annotation tool strip (tools, undo, redo) on top, capture centered on a darker neutral, status bar below (preset, size, Fit %)
+  - Inspector: scrolling collapsible sections, **Export pinned at the foot** and never collapsible
+- **Inspector order** · suggestion banner (only when present) → Format → Style → Annotation options → Auto-crop → Sensitive data → Text extraction → Collaboration → Export
+- **Empty state** · no capture: inspector shows one line of guidance, no empty sections
+- **Library / Settings** · scroll inside the window, shared `max-w-5xl` left edge; Settings content is a `max-w-2xl` column of grouped rows (label left, control right)
 
 ## Typography
 
-- **Body** · IBM Plex Sans (`--sg-font-family-sans` / `font-sans`)
-- **Display / wordmark / page titles** · IBM Plex Mono (`font-display`, `--sg-font-family-display`)
-- **Code / shortcuts** · IBM Plex Mono (`--sg-font-family-mono`)
-- **Bundled via** · `@fontsource/ibm-plex-sans` + `@fontsource/ibm-plex-mono` in `global.css`
-- **Headers** · always roman - no italic display type
+- **All text** · system sans (`-apple-system`, SF Pro, Segoe UI); no bundled web fonts
+- **Code / shortcuts** · system mono
+- **Scale** · 12px section labels and hints, 13px controls, 14px body rows, 20px page titles
+- **Numerals** · `tabular-nums` on live values (sliders, sizes, percentages)
 
-## Tokens (canonical mapping)
+## Tokens (desktop overrides)
 
-Hallmark role → SnapGlow semantic token (light mode):
+| Role | Token | Light | Dark |
+| --- | --- | --- | --- |
+| window | `--sg-color-background` | oklch(0.965 0.002 260) | oklch(0.22 0.005 260) |
+| panel | `--sg-color-surface` | oklch(0.99 0.001 260) | oklch(0.26 0.006 260) |
+| stage | `--app-stage` | oklch(0.9 0.004 260) | oklch(0.17 0.004 260) |
+| ink | `--sg-color-foreground` | oklch(0.22 0.01 260) | oklch(0.95 0.003 260) |
+| muted | `--sg-color-muted` | oklch(0.5 0.01 260) | oklch(0.72 0.008 260) |
+| rule | `--sg-color-border` | oklch(0.88 0.004 260) | oklch(0.34 0.006 260) |
+| accent | `--sg-color-primary` | oklch(0.55 0.19 258) | oklch(0.68 0.16 255) |
+| destructive | `--sg-color-destructive` | oklch(0.55 0.2 25) | oklch(0.68 0.19 25) |
+| success | `--sg-color-success` | oklch(0.5 0.13 150) | oklch(0.7 0.13 150) |
 
-| Role | Token | OKLCH |
-| --- | --- | --- |
-| paper | `--sg-color-background` | oklch(0.99 0.004 70) |
-| paper-2 | `--sg-color-surface` | oklch(0.97 0.006 70) |
-| ink | `--sg-color-foreground` | oklch(0.20 0.010 52) |
-| muted | `--sg-color-muted` | oklch(0.54 0.008 60) |
-| rule | `--sg-color-border` | oklch(0.90 0.010 66) |
-| accent | `--sg-color-primary` | oklch(0.54 0.12 60) |
-| accent-ink | `--sg-color-primary-foreground` | oklch(0.99 0.004 70) |
-| focus | `--sg-color-focus-ring` | oklch(0.54 0.12 60) |
-| destructive | `--sg-color-destructive` | oklch(0.55 0.22 25) |
-| success | `--sg-color-success` | oklch(0.48 0.12 145) |
+Radius: 6px controls, 10px panels. Hairlines 1px. One accent (blue) for selection and the primary action.
 
-## CTA voice
+## Controls
 
-- **Primary** · `bg-primary text-primary-foreground` · `rounded-md` · opacity hover
-- **Secondary** · `bg-surface border-border` · same radius
-- **Ghost** · transparent · hover `bg-surface`
-- **Destructive** · `bg-destructive` · confirm via deferred delete + undo, never `window.confirm`
-- **Labels** · verb-first ("Save preset", "Check for updates") · async states swap label text
+- **Height** · 32px for buttons (`sm`), selects and text inputs; the primary Export button shares that row height
+- **Selects** · native element, `appearance: none` with a drawn chevron (theme.css)
+- **Segmented** · `@/shared/components/Segmented` for mutually exclusive modes
+- **Slider rows** · `@/shared/components/SliderField`: label left, live value right, slider below
+- **Primary** · `bg-primary text-primary-foreground`; Secondary · `bg-surface border-border`; Ghost · transparent
+- **Destructive** · deferred delete with undo toast, never `window.confirm`
+- **Labels** · verb-first ("Save shortcut", "Check for updates")
 
 ## Interaction
 
-- **Focus** · `.sg-focus-ring` utility + `@snapglow/ui` `focusRingClasses` on shared components
-- **Delete** · optimistic remove + 8s undo toast (history captures, custom presets)
-- **Tooltips** · 800ms hover delay · silent success preferred over celebratory toasts
-- **Motion** · motion-cut · `transition-colors` / `transition-opacity` only · no layout animation
-- **Reduced motion** · ≤150ms opacity crossfade
-- **Capture HUD** · `.capture-hud` classes - semantic tokens via `color-mix`, not raw Tailwind neutrals
+- **Focus** · `.sg-focus-ring` utility and `@snapglow/ui` `focusRingClasses`
+- **Tooltips** · 800ms hover delay; silent success preferred over celebratory toasts
+- **Motion** · `transition-colors` / `transition-opacity` only, no layout animation; reduced motion handled globally
+- **Capture HUD** · `.capture-hud` classes, semantic tokens through `color-mix`, cool neutral scale from theme.css
 
-## Exports
+## Known gaps
+
+- Capture overlay layout, Cloud / Team / Integrations / Marketplace / Watermark settings sections and `HistoryPreview` have not been restyled or reviewed.
+- Shortcut field shows the raw Tauri format; a key recorder is not built.
+- No zoom control: the preview fits the window (status bar shows Fit %).
+- `.impeccable/design.json` has not been generated for this system.
+
+## Shared tokens (web and mobile, unchanged)
+
 
 ### 1 · `tokens.css` (source of truth)
 
