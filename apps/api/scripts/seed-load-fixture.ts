@@ -31,7 +31,11 @@ async function main() {
       .insert(schema.users)
       .values({ auth0Sub: LOAD_FIXTURE_SUB, email: 'load-test@snapglow.local' })
       .returning();
-    user = inserted[0]!;
+    const row = inserted[0];
+    if (!row) {
+      throw new Error('Failed to seed user');
+    }
+    user = row;
   }
 
   let workspace = (
@@ -52,7 +56,11 @@ async function main() {
         createdBy: user.id,
       })
       .returning();
-    workspace = inserted[0]!;
+    const row = inserted[0];
+    if (!row) {
+      throw new Error('Failed to seed workspace');
+    }
+    workspace = row;
 
     await db.insert(schema.workspaceMembers).values({
       workspaceId: workspace.id,
@@ -87,7 +95,11 @@ async function main() {
         createdBy: user.id,
       })
       .returning();
-    apiKey = inserted[0]!;
+    const row = inserted[0];
+    if (!row) {
+      throw new Error('Failed to seed apiKey');
+    }
+    apiKey = row;
   }
 
   const storageKey = `load-test/${workspace.id}/fixture.png`;
@@ -114,7 +126,11 @@ async function main() {
         documentState: { annotations: [], layout: null },
       })
       .returning();
-    capture = inserted[0]!;
+    const row = inserted[0];
+    if (!row) {
+      throw new Error('Failed to seed capture');
+    }
+    capture = row;
   }
 
   await client.end();
