@@ -8,6 +8,11 @@ export const commonJa = {
   marketplace: 'マーケットプレイス',
   affiliates: 'アフィリエイト',
   blog: 'ブログ',
+  consentTitle: 'アクセス解析',
+  consentBody:
+    'このサイトでは有用なページを把握するため PostHog を使用します。同意するまで無効です。共有・コラボレーションのリンクは送信されません。',
+  consentAccept: '同意する',
+  consentDecline: '拒否する',
 };
 
 export const marketingJa = {
