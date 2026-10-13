@@ -21,11 +21,11 @@ function AppShell() {
   useIntegrationsListener();
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="flex h-full flex-col bg-background text-foreground">
       <CaptureErrorBanner />
       <CaptureProgressBanner />
       <AppTopNav />
-      <div className="min-h-0 min-w-0 flex-1 overflow-x-clip">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <AppRoutes />
       </div>
     </div>

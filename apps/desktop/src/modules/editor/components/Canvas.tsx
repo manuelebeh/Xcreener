@@ -21,7 +21,8 @@ import { useEditorStore } from '../store';
 import type { RenderInput } from '../types';
 import { TextEditorOverlay } from './TextEditorOverlay';
 
-const PREVIEW_MAX_HEIGHT = 'min(62vh, 560px)';
+/** Stage padding (p-8) around the preview, subtracted from the measured stage size. */
+const STAGE_PADDING = 64;
 
 export function Canvas() {
   const screenshot = useEditorStore((s) => s.screenshot);
@@ -174,8 +175,8 @@ export function Canvas() {
     const updateSize = () => {
       const rect = container.getBoundingClientRect();
       setContainerSize({
-        width: Math.floor(rect.width),
-        height: Math.floor(rect.height),
+        width: Math.max(0, Math.floor(rect.width) - STAGE_PADDING),
+        height: Math.max(0, Math.floor(rect.height) - STAGE_PADDING),
       });
     };
 
@@ -211,25 +212,15 @@ export function Canvas() {
   const presetLabel = frame?.name ?? 'Free';
 
   return (
-    <section className="w-full space-y-2" aria-label="Export preview">
-      <div className="flex items-center justify-between gap-2 px-1">
-        <p className="text-xs font-medium text-foreground">Export preview</p>
-        {layout ? (
-          <p className="text-xs text-muted" data-testid="canvas-export-meta">
-            {presetLabel} · {exportLabel}
-          </p>
-        ) : null}
-      </div>
-
+    <section className="flex h-full min-h-0 w-full flex-col" aria-label="Export preview">
       <div
         ref={containerRef}
-        className="flex w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/20 p-4"
-        style={{ height: PREVIEW_MAX_HEIGHT, minHeight: 220 }}
+        className="app-stage flex min-h-0 flex-1 items-center justify-center p-8"
         data-testid="canvas-preview-stage"
       >
         {screenshot && layout && displaySize.width > 0 ? (
           <div
-            className="relative shrink-0 overflow-hidden shadow-md ring-1 ring-border/80"
+            className="relative shrink-0 overflow-hidden shadow-[0_8px_30px_rgb(0_0_0/0.22)] ring-1 ring-black/10"
             style={{
               width: displaySize.width,
               height: displaySize.height,
@@ -263,6 +254,15 @@ export function Canvas() {
             Capture a screenshot to start beautifying
           </p>
         )}
+      </div>
+
+      <div className="flex h-7 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
+        <p className="text-xs text-muted">Export preview</p>
+        {layout ? (
+          <p className="text-xs text-muted tabular-nums" data-testid="canvas-export-meta">
+            {presetLabel} · {exportLabel} · Fit {Math.round(displayScale * 100)}%
+          </p>
+        ) : null}
       </div>
     </section>
   );
