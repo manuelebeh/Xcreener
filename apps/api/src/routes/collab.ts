@@ -13,8 +13,10 @@ import { can, isPaidPlan, type WorkspaceRole } from '@snapglow/team-core';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
+import { z } from 'zod';
 import * as schema from '../db/schema';
 import { env } from '../env';
+import { allowOrReply } from '../lib/rate-limit';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import { getActiveWorkspaceId, resolveMembership } from '../plugins/workspace-auth';
 import { applyAnnotationOp } from '../services/collab-ops';
@@ -29,6 +31,16 @@ interface CollabRouteOptions {
   db: PostgresJsDatabase<typeof schema>;
   storage: StorageService;
 }
+
+const commentBodySchema = z.string().trim().min(1).max(5000);
+
+const commentCreateSchema = z.object({
+  body: commentBodySchema,
+  parentId: z.string().uuid().nullish(),
+  anchor: z.object({ x: z.number().finite(), y: z.number().finite() }).nullish(),
+});
+
+const commentUpdateSchema = z.object({ body: commentBodySchema });
 
 function isAllowedMimeType(value: string): value is ShareMimeType {
   return (ALLOWED_SHARE_MIME_TYPES as readonly string[]).includes(value);
@@ -155,6 +167,9 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
     const role = await resolveMembership(options.db, workspaceId, user.id);
     if (!role || !can(role, 'collab:edit')) {
       return reply.code(403).send({ error: 'Forbidden' });
+    }
+    if (!(await allowOrReply(reply, 'collab-create', user.id, 60, 3600))) {
+      return reply;
     }
 
     if (!(await ensurePaidWorkspace(options.db, workspaceId))) {
@@ -375,11 +390,11 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
 
       const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
       const { id } = request.params as { id: string };
-      const body = request.body as {
-        body: string;
-        parentId?: string | null;
-        anchor?: { x: number; y: number } | null;
-      };
+      const parsedBody = commentCreateSchema.safeParse(request.body);
+      if (!parsedBody.success) {
+        return reply.code(400).send({ error: 'Invalid comment' });
+      }
+      const body = parsedBody.data;
 
       const access = await resolveDocumentAccess(options.db, id, user.id);
       if (!access) {
@@ -387,6 +402,19 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
       }
       if (!can(access.role, 'comments:create')) {
         return reply.code(403).send({ error: 'Forbidden' });
+      }
+      if (!(await allowOrReply(reply, 'comment', user.id, 60, 60))) {
+        return reply;
+      }
+      if (body.parentId) {
+        const parents = await options.db
+          .select({ id: schema.comments.id })
+          .from(schema.comments)
+          .where(and(eq(schema.comments.id, body.parentId), eq(schema.comments.documentId, id)))
+          .limit(1);
+        if (!parents[0]) {
+          return reply.code(400).send({ error: 'Invalid parent comment' });
+        }
       }
 
       const mentionUserIds = await resolveMentionUserIds(
@@ -453,7 +481,11 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
 
       const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
       const { id, commentId } = request.params as { id: string; commentId: string };
-      const body = request.body as { body: string };
+      const parsedBody = commentUpdateSchema.safeParse(request.body);
+      if (!parsedBody.success) {
+        return reply.code(400).send({ error: 'Invalid comment' });
+      }
+      const body = parsedBody.data;
 
       const access = await resolveDocumentAccess(options.db, id, user.id);
       if (!access) {

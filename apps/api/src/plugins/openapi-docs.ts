@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import type { FastifyInstance } from 'fastify';
 import { parse as parseYaml } from 'yaml';
@@ -18,12 +19,16 @@ export async function registerOpenApiDocs(app: FastifyInstance) {
 
   app.get('/openapi.json', async () => spec);
 
+  // swagger-ui requires @fastify/swagger; static mode serves the hand-written spec as-is.
+  await app.register(swagger, {
+    mode: 'static',
+    specification: { document: spec as never },
+  });
   await app.register(swaggerUi, {
     routePrefix: '/docs',
     uiConfig: {
       docExpansion: 'list',
       deepLinking: true,
-      url: '/openapi.json',
     },
     staticCSP: true,
   });

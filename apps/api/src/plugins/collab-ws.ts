@@ -1,6 +1,5 @@
 import websocket from '@fastify/websocket';
 import {
-  type AnnotationOp,
   COLLAB_WS_PATH,
   type CollabServerMessage,
   isCollabClientMessage,
@@ -8,17 +7,18 @@ import {
   participantColor,
 } from '@snapglow/collab-core';
 import { can } from '@snapglow/team-core';
-import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import type { WebSocket } from 'ws';
-import * as schema from '../db/schema';
+import type * as schema from '../db/schema';
 import { env } from '../env';
 import { upsertAuthUser } from '../plugins/auth';
 import { ensurePaidWorkspace, resolveDocumentAccess } from '../routes/collab';
-import { applyAnnotationOp } from '../services/collab-ops';
+import { applyAnnotationOpToDocument, isValidAnnotationOp } from '../services/collab-ops';
 import { collabRoomHub } from '../services/collab-room';
+
+const MAX_MESSAGE_BYTES = 256 * 1024;
 
 const jwks = createRemoteJWKSet(new URL(`https://${env.AUTH0_DOMAIN}/.well-known/jwks.json`));
 
@@ -31,7 +31,17 @@ interface SocketContext {
   email: string | null;
   documentId: string;
   role: string;
+  /** Auth0 token expiry (ms since epoch); the socket is dropped once it passes. */
+  expiresAtMs: number | null;
+  /** Last time membership was confirmed against the database. */
+  checkedAtMs: number;
   socket: WebSocket;
+}
+
+const MEMBERSHIP_RECHECK_MS = 15_000;
+
+function isMembershipCheckDue(context: SocketContext): boolean {
+  return Date.now() - context.checkedAtMs >= MEMBERSHIP_RECHECK_MS;
 }
 
 function send(socket: WebSocket, message: CollabServerMessage): void {
@@ -57,7 +67,7 @@ export async function registerCollabWebSocket(
   app: FastifyInstance,
   options: CollabRouteOptions
 ): Promise<void> {
-  await app.register(websocket);
+  await app.register(websocket, { options: { maxPayload: MAX_MESSAGE_BYTES } });
 
   app.get(COLLAB_WS_PATH, { websocket: true }, (socket, request) => {
     let context: SocketContext | null = null;
@@ -102,6 +112,10 @@ export async function registerCollabWebSocket(
         }
 
         if (payload.type === 'auth') {
+          if (context) {
+            send(socket, { type: 'auth:error', error: 'Already authenticated' });
+            return;
+          }
           try {
             const { payload: jwtPayload } = await jwtVerify(payload.token, jwks, {
               issuer: `https://${env.AUTH0_DOMAIN}/`,
@@ -113,7 +127,10 @@ export async function registerCollabWebSocket(
               return;
             }
 
-            const email = typeof jwtPayload.email === 'string' ? jwtPayload.email : null;
+            const email =
+              typeof jwtPayload.email === 'string' && jwtPayload.email_verified !== false
+                ? jwtPayload.email
+                : null;
             const user = await upsertAuthUser(options.db, auth0Sub, email);
             const access = await resolveDocumentAccess(options.db, payload.documentId, user.id);
             if (!access) {
@@ -136,6 +153,8 @@ export async function registerCollabWebSocket(
               email: user.email,
               documentId: payload.documentId,
               role: access.role,
+              expiresAtMs: typeof jwtPayload.exp === 'number' ? jwtPayload.exp * 1000 : null,
+              checkedAtMs: Date.now(),
               socket,
             };
 
@@ -179,6 +198,28 @@ export async function registerCollabWebSocket(
           return;
         }
 
+        // Authorization can change while the socket is open: token expiry, removed member, new role.
+        const recheck = payload.type === 'annotation:op' || isMembershipCheckDue(context);
+        if (context.expiresAtMs !== null && Date.now() >= context.expiresAtMs) {
+          send(socket, { type: 'auth:error', error: 'Token expired' });
+          socket.close(4401, 'Token expired');
+          return;
+        }
+        if (recheck) {
+          const access = await resolveDocumentAccess(
+            options.db,
+            context.documentId,
+            context.userId
+          );
+          if (!access) {
+            send(socket, { type: 'auth:error', error: 'Access revoked' });
+            socket.close(4403, 'Access revoked');
+            return;
+          }
+          context.role = access.role;
+          context.checkedAtMs = Date.now();
+        }
+
         if (payload.type === 'presence:update') {
           const presence: ParticipantPresence = {
             userId: context.userId,
@@ -203,28 +244,20 @@ export async function registerCollabWebSocket(
             return;
           }
 
-          const rows = await options.db
-            .select()
-            .from(schema.collabDocuments)
-            .where(eq(schema.collabDocuments.id, context.documentId))
-            .limit(1);
-          const doc = rows[0];
-          if (!doc) {
-            send(socket, { type: 'error', error: 'Document not found' });
+          if (!isValidAnnotationOp(payload.op)) {
+            send(socket, { type: 'error', error: 'Invalid annotation op' });
             return;
           }
 
-          const nextState = applyAnnotationOp(doc.documentState, payload.op as AnnotationOp);
-          const nextVersion = doc.version + 1;
-
-          await options.db
-            .update(schema.collabDocuments)
-            .set({
-              documentState: nextState,
-              version: nextVersion,
-              updatedAt: new Date(),
-            })
-            .where(eq(schema.collabDocuments.id, context.documentId));
+          const nextVersion = await applyAnnotationOpToDocument(
+            options.db,
+            context.documentId,
+            payload.op
+          );
+          if (nextVersion === null) {
+            send(socket, { type: 'error', error: 'Annotation op rejected' });
+            return;
+          }
 
           await collabRoomHub.publish(context.documentId, {
             type: 'annotation:op',
