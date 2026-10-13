@@ -2,7 +2,7 @@ import type { IntegrationProvider } from '@snapglow/integrations-core';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { getApiUrl } from '@/modules/cloud/config';
-import { createOAuthState } from '@/modules/cloud/pkce';
+import { deepLinkRoute } from '@/shared/lib/deepLink';
 import { getIntegrationsRedirectUri, isIntegrationsConfigured } from './config';
 import { type StoredIntegrationToken, saveIntegrationToken } from './tokenStorage';
 
@@ -23,9 +23,6 @@ export async function startIntegrationLogin(provider: IntegrationProvider): Prom
     throw new Error('Sign in to SnapGlow cloud before connecting integrations');
   }
 
-  const state = createOAuthState();
-  pendingLogin = { provider, state };
-
   const response = await fetch(`${getApiUrl()}/v1/integrations/${provider}/authorize`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
@@ -35,19 +32,25 @@ export async function startIntegrationLogin(provider: IntegrationProvider): Prom
     throw new Error(payload?.error ?? `Failed to start ${provider} OAuth`);
   }
 
+  // The API generates the state and embeds it in authorizeUrl; the callback must echo it back.
   const payload = (await response.json()) as { authorizeUrl: string; state: string };
-  if (payload.state !== state) {
+  const authorizeUrl = new URL(payload.authorizeUrl);
+  if (!payload.state || authorizeUrl.searchParams.get('state') !== payload.state) {
     throw new Error('OAuth state mismatch');
   }
+  if (authorizeUrl.protocol !== 'https:') {
+    throw new Error('Refusing to open a non-https authorization URL');
+  }
 
-  await openUrl(payload.authorizeUrl);
+  pendingLogin = { provider, state: payload.state };
+  await openUrl(authorizeUrl.toString());
 }
 
 export async function handleIntegrationCallback(
   url: string
 ): Promise<StoredIntegrationToken | null> {
   const parsed = new URL(url);
-  if (parsed.protocol !== 'snapglow:' || parsed.pathname !== '//integrations/callback') {
+  if (deepLinkRoute(parsed) !== 'integrations/callback') {
     return null;
   }
 
