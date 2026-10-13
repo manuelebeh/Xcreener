@@ -1,10 +1,6 @@
 ---
 name: no-ai-slop
-description: >-
-  Remove AI writing tells and tighten prose. Use for chat replies, docs,
-  README, PR/commit messages, UI/marketing copy; when the user asks to
-  humanize, de-slop, clean writing, or avoid AI tone. Always-on core also
-  lives in AGENTS.md (all agents) and .cursor/rules/no-ai-slop.mdc (Cursor).
+description: Remove AI writing tells and tighten prose. Use for deep rewrites of docs, README, ADRs, PR/commit messages, UI and marketing copy, or when the user asks to humanize, de-slop, humanise, clean up writing, or remove AI tone ("style IA", "ton robotique").
 ---
 
 # No AI Slop
