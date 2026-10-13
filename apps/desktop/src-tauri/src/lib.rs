@@ -68,8 +68,15 @@ pub fn run() {
             }
 
             init_shortcut_state(app.handle());
-            register_capture_shortcut(app.handle(), shortcuts::DEFAULT_CAPTURE_SHORTCUT)?;
-            tray::setup_tray(app.handle())?;
+            // A taken shortcut or a missing tray (CI sessions, minimal desktops) must not stop the app.
+            if let Err(error) =
+                register_capture_shortcut(app.handle(), shortcuts::DEFAULT_CAPTURE_SHORTCUT)
+            {
+                eprintln!("[SnapGlow] could not register the capture shortcut: {error}");
+            }
+            if let Err(error) = tray::setup_tray(app.handle()) {
+                eprintln!("[SnapGlow] could not create the tray icon: {error}");
+            }
             overlay::setup_overlay_window(app.handle())?;
 
             if let Some(window) = app.get_webview_window("main") {
