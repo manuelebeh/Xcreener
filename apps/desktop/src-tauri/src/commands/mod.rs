@@ -11,7 +11,7 @@ pub use capture::{
     capture_scrolling_window_command, capture_window, get_capture_overlay_bounds,
     get_window_at_point_command, hide_capture_overlay, list_monitors_command,
     list_windows_command, pause_region_recording_command, resume_region_recording_command,
-    show_capture_overlay, show_live_capture_overlay, start_region_recording_command,
+    show_capture_overlay, show_live_capture_overlay, start_capture_command, start_region_recording_command,
     stop_region_recording_command, stop_scrolling_capture_command, open_path_command,
 };
 pub use classification::classify_content_command;
