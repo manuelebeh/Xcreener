@@ -16,8 +16,11 @@
       {
         "label": "main",
         "title": "SnapGlow",
-        "width": 480,
-        "height": 640,
+        "width": 1120,
+        "height": 740,
+        "minWidth": 900,
+        "minHeight": 600,
+        "center": true,
         "resizable": true,
         "decorations": true,
         "visible": false
