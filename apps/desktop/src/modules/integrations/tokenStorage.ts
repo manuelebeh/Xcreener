@@ -1,5 +1,5 @@
 import type { IntegrationProvider } from '@snapglow/integrations-core';
-import { getSetting, setSetting } from '@/db';
+import { readSecret, writeSecret } from '@/shared/lib/secureStorage';
 
 export interface StoredIntegrationToken {
   accessToken: string;
@@ -9,12 +9,14 @@ export interface StoredIntegrationToken {
   metadata?: Record<string, string>;
 }
 
-const TOKEN_KEY = 'integrationTokens';
+/** Legacy SQLite settings key, only read to migrate old installs into the keychain. */
+const LEGACY_TOKEN_KEY = 'integrationTokens';
+const SECRET_NAME = 'integrations.tokens';
 
 type TokenMap = Partial<Record<IntegrationProvider, StoredIntegrationToken>>;
 
 export async function loadIntegrationTokens(): Promise<TokenMap> {
-  const raw = await getSetting(TOKEN_KEY);
+  const raw = await readSecret(SECRET_NAME, LEGACY_TOKEN_KEY);
   if (!raw) {
     return {};
   }
@@ -32,13 +34,13 @@ export async function saveIntegrationToken(
 ): Promise<void> {
   const current = await loadIntegrationTokens();
   current[provider] = token;
-  await setSetting(TOKEN_KEY, JSON.stringify(current));
+  await writeSecret(SECRET_NAME, LEGACY_TOKEN_KEY, JSON.stringify(current));
 }
 
 export async function clearIntegrationToken(provider: IntegrationProvider): Promise<void> {
   const current = await loadIntegrationTokens();
   delete current[provider];
-  await setSetting(TOKEN_KEY, JSON.stringify(current));
+  await writeSecret(SECRET_NAME, LEGACY_TOKEN_KEY, JSON.stringify(current));
 }
 
 export async function getIntegrationToken(
