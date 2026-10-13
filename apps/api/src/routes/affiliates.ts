@@ -48,10 +48,10 @@ async function capturePostHogEvent(
 
 export async function registerAffiliateRoutes(app: FastifyInstance) {
   app.post('/v1/webhooks/rewardful', async (request, reply) => {
-    const rawBody =
-      request.body instanceof Buffer
-        ? request.body.toString('utf8')
-        : JSON.stringify(request.body ?? {});
+    if (!(request.body instanceof Buffer)) {
+      return reply.code(400).send({ error: 'Invalid webhook payload' });
+    }
+    const rawBody = request.body.toString('utf8');
     const signature = request.headers['x-rewardful-signature'] as string | undefined;
 
     if (!verifyRewardfulSignature(rawBody, signature)) {

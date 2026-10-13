@@ -4,8 +4,12 @@ import { and, desc, eq, gt, or } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import * as schema from '../db/schema';
+import { parseOptionalDate } from '../lib/dates';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import type { StorageService } from '../services/storage';
+
+const MAX_SETTING_PATCHES = 50;
+const MAX_SETTING_VALUE_LENGTH = 2000;
 
 interface SyncRouteOptions {
   db: PostgresJsDatabase<typeof schema>;
@@ -21,7 +25,11 @@ export async function registerSyncRoutes(app: FastifyInstance, options: SyncRout
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
     const query = request.query as { since?: string };
-    const since = query.since ? new Date(query.since) : new Date(0);
+    const parsedSince = parseOptionalDate(query.since);
+    if (parsedSince === null) {
+      return reply.code(400).send({ error: 'Invalid since parameter' });
+    }
+    const since = parsedSince ?? new Date(0);
 
     const rows = await options.db
       .select()
@@ -96,7 +104,11 @@ export async function registerSyncRoutes(app: FastifyInstance, options: SyncRout
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
     const query = request.query as { since?: string };
-    const since = query.since ? new Date(query.since) : new Date(0);
+    const parsedSince = parseOptionalDate(query.since);
+    if (parsedSince === null) {
+      return reply.code(400).send({ error: 'Invalid since parameter' });
+    }
+    const since = parsedSince ?? new Date(0);
 
     const rows = await options.db
       .select()
@@ -132,7 +144,23 @@ export async function registerSyncRoutes(app: FastifyInstance, options: SyncRout
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
     const body = request.body as { settings?: SettingsPatch[] };
-    const patches = body.settings ?? [];
+    const patches = Array.isArray(body?.settings) ? body.settings : [];
+    if (
+      patches.length > MAX_SETTING_PATCHES ||
+      patches.some(
+        (patch) =>
+          typeof patch?.key !== 'string' ||
+          typeof patch.value !== 'string' ||
+          patch.value.length > MAX_SETTING_VALUE_LENGTH ||
+          !(parseOptionalDate(patch.updatedAt) instanceof Date)
+      )
+    ) {
+      return reply.code(400).send({ error: 'Invalid settings payload' });
+    }
+    const now = Date.now();
+    // A client clock in the future would otherwise win last-write-wins forever.
+    const clampedUpdatedAt = (patch: SettingsPatch) =>
+      new Date(Math.min(new Date(patch.updatedAt).getTime(), now));
 
     for (const patch of patches) {
       if (!(SYNCABLE_SETTING_KEYS as readonly string[]).includes(patch.key)) {
@@ -145,13 +173,13 @@ export async function registerSyncRoutes(app: FastifyInstance, options: SyncRout
           userId: user.id,
           key: patch.key,
           value: patch.value,
-          updatedAt: new Date(patch.updatedAt),
+          updatedAt: clampedUpdatedAt(patch),
         })
         .onConflictDoUpdate({
           target: [schema.userSettings.userId, schema.userSettings.key],
           set: {
             value: patch.value,
-            updatedAt: new Date(patch.updatedAt),
+            updatedAt: clampedUpdatedAt(patch),
           },
         });
     }
