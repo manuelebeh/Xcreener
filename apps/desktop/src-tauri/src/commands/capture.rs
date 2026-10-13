@@ -114,9 +114,58 @@ pub async fn cancel_region_recording_command() -> Result<(), String> {
     cancel_region_recording()
 }
 
+/// Media the history and recording flows hand to the OS default viewer.
+const OPENABLE_EXTENSIONS: &[&str] = &["png", "jpg", "jpeg", "webp", "gif", "mp4", "mov", "webm"];
+
+/// Only existing media files may be opened, so a compromised WebView cannot launch
+/// arbitrary apps, scripts, or URLs through the OS handler.
+fn validate_openable_path(path: &str) -> Result<std::path::PathBuf, String> {
+    let path = std::path::Path::new(path);
+    if !path.is_absolute() {
+        return Err("Path must be absolute".into());
+    }
+    let canonical = path
+        .canonicalize()
+        .map_err(|_| "File not found".to_string())?;
+    if !canonical.is_file() {
+        return Err("Not a file".into());
+    }
+    let extension = canonical
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(str::to_ascii_lowercase)
+        .unwrap_or_default();
+    if !OPENABLE_EXTENSIONS.contains(&extension.as_str()) {
+        return Err("Unsupported file type".into());
+    }
+    Ok(canonical)
+}
+
 #[tauri::command]
 pub async fn open_path_command(path: String) -> Result<(), String> {
+    let path = validate_openable_path(&path)?;
     open::that(path).map_err(|error| error.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::validate_openable_path;
+
+    #[test]
+    fn opens_existing_media_files_only() {
+        let dir = tempfile::tempdir().unwrap();
+        let video = dir.path().join("clip.MP4");
+        std::fs::write(&video, b"x").unwrap();
+        let script = dir.path().join("run.command");
+        std::fs::write(&script, b"x").unwrap();
+
+        assert!(validate_openable_path(video.to_str().unwrap()).is_ok());
+        assert!(validate_openable_path(script.to_str().unwrap()).is_err());
+        assert!(validate_openable_path(dir.path().to_str().unwrap()).is_err());
+        assert!(validate_openable_path("https://example.com/a.mp4").is_err());
+        assert!(validate_openable_path("relative/clip.mp4").is_err());
+        assert!(validate_openable_path(dir.path().join("missing.mp4").to_str().unwrap()).is_err());
+    }
 }
 
 #[tauri::command]
