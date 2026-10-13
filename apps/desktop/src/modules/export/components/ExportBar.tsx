@@ -13,7 +13,7 @@ import {
 } from '@/integrations/posthog/experiments';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
-import { uploadShare } from '@/modules/cloud/uploadShare';
+import { revokeShare, uploadShare } from '@/modules/cloud/uploadShare';
 import { useEditorStore } from '@/modules/editor/store';
 import { SendToIntegrationDialog } from '@/modules/integrations/components/SendToIntegrationDialog';
 import { useIntegrationsStore } from '@/modules/integrations/store';
@@ -52,6 +52,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
   const { exportImage } = useExportRender();
   const dragBlobRef = useRef<Blob | null>(null);
   const [dragReady, setDragReady] = useState(false);
+  const [lastShareToken, setLastShareToken] = useState<string | null>(null);
   const [sendProvider, setSendProvider] = useState<IntegrationProvider | null>(null);
   const [pendingSendBlob, setPendingSendBlob] = useState<Blob | null>(null);
   const [pendingSendFormat, setPendingSendFormat] = useState<ExportFormat>('png');
@@ -143,6 +144,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
 
           const share = await uploadShare(result.blob, shareExpiry, `snapglow-export.${format}`);
           await writeText(share.url);
+          setLastShareToken(share.token);
           setLastMessage(`Share link copied · ${share.url}${compressionMessage}`);
           return;
         }
@@ -402,6 +404,26 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         <p className="text-xs text-muted" data-testid="export-status-message">
           {lastMessage}
         </p>
+      ) : null}
+
+      {lastShareToken ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          data-testid="revoke-last-share"
+          onClick={() => {
+            void revokeShare(lastShareToken)
+              .then(() => {
+                setLastShareToken(null);
+                setLastMessage('Share link revoked');
+              })
+              .catch((error) =>
+                setLastMessage(error instanceof Error ? error.message : String(error))
+              );
+          }}
+        >
+          Revoke last link
+        </Button>
       ) : null}
 
       {sendProvider && pendingSendBlob ? (
