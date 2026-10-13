@@ -12,4 +12,4 @@ alwaysApply: false
 - Domain modules under `src/modules/` (capture, editor, export, redaction). Zustand per module.
 - Prefer `npx expo install <pkg>` inside `apps/mobile/` to stay on SDK 56.
 - Dev: `mise run dev:mobile` / `dev:mobile:ios` / `dev:mobile:android`. Rebuild after native module changes.
-- Docs: Expo [SDK 56](https://docs.expo.dev/versions/v56.0.0/), `.agents/rules/mobile.md`, `apps/mobile/AGENTS.md`.
+- Docs: Expo [SDK 56](https://docs.expo.dev/versions/v56.0.0/), `apps/mobile/AGENTS.md`.

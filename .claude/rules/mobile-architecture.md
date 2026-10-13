@@ -37,6 +37,7 @@ apps/mobile/
 ├── modules/snapglow-ocr/  # Local Expo module — Vision (iOS) + ML Kit (Android)
 └── src/modules/
     ├── capture/         # Share import + image state (Sprint 1b.1)
+    ├── cloud/           # Cloud library API client and hook
     ├── editor/          # Skia beautify, presets, annotations (Sprint 1b.2)
     ├── export/          # Full-res export, Photos save + share sheet (Sprint 1b.2–1b.3)
     └── redaction/       # On-device OCR scan + blur masking (Sprint 1b.3)
