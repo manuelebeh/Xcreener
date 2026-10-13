@@ -1,7 +1,6 @@
 mod types;
 mod validate;
 
-#[cfg(any(target_os = "macos", target_os = "windows"))]
 pub mod platform;
 
 pub mod native;
