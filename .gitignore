@@ -45,3 +45,6 @@ apps/desktop/.impeccable/mocks/
 
 # Gradle cache (native modules)
 .gradle/
+
+# TypeScript incremental build info
+*.tsbuildinfo
