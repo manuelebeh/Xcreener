@@ -67,4 +67,4 @@ Rust commands live in `src-tauri/src/commands/` (`capture`, `redaction`, `export
 - Functional components only
 - Co-locate component-specific types with the component
 - Biome for lint/format - no ESLint/Prettier
-- UI polish: use the Hallmark skill when building new surfaces
+- UI polish: use the impeccable skill when building new surfaces
