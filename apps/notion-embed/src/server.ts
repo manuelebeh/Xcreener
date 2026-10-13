@@ -11,7 +11,6 @@ const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID ?? '';
 const NOTION_CLIENT_SECRET = process.env.NOTION_CLIENT_SECRET ?? '';
 const REDIRECT_URI =
   process.env.NOTION_EMBED_REDIRECT_URI ?? `http://localhost:${PORT}/oauth/callback`;
-const WEB_PUBLIC_URL = process.env.WEB_PUBLIC_URL ?? 'http://localhost:3000';
 
 const sessions = new Map<string, { notionToken: string; workspaceName?: string }>();
 
@@ -136,6 +135,13 @@ const server = createServer(async (req, res) => {
     if (!code || !state) {
       res.writeHead(400);
       res.end('Missing code or state');
+      return;
+    }
+    // Only states issued by /oauth/start are valid; otherwise a caller could pick the session id.
+    const pending = sessions.get(state);
+    if (!pending || pending.notionToken) {
+      res.writeHead(400);
+      res.end('Unknown or already used state');
       return;
     }
 
