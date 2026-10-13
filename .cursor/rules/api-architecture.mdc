@@ -83,6 +83,13 @@ pnpm --filter @snapglow/api db:migrate
 | GET | `/v1/workspaces/:id/usage` | admin JWT | Team usage reports (`period=7d\|30d\|90d`) |
 | GET/POST | `/v1/workspaces/:id/api-keys` | admin JWT | List / create API keys (Team Pro) |
 | DELETE | `/v1/workspaces/:id/api-keys/:keyId` | admin JWT | Revoke API key |
+| DELETE | `/v1/shares/:token` | Bearer JWT | Revoke a share you created |
+| GET | `/v1/sync/library` | Bearer JWT | Library sync pull |
+| DELETE | `/v1/library/:id` | Bearer JWT | Delete a library item (sync) |
+| GET/PUT | `/v1/users/me/settings` | Bearer JWT | Cross-device settings sync |
+| GET | `/v1/templates`, `/v1/templates/:slug` | No | Template marketplace listing and detail |
+| POST | `/v1/templates` | Bearer JWT | Submit a template |
+| POST | `/v1/webhooks/rewardful` | Rewardful sig | Affiliate events (fails closed without a secret) |
 
 Optional header `X-Workspace-Id` scopes library/share uploads and collab document creation to a team workspace. Library list with this header returns workspace-scoped items.
 
@@ -108,6 +115,6 @@ Optional header `X-Workspace-Id` scopes library/share uploads and collab documen
 - VS Code plugin: `apps/vscode-extension/`
 - Figma plugin: `apps/figma-plugin/`
 - Notion embed tool: `apps/notion-embed/`
-- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`, `013-public-api.md`, `014-plugins-and-embeds.md`
+- ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`, `013-public-api.md`, `014-plugins-and-embeds.md`, `015-template-marketplace.md`, `016-affiliate-program.md`, `018-cross-device-sync.md`
 - SDK: `packages/sdk` (`@snapglow/sdk`)
 - Plugin presets: `packages/plugin-core` (`@snapglow/plugin-core`)
