@@ -8,6 +8,11 @@ export const commonFr = {
   marketplace: 'Marketplace',
   affiliates: 'Affiliés',
   blog: 'Blog',
+  consentTitle: 'Statistiques',
+  consentBody:
+    "Nous utilisons PostHog pour comprendre quelles pages sont utiles. Désactivé tant que vous n'acceptez pas. Les liens de partage et de collaboration ne sont jamais envoyés.",
+  consentAccept: 'Accepter',
+  consentDecline: 'Refuser',
 };
 
 export const marketingFr = {
