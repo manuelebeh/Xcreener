@@ -70,8 +70,8 @@ jobs:
           S3_SECRET_KEY: minioadmin
         run: |
           output=$(pnpm exec tsx scripts/seed-load-fixture.ts)
-          echo "$output"
-          echo "$output" >> "$GITHUB_OUTPUT"
+          # GITHUB_OUTPUT only takes key=value lines, so drop the script's intro line.
+          echo "$output" | grep '^LOAD_TEST_' >> "$GITHUB_OUTPUT"
 
       - name: Start API
         working-directory: apps/api
