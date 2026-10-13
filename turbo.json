@@ -15,7 +15,8 @@
       "dependsOn": ["^format"]
     },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "env": ["INTEGRATION_DATABASE_URL"]
     },
     "dev": {
       "cache": false,
