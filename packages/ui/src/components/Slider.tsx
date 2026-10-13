@@ -39,7 +39,8 @@ export function Slider({
       </SliderPrimitive.Track>
       <SliderPrimitive.Thumb
         className={clsx(
-          'block h-4 w-4 rounded-full border border-primary bg-background shadow-sm',
+          'block size-4 cursor-grab rounded-full border border-black/10 bg-white active:cursor-grabbing',
+          'shadow-[0_1px_3px_rgb(0_0_0/0.35),0_0_0_0.5px_rgb(0_0_0/0.08)]',
           focusRingClasses,
           'disabled:pointer-events-none disabled:opacity-50'
         )}
