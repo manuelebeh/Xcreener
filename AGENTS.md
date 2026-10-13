@@ -63,6 +63,10 @@ First-party behavioral skills (always relevant; deep detail on demand):
 - [`karpathy-guidelines`](.agents/skills/karpathy-guidelines/) — from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
 - [`no-ai-slop`](.agents/skills/no-ai-slop/) — full rewrite process; always-on core is below
 
+On-demand first-party skills:
+
+- [`platform-audit`](.agents/skills/platform-audit/) — read-only full audit (security, perf, architecture, privacy) across desktop, Rust, web, API, mobile, plugins, CI; report goes to `docs/internal/technical/audits/`
+
 Pinned third-party skills (`skills-lock.json`): [marketingskills](https://github.com/coreyhaines31/marketingskills), [taste-skill](https://github.com/Leonxlnx/taste-skill), [impeccable](https://github.com/pbakaus/impeccable). Update with `npx skills update`.
 
 ### CodeGraph
