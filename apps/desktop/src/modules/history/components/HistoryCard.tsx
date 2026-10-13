@@ -34,16 +34,16 @@ export function HistoryCard({
   return (
     <article
       className={clsx(
-        'group relative overflow-hidden rounded-lg border bg-surface transition-colors',
+        'group relative flex flex-col overflow-hidden rounded-lg border bg-surface transition-colors',
         isSelected
           ? 'border-primary ring-1 ring-primary/40'
-          : 'border-border hover:border-primary/40'
+          : 'border-border hover:border-foreground/25'
       )}
       data-testid={`history-card-${capture.id}`}
     >
       <button
         type="button"
-        className="block w-full text-left"
+        className="block w-full flex-1 text-left"
         onClick={onSelect}
         onDoubleClick={onOpen}
         aria-label={`Preview capture ${capture.filename}`}
@@ -83,77 +83,96 @@ export function HistoryCard({
         </div>
       </button>
 
-      <div className="space-y-2 border-t border-border px-3 py-2">
-        <form
-          className="flex gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (!tagDraft.trim()) {
-              return;
-            }
-            onAddTag(tagDraft.trim());
-            setTagDraft('');
-          }}
+      <div className="flex items-center gap-2 border-t border-border px-3 py-2">
+        <button
+          type="button"
+          className="sg-focus-ring h-7 flex-1 rounded-md bg-foreground/[0.06] px-2 text-xs font-medium whitespace-nowrap hover:bg-foreground/[0.1] disabled:opacity-50"
+          data-testid="history-open-button"
+          disabled={isOpening}
+          onClick={onOpen}
         >
-          <input
-            value={tagDraft}
-            onChange={(event) => setTagDraft(event.target.value)}
-            placeholder="Add tag"
-            className="sg-focus-ring min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1 text-xs"
-          />
-          <button
-            type="submit"
-            className="rounded-md border border-border px-2 py-1 text-xs whitespace-nowrap hover:bg-muted/40"
-          >
-            Tag
-          </button>
-        </form>
+          {isOpening
+            ? 'Opening…'
+            : capture.format === 'gif' || capture.format === 'mp4'
+              ? 'Open file'
+              : 'Open in editor'}
+        </button>
+        <button
+          type="button"
+          className="sg-focus-ring h-7 rounded-md px-2 text-xs whitespace-nowrap text-destructive hover:bg-destructive/10"
+          data-testid="history-delete-button"
+          onClick={onDelete}
+        >
+          Delete
+        </button>
+      </div>
 
-        {collections.length > 0 ? (
-          <select
-            className="sg-focus-ring w-full rounded-md border border-border bg-background px-2 py-1 text-xs"
-            defaultValue=""
-            onChange={(event) => {
-              const value = Number.parseInt(event.target.value, 10);
-              if (Number.isFinite(value)) {
-                onAddToCollection(value);
-                event.target.value = '';
+      <details className="group border-t border-border">
+        <summary className="flex cursor-pointer list-none items-center gap-1.5 px-3 py-2 text-xs text-muted select-none hover:text-foreground [&::-webkit-details-marker]:hidden">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 12 12"
+            className="size-3 transition-transform group-open:rotate-90"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M4.5 2.5 8 6l-3.5 3.5" />
+          </svg>
+          Tags and collections
+        </summary>
+        <div className="space-y-2 px-3 pb-3">
+          <form
+            className="flex gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!tagDraft.trim()) {
+                return;
               }
+              onAddTag(tagDraft.trim());
+              setTagDraft('');
             }}
           >
-            <option value="">Add to collection…</option>
-            {collections.map((collection) => (
-              <option key={collection.id} value={collection.id}>
-                {collection.name}
-              </option>
-            ))}
-          </select>
-        ) : null}
+            <input
+              value={tagDraft}
+              onChange={(event) => setTagDraft(event.target.value)}
+              placeholder="Add tag"
+              aria-label="Add tag"
+              className="sg-focus-ring h-7 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs"
+            />
+            <button
+              type="submit"
+              className="sg-focus-ring h-7 rounded-md border border-border px-2.5 text-xs whitespace-nowrap hover:bg-foreground/[0.05]"
+            >
+              Tag
+            </button>
+          </form>
 
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="sg-focus-ring flex-1 rounded-md border border-border px-2 py-1 text-xs font-medium whitespace-nowrap hover:bg-muted/40 disabled:opacity-50"
-            data-testid="history-open-button"
-            disabled={isOpening}
-            onClick={onOpen}
-          >
-            {isOpening
-              ? 'Opening…'
-              : capture.format === 'gif' || capture.format === 'mp4'
-                ? 'Open file'
-                : 'Open in editor'}
-          </button>
-          <button
-            type="button"
-            className="sg-focus-ring rounded-md border border-border px-2 py-1 text-xs whitespace-nowrap text-destructive hover:bg-destructive/10"
-            data-testid="history-delete-button"
-            onClick={onDelete}
-          >
-            Delete
-          </button>
+          {collections.length > 0 ? (
+            <select
+              aria-label="Add to collection"
+              className="sg-focus-ring h-7 w-full rounded-md border border-border bg-background px-2 text-xs"
+              defaultValue=""
+              onChange={(event) => {
+                const value = Number.parseInt(event.target.value, 10);
+                if (Number.isFinite(value)) {
+                  onAddToCollection(value);
+                  event.target.value = '';
+                }
+              }}
+            >
+              <option value="">Add to collection…</option>
+              {collections.map((collection) => (
+                <option key={collection.id} value={collection.id}>
+                  {collection.name}
+                </option>
+              ))}
+            </select>
+          ) : null}
         </div>
-      </div>
+      </details>
     </article>
   );
 }
