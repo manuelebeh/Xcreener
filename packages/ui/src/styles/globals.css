@@ -2,6 +2,9 @@
 @import '@snapglow/design-tokens/tailwind-theme.css';
 @import 'tailwindcss';
 
+/* Scan these components too, so utilities used only here (h-4, w-4...) exist in every consumer's CSS. */
+@source '../';
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -25,4 +28,19 @@
       transition-duration: 0.01ms !important;
     }
   }
+}
+
+@keyframes sg-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sg-tooltip {
+  animation: sg-tooltip-in 120ms ease-out;
 }

@@ -73,15 +73,16 @@ export function Tooltip({ content, children, side = 'top', className }: TooltipP
       <TooltipPrimitive.Portal>
         <TooltipPrimitive.Content
           side={side}
-          sideOffset={6}
+          sideOffset={8}
           className={clsx(
-            'z-50 rounded-md bg-foreground px-3 py-1.5 text-xs text-background shadow-md',
-            'motion-safe:animate-in motion-safe:fade-in-0 motion-safe:zoom-in-95',
+            'sg-tooltip z-50 max-w-64 rounded-md border border-border bg-surface px-2 py-1',
+            'text-xs leading-4 font-medium text-foreground',
+            'shadow-[0_4px_14px_rgb(0_0_0/0.16),0_1px_2px_rgb(0_0_0/0.12)]',
+            'motion-reduce:animate-none',
             className
           )}
         >
           {content}
-          <TooltipPrimitive.Arrow className="fill-foreground" />
         </TooltipPrimitive.Content>
       </TooltipPrimitive.Portal>
     </TooltipPrimitive.Root>
