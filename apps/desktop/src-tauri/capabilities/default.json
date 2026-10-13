@@ -1,9 +1,11 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for SnapGlow desktop windows",
-  "windows": ["main", "capture-overlay"],
-    "permissions": [
+  "description": "Capability for the SnapGlow main window",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
     "core:default",
     "core:event:default",
     "core:tray:default",
@@ -34,7 +36,17 @@
     "fs:allow-exists",
     {
       "identifier": "fs:scope-appdata-recursive",
-      "allow": [{ "path": "$APPDATA/**" }, { "path": "$TEMP/**" }, { "path": "$TMP/**" }]
+      "allow": [
+        {
+          "path": "$APPDATA/**"
+        },
+        {
+          "path": "$TEMP/**"
+        },
+        {
+          "path": "$TMP/**"
+        }
+      ]
     }
   ]
 }
