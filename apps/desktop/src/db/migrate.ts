@@ -29,18 +29,48 @@ const MIGRATIONS: { version: number; sql: string }[] = [
   { version: 2, sql: migration002 },
 ];
 
-/** Split a SQL migration file into executable statements (Tauri SQL runs one at a time). */
+/**
+ * Split a SQL migration file into executable statements (Tauri SQL runs one at a time).
+ * A trigger body holds its own semicolons, so a CREATE TRIGGER stays one statement until its END.
+ */
 export function splitSqlStatements(sql: string): string[] {
-  return sql
-    .split(';')
-    .map((statement) =>
-      statement
-        .split('\n')
-        .filter((line) => !line.trim().startsWith('--'))
-        .join('\n')
-        .trim()
-    )
-    .filter((statement) => statement.length > 0);
+  const withoutComments = sql
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('--'))
+    .join('\n');
+
+  const statements: string[] = [];
+  let pending = '';
+
+  for (const part of withoutComments.split(';')) {
+    pending = pending ? `${pending};${part}` : part;
+    const isTrigger = /^\s*CREATE\s+(?:TEMP\s+|TEMPORARY\s+)?TRIGGER\b/i.test(pending);
+    if (isTrigger && !/\bEND\s*$/i.test(pending.trim())) {
+      continue;
+    }
+    const statement = pending.trim();
+    if (statement.length > 0) {
+      statements.push(statement);
+    }
+    pending = '';
+  }
+
+  if (pending.trim().length > 0) {
+    statements.push(pending.trim());
+  }
+
+  return statements;
+}
+
+/** Matches `ALTER TABLE <t> ADD COLUMN <c> ...`, the one migration statement SQLite cannot make idempotent. */
+export function parseAddColumn(statement: string): { table: string; column: string } | null {
+  const match = statement.match(/^ALTER\s+TABLE\s+(\w+)\s+ADD\s+COLUMN\s+(\w+)/i);
+  return match?.[1] && match[2] ? { table: match[1], column: match[2] } : null;
+}
+
+async function columnExists(db: Database, table: string, column: string): Promise<boolean> {
+  const columns = await db.select<{ name: string }[]>(`PRAGMA table_info(${table})`);
+  return columns.some((item) => item.name === column);
 }
 
 async function getAppliedVersion(db: Database): Promise<number> {
@@ -91,6 +121,11 @@ async function applyMigrations(db: Database): Promise<void> {
 
     const statements = splitSqlStatements(migration.sql);
     for (const statement of statements) {
+      // A run interrupted after ALTER but before the version row left the column behind.
+      const addColumn = parseAddColumn(statement);
+      if (addColumn && (await columnExists(db, addColumn.table, addColumn.column))) {
+        continue;
+      }
       await db.execute(statement);
     }
     await db.execute('INSERT INTO _schema_migrations (version) VALUES (?)', [migration.version]);
