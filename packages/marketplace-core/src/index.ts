@@ -54,7 +54,11 @@ export const createTemplateSubmissionSchema = z.object({
   description: z.string().max(2000).optional(),
   style: templateStyleSchema,
   tags: z.array(z.string().min(1).max(32)).max(10).default([]),
-  previewUrl: z.string().url().optional(),
+  previewUrl: z
+    .string()
+    .url()
+    .refine((value) => value.startsWith('https://'), 'previewUrl must use https')
+    .optional(),
 });
 
 export const moderateTemplateSchema = z.object({
@@ -72,7 +76,6 @@ export interface TemplateListingResponse {
   title: string;
   description: string | null;
   authorId: string;
-  authorEmail: string | null;
   status: TemplateStatus;
   style: TemplateStyle;
   tags: string[];
