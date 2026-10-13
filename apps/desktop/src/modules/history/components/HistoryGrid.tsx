@@ -26,7 +26,10 @@ export function HistoryGrid({
   onAddToCollection,
 }: HistoryGridProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3" data-testid="history-grid">
+    <div
+      className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4"
+      data-testid="history-grid"
+    >
       {captures.map((capture) => (
         <HistoryCard
           key={capture.id}
