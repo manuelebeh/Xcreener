@@ -47,6 +47,9 @@ export const config = {
   capabilities: [
     {
       browserName: 'wry',
+      // WebdriverIO 9 adds `webSocketUrl: true` (BiDi) for any named browser; WebKitWebDriver
+      // without BiDi then answers "Failed to match capabilities". tauri-driver speaks classic WebDriver.
+      'wdio:enforceWebDriverClassic': true,
       'tauri:options': resolveTauriOptions(),
     },
   ],
