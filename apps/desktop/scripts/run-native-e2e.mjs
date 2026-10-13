@@ -85,6 +85,25 @@ function resolveNativeDriverArgs() {
   return [];
 }
 
+/** On failure, replay the session request by hand so the driver's own error message reaches the log. */
+async function probeSessionCreation() {
+  const ext = process.platform === 'win32' ? '.exe' : '';
+  const application = process.env.TAURI_APP_PATH ?? path.join(tauriDir, 'target', 'debug', `snapglow-desktop${ext}`);
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${driverPort}/session`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        capabilities: { alwaysMatch: { browserName: 'wry', 'tauri:options': { application } } },
+      }),
+    });
+    console.error(`[probe] POST /session -> ${response.status}: ${(await response.text()).slice(0, 2000)}`);
+  } catch (probeError) {
+    console.error(`[probe] POST /session failed: ${probeError}`);
+  }
+}
+
 async function runWebDriverSuite() {
   const nativeDriverArgs = resolveNativeDriverArgs();
   if (process.platform === 'win32' && nativeDriverArgs.length === 0) {
@@ -125,6 +144,7 @@ async function runWebDriverSuite() {
     if (driverOutput.trim()) {
       console.error(driverOutput.trim());
     }
+    await probeSessionCreation();
     throw error;
   } finally {
     try {

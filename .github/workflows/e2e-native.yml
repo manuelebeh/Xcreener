@@ -54,6 +54,26 @@ jobs:
             webkit2gtk-driver \
             xvfb
 
+      - name: Expose WebKitWebDriver on PATH (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          # On Ubuntu 24.04 webkit2gtk-driver installs the binary under a versioned lib directory.
+          if ! command -v WebKitWebDriver >/dev/null; then
+            driver="$(dpkg -L webkit2gtk-driver | grep -E '/WebKitWebDriver$' | head -n 1)"
+            sudo ln -sf "$driver" /usr/local/bin/WebKitWebDriver
+          fi
+          command -v WebKitWebDriver
+          WebKitWebDriver --version || true
+
+      - name: Show Edge and WebView2 runtime versions (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $edge = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{56EB18F8-B008-4CBD-B6D2-8C97FE7E9062}'
+          $webview = 'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
+          "Edge: $((Get-ItemProperty $edge -ErrorAction SilentlyContinue).pv)"
+          "WebView2 runtime: $((Get-ItemProperty $webview -ErrorAction SilentlyContinue).pv)"
+
       - name: Install msedgedriver (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
