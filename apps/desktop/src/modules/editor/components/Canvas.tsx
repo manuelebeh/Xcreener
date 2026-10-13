@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { RemoteCursorsOverlay } from '@/modules/collab/components/RemoteCursorsOverlay';
 import { useCollabPointerPresence } from '@/modules/collab/hooks/useCollabSession';
 import { useCollabStore } from '@/modules/collab/store';
@@ -34,15 +35,17 @@ export function Canvas() {
   const annotations = useEditorStore((s) => s.annotations);
   const selectedAnnotationId = useEditorStore((s) => s.selectedAnnotationId);
   const activeTool = useEditorStore((s) => s.activeTool);
-  const watermarkSettings = useSettingsStore((s) => ({
-    watermarkEnabled: s.watermarkEnabled,
-    watermarkDisplayName: s.watermarkDisplayName,
-    watermarkUrl: s.watermarkUrl,
-    watermarkLogoPath: s.watermarkLogoPath,
-    watermarkPosition: s.watermarkPosition,
-    watermarkOpacity: s.watermarkOpacity,
-    useTeamBrandKit: s.useTeamBrandKit,
-  }));
+  const watermarkSettings = useSettingsStore(
+    useShallow((s) => ({
+      watermarkEnabled: s.watermarkEnabled,
+      watermarkDisplayName: s.watermarkDisplayName,
+      watermarkUrl: s.watermarkUrl,
+      watermarkLogoPath: s.watermarkLogoPath,
+      watermarkPosition: s.watermarkPosition,
+      watermarkOpacity: s.watermarkOpacity,
+      useTeamBrandKit: s.useTeamBrandKit,
+    }))
+  );
 
   const [watermarkLogo, setWatermarkLogo] = useState<HTMLImageElement | null>(null);
 
