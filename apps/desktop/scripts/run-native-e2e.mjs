@@ -104,6 +104,55 @@ async function probeSessionCreation() {
   }
 }
 
+/** Launch the debug app alone for a few seconds and print what it says, so a startup crash is visible. */
+async function smokeLaunchApp() {
+  const ext = process.platform === 'win32' ? '.exe' : '';
+  const application =
+    process.env.TAURI_APP_PATH ?? path.join(tauriDir, 'target', 'debug', `snapglow-desktop${ext}`);
+  const [command, args] =
+    process.platform === 'linux' ? ['xvfb-run', ['-a', application]] : [application, []];
+
+  const child = spawn(command, args, {
+    cwd: desktopDir,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    detached: process.platform !== 'win32',
+    env: { ...process.env, TAURI_WEBVIEW_AUTOMATION: 'true', RUST_BACKTRACE: '1' },
+  });
+
+  let output = '';
+  child.stdout?.on('data', (chunk) => {
+    output += chunk.toString();
+  });
+  child.stderr?.on('data', (chunk) => {
+    output += chunk.toString();
+  });
+
+  const exit = await Promise.race([
+    new Promise((resolve) => {
+      child.on('exit', (code, signal) => resolve(`exited (code ${code}, signal ${signal})`));
+      child.on('error', (error) => resolve(`failed to start: ${error.message}`));
+    }),
+    sleep(15_000).then(() => null),
+  ]);
+
+  console.log(`[smoke] app ${exit ?? 'still running after 15s'}`);
+  if (output.trim()) {
+    console.log(`[smoke] output:\n${output.trim().slice(-4000)}`);
+  }
+
+  if (!exit) {
+    try {
+      if (process.platform === 'win32') {
+        child.kill();
+      } else {
+        process.kill(-child.pid);
+      }
+    } catch {
+      // already stopped
+    }
+  }
+}
+
 async function runWebDriverSuite() {
   const nativeDriverArgs = resolveNativeDriverArgs();
   if (process.platform === 'win32' && nativeDriverArgs.length === 0) {
@@ -163,5 +212,6 @@ if (os.platform() === 'darwin') {
   await runMacOsFallback();
 } else {
   await runRustTests();
+  await smokeLaunchApp();
   await runWebDriverSuite();
 }
