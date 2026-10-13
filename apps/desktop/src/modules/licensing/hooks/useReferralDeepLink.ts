@@ -2,20 +2,17 @@ import { getCurrent, onOpenUrl } from '@tauri-apps/plugin-deep-link';
 import { useEffect } from 'react';
 import { setSetting } from '@/db';
 import { useSettingsStore } from '@/modules/settings/store';
+import { deepLinkRoute } from '@/shared/lib/deepLink';
 import { isTauriRuntime } from '@/shared/lib/tauri';
 import { SETTING_KEYS } from '@/shared/types/settings';
 
+const REFERRAL_CODE_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
+
 function parseReferralCode(url: string): string | null {
   try {
-    const parsed = new URL(url);
-    if (parsed.protocol !== 'snapglow:') {
-      return null;
-    }
-    if (parsed.hostname !== 'ref') {
-      return null;
-    }
-    const code = parsed.pathname.replace(/^\/+/, '').trim();
-    return code || null;
+    const route = deepLinkRoute(new URL(url));
+    const code = route?.startsWith('ref/') ? route.slice('ref/'.length) : null;
+    return code && REFERRAL_CODE_PATTERN.test(code) ? code : null;
   } catch {
     return null;
   }

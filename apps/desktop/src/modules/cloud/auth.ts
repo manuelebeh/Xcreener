@@ -1,4 +1,5 @@
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { deepLinkRoute } from '@/shared/lib/deepLink';
 import { getAuth0Config } from './config';
 import { createCodeChallenge, createCodeVerifier, createOAuthState } from './pkce';
 import {
@@ -46,7 +47,7 @@ export async function startAuthLoginWithOrganization(organization: string | null
 
 export async function handleAuthCallback(url: string): Promise<StoredAuthTokens | null> {
   const parsed = new URL(url);
-  if (parsed.protocol !== 'snapglow:' || parsed.pathname !== '//auth/callback') {
+  if (deepLinkRoute(parsed) !== 'auth/callback') {
     return null;
   }
 
