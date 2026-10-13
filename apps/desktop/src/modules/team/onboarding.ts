@@ -63,7 +63,10 @@ export function getNextOnboardingStep(
   if (currentIndex < 0 || currentIndex >= TEAM_ONBOARDING_STEPS.length - 1) {
     return null;
   }
-  let next = TEAM_ONBOARDING_STEPS[currentIndex + 1]!;
+  let next = TEAM_ONBOARDING_STEPS[currentIndex + 1];
+  if (!next) {
+    return null;
+  }
   if (options?.skipBrandKit && next === 'brand-kit') {
     next = TEAM_ONBOARDING_STEPS[currentIndex + 2] ?? next;
   }

@@ -104,8 +104,8 @@ export async function requireIntegrationToken(
   provider: IntegrationProvider
 ): Promise<StoredIntegrationToken> {
   const token = await getIntegrationToken(provider);
-  if (!isIntegrationTokenValid(token)) {
+  if (!token || !isIntegrationTokenValid(token)) {
     throw new Error(`Connect ${INTEGRATION_LABELS[provider]} in Settings first`);
   }
-  return token!;
+  return token;
 }
