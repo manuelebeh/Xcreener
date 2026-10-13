@@ -9,7 +9,7 @@ use crate::capture::{
     CaptureRecordingCompletePayload, MonitorInfo, WindowInfo,
 };
 use crate::overlay;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 #[tauri::command]
 pub async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>, String> {
@@ -49,6 +49,25 @@ pub async fn get_capture_overlay_bounds() -> Result<CaptureOverlayBounds, String
 #[tauri::command]
 pub async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds, String> {
     overlay::open_capture_overlay(&app)
+}
+
+/// Starts a capture from the main window's button. The preview screenshot must not contain
+/// SnapGlow itself, so the window is hidden and given a moment to leave the screen first.
+/// The overlay then opens from its own thread, exactly like the global shortcut does.
+#[tauri::command]
+pub fn start_capture_command(app: AppHandle) -> Result<(), String> {
+    if let Some(main_window) = app.get_webview_window("main") {
+        main_window.hide().map_err(|error| error.to_string())?;
+    }
+
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(250));
+        if let Err(error) = overlay::open_capture_overlay(&app) {
+            eprintln!("[SnapGlow] failed to open capture overlay: {error}");
+        }
+    });
+
+    Ok(())
 }
 
 #[tauri::command]

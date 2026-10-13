@@ -25,9 +25,32 @@ export function NotificationsBell() {
 
   return (
     <div className="relative">
-      <Button type="button" variant="ghost" size="sm" onClick={() => setOpen((value) => !value)}>
-        Notifications{unread > 0 ? ` (${unread})` : ''}
-      </Button>
+      <button
+        type="button"
+        aria-label={unread > 0 ? `Notifications (${unread} unread)` : 'Notifications'}
+        aria-expanded={open}
+        className="sg-focus-ring relative flex size-8 items-center justify-center rounded-md text-muted transition-colors hover:bg-foreground/[0.06] hover:text-foreground"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 20 20"
+          className="size-[18px]"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5 8a5 5 0 0 1 10 0c0 4 1.5 5 1.5 5h-13S5 12 5 8Z" />
+          <path d="M8.5 16a1.5 1.5 0 0 0 3 0" />
+        </svg>
+        {unread > 0 ? (
+          <span className="absolute top-0.5 right-0.5 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground tabular-nums">
+            {unread}
+          </span>
+        ) : null}
+      </button>
       {open ? (
         <div className="absolute right-0 z-30 mt-2 w-80 rounded-lg border border-border bg-surface p-3 shadow-lg">
           <div className="mb-2 flex items-center justify-between">
