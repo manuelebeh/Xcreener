@@ -49,9 +49,12 @@ export async function createCollabDocument(options: {
 }
 
 export async function fetchCollabDocument(documentId: string): Promise<CollabDocumentResponse> {
-  const response = await fetch(`${getApiUrl()}/v1/collab/documents/${documentId}`, {
-    headers: await authHeaders(),
-  });
+  const response = await fetch(
+    `${getApiUrl()}/v1/collab/documents/${encodeURIComponent(documentId)}`,
+    {
+      headers: await authHeaders(),
+    }
+  );
 
   if (!response.ok) {
     throw new Error('Failed to load collaboration document');
@@ -64,14 +67,17 @@ export async function patchCollabDocument(
   documentId: string,
   payload: { documentState?: CollabDocumentState; title?: string }
 ): Promise<CollabDocumentResponse> {
-  const response = await fetch(`${getApiUrl()}/v1/collab/documents/${documentId}`, {
-    method: 'PATCH',
-    headers: {
-      ...(await authHeaders()),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
+  const response = await fetch(
+    `${getApiUrl()}/v1/collab/documents/${encodeURIComponent(documentId)}`,
+    {
+      method: 'PATCH',
+      headers: {
+        ...(await authHeaders()),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    }
+  );
 
   if (!response.ok) {
     throw new Error('Failed to update collaboration document');
@@ -81,9 +87,12 @@ export async function patchCollabDocument(
 }
 
 export async function fetchComments(documentId: string): Promise<CommentResponse[]> {
-  const response = await fetch(`${getApiUrl()}/v1/collab/documents/${documentId}/comments`, {
-    headers: await authHeaders(),
-  });
+  const response = await fetch(
+    `${getApiUrl()}/v1/collab/documents/${encodeURIComponent(documentId)}/comments`,
+    {
+      headers: await authHeaders(),
+    }
+  );
   if (!response.ok) {
     throw new Error('Failed to load comments');
   }
@@ -95,14 +104,17 @@ export async function createComment(
   documentId: string,
   body: { body: string; parentId?: string | null; anchor?: { x: number; y: number } | null }
 ): Promise<CommentResponse> {
-  const response = await fetch(`${getApiUrl()}/v1/collab/documents/${documentId}/comments`, {
-    method: 'POST',
-    headers: {
-      ...(await authHeaders()),
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+  const response = await fetch(
+    `${getApiUrl()}/v1/collab/documents/${encodeURIComponent(documentId)}/comments`,
+    {
+      method: 'POST',
+      headers: {
+        ...(await authHeaders()),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }
+  );
   if (!response.ok) {
     throw new Error('Failed to create comment');
   }
