@@ -45,7 +45,9 @@ export async function authenticateRequest(
       return;
     }
 
-    const email = typeof payload.email === 'string' ? payload.email : null;
+    // Membership and invitations match on email, so an explicitly unverified address is ignored.
+    const email =
+      typeof payload.email === 'string' && payload.email_verified !== false ? payload.email : null;
     const auth0OrgId =
       typeof payload.org_id === 'string'
         ? payload.org_id

@@ -12,11 +12,17 @@ declare module 'fastify' {
   }
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function resolveMembership(
   db: PostgresJsDatabase<typeof schema>,
   workspaceId: string,
   userId: string
 ): Promise<WorkspaceRole | null> {
+  if (!UUID_PATTERN.test(workspaceId)) {
+    return null;
+  }
+
   const rows = await db
     .select({ role: schema.workspaceMembers.role })
     .from(schema.workspaceMembers)
