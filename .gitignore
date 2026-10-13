@@ -42,3 +42,6 @@ pnpm-debug.log*
 apps/desktop/.impeccable/review/
 apps/desktop/.impeccable/questions/
 apps/desktop/.impeccable/mocks/
+
+# Gradle cache (native modules)
+.gradle/
