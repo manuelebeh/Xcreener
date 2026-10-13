@@ -22,7 +22,7 @@ use commands::{
     detect_sensitive_data, get_capture_overlay_bounds,
     get_window_at_point_command, get_overlay_webview_layout, hide_capture_overlay,
     list_monitors_command, list_windows_command, pause_region_recording_command,
-    recognize_text_command, resume_region_recording_command, show_capture_overlay,
+    recognize_text_command, resume_region_recording_command, show_capture_overlay, start_capture_command,
     show_live_capture_overlay, start_region_recording_command, stop_region_recording_command,
     stop_scrolling_capture_command, open_path_command,
 };
@@ -111,6 +111,7 @@ pub fn run() {
             get_capture_overlay_bounds,
             get_overlay_webview_layout,
             show_capture_overlay,
+            start_capture_command,
             capture_overlay_ready,
             hide_capture_overlay,
             cancel_capture_overlay,
