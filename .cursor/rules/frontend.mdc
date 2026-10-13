@@ -38,4 +38,4 @@ Biome only - root `biome.json` extends `@snapglow/biome-config`. No ESLint or Pr
 
 ## UI polish
 
-Use impeccable / taste skills (`.agents/skills/`) for visual QA on new UI. Read `design.md` before changes: desktop editor uses Feature Stack (canvas left, tools rail right) and nav N1b.
+Use impeccable / taste skills (`.agents/skills/`) for visual QA on new UI. Read `design.md` before changes: desktop editor is a canvas stage on the left with a docked inspector on the right, and a segmented top toolbar.
