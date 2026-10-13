@@ -11,6 +11,7 @@ import type { FastifyInstance } from 'fastify';
 import { nanoid } from 'nanoid';
 import * as schema from '../db/schema';
 import { env } from '../env';
+import { allowOrReply } from '../lib/rate-limit';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 
 interface TemplateRouteOptions {
@@ -35,22 +36,15 @@ function isModerator(auth0Sub: string): boolean {
 }
 
 async function toTemplateResponse(
-  db: PostgresJsDatabase<typeof schema>,
+  _db: PostgresJsDatabase<typeof schema>,
   listing: schema.TemplateListing
 ): Promise<TemplateListingResponse> {
-  const authorRows = await db
-    .select({ email: schema.users.email })
-    .from(schema.users)
-    .where(eq(schema.users.id, listing.authorId))
-    .limit(1);
-
   return {
     id: listing.id,
     slug: listing.slug,
     title: listing.title,
     description: listing.description,
     authorId: listing.authorId,
-    authorEmail: authorRows[0]?.email ?? null,
     status: listing.status,
     style: listing.style,
     tags: listing.tags ?? [],
@@ -104,7 +98,7 @@ export async function registerTemplateRoutes(app: FastifyInstance, options: Temp
       );
     }
 
-    const whereClause = conditions.length === 1 ? conditions[0]! : and(...conditions);
+    const whereClause = and(...conditions);
 
     const rows = await options.db
       .select()
@@ -166,6 +160,9 @@ export async function registerTemplateRoutes(app: FastifyInstance, options: Temp
     }
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+    if (!(await allowOrReply(reply, 'template-submit', user.id, 10, 3600))) {
+      return reply;
+    }
     const baseSlug =
       slugifyTemplateTitle(parsed.data.title) || `template-${nanoid(8).toLowerCase()}`;
     const slug = await ensureUniqueSlug(options.db, baseSlug);

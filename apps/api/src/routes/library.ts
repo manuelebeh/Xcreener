@@ -6,10 +6,11 @@ import {
   MAX_LIBRARY_ITEM_BYTES,
   type ShareMimeType,
 } from '@snapglow/cloud-core';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import * as schema from '../db/schema';
+import { allowOrReply } from '../lib/rate-limit';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import { getActiveWorkspaceId, resolveMembership } from '../plugins/workspace-auth';
 import type { StorageService } from '../services/storage';
@@ -41,6 +42,31 @@ function parseTagsField(value: unknown): string[] {
     }
   }
   return [];
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Returns the de-duplicated ids when every one is a collection owned by the user, else null. */
+async function resolveOwnedCollectionIds(
+  db: PostgresJsDatabase<typeof schema>,
+  userId: string,
+  collectionIds: unknown
+): Promise<string[] | null> {
+  if (!Array.isArray(collectionIds)) {
+    return null;
+  }
+  const ids = [...new Set(collectionIds)];
+  if (ids.length === 0) {
+    return [];
+  }
+  if (!ids.every((id): id is string => typeof id === 'string' && UUID_PATTERN.test(id))) {
+    return null;
+  }
+  const owned = await db
+    .select({ id: schema.collections.id })
+    .from(schema.collections)
+    .where(and(eq(schema.collections.userId, userId), inArray(schema.collections.id, ids)));
+  return owned.length === ids.length ? ids : null;
 }
 
 async function getCollectionIdsForItem(
@@ -82,6 +108,9 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
     }
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+    if (!(await allowOrReply(reply, 'library-upload', user.id, 120, 3600))) {
+      return reply;
+    }
     const multipart = await request.file();
     if (!multipart) {
       return reply.code(400).send({ error: 'Missing file upload' });
@@ -116,9 +145,16 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
         ? localIdField.value
         : null;
     const tags = parseTagsField(tagsField && 'value' in tagsField ? tagsField.value : undefined);
-    const collectionIds = parseTagsField(
-      collectionIdsField && 'value' in collectionIdsField ? collectionIdsField.value : undefined
+    const collectionIds = await resolveOwnedCollectionIds(
+      options.db,
+      user.id,
+      parseTagsField(
+        collectionIdsField && 'value' in collectionIdsField ? collectionIdsField.value : undefined
+      )
     );
+    if (!collectionIds) {
+      return reply.code(400).send({ error: 'Invalid collection' });
+    }
 
     if (localId) {
       const existing = await options.db
@@ -139,9 +175,6 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
       }
     }
 
-    const storageKey = `library/${user.id}/${localId ?? crypto.randomUUID()}`;
-    await options.storage.uploadObject(storageKey, buffer, mimeType);
-
     const workspaceId = getActiveWorkspaceId(request);
     if (workspaceId) {
       const role = await resolveMembership(options.db, workspaceId, user.id);
@@ -149,6 +182,9 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
         return reply.code(403).send({ error: 'Forbidden' });
       }
     }
+
+    const storageKey = `library/${user.id}/${crypto.randomUUID()}`;
+    await options.storage.uploadObject(storageKey, buffer, mimeType);
 
     const [item] = await options.db
       .insert(schema.libraryItems)
@@ -294,7 +330,18 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
 
     const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
     const { id } = request.params as { id: string };
-    const body = request.body as { tags?: string[]; title?: string; collectionIds?: string[] };
+    const body = (request.body ?? {}) as {
+      tags?: unknown;
+      title?: unknown;
+      collectionIds?: unknown;
+    };
+    if (
+      (body.tags !== undefined &&
+        !(Array.isArray(body.tags) && body.tags.every((tag) => typeof tag === 'string'))) ||
+      (body.title !== undefined && body.title !== null && typeof body.title !== 'string')
+    ) {
+      return reply.code(400).send({ error: 'Invalid request body' });
+    }
 
     const rows = await options.db
       .select()
@@ -307,12 +354,20 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
       return reply.code(404).send({ error: 'Library item not found' });
     }
 
+    const collectionIds =
+      body.collectionIds === undefined
+        ? undefined
+        : await resolveOwnedCollectionIds(options.db, user.id, body.collectionIds);
+    if (collectionIds === null) {
+      return reply.code(400).send({ error: 'Invalid collection' });
+    }
+
     const updates: Partial<typeof schema.libraryItems.$inferInsert> = {};
     if (body.tags) {
-      updates.tags = body.tags;
+      updates.tags = body.tags as string[];
     }
     if (body.title !== undefined) {
-      updates.title = body.title;
+      updates.title = body.title as string | null;
     }
 
     if (Object.keys(updates).length > 0) {
@@ -322,13 +377,13 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
         .where(eq(schema.libraryItems.id, id));
     }
 
-    if (body.collectionIds) {
+    if (collectionIds) {
       await options.db
         .delete(schema.libraryItemCollections)
         .where(eq(schema.libraryItemCollections.libraryItemId, id));
-      if (body.collectionIds.length > 0) {
+      if (collectionIds.length > 0) {
         await options.db.insert(schema.libraryItemCollections).values(
-          body.collectionIds.map((collectionId) => ({
+          collectionIds.map((collectionId) => ({
             libraryItemId: id,
             collectionId,
           }))

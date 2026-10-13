@@ -1,5 +1,5 @@
 import type { CollectionResponse, CreateCollectionResponse } from '@snapglow/cloud-core';
-import { desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import * as schema from '../db/schema';
@@ -97,11 +97,11 @@ export async function registerCollectionRoutes(
     const rows = await options.db
       .update(schema.collections)
       .set({ name })
-      .where(eq(schema.collections.id, id))
+      .where(and(eq(schema.collections.id, id), eq(schema.collections.userId, user.id)))
       .returning();
 
     const collection = rows[0];
-    if (!collection || collection.userId !== user.id) {
+    if (!collection) {
       return reply.code(404).send({ error: 'Collection not found' });
     }
 

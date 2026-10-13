@@ -16,6 +16,7 @@ import type { FastifyInstance } from 'fastify';
 import { nanoid } from 'nanoid';
 import * as schema from '../db/schema';
 import { env } from '../env';
+import { allowOrReply } from '../lib/rate-limit';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import { requireWorkspaceRole, resolveMembership } from '../plugins/workspace-auth';
 import { createAuth0Organization } from '../services/auth0-management';
@@ -456,6 +457,9 @@ export async function registerWorkspaceRoutes(
 
       const { token } = request.params as { token: string };
       const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      if (!(await allowOrReply(reply, 'invite-accept', user.id, 20, 3600))) {
+        return reply;
+      }
 
       const invitationRows = await options.db
         .select()
