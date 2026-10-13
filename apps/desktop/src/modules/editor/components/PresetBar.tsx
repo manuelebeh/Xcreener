@@ -1,30 +1,24 @@
 import { Tooltip, TooltipProvider } from '@snapglow/ui';
 import { clsx } from 'clsx';
+import type { ReactNode } from 'react';
 import { FREE_PRESET_ID, SOCIAL_PRESETS, STANDARD_PRESETS } from '../engine/presets';
 import { useEditorStore } from '../store';
 import type { FramePreset } from '../types';
 import { PresetPicker } from './PresetPicker';
-
-const SOCIAL_LABELS: Record<string, string> = {
-  twitter: 'X',
-  linkedin: 'LI',
-  facebook: 'FB',
-  instagram: 'IG',
-  youtube: 'YT',
-};
+import { SocialIcon } from './SocialIcons';
 
 function PresetButton({
   preset,
   isActive,
   onSelect,
-  label,
+  icon,
 }: {
   preset: FramePreset;
   isActive: boolean;
   onSelect: () => void;
-  label?: string;
+  icon?: ReactNode;
 }) {
-  const displayLabel = label ?? preset.name;
+  const displayLabel = icon ?? preset.name;
   const tooltip =
     preset.width > 0 ? `${preset.name} · ${preset.width}×${preset.height}` : preset.name;
 
@@ -35,10 +29,10 @@ function PresetButton({
         aria-label={preset.name}
         aria-pressed={isActive}
         className={clsx(
-          'sg-focus-ring flex h-8 min-w-8 items-center justify-center whitespace-nowrap rounded-md border px-2 text-xs font-medium transition-colors',
+          'sg-focus-ring flex h-8 min-w-8 items-center justify-center whitespace-nowrap rounded-md px-2 text-xs font-medium tabular-nums transition-colors',
           isActive
-            ? 'border-primary bg-primary text-primary-foreground'
-            : 'border-border bg-surface text-foreground hover:bg-muted/30'
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1]'
         )}
         onClick={onSelect}
       >
@@ -57,7 +51,7 @@ export function PresetBar({ embedded = false }: { embedded?: boolean }) {
   const isFree = selectedPresetId === null;
 
   const content = (
-    <div className="flex w-full flex-wrap items-center gap-2" data-testid="preset-bar">
+    <div className="flex w-full flex-wrap items-center gap-1.5" data-testid="preset-bar">
       {!embedded ? <span className="mr-1 text-xs font-medium text-muted">Format</span> : null}
 
       {SOCIAL_PRESETS.map((preset) => (
@@ -66,11 +60,11 @@ export function PresetBar({ embedded = false }: { embedded?: boolean }) {
           preset={preset}
           isActive={selectedPresetId === preset.id}
           onSelect={() => setPreset(preset.id)}
-          label={SOCIAL_LABELS[preset.id]}
+          icon={<SocialIcon presetId={preset.id} />}
         />
       ))}
 
-      <div className="mx-1 h-6 w-px bg-border" aria-hidden="true" />
+      <div className="mx-0.5 h-5 w-px bg-border" aria-hidden="true" />
 
       {standardWithoutFree.map((preset) => (
         <PresetButton
@@ -89,7 +83,7 @@ export function PresetBar({ embedded = false }: { embedded?: boolean }) {
         />
       ) : null}
 
-      <div className="ml-auto">
+      <div className="mt-1 w-full">
         <PresetPicker />
       </div>
     </div>

@@ -103,17 +103,17 @@ export function PresetPicker() {
     <div className="relative">
       <Button
         type="button"
-        variant="ghost"
+        variant="secondary"
         size="sm"
         aria-expanded={open}
-        className="whitespace-nowrap"
+        className="h-7 w-full text-xs whitespace-nowrap"
         onClick={() => setOpen((value) => !value)}
       >
         Presets
       </Button>
 
       {open ? (
-        <div className="absolute right-0 top-full z-50 mt-1 w-72 rounded-lg border border-border bg-surface p-3 shadow-lg">
+        <div className="absolute right-0 left-0 top-full z-50 mt-1 rounded-lg border border-border bg-surface p-3 shadow-lg">
           <div className="space-y-3">
             <div>
               <Label className="text-xs">Save current style</Label>
