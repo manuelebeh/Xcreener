@@ -1,4 +1,4 @@
-# SnapGlow — Agent instructions
+# SnapGlow agent instructions
 
 Privacy-first screenshot app: capture, beautify, share. Local-first; optional cloud links. Monorepo: pnpm + Turborepo + mise (Node, Rust).
 
@@ -60,12 +60,12 @@ If a skill matches the task, read its `SKILL.md` before improvising. For UI work
 
 First-party behavioral skills (always relevant; deep detail on demand):
 
-- [`karpathy-guidelines`](.agents/skills/karpathy-guidelines/) — from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
-- [`no-ai-slop`](.agents/skills/no-ai-slop/) — full rewrite process; always-on core is below
+- [`karpathy-guidelines`](.agents/skills/karpathy-guidelines/): from [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills)
+- [`no-ai-slop`](.agents/skills/no-ai-slop/): full rewrite process; always-on core is below
 
 On-demand first-party skills:
 
-- [`platform-audit`](.agents/skills/platform-audit/) — read-only full audit (security, perf, architecture, privacy) across desktop, Rust, web, API, mobile, plugins, CI; report goes to `docs/internal/technical/audits/`
+- [`platform-audit`](.agents/skills/platform-audit/): read-only full audit (security, perf, architecture, privacy) across desktop, Rust, web, API, mobile, plugins, CI; report goes to `docs/internal/technical/audits/`
 
 Pinned third-party skills (`skills-lock.json`): [marketingskills](https://github.com/coreyhaines31/marketingskills), [taste-skill](https://github.com/Leonxlnx/taste-skill), [impeccable](https://github.com/pbakaus/impeccable). Update with `npx skills update`.
 
@@ -81,10 +81,10 @@ Always-on for every agent that reads this file (Cursor, Codex, Copilot, Gemini, 
 
 Derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876); packaged as [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills). Bias: caution over speed; for trivial tasks, use judgment.
 
-1. **Think before coding** — State assumptions; present interpretations instead of picking silently; push back on overkill; stop and ask when confused.
-2. **Simplicity first** — Minimum code that solves the ask. No speculative features, single-use abstractions, or error handling for impossible cases. If 200 lines could be 50, rewrite.
-3. **Surgical changes** — Touch only what the request requires. Do not drive-by refactor. Clean up only orphans your change created.
-4. **Goal-driven execution** — Turn work into verifiable goals (tests that fail then pass). Multi-step: `step → verify` plan, then loop until checks pass.
+1. **Think before coding.** State assumptions; present interpretations instead of picking silently; push back on overkill; stop and ask when confused.
+2. **Simplicity first.** Minimum code that solves the ask. No speculative features, single-use abstractions, or error handling for impossible cases. If 200 lines could be 50, rewrite.
+3. **Surgical changes.** Touch only what the request requires. Do not drive-by refactor. Clean up only orphans your change created.
+4. **Goal-driven execution.** Turn work into verifiable goals (tests that fail then pass). Multi-step: `step → verify` plan, then loop until checks pass.
 
 ### No AI slop (prose and chat)
 
