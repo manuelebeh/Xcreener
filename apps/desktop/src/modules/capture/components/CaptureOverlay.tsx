@@ -209,10 +209,9 @@ export function CaptureOverlay() {
       if (event.payload.phase === 'recording') {
         setCaptureProgress(event.payload);
         setRecordingPaused(Boolean(event.payload.paused));
-        if (event.payload.elapsedSecs != null) {
-          setRecordingAnchorMs(
-            (previous) => previous ?? Date.now() - event.payload.elapsedSecs! * 1000
-          );
+        const { elapsedSecs } = event.payload;
+        if (elapsedSecs != null) {
+          setRecordingAnchorMs((previous) => previous ?? Date.now() - elapsedSecs * 1000);
         }
       }
     }).then((fn) => {

@@ -1,11 +1,12 @@
 use super::control::{
-    active_elapsed_ms, allocate_frame_index, emit_recording_progress, mark_recording_paused,
-    mark_recording_resumed, record_frame_saved, recording_is_cancelled, request_recording_stop,
-    reset_recording_flags, RECORDING_ACTIVE, RECORDING_CANCELLED, RECORDING_FRAME_COUNT,
-    RECORDING_PAUSED,
+    active_elapsed_ms, emit_recording_progress, mark_recording_paused, mark_recording_resumed,
+    request_recording_stop, reset_recording_flags, RECORDING_ACTIVE, RECORDING_CANCELLED,
+    RECORDING_FRAME_COUNT, RECORDING_PAUSED,
 };
 #[cfg(not(target_os = "macos"))]
-use super::control::recording_stop_requested;
+use super::control::{
+    allocate_frame_index, record_frame_saved, recording_is_cancelled, recording_stop_requested,
+};
 use super::encode_gif::{encode_gif_from_dir, GifQuality};
 #[cfg(not(target_os = "macos"))]
 use super::encode_gif::write_frame_rgba;

@@ -37,8 +37,8 @@ export const useTextExtractionStore = create<TextExtractionState>((set, get) => 
         (line) =>
           `${Math.round(line.x)}:${Math.round(line.y)}:${Math.round(line.width)}:${Math.round(line.height)}:${line.text}`
       );
-      const anchor = selectedLineIds[selectedLineIds.length - 1]!;
-      const start = ids.indexOf(anchor);
+      const anchor = selectedLineIds[selectedLineIds.length - 1];
+      const start = anchor === undefined ? -1 : ids.indexOf(anchor);
       const end = ids.indexOf(lineId);
       if (start >= 0 && end >= 0) {
         const [from, to] = start < end ? [start, end] : [end, start];
