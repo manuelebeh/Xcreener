@@ -1,0 +1,115 @@
+/* Desktop theme: neutral cool chrome, one blue accent, system fonts.
+ * Overrides the shared amber tokens for this app only; web and mobile keep theirs.
+ * Both the Tailwind (--color-*) and the semantic (--sg-color-*) variables are set. */
+
+:root {
+  --app-background: oklch(0.965 0.002 260);
+  --app-surface: oklch(0.99 0.001 260);
+  --app-stage: oklch(0.9 0.004 260);
+  --app-foreground: oklch(0.22 0.01 260);
+  --app-muted: oklch(0.5 0.01 260);
+  --app-border: oklch(0.88 0.004 260);
+  --app-primary: oklch(0.55 0.19 258);
+  --app-primary-foreground: oklch(0.99 0.002 260);
+  --app-destructive: oklch(0.55 0.2 25);
+  --app-success: oklch(0.5 0.13 150);
+  --app-font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui,
+    sans-serif;
+  --app-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Segoe UI Mono', monospace;
+}
+
+[data-theme='dark'] {
+  --app-background: oklch(0.22 0.005 260);
+  --app-surface: oklch(0.26 0.006 260);
+  --app-stage: oklch(0.17 0.004 260);
+  --app-foreground: oklch(0.95 0.003 260);
+  --app-muted: oklch(0.72 0.008 260);
+  --app-border: oklch(0.34 0.006 260);
+  --app-primary: oklch(0.68 0.16 255);
+  --app-primary-foreground: oklch(0.16 0.01 260);
+  --app-destructive: oklch(0.68 0.19 25);
+  --app-success: oklch(0.7 0.13 150);
+}
+
+:root,
+[data-theme='dark'] {
+  --sg-color-background: var(--app-background);
+  --sg-color-surface: var(--app-surface);
+  --sg-color-foreground: var(--app-foreground);
+  --sg-color-muted: var(--app-muted);
+  --sg-color-border: var(--app-border);
+  --sg-color-primary: var(--app-primary);
+  --sg-color-primary-foreground: var(--app-primary-foreground);
+  --sg-color-destructive: var(--app-destructive);
+  --sg-color-success: var(--app-success);
+  --sg-color-focus-ring: var(--app-primary);
+
+  --color-background: var(--app-background);
+  --color-surface: var(--app-surface);
+  --color-foreground: var(--app-foreground);
+  --color-muted: var(--app-muted);
+  --color-border: var(--app-border);
+  --color-primary: var(--app-primary);
+  --color-primary-foreground: var(--app-primary-foreground);
+  --color-destructive: var(--app-destructive);
+  --color-success: var(--app-success);
+  --color-focus-ring: var(--app-primary);
+
+  --font-sans: var(--app-font-sans);
+  --font-display: var(--app-font-sans);
+  --font-mono: var(--app-font-mono);
+  --sg-font-family-sans: var(--app-font-sans);
+  --sg-font-family-display: var(--app-font-sans);
+  --sg-font-family-mono: var(--app-font-mono);
+
+  --radius-md: 0.375rem;
+  --radius-lg: 0.625rem;
+
+  /* Cool neutral scale (the capture HUD reads 50 and 950). */
+  --sg-color-neutral-0: oklch(0.99 0.001 260);
+  --sg-color-neutral-50: oklch(0.97 0.002 260);
+  --sg-color-neutral-100: oklch(0.945 0.003 260);
+  --sg-color-neutral-200: oklch(0.9 0.004 260);
+  --sg-color-neutral-300: oklch(0.84 0.005 260);
+  --sg-color-neutral-400: oklch(0.7 0.008 260);
+  --sg-color-neutral-500: oklch(0.54 0.01 260);
+  --sg-color-neutral-600: oklch(0.45 0.01 260);
+  --sg-color-neutral-700: oklch(0.37 0.01 260);
+  --sg-color-neutral-800: oklch(0.27 0.008 260);
+  --sg-color-neutral-900: oklch(0.21 0.007 260);
+  --sg-color-neutral-950: oklch(0.15 0.006 260);
+}
+
+.app-stage {
+  background: var(--app-stage);
+}
+
+/* Native-feeling scrollbars that follow the theme. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--app-muted) 45%, transparent) transparent;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--app-primary) 30%, transparent);
+}
+
+/* One control height (32px) and a drawn chevron on selects, so native widgets match the theme. */
+select,
+input:not([type='checkbox'], [type='radio'], [type='color'], [type='range'], [type='file']) {
+  height: 2rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 1.75rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%238b8f98' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 4.5 3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.55rem center;
+  background-size: 0.75rem;
+}
