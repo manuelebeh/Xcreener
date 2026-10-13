@@ -40,6 +40,7 @@ openh264 = "0.6"
 mp4 = "0.14"
 bytes = "1"
 open = "5"
+keyring = { version = "3", default-features = false, features = ["apple-native", "windows-native", "linux-native"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
 screencapturekit = "8"

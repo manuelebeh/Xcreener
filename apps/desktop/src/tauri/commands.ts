@@ -153,16 +153,16 @@ export function compressExportBytes(imageData: number[], format: string, quality
   });
 }
 
-export function exportImage(imageData: number[], format: string, quality: number, path: string) {
-  return invoke<void>('export_image', { imageData, format, quality, path });
+export function secureStoreGet(name: string) {
+  return invoke<string | null>('secure_store_get', { name });
 }
 
-export function getSetting(key: string) {
-  return invoke<string | null>('get_setting', { key });
+export function secureStoreSet(name: string, value: string) {
+  return invoke<void>('secure_store_set', { name, value });
 }
 
-export function setSetting(key: string, value: string) {
-  return invoke<void>('set_setting', { key, value });
+export function secureStoreDelete(name: string) {
+  return invoke<void>('secure_store_delete', { name });
 }
 
 export type { CaptureMetadata };

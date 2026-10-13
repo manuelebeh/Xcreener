@@ -1,4 +1,4 @@
-import { getSetting, setSetting } from '@/db';
+import { readSecret, removeSecret, writeSecret } from '@/shared/lib/secureStorage';
 
 export interface StoredAuthTokens {
   accessToken: string;
@@ -6,10 +6,12 @@ export interface StoredAuthTokens {
   expiresAt: number | null;
 }
 
-const TOKEN_KEY = 'cloudAuthTokens';
+/** Legacy SQLite settings key, only read to migrate old installs into the keychain. */
+const LEGACY_TOKEN_KEY = 'cloudAuthTokens';
+const SECRET_NAME = 'cloud.tokens';
 
 export async function loadAuthTokens(): Promise<StoredAuthTokens | null> {
-  const raw = await getSetting(TOKEN_KEY);
+  const raw = await readSecret(SECRET_NAME, LEGACY_TOKEN_KEY);
   if (!raw) {
     return null;
   }
@@ -22,11 +24,11 @@ export async function loadAuthTokens(): Promise<StoredAuthTokens | null> {
 }
 
 export async function saveAuthTokens(tokens: StoredAuthTokens): Promise<void> {
-  await setSetting(TOKEN_KEY, JSON.stringify(tokens));
+  await writeSecret(SECRET_NAME, LEGACY_TOKEN_KEY, JSON.stringify(tokens));
 }
 
 export async function clearAuthTokens(): Promise<void> {
-  await setSetting(TOKEN_KEY, '');
+  await removeSecret(SECRET_NAME, LEGACY_TOKEN_KEY);
 }
 
 export function isAccessTokenValid(tokens: StoredAuthTokens | null): boolean {
