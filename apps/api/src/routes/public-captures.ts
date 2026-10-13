@@ -18,6 +18,7 @@ import type { FastifyInstance } from 'fastify';
 import { customAlphabet } from 'nanoid';
 import * as schema from '../db/schema';
 import { env } from '../env';
+import { parseOptionalDate } from '../lib/dates';
 import { authenticateApiKey, sendRateLimitReply } from '../plugins/api-key-auth';
 import {
   checkApiExportRateLimit,
@@ -81,6 +82,16 @@ async function toCaptureResponse(
   };
 }
 
+function exportMimeType(exportKey: string): string {
+  if (exportKey.endsWith('.jpg')) {
+    return 'image/jpeg';
+  }
+  if (exportKey.endsWith('.webp')) {
+    return 'image/webp';
+  }
+  return 'image/png';
+}
+
 async function getBrandKitForWorkspace(db: PostgresJsDatabase<typeof schema>, workspaceId: string) {
   const rows = await db
     .select()
@@ -101,7 +112,7 @@ async function ensureCaptureExport(
     const buffer = await storage.getObject(capture.exportStorageKey);
     return {
       exportKey: capture.exportStorageKey,
-      mimeType: capture.exportStorageKey.endsWith('.jpg') ? 'image/jpeg' : 'image/png',
+      mimeType: exportMimeType(capture.exportStorageKey),
       byteSize: buffer.byteLength,
     };
   }
@@ -225,8 +236,12 @@ export async function registerPublicCaptureRoutes(
     const limit = Math.min(Math.max(Number.parseInt(query.limit ?? '50', 10) || 50, 1), 50);
     const conditions = [eq(schema.apiCaptures.workspaceId, workspaceId)];
 
-    if (query.cursor) {
-      conditions.push(lt(schema.apiCaptures.createdAt, new Date(query.cursor)));
+    const cursor = parseOptionalDate(query.cursor);
+    if (cursor === null) {
+      return reply.code(400).send({ error: 'Invalid cursor' });
+    }
+    if (cursor) {
+      conditions.push(lt(schema.apiCaptures.createdAt, cursor));
     }
 
     if (query.tag) {

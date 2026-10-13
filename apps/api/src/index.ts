@@ -2,15 +2,29 @@ import { buildApp } from './app';
 import { createDb, runMigrations } from './db/migrate';
 import { env } from './env';
 import { closeRedis, getRedis } from './services/redis';
+import { purgeExpiredShares } from './services/share-cleanup';
+import { StorageService } from './services/storage';
 
 async function main() {
   await runMigrations();
   const { db, client } = createDb();
   await getRedis().connect();
 
-  const app = await buildApp({ db });
+  const storage = new StorageService();
+  const app = await buildApp({ db, storage });
+
+  const cleanup = setInterval(
+    () => {
+      purgeExpiredShares(db, storage).catch((error) =>
+        console.error('Share cleanup failed', error)
+      );
+    },
+    60 * 60 * 1000
+  );
+  cleanup.unref();
 
   const shutdown = async () => {
+    clearInterval(cleanup);
     await app.close();
     await closeRedis();
     await client.end();

@@ -8,7 +8,7 @@ import {
   type PublicShareResponse,
   type ShareMimeType,
 } from '@snapglow/cloud-core';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import { customAlphabet } from 'nanoid';
@@ -69,10 +69,6 @@ export async function registerShareRoutes(app: FastifyInstance, options: ShareRo
       return reply.code(413).send({ error: 'File too large' });
     }
 
-    const token = createToken();
-    const storageKey = `shares/${user.id}/${token}`;
-    await options.storage.uploadObject(storageKey, buffer, mimeType);
-
     const workspaceId = getActiveWorkspaceId(request);
     if (workspaceId) {
       const role = await resolveMembership(options.db, workspaceId, user.id);
@@ -80,6 +76,10 @@ export async function registerShareRoutes(app: FastifyInstance, options: ShareRo
         return reply.code(403).send({ error: 'Forbidden' });
       }
     }
+
+    const token = createToken();
+    const storageKey = `shares/${user.id}/${token}`;
+    await options.storage.uploadObject(storageKey, buffer, mimeType);
 
     const expiresAt = computeExpiresAt(expiresRaw);
     const [share] = await options.db
@@ -113,6 +113,41 @@ export async function registerShareRoutes(app: FastifyInstance, options: ShareRo
     });
 
     return reply.code(201).send(response);
+  });
+
+  app.delete('/v1/shares/:token', { preHandler: authenticateRequest }, async (request, reply) => {
+    const authUser = request.authUser;
+    if (!authUser) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+
+    const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+    const { token } = request.params as { token: string };
+
+    const rows = await options.db
+      .select()
+      .from(schema.shares)
+      .where(eq(schema.shares.token, token))
+      .limit(1);
+    const share = rows[0];
+
+    let allowed = share?.userId === user.id;
+    if (share && !allowed && share.workspaceId) {
+      allowed = (await resolveMembership(options.db, share.workspaceId, user.id)) === 'admin';
+    }
+    if (!share || !allowed) {
+      return reply.code(404).send({ error: 'Share not found' });
+    }
+
+    // Row first: the link stops working even if the object delete fails and is retried later.
+    await options.db
+      .delete(schema.shares)
+      .where(and(eq(schema.shares.id, share.id), eq(schema.shares.token, token)));
+    await options.storage.deleteObject(share.storageKey).catch((error) => {
+      request.log.error({ error, key: share.storageKey }, 'Failed to delete revoked share object');
+    });
+
+    return reply.code(204).send();
   });
 
   app.get('/v1/shares/:token', async (request, reply) => {
