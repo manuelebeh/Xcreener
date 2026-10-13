@@ -40,7 +40,13 @@ jobs:
     env:
       # Enables apps/api/src/routes/security.integration.test.ts against the service above.
       INTEGRATION_DATABASE_URL: postgresql://snapglow:snapglow@localhost:5432/snapglow
+      # The Tauri dependency tree fills the runner disk with debug info: keep symbols out of CI builds.
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
     steps:
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
