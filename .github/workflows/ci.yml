@@ -10,13 +10,40 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: snapglow
+          POSTGRES_PASSWORD: snapglow
+          POSTGRES_DB: snapglow
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U snapglow -d snapglow"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Enables apps/api/src/routes/security.integration.test.ts against the service above.
+      INTEGRATION_DATABASE_URL: postgresql://snapglow:snapglow@localhost:5432/snapglow
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - uses: jdx/mise-action@v2
+      - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
         with:
           install: true
 
@@ -41,7 +68,20 @@ jobs:
       - name: Typecheck
         run: mise run typecheck
 
-      - name: Unit tests
+      - name: Apply API migrations
+        env:
+          DATABASE_URL: postgresql://snapglow:snapglow@localhost:5432/snapglow
+          REDIS_URL: redis://localhost:6379
+          AUTH0_DOMAIN: example.auth0.com
+          AUTH0_AUDIENCE: https://api.example.com
+          WEB_PUBLIC_URL: http://localhost:3000
+          S3_ENDPOINT: http://localhost:9000
+          S3_BUCKET: snapglow-shares
+          S3_ACCESS_KEY: minioadmin
+          S3_SECRET_KEY: minioadmin
+        run: mise exec -- pnpm --filter @snapglow/api db:migrate
+
+      - name: Unit and integration tests
         run: mise run test
 
       - name: Playwright smoke (web UI)
@@ -61,3 +101,30 @@ jobs:
       - name: Cargo check
         working-directory: apps/desktop/src-tauri
         run: cargo check --locked
+
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
+        with:
+          install: true
+
+      - name: Install dependencies
+        run: mise run install
+
+      # Advisory only until the Expo toolchain advisories (apps/mobile) are cleared.
+      - name: Dependency audit (production)
+        continue-on-error: true
+        run: mise exec -- pnpm audit --prod --audit-level high
+
+      - name: Secret scan
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
