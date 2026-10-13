@@ -303,57 +303,81 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => runExport('save')}
-            disabled={isExporting}
-            data-testid="export-save-button"
-          >
-            {isExporting ? 'Exporting…' : 'Export'}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            onClick={() => runExport('copy')}
-            disabled={isExporting}
-            data-testid="export-copy-button"
-          >
-            Copy
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            onClick={() => runExport('drag')}
-            disabled={isExporting}
-            data-testid="export-drag-button"
-          >
-            Prepare drag
-          </Button>
-          {shareButton}
-          {sendMenu}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              className="flex-1"
+              onClick={() => runExport('save')}
+              disabled={isExporting}
+              data-testid="export-save-button"
+            >
+              {isExporting ? 'Exporting…' : 'Export'}
+            </Button>
+            <Label htmlFor="export-format" className="sr-only">
+              Format
+            </Label>
+            <div className="w-24 shrink-0">
+              <Select
+                id="export-format"
+                value={format}
+                onChange={(event) => setFormat(event.target.value as ExportFormat)}
+                data-testid="export-format-select"
+              >
+                {EXPORT_FORMATS.map((item) => (
+                  <option key={item} value={item}>
+                    {formatLabel(item)}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => runExport('copy')}
+              disabled={isExporting}
+              data-testid="export-copy-button"
+            >
+              Copy
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => runExport('drag')}
+              disabled={isExporting}
+              data-testid="export-drag-button"
+            >
+              Prepare drag
+            </Button>
+            {shareButton}
+            {sendMenu}
+          </div>
         </div>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="space-y-1">
-          <Label htmlFor="export-format">Format</Label>
-          <Select
-            id="export-format"
-            value={format}
-            onChange={(event) => setFormat(event.target.value as ExportFormat)}
-            data-testid="export-format-select"
-          >
-            {EXPORT_FORMATS.map((item) => (
-              <option key={item} value={item}>
-                {formatLabel(item)}
-              </option>
-            ))}
-          </Select>
-        </div>
+      <div className="grid grid-cols-2 gap-3">
+        {embedded ? null : (
+          <div className="space-y-1">
+            <Label htmlFor="export-format">Format</Label>
+            <Select
+              id="export-format"
+              value={format}
+              onChange={(event) => setFormat(event.target.value as ExportFormat)}
+              data-testid="export-format-select"
+            >
+              {EXPORT_FORMATS.map((item) => (
+                <option key={item} value={item}>
+                  {formatLabel(item)}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
 
         {format !== 'png' ? (
           <div className="space-y-1">
