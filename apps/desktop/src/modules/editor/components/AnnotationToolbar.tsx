@@ -1,17 +1,18 @@
 import { Button, Label, Slider, Tooltip, TooltipProvider } from '@snapglow/ui';
 import type { Annotation, BlurMode, EditorTool } from '../annotations/types';
 import { useEditorStore } from '../store';
+import { ToolIcon } from './ToolIcons';
 
-const TOOLS: { id: EditorTool; label: string; short: string }[] = [
-  { id: 'select', label: 'Select', short: 'Select' },
-  { id: 'move', label: 'Move capture', short: 'Move' },
-  { id: 'text', label: 'Text', short: 'Text' },
-  { id: 'rect', label: 'Rectangle', short: 'Rect' },
-  { id: 'ellipse', label: 'Ellipse', short: 'Oval' },
-  { id: 'arrow', label: 'Arrow', short: 'Arrow' },
-  { id: 'line', label: 'Line', short: 'Line' },
-  { id: 'highlight', label: 'Highlight', short: 'Mark' },
-  { id: 'blur', label: 'Blur', short: 'Blur' },
+const TOOLS: { id: EditorTool; label: string }[] = [
+  { id: 'select', label: 'Select' },
+  { id: 'move', label: 'Move capture' },
+  { id: 'text', label: 'Text' },
+  { id: 'rect', label: 'Rectangle' },
+  { id: 'ellipse', label: 'Ellipse' },
+  { id: 'arrow', label: 'Arrow' },
+  { id: 'line', label: 'Line' },
+  { id: 'highlight', label: 'Highlight' },
+  { id: 'blur', label: 'Blur' },
 ];
 
 function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
@@ -171,17 +172,99 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
   return null;
 }
 
-export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) {
+export function AnnotationToolStrip() {
   const screenshot = useEditorStore((s) => s.screenshot);
   const activeTool = useEditorStore((s) => s.activeTool);
   const setActiveTool = useEditorStore((s) => s.setActiveTool);
+  const undo = useEditorStore((s) => s.undo);
+  const redo = useEditorStore((s) => s.redo);
+  const history = useEditorStore((s) => s.history);
+
+  if (!screenshot) {
+    return null;
+  }
+
+  return (
+    <TooltipProvider>
+      <div className="flex items-center gap-2" data-testid="annotation-toolbar">
+        <div className="flex gap-0.5 rounded-md bg-foreground/[0.06] p-0.5">
+          {TOOLS.map((tool) => (
+            <Tooltip key={tool.id} content={tool.label} side="bottom">
+              <button
+                type="button"
+                aria-label={tool.label}
+                aria-pressed={activeTool === tool.id}
+                data-testid={`annotation-tool-${tool.id}`}
+                className={`sg-focus-ring flex h-7 w-8 items-center justify-center rounded-[5px] transition-colors ${
+                  activeTool === tool.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-foreground hover:bg-foreground/[0.08]'
+                }`}
+                onClick={() => setActiveTool(tool.id)}
+              >
+                <ToolIcon tool={tool.id} />
+              </button>
+            </Tooltip>
+          ))}
+        </div>
+        <div className="ml-1 flex gap-0.5 border-l border-border pl-2">
+          <Tooltip content="Undo" side="bottom">
+            <button
+              type="button"
+              aria-label="Undo"
+              className="sg-focus-ring flex h-7 w-8 items-center justify-center rounded-[5px] text-foreground transition-colors hover:bg-foreground/[0.08] disabled:pointer-events-none disabled:opacity-40"
+              onClick={undo}
+              disabled={history.past.length === 0}
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="size-[18px]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M7 6 3.5 9.5 7 13M4 9.5h8.5a4 4 0 0 1 0 8H9" />
+              </svg>
+            </button>
+          </Tooltip>
+          <Tooltip content="Redo" side="bottom">
+            <button
+              type="button"
+              aria-label="Redo"
+              className="sg-focus-ring flex h-7 w-8 items-center justify-center rounded-[5px] text-foreground transition-colors hover:bg-foreground/[0.08] disabled:pointer-events-none disabled:opacity-40"
+              onClick={redo}
+              disabled={history.future.length === 0}
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="size-[18px]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M13 6l3.5 3.5L13 13M16 9.5H7.5a4 4 0 0 0 0 8H11" />
+              </svg>
+            </button>
+          </Tooltip>
+        </div>
+      </div>
+    </TooltipProvider>
+  );
+}
+
+export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) {
+  const screenshot = useEditorStore((s) => s.screenshot);
+  const activeTool = useEditorStore((s) => s.activeTool);
   const annotations = useEditorStore((s) => s.annotations);
   const selectedAnnotationId = useEditorStore((s) => s.selectedAnnotationId);
   const toolDefaults = useEditorStore((s) => s.toolDefaults);
   const updateToolDefaults = useEditorStore((s) => s.updateToolDefaults);
-  const undo = useEditorStore((s) => s.undo);
-  const redo = useEditorStore((s) => s.redo);
-  const history = useEditorStore((s) => s.history);
 
   const selectedAnnotation = annotations.find(
     (annotation) => annotation.id === selectedAnnotationId
@@ -191,36 +274,12 @@ export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) 
     return null;
   }
 
-  const toolbar = (
-    <div className="w-full space-y-3" data-testid="annotation-toolbar">
-      <div className="flex flex-wrap items-center gap-1.5">
-        {!embedded ? <p className="mr-2 text-xs font-medium text-foreground">Annotations</p> : null}
-        {TOOLS.map((tool) => (
-          <Tooltip key={tool.id} content={tool.label}>
-            <Button
-              size="sm"
-              variant={activeTool === tool.id ? 'primary' : 'secondary'}
-              onClick={() => setActiveTool(tool.id)}
-              aria-label={tool.label}
-              className="whitespace-nowrap"
-              data-testid={`annotation-tool-${tool.id}`}
-            >
-              {embedded ? tool.short : tool.label}
-            </Button>
-          </Tooltip>
-        ))}
-        <div className="ml-auto flex gap-2">
-          <Button size="sm" variant="ghost" onClick={undo} disabled={history.past.length === 0}>
-            Undo
-          </Button>
-          <Button size="sm" variant="ghost" onClick={redo} disabled={history.future.length === 0}>
-            Redo
-          </Button>
-        </div>
-      </div>
+  const showBlurDefaults = activeTool === 'blur' && !selectedAnnotation;
 
-      {activeTool === 'blur' && !selectedAnnotation ? (
-        <div className="flex flex-wrap items-end gap-3 border-t border-border pt-3">
+  const toolbar = (
+    <div className="w-full space-y-3" data-testid="annotation-options">
+      {showBlurDefaults ? (
+        <div className="flex flex-wrap items-end gap-3">
           <div className="flex gap-1">
             {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
               <Button
@@ -249,16 +308,18 @@ export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) 
       ) : null}
 
       {selectedAnnotation ? <SelectedAnnotationPanel annotation={selectedAnnotation} /> : null}
+
+      {!showBlurDefaults && !selectedAnnotation ? (
+        <p className="text-xs text-muted">
+          Pick a tool in the toolbar above the canvas. Options for the selected shape appear here.
+        </p>
+      ) : null}
     </div>
   );
 
   if (embedded) {
-    return <TooltipProvider>{toolbar}</TooltipProvider>;
+    return toolbar;
   }
 
-  return (
-    <TooltipProvider>
-      <div className="rounded-lg border border-border bg-surface p-4">{toolbar}</div>
-    </TooltipProvider>
-  );
+  return <div className="rounded-lg border border-border bg-surface p-4">{toolbar}</div>;
 }
