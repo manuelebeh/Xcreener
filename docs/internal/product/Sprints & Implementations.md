@@ -88,7 +88,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 | `[x]` (2026-06-15) | P0-004 | Configurer CI/CD (GitHub Actions) : build, lint, tests | P0 | 2j | P0-001 |
 | `[x]` (2026-06-15) | P0-005 | Définir l'architecture des modules (capture, editor, export, settings) | P0 | 2j | P0-002 |
 | `[x]` (2026-06-15) | P0-006 | Setup du store de configuration local (SQLite via Tauri) | P1 | 1j | P0-002 |
-| `[x]` (2026-06-15) | P0-007 | Setup outillage dev : Hallmark + CodeGraph + Husky/Commitlint (temporaire) + `AGENTS.md` / `.agents/rules/` | P1 | 1j | P0-001 |
+| `[x]` (2026-06-15) | P0-007 | Setup outillage dev : CodeGraph + Husky/Commitlint (temporaire) + `AGENTS.md` / `.agents/rules/` | P1 | 1j | P0-001 |
 
 **Livrable :** Projet Tauri fonctionnel avec CI/CD, build macOS + Windows validé, `mise run dev:desktop` opérationnel, hooks git, index CodeGraph, conventions agent.
 
@@ -99,7 +99,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 - **Tooling** : `packages/biome-config`, `packages/typescript-config`, Husky + Commitlint, Biome via Turbo.
 - **Architecture** : modules `capture` / `editor` / `export` / `settings`, couche `app/` + `tauri/` + `db/`, stubs Rust `commands/`, ADR-001.
 - **SQLite** : `@tauri-apps/plugin-sql`, migration `001_init.sql`, helpers settings + init au démarrage (thème).
-- **Dev intel** : Hallmark (`.cursor/skills/hallmark/`), CodeGraph init + MCP (`.cursor/mcp.json`), `AGENTS.md`, `.agents/rules/`, `.cursor/rules/desktop-architecture.mdc`.
+- **Dev intel** : CodeGraph init + MCP (`.cursor/mcp.json`), `AGENTS.md`, `.agents/rules/`, `.cursor/rules/desktop-architecture.mdc`.
 - **CI/CD** : `.github/workflows/ci.yml` (lint, typecheck, `cargo check`) + `build.yml` (matrix macOS arm64/x64 + Windows).
 
 **Reporté (hors Sprint 0.1)**
@@ -431,7 +431,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 - **E2E natif** : `e2e_inject_screenshot`, bridge export dev, spec `capture-beautify-export.spec.ts`, fixture PNG 800×600
 - **Perf** : marks `snapglow-render` en dev, `stressCaptures.test.ts` + `pnpm test:stress-captures`
 - **Release beta unsigned** : doc install Gatekeeper/SmartScreen, checklist secrets updater, stub Windows signing dans `release.yml`
-- **Polish UX (P1-037, Hallmark)** : `design.md` verrouillé (Feature Stack, nav N1b, thème warm amber OKLCH, IBM Plex Sans/Mono) ; passes audit 0 critical / ship-ready ; conformité pass 5
+- **Polish UX (P1-037)** : `design.md` verrouillé (Feature Stack, nav N1b, thème warm amber OKLCH, IBM Plex Sans/Mono) ; passes audit 0 critical / ship-ready ; conformité pass 5
 - **Shell** : `AppTopNav` (wordmark + liens Editor / History / Settings), routes `min-h-0 flex-1` (scroll unique)
 - **Éditeur** : `EditorSection` + `EditorToolsPanel` - ordre Format → Style → Annotations → Sensitive data → Export ; gradients adoucis ; focus rings, tooltip 800 ms, boutons `:active`
 - **Historique / Settings** : parité layout `max-w-5xl`, titres `font-display`
