@@ -11,9 +11,9 @@ paths:
 - Product: SnapGlow
 - Crate: `snapglow-desktop` in `apps/desktop/src-tauri/`
 
-## Window (Sprint 0.1 skeleton)
+## Windows
 
-Menu-bar style: 480×640, native decorations on `main`, frameless `capture-overlay`, initially hidden (`visible: false`).
+Menu-bar style: `main` is 1120×740 (minimum 900×600) with native decorations, `capture-overlay` is frameless and transparent, both initially hidden (`visible: false`).
 
 ## Commands
 
@@ -24,8 +24,6 @@ Rust modules in `src-tauri/src/commands/`:
 - `classification` - `classify_content_command` : on-device screenshot content classifier (Sprint 2b.1)
 - `ocr` - `recognize_text_command` : copy-text OCR, returns raw `TextLine[]` (Sprint 2b.2)
 - `image_processing` - `detect_content_bounds_command`, `crop_image_command`, `compress_export_bytes_command` (Sprint 2b.2)
-- `export` - `export_image` : compress + write to path (optional; primary export uses frontend canvas + `compress_export_bytes_command`)
-- `storage` - settings IPC placeholders; frontend uses SQL plugin directly
 
 Engines:
 
@@ -53,7 +51,8 @@ Shared packages: `@snapglow/style-suggestion-core`, `@snapglow/ocr-core`.
 - Migrations: `src/db/migrations/*.sql`, applied via `migrate.ts` (`ensureMigrationsApplied`)
 - Capture history: `src/db/captures.ts` (retention 30, frontend-only)
 - Settings keys (2b.2): `ocrEngine`, `ocrLanguages`, `smartCompression`
-- Capability: `sql:default` + `sql:allow-execute` in `capabilities/default.json`
+- Capabilities: `capabilities/default.json` (window `main`: `sql:default` + `sql:allow-execute`, fs, clipboard, opener) and `capabilities/overlay.json` (window `capture-overlay`: events and window show/hide only)
+- Tokens: Auth0 and integration tokens live in the OS keychain through `src-tauri/src/secure_store.rs` (`secure_store_get/set/delete`), not in the SQLite settings table
 
 ## Tauri features & security
 
