@@ -4,7 +4,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 const API_URL = process.env.API_URL ?? process.env.VITE_API_URL ?? 'http://localhost:8787';
 
 async function fetchShare(token: string): Promise<PublicShareResponse> {
-  const response = await fetch(`${API_URL}/v1/shares/${token}`, {
+  const response = await fetch(`${API_URL}/v1/shares/${encodeURIComponent(token)}`, {
     headers: { Accept: 'application/json' },
   });
 

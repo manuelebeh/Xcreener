@@ -80,8 +80,15 @@ export function getHelpCategories(): string[] {
   return [...new Set(getHelpArticles().map((article) => article.category))].sort();
 }
 
+const SAFE_HREF_PATTERN = /^(https?:\/\/|\/|#|mailto:)/i;
+
 export function renderSimpleMarkdown(markdown: string): string {
-  const escaped = markdown.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const escaped = markdown
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 
   return escaped
     .replace(/^### (.+)$/gm, '<h3 class="text-base font-semibold mt-6 mb-2">$1</h3>')
@@ -89,7 +96,11 @@ export function renderSimpleMarkdown(markdown: string): string {
     .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mb-4">$1</h1>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/`([^`]+)`/g, '<code class="rounded bg-surface px-1 py-0.5 text-sm">$1</code>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary underline">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_match, text: string, href: string) =>
+      SAFE_HREF_PATTERN.test(href)
+        ? `<a href="${href}" class="text-primary underline">${text}</a>`
+        : text
+    )
     .replace(/^- (.+)$/gm, '<li class="ml-4 list-disc">$1</li>')
     .replace(/(<li[\s\S]*?<\/li>\n?)+/g, (block) => `<ul class="my-3 space-y-1">${block}</ul>`)
     .replace(/^(?!<[hul])(.+)$/gm, '<p class="my-3 text-muted leading-relaxed">$1</p>');

@@ -4,7 +4,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 const API_URL = process.env.API_URL ?? process.env.VITE_API_URL ?? 'http://localhost:8787';
 
 async function fetchEmbed(token: string): Promise<PublicEmbedResponse> {
-  const response = await fetch(`${API_URL}/v1/embeds/${token}`, {
+  const response = await fetch(`${API_URL}/v1/embeds/${encodeURIComponent(token)}`, {
     headers: { Accept: 'application/json' },
   });
 
