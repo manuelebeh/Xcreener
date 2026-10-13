@@ -70,7 +70,7 @@ async function createClient(context: vscode.ExtensionContext): Promise<SnapGlowC
   return new SnapGlowClient({ apiKey, baseUrl: getBaseUrl() });
 }
 
-export async function captureEditor(context: vscode.ExtensionContext): Promise<Buffer | null> {
+export async function captureEditor(): Promise<Buffer | null> {
   const editor = vscode.window.activeTextEditor;
   if (!editor) {
     vscode.window.showWarningMessage('No active editor to capture.');
@@ -98,7 +98,7 @@ export async function captureEditor(context: vscode.ExtensionContext): Promise<B
 }
 
 export async function captureAndBeautify(context: vscode.ExtensionContext): Promise<void> {
-  const png = await captureEditor(context);
+  const png = await captureEditor();
   if (!png) {
     return;
   }
@@ -146,8 +146,8 @@ export async function captureAndBeautify(context: vscode.ExtensionContext): Prom
   );
 }
 
-export async function captureEditorToClipboard(context: vscode.ExtensionContext): Promise<void> {
-  const png = await captureEditor(context);
+export async function captureEditorToClipboard(): Promise<void> {
+  const png = await captureEditor();
   if (!png) {
     return;
   }
@@ -159,9 +159,7 @@ export async function captureEditorToClipboard(context: vscode.ExtensionContext)
 export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('snapglow.configureApiKey', () => setApiKey(context)),
-    vscode.commands.registerCommand('snapglow.captureEditor', () =>
-      captureEditorToClipboard(context)
-    ),
+    vscode.commands.registerCommand('snapglow.captureEditor', () => captureEditorToClipboard()),
     vscode.commands.registerCommand('snapglow.captureAndBeautify', () =>
       captureAndBeautify(context)
     )
