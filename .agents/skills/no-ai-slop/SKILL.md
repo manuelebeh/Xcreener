@@ -36,9 +36,9 @@ reference. Neutral and plain is correct there. Still strip filler and AI vocab.
 ## Process
 
 1. **Scan** for patterns in Core rules + [phrases.md](phrases.md) + [structures.md](structures.md).
-2. **Draft rewrite** — same coverage/meaning, natural speech, varied sentence length.
-3. **Audit** — ask: "What still sounds obviously AI?" List remaining tells in bullets.
-4. **Final rewrite** — fix those tells. Prefer specifics over polish.
+2. **Draft rewrite:** same coverage/meaning, natural speech, varied sentence length.
+3. **Audit:** ask: "What still sounds obviously AI?" List remaining tells in bullets.
+4. **Final rewrite:** fix those tells. Prefer specifics over polish.
 
 If the user gives a writing sample, match their rhythm and word choices instead
 of a generic "clean" voice.
@@ -65,7 +65,7 @@ For normal agent replies, just write cleanly. Do not narrate the checklist.
 7. **Trust the reader.** No hand-holding, sycophancy, or chatbot closers
    ("Hope this helps!", "Let me know if...").
 8. **Formatting hygiene**
-   - No em dashes or en dashes — use commas, periods, colons, or parentheses
+   - No em dashes or en dashes: use commas, periods, colons, or parentheses
    - Bold sparingly (never whole sentences)
    - No emoji decoration in prose
    - Sentence-case headings, not Title Case

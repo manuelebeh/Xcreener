@@ -6,11 +6,10 @@ A previous API-only audit exists: `docs/internal/technical/security-audit-2026-0
 
 ## Desktop (Tauri 2)
 
-- **WebView privileges** (`src-tauri/capabilities/default.json`, `tauri.conf.json`): one capability for both `main` and `capture-overlay`; `sql:allow-execute` (arbitrary SQL from JS on `snapglow.db`), `fs:allow-remove` / `allow-write-file` / `allow-copy-file` on `$APPDATA/**`, `$TEMP/**`, `$TMP/**`, `opener:default`, `process:default`, `clipboard-manager`. `withGlobalTauri: true` exposes `window.__TAURI__` to any script. What does an XSS (rendered template, collab document, share preview, OCR text) get?
-- **Tokens in plaintext SQLite**: Auth0 access + refresh tokens (`modules/cloud/tokenStorage.ts`) and integration tokens (`modules/integrations/tokenStorage.ts`) go through `getSetting` / settings table. Readable by any local process running as the user and by any WebView script through `sql:allow-execute`. OS keychain not used.
-- **Stub commands**: `commands/storage.rs` `get_setting` / `set_setting` always return an error ("Sprint 0.3"). Dead IPC surface, or something still calls them?
+- **WebView privileges** (`src-tauri/capabilities/default.json`, `overlay.json`, `tauri.conf.json`): `default.json` serves `main` only and `overlay.json` gives `capture-overlay` events and window show/hide. Still open to check: `sql:allow-execute` (arbitrary SQL from JS on `snapglow.db`), `fs:allow-remove` / `allow-write-file` / `allow-copy-file` on `$APPDATA/**`, `$TEMP/**`, `$TMP/**`, `opener:default`, `process:default`, `clipboard-manager`. `withGlobalTauri: true` exposes `window.__TAURI__` to any script. What does an XSS (rendered template, collab document, share preview, OCR text) get?
+- **Tokens**: Auth0 and integration tokens now go to the OS keychain through `secure_store.rs` and `src/shared/lib/secureStorage.ts`, with a one-time move out of the SQLite settings row. Check that the move leaves no plaintext copy, and that nothing reachable through `sql:allow-execute` still holds a token.
 - **Deep links** (`snapglow://`): `useCloudAuthListener` (Auth0 PKCE callback, state checked against an in-memory `pendingLogin`), `useIntegrationsListener` (integration OAuth callback, default `INTEGRATIONS_REDIRECT_URI=snapglow://integrations/callback`), `useReferralDeepLink`. Custom schemes can be registered by another app (RFC 8252 prefers claimed HTTPS or loopback redirects): code interception for integrations that do not use PKCE; does the API bind integration `state` to the user who started the flow? What happens with a link arriving at cold start (`getCurrent()`)?
-- **CSP** in production: `connect-src` includes `http://localhost:8787` and `http://127.0.0.1:8787`, plus GitHub, Auth0, Slack, Notion, Linear, PostHog, Sentry. `style-src 'unsafe-inline'`. Assess what a script could exfiltrate to and whether a dev-only config is shipped.
+- **CSP**: the production `connect-src` no longer lists `localhost:8787` (it moved to `devCsp`). `style-src 'unsafe-inline'` remains. Assess what a script could still exfiltrate to.
 - **`macOSPrivateApi: true`** and an always-on-top transparent overlay on all workspaces: App Store / notarization implications, click-jacking of the overlay, focus stealing.
 - **`tesseract` subprocess** (`ocr/tesseract.rs`): resolved from `PATH`, arguments, temp file handling.
 - **`unsafe`** (~11 occurrences across capture, overlay, OCR FFI): invariants documented?
@@ -21,9 +20,9 @@ A previous API-only audit exists: `docs/internal/technical/security-audit-2026-0
 
 - **Global `bodyLimit: 100 MB`** applies to every route, including JSON endpoints, not just uploads. Combined with multipart `fileSize` 100 MB and server-side rendering (`@napi-rs/canvas`), check memory per request and image decompression bombs.
 - **Share / public capture tokens**: `customAlphabet(base36, 12)` ≈ 62 bits (`routes/shares.ts`, `routes/public-captures.ts`). Enough against online guessing if rate limited; check rate limiting on `/v1/shares/:token` and `/v1/embeds/:token`, expiry enforcement on every path that serves the image (including direct S3/presigned URLs), revocation, `noindex`, referrer leakage.
-- **Auth0 JWT** (`plugins/auth.ts`): `email` claim copied into `users.email` on every request without checking `email_verified`. Does anything authorize by email (invitations, workspace membership, marketplace moderation)? `org_id` / `orgId` claims accepted from either name.
+- **Auth0 JWT** (`plugins/auth.ts`): an `email` claim is now ignored when `email_verified` is false. Does anything else authorize by email (invitations, workspace membership, marketplace moderation)? `org_id` / `orgId` claims accepted from either name.
 - **API keys** (`plugins/api-key-auth.ts`): SHA-256 lookup by hash (constant-time compare not needed for an indexed hash lookup, but check), plan gate via `hasApiAccess`, scopes (read vs write?), last-used tracking, key management routes callable with an API key?
-- **Collab WebSocket** (`plugins/collab-ws.ts`): JWT on the first message, role check for `collab:edit`. Check Origin validation (cross-site WebSocket hijacking is moot with bearer tokens but verify), max message size, rate per socket, token expiry during a long session, revoked membership disconnecting live sockets, doc size growth.
+- **Collab WebSocket** (`plugins/collab-ws.ts`): JWT on the first message, role check for `collab:edit`, a 256 KB message cap, token expiry and a periodic membership recheck. Still check Origin validation, rate per socket, and doc size growth.
 - **Web collab route** `/c/$documentId`: document ID in the URL; can a non-member open it? What does the viewer page fetch without auth?
 - **CORS** (`lib/cors.ts`): `CORS_ORIGINS` defaults to `''`; what does `isOriginAllowed` do with no origin (desktop, curl) and an empty allowlist? `credentials: true` with bearer tokens is unnecessary.
 - **Helmet**: CSP and HSTS only when `NODE_ENV === 'production'`; staging runs without them?
@@ -47,12 +46,12 @@ A previous API-only audit exists: `docs/internal/technical/security-audit-2026-0
 - **Mobile** (Expo 56, scheme `snapglow`, `expo-share-intent`, `expo-media-library`): shared images from other apps (untrusted input), media library permissions, AsyncStorage for anything sensitive, deep links, OTA/EAS update channel.
 - **VS Code extension**: API key in `context.secrets` (good). Webviews and their CSP, `@napi-rs/canvas` native binary per platform, `vscode-extension.yml` on Node 22.
 - **Figma plugin**: `innerHTML` in `src/ui.ts`; where the API key is stored (`figma.clientStorage`?), network access declared in `manifest.json`.
-- **Notion embed** (`apps/notion-embed/src/server.ts`): standalone Node server doing Notion OAuth; where it stores `notionToken`, session handling, CSRF/state, listen address, deployment unknown.
+- **Notion embed** (`apps/notion-embed/src/server.ts`): standalone Node server doing Notion OAuth; the callback now accepts only states issued by `/oauth/start`. Still check where it stores `notionToken`, session handling, listen address, deployment unknown.
 
 ## Infra, CI, supply chain
 
-- **docker-compose** (`apps/api/docker-compose.yml`): Postgres `5432`, Redis `6379` (no password), MinIO `9000`/`9001` with `minioadmin`, published on all interfaces; `minio/minio:latest`. Fine on a laptop only.
+- **docker-compose** (`apps/api/docker-compose.yml`): ports now bind `127.0.0.1` and the MinIO image is pinned. Redis still has no password and MinIO keeps `minioadmin`. Fine on a laptop only.
 - **No Dockerfile or deploy workflow** for the API/web: production hosting, TLS, DB/S3 backups are `UNVERIFIED`.
-- **CI**: actions pinned by tag (`@v4`, `@v2`, `tauri-action@v0`), `permissions:` only in `release.yml`, no `pnpm audit` / `cargo audit` / secret scanning / dependency review (the 2026-06 audit recommended a scheduled audit).
+- **CI**: actions pinned by SHA and workflow-level `permissions:` set; Postgres and Redis services run the API integration tests. Still missing: `pnpm audit` / `cargo audit` / secret scanning / dependency review (the 2026-06 audit recommended a scheduled audit).
 - `.tauri/` is gitignored and `.env*` too: confirm nothing sensitive was ever tracked (`git log --all -- .tauri '*.env*' '*.key'`).
 - `tools/style-classifier` (Python dataset tooling): out of the runtime path; check it ships nothing into the app except the model, and the model's provenance.
