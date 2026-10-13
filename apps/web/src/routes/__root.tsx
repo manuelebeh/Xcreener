@@ -8,6 +8,7 @@ import {
   useSearch,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { ConsentBanner } from '../integrations/posthog/ConsentBanner';
 import PostHogProvider from '../integrations/posthog/provider';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import appCss from '../styles.css?url';
@@ -53,6 +54,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <SnapGlowI18nProvider locale={locale}>
           <PostHogProvider>
             {children}
+            <ConsentBanner />
             <TanStackDevtools
               config={{
                 position: 'bottom-right',

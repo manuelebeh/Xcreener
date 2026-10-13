@@ -8,6 +8,11 @@ export const commonEn = {
   marketplace: 'Marketplace',
   affiliates: 'Affiliates',
   blog: 'Blog',
+  consentTitle: 'Analytics',
+  consentBody:
+    'We use PostHog analytics on this site to understand which pages help. It stays off unless you accept. Share and collaboration links are never sent.',
+  consentAccept: 'Accept',
+  consentDecline: 'Decline',
 };
 
 export const marketingEn = {
