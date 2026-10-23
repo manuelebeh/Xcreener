@@ -1,4 +1,4 @@
-use crate::overlay;
+use crate::{overlay, tray};
 use std::str::FromStr;
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager};
@@ -34,6 +34,7 @@ pub fn register_capture_shortcut(app: &AppHandle, shortcut: &str) -> Result<(), 
         let mut current = state.0.lock().map_err(|e| e.to_string())?;
         *current = shortcut.to_string();
     }
+    tray::update_capture_accelerator(app, shortcut);
 
     Ok(())
 }

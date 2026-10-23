@@ -65,6 +65,20 @@ describe('useEditorStore', () => {
     expect(state.shadow).toEqual(instagramDefaults?.shadow);
   });
 
+  it('applies a network variant with its own size and the network style', () => {
+    const screenshot = createMockScreenshot(800, 600);
+    useEditorStore.getState().setScreenshot(screenshot);
+
+    useEditorStore.getState().setPreset('instagram-story');
+
+    const state = useEditorStore.getState();
+    const instagramDefaults = getPresetStyleDefaults('instagram');
+
+    expect(state.selectedPresetId).toBe('instagram-story');
+    expect(state.padding).toBe(autoFramePadding({ width: 1080, height: 1920 }));
+    expect(state.borderRadius).toBe(instagramDefaults?.borderRadius);
+  });
+
   it('preserves manual padding when changing preset', () => {
     const screenshot = createMockScreenshot(800, 600);
     useEditorStore.getState().setScreenshot(screenshot);

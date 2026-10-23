@@ -4,10 +4,13 @@ export {
   FREE_PRESET_ID,
   fitTransform,
   getFreePreset,
+  getNetworkPresets,
   getPresetById,
+  getPresetLabel,
   getPresetStyleDefaults,
   PRESET_STYLE_DEFAULTS,
   resolvePresetPadding,
+  SOCIAL_NETWORKS,
   SOCIAL_PRESETS,
   STANDARD_PRESETS,
 } from '@snapglow/editor-core';
