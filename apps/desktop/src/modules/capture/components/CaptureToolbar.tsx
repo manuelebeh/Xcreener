@@ -69,6 +69,7 @@ export function CaptureToolbar({
             key={kind.id}
             type="button"
             data-testid={`capture-media-${kind.id}`}
+            aria-pressed={mediaKind === kind.id}
             className={`sg-focus-ring cursor-pointer rounded-full px-3 py-1.5 whitespace-nowrap transition-colors ${
               mediaKind === kind.id ? 'capture-hud-btn-active' : 'capture-hud-btn'
             }`}
@@ -91,6 +92,7 @@ export function CaptureToolbar({
             key={mode.id}
             type="button"
             data-testid={`capture-mode-${mode.id}`}
+            aria-pressed={activeMode === mode.id}
             className={`sg-focus-ring rounded-full px-3 py-1.5 whitespace-nowrap transition-colors ${
               activeMode === mode.id ? 'capture-hud-btn-active' : 'capture-hud-btn'
             } ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
@@ -122,6 +124,7 @@ export function CaptureToolbar({
                 key={format}
                 type="button"
                 data-testid={`capture-format-${format}`}
+                aria-pressed={outputFormat === format}
                 className={`sg-focus-ring cursor-pointer rounded-full px-2.5 py-1.5 text-xs uppercase transition-colors ${
                   outputFormat === format ? 'capture-hud-btn-active' : 'capture-hud-btn'
                 }`}
@@ -146,6 +149,7 @@ export function CaptureToolbar({
                     key={quality.id}
                     type="button"
                     data-testid={`capture-gif-quality-${quality.id}`}
+                    aria-pressed={gifQuality === quality.id}
                     title={quality.title}
                     className={`sg-focus-ring cursor-pointer rounded-full px-2.5 py-1.5 text-xs transition-colors ${
                       gifQuality === quality.id ? 'capture-hud-btn-active' : 'capture-hud-btn'

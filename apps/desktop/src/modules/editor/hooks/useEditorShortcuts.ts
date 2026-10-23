@@ -22,7 +22,9 @@ export function useEditorShortcuts(): void {
       const state = useEditorStore.getState();
 
       if (isMeta && event.key.toLowerCase() === 'c' && !event.shiftKey) {
-        if (!state.screenshot || useExportStore.getState().isExporting) {
+        // Text selected on the capture (OCR text layer): let the native copy run.
+        const hasTextSelection = Boolean(window.getSelection()?.toString().trim());
+        if (!state.screenshot || hasTextSelection || useExportStore.getState().isExporting) {
           return;
         }
         event.preventDefault();

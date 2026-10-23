@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+
 use image::GenericImageView;
 use objc2::AnyThread;
 use objc2::rc::Retained;
@@ -12,11 +14,18 @@ use crate::ocr::types::TextLine;
 
 pub struct MacOcrEngine;
 
+/// Vision fails with CRImageReaderError 1 when text requests on different images
+/// overlap (e.g. two editor scans), so each whole request runs under this lock.
+static VISION_LOCK: Mutex<()> = Mutex::new(());
+
 impl OcrEngine for MacOcrEngine {
     fn recognize(&self, png_bytes: &[u8]) -> Result<Vec<TextLine>, String> {
         let decoded = image::load_from_memory(png_bytes).map_err(|error| error.to_string())?;
         let (image_width, image_height) = decoded.dimensions();
 
+        let _guard = VISION_LOCK
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
         let data = NSData::with_bytes(png_bytes);
         let options = NSDictionary::<objc2_vision::VNImageOption, AnyObject>::new();
         let handler = VNImageRequestHandler::initWithData_options(

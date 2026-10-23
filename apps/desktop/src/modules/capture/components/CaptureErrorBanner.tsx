@@ -18,7 +18,7 @@ export function CaptureErrorBanner() {
         <p className="min-w-0">{error}</p>
         <button
           type="button"
-          className="shrink-0 text-xs font-medium text-muted underline-offset-2 hover:underline"
+          className="sg-focus-ring shrink-0 rounded-sm text-xs font-medium text-muted underline-offset-2 hover:underline"
           onClick={() => setError(null)}
         >
           Dismiss

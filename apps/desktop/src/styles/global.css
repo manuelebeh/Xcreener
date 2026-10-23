@@ -13,6 +13,16 @@ body,
 body {
   margin: 0;
   font-family: var(--sg-font-family-sans);
+  /* Native app chrome: labels are not selectable, so a drag on the OCR text layer stays in it. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+[contenteditable='true'] {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 a {

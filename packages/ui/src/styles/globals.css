@@ -19,6 +19,26 @@
     color-scheme: light dark;
   }
 
+  /* Tailwind v4 preflight gives buttons cursor: default. Utilities (cursor-grab...) still win. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='menuitem'],
+  [role='menuitemradio'],
+  [role='option'],
+  [role='tab'],
+  a[href],
+  summary,
+  select:not(:disabled),
+  input:is([type='checkbox'], [type='radio'], [type='color'], [type='file']):not(:disabled),
+  label:has(> input:is([type='checkbox'], [type='radio']):not(:disabled)) {
+    cursor: pointer;
+  }
+
+  :disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

@@ -90,12 +90,15 @@ pub fn recognize_text_with_options(
     #[cfg(any(target_os = "macos", target_os = "windows"))]
     {
         if !needs_tesseract_for_languages(&options.languages) {
-            if let Ok(lines) = native_engine().recognize_with_languages(png_bytes, &options.languages)
-            {
-                if !lines.is_empty() {
-                    return Ok(lines);
-                }
+            let native = native_engine().recognize_with_languages(png_bytes, &options.languages);
+            if matches!(&native, Ok(lines) if !lines.is_empty()) {
+                return native;
             }
+            // Tesseract is an optional extra: when it is missing or fails, keep the
+            // native answer (no text, or the native error) instead of its error.
+            return tesseract_engine()
+                .recognize_with_languages(png_bytes, &options.languages)
+                .or(native);
         }
     }
 

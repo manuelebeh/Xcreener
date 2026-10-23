@@ -101,7 +101,7 @@ export function ApiKeysSection() {
       {revealedKey ? (
         <div className="space-y-2 rounded-md border border-accent/40 bg-accent/5 p-3">
           <p className="m-0 text-xs font-medium text-foreground">New API key — copy now</p>
-          <code className="block break-all rounded bg-surface px-2 py-1 text-xs">
+          <code className="block select-text break-all rounded bg-surface px-2 py-1 text-xs">
             {revealedKey.key}
           </code>
           <div className="flex gap-2">

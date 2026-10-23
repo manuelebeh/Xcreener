@@ -49,7 +49,7 @@ export function RedactionOverlay({ displayScale }: RedactionOverlayProps) {
           <button
             key={detection.id}
             type="button"
-            className="pointer-events-auto absolute border border-white/70"
+            className="sg-focus-ring pointer-events-auto absolute border border-white/70"
             style={{
               left: rect.x * displayScale,
               top: rect.y * displayScale,
@@ -58,6 +58,7 @@ export function RedactionOverlay({ displayScale }: RedactionOverlayProps) {
               backgroundColor: detectionColor(detection.kind),
             }}
             title={`Mask ${detection.kind}`}
+            aria-label={`Mask ${detection.kind}`}
             onClick={() => maskOne(detection.id)}
             data-testid={`redaction-hit-${detection.kind}`}
           />

@@ -31,7 +31,11 @@ export function CollectionsSidebar({
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-medium text-foreground">Collections</p>
           {(activeCollectionId !== null || activeTag) && (
-            <button type="button" className="text-xs text-primary" onClick={onClearFilters}>
+            <button
+              type="button"
+              className="sg-focus-ring rounded-sm text-xs text-primary hover:underline"
+              onClick={onClearFilters}
+            >
               Clear
             </button>
           )}
@@ -45,6 +49,7 @@ export function CollectionsSidebar({
               <button
                 key={collection.id}
                 type="button"
+                aria-pressed={activeCollectionId === collection.id}
                 className={`sg-focus-ring block w-full rounded-md px-2 py-1.5 text-left text-xs ${
                   activeCollectionId === collection.id
                     ? 'bg-primary/10 font-medium text-foreground'
@@ -88,7 +93,8 @@ export function CollectionsSidebar({
             <button
               key={tag}
               type="button"
-              className={`rounded-full px-2 py-0.5 text-xs ${
+              aria-pressed={activeTag === tag}
+              className={`sg-focus-ring rounded-full px-2 py-0.5 text-xs ${
                 activeTag === tag
                   ? 'bg-primary/15 font-medium text-foreground'
                   : 'bg-muted/30 text-muted hover:text-foreground'
