@@ -4,6 +4,8 @@ import { StatusBar } from 'expo-status-bar';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AccountSection } from '@/modules/account';
+
 export default function HomeScreen() {
   const { colors, resolvedTheme, theme, setTheme } = useTheme();
 
@@ -23,6 +25,8 @@ export default function HomeScreen() {
         <Text style={[styles.subtitle, { color: colors.muted }]}>
           Share a screenshot from Photos or any app to import it here.
         </Text>
+
+        <AccountSection />
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Design tokens</Text>

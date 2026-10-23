@@ -36,6 +36,7 @@ apps/mobile/
 ├── metro.config.js      # Monorepo workspace resolution
 ├── modules/snapglow-ocr/  # Local Expo module — Vision (iOS) + ML Kit (Android)
 └── src/modules/
+    ├── account/         # Auth0 sign-in (PKCE) + API-signed plan; free plans get the watermark
     ├── capture/         # Share import + image state (Sprint 1b.1)
     ├── cloud/           # Cloud library API client and hook
     ├── editor/          # Skia beautify, presets, annotations (Sprint 1b.2)

@@ -40,6 +40,8 @@ const config: ExpoConfig = {
     ...(isProduction ? [] : (['expo-dev-client'] as const)),
     'expo-image',
     'expo-sharing',
+    'expo-web-browser',
+    'expo-secure-store',
     [
       'expo-media-library',
       {
