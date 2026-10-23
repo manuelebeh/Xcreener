@@ -153,3 +153,10 @@ export interface CaptureImagePayload {
 export interface CaptureErrorPayload {
   message: string;
 }
+
+/** Plan from a signature-checked API token (`verify_entitlement`). */
+export interface Entitlement {
+  plan: 'free' | 'team_starter' | 'team_pro';
+  /** Unix seconds. */
+  expiresAt: number;
+}

@@ -1,13 +1,7 @@
 import { Button, Input, Select, Slider } from '@snapglow/ui';
 import { open } from '@tauri-apps/plugin-dialog';
-import { useEffect, useState } from 'react';
 import { setSetting } from '@/db';
-import {
-  captureExperimentExposure,
-  capturePaywallShown,
-  getPaywallExperimentVariant,
-} from '@/integrations/posthog/experiments';
-import { hasPremiumAccess } from '@/modules/licensing/premiumAccess';
+import { usePremiumAccess } from '@/modules/licensing/premiumAccess';
 import { SETTING_KEYS, type WatermarkPosition } from '@/shared/types/settings';
 import { useSettingsStore } from '../store';
 
@@ -24,12 +18,10 @@ export function WatermarkSection() {
   const setWatermarkLogoPath = useSettingsStore((s) => s.setWatermarkLogoPath);
   const setWatermarkPosition = useSettingsStore((s) => s.setWatermarkPosition);
   const setWatermarkOpacity = useSettingsStore((s) => s.setWatermarkOpacity);
-  const [paywallMessage, setPaywallMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const variant = getPaywallExperimentVariant();
-    captureExperimentExposure('paywall-timing-v1', variant);
-  }, []);
+  // Free plans export the SnapGlow badge whatever is saved here (watermarkFromSettings);
+  // the controls are locked so the UI says the same thing.
+  const premium = usePremiumAccess();
+  const locked = !premium;
 
   async function handleLogoPick() {
     const selected = await open({
@@ -49,28 +41,22 @@ export function WatermarkSection() {
     <div className="rounded-md border border-border p-3">
       <p className="m-0 text-sm font-medium">Export watermark</p>
       <p className="mt-1 text-xs text-muted">
-        Applied on export, share links, and integration uploads. Free plans keep the watermark on
-        exports.
+        Applied on export, share links, and integration uploads.
       </p>
+      {locked ? (
+        <p className="mt-2 text-xs text-muted" role="status">
+          Free plans show the SnapGlow watermark. You can choose its corner. Removing or customizing
+          it requires Team Starter or Pro: Settings → Team → Billing.
+        </p>
+      ) : null}
 
       <label className="mt-3 flex items-center gap-2 text-sm font-medium">
         <input
           type="checkbox"
-          checked={watermarkEnabled}
+          checked={locked || watermarkEnabled}
+          disabled={locked}
           onChange={async (event) => {
             const next = event.target.checked;
-            if (
-              !next &&
-              !hasPremiumAccess() &&
-              getPaywallExperimentVariant() === 'watermark_gate'
-            ) {
-              capturePaywallShown('watermark_disable');
-              setPaywallMessage(
-                'Removing the watermark requires Team Starter or Pro. Open Settings → Team → Billing.'
-              );
-              return;
-            }
-            setPaywallMessage(null);
             setWatermarkEnabled(next);
             await setSetting(SETTING_KEYS.watermarkEnabled, String(next));
           }}
@@ -80,12 +66,6 @@ export function WatermarkSection() {
         Show watermark on exports
       </label>
 
-      {paywallMessage ? (
-        <p className="mt-2 text-xs text-muted" role="status">
-          {paywallMessage}
-        </p>
-      ) : null}
-
       <div className="mt-3 space-y-3">
         <div>
           <label htmlFor="watermark-name" className="block text-sm font-medium">
@@ -93,6 +73,7 @@ export function WatermarkSection() {
             <Input
               id="watermark-name"
               value={watermarkDisplayName}
+              disabled={locked}
               onChange={async (event) => {
                 setWatermarkDisplayName(event.target.value);
                 await setSetting(SETTING_KEYS.watermarkDisplayName, event.target.value);
@@ -108,6 +89,7 @@ export function WatermarkSection() {
             <Input
               id="watermark-url"
               value={watermarkUrl}
+              disabled={locked}
               onChange={async (event) => {
                 setWatermarkUrl(event.target.value);
                 await setSetting(SETTING_KEYS.watermarkUrl, event.target.value);
@@ -147,6 +129,7 @@ export function WatermarkSection() {
             max={100}
             step={1}
             value={[watermarkOpacity]}
+            disabled={locked}
             onValueChange={async (value) => {
               const next = value[0] ?? watermarkOpacity;
               setWatermarkOpacity(next);
@@ -157,7 +140,13 @@ export function WatermarkSection() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="secondary" size="sm" onClick={() => void handleLogoPick()}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={locked}
+            onClick={() => void handleLogoPick()}
+          >
             Choose logo
           </Button>
           {watermarkLogoPath ? (

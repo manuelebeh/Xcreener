@@ -6,6 +6,7 @@ import type {
 } from '@snapglow/team-core';
 import { create } from 'zustand';
 import { setSetting } from '@/db';
+import { refreshEntitlement } from '@/modules/licensing/entitlement';
 import { SETTING_KEYS } from '@/shared/types/settings';
 import {
   acceptInvitation,
@@ -71,6 +72,8 @@ export const useTeamStore = create<TeamState>((set, get) => ({
       const activeWorkspaceId =
         storedId && workspaces.some((workspace) => workspace.id === storedId) ? storedId : null;
       set({ workspaces, activeWorkspaceId, isLoading: false });
+      // The plan may have changed (checkout, downgrade): re-sign it for paid features.
+      await refreshEntitlement();
 
       if (activeWorkspaceId) {
         await get().refreshMembers();

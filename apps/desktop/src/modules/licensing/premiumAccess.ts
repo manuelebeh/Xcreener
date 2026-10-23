@@ -1,16 +1,19 @@
-import { isPaidPlan } from '@snapglow/team-core';
-import { isExternalLicense } from '@/modules/licensing/detectLicenseSource';
-import { useSettingsStore } from '@/modules/settings/store';
 import { useTeamStore } from '@/modules/team/store';
+import { detectLicenseSource, isExternalLicense } from './detectLicenseSource';
+import { hasPaidEntitlement, isPaidEntitlement, useEntitlementStore } from './entitlement';
 
+/**
+ * Paid plan, from sources the user cannot edit: the build's distribution channel, or an
+ * API-signed entitlement verified in Rust. Never from SQLite settings or the team list.
+ */
 export function hasPremiumAccess(): boolean {
-  const { licenseSource } = useSettingsStore.getState();
-  if (isExternalLicense(licenseSource)) {
-    return true;
-  }
+  return isExternalLicense(detectLicenseSource()) || hasPaidEntitlement();
+}
 
-  const { workspaces } = useTeamStore.getState();
-  return workspaces.some((workspace) => isPaidPlan(workspace.plan));
+/** Same as hasPremiumAccess, re-rendering when the verified plan changes. */
+export function usePremiumAccess(): boolean {
+  const entitlement = useEntitlementStore((s) => s.entitlement);
+  return isExternalLicense(detectLicenseSource()) || isPaidEntitlement(entitlement);
 }
 
 export function hasEnterpriseIntegrationsAccess(): boolean {

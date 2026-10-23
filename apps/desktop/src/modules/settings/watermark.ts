@@ -1,7 +1,8 @@
-import type { WatermarkConfig } from '@snapglow/editor-core';
+import { DEFAULT_WATERMARK, type WatermarkConfig } from '@snapglow/editor-core';
 import type { BrandKitConfig } from '@snapglow/team-core';
 import { isPaidPlan } from '@snapglow/team-core';
 import { convertFileSrc } from '@tauri-apps/api/core';
+import { hasPremiumAccess } from '@/modules/licensing/premiumAccess';
 import { useSettingsStore } from '@/modules/settings/store';
 import { useTeamStore } from '@/modules/team/store';
 import type { AppSettings } from '@/shared/types/settings';
@@ -16,8 +17,15 @@ export function watermarkFromSettings(
     | 'watermarkPosition'
     | 'watermarkOpacity'
     | 'useTeamBrandKit'
-  >
+  >,
+  premium = hasPremiumAccess()
 ): WatermarkConfig {
+  // Every export goes through here, so this is where the free plan is enforced: the
+  // SnapGlow badge whatever the saved settings say. Only the corner is the user's choice.
+  if (!premium) {
+    return { ...DEFAULT_WATERMARK, position: settings.watermarkPosition };
+  }
+
   const teamMerged = resolveTeamBrandKitWatermark(settings.useTeamBrandKit);
   if (teamMerged) {
     return teamMerged;

@@ -4,14 +4,42 @@ import {
   INTEGRATION_REDIRECT_URI,
   INTEGRATION_SCOPES,
   type IntegrationProvider,
+  isEnterpriseIntegrationProvider,
   isIntegrationProvider,
 } from '@snapglow/integrations-core';
-import type { FastifyInstance } from 'fastify';
+import { hasEnterpriseIntegrationsAccess } from '@snapglow/team-core';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { customAlphabet } from 'nanoid';
+import type * as schema from '../db/schema';
 import { env } from '../env';
-import { authenticateRequest } from '../plugins/auth';
+import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
+import { bestPlanForUser } from '../services/entitlement';
 
 const createState = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 24);
+
+const ENTERPRISE_PLAN_ERROR = 'Jira, Confluence and Microsoft Teams require Team Pro';
+
+interface IntegrationRouteOptions {
+  db: PostgresJsDatabase<typeof schema>;
+}
+
+/** Enterprise providers are a Team Pro feature: checked here, not only in the desktop UI. */
+async function lacksEnterpriseAccess(
+  db: PostgresJsDatabase<typeof schema>,
+  request: FastifyRequest,
+  provider: IntegrationProvider
+): Promise<boolean> {
+  if (!isEnterpriseIntegrationProvider(provider)) {
+    return false;
+  }
+  const authUser = request.authUser;
+  if (!authUser) {
+    return true;
+  }
+  const user = await upsertAuthUser(db, authUser.auth0Sub, authUser.email);
+  return !hasEnterpriseIntegrationsAccess(await bestPlanForUser(db, user.id));
+}
 
 interface ProviderOAuthConfig {
   authorizeUrl: string;
@@ -269,7 +297,10 @@ async function exchangeProviderToken(
   };
 }
 
-export async function registerIntegrationRoutes(app: FastifyInstance) {
+export async function registerIntegrationRoutes(
+  app: FastifyInstance,
+  options: IntegrationRouteOptions
+) {
   app.get(
     '/v1/integrations/:provider/authorize',
     { preHandler: authenticateRequest },
@@ -277,6 +308,10 @@ export async function registerIntegrationRoutes(app: FastifyInstance) {
       const { provider: rawProvider } = request.params as { provider: string };
       if (!isIntegrationProvider(rawProvider)) {
         return reply.code(400).send({ error: 'Unknown integration provider' });
+      }
+
+      if (await lacksEnterpriseAccess(options.db, request, rawProvider)) {
+        return reply.code(403).send({ error: ENTERPRISE_PLAN_ERROR });
       }
 
       const config = providerConfig(rawProvider);
@@ -301,6 +336,10 @@ export async function registerIntegrationRoutes(app: FastifyInstance) {
       const { provider: rawProvider } = request.params as { provider: string };
       if (!isIntegrationProvider(rawProvider)) {
         return reply.code(400).send({ error: 'Unknown integration provider' });
+      }
+
+      if (await lacksEnterpriseAccess(options.db, request, rawProvider)) {
+        return reply.code(403).send({ error: ENTERPRISE_PLAN_ERROR });
       }
 
       const config = providerConfig(rawProvider);

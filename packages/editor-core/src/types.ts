@@ -101,7 +101,8 @@ export const DEFAULT_WATERMARK: WatermarkConfig = {
   displayName: 'SnapGlow',
   url: null,
   position: 'bottom-right',
-  opacity: 0.45,
+  /** Percent (0-100), like the desktop setting; drawWatermark divides by 100. */
+  opacity: 45,
 };
 
 export interface RenderInput {

@@ -3,7 +3,6 @@ import { isAnalyticsActive } from '@/integrations/observability';
 import { useSettingsStore } from '@/modules/settings/store';
 
 export type OnboardingExperimentVariant = 'default' | 'skip_brand_kit';
-export type PaywallExperimentVariant = 'watermark_gate' | 'export_limit_message';
 
 function canUseExperiments(): boolean {
   const analyticsEnabled = useSettingsStore.getState().analyticsEnabled;
@@ -18,26 +17,11 @@ export function getOnboardingExperimentVariant(): OnboardingExperimentVariant {
   return variant === 'skip_brand_kit' ? 'skip_brand_kit' : 'default';
 }
 
-export function getPaywallExperimentVariant(): PaywallExperimentVariant {
-  if (!canUseExperiments()) {
-    return 'watermark_gate';
-  }
-  const variant = posthog.getFeatureFlag('paywall-timing-v1');
-  return variant === 'export_limit_message' ? 'export_limit_message' : 'watermark_gate';
-}
-
 export function captureExperimentExposure(experiment: string, variant: string): void {
   if (!canUseExperiments()) {
     return;
   }
   posthog.capture('experiment_exposure', { experiment, variant, surface: 'desktop' });
-}
-
-export function capturePaywallShown(reason: string): void {
-  if (!canUseExperiments()) {
-    return;
-  }
-  posthog.capture('paywall_shown', { reason, surface: 'desktop' });
 }
 
 export function capturePaywallConverted(plan: string): void {
