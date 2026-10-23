@@ -50,9 +50,13 @@ impl OcrEngine for TesseractOcrEngine {
             command.env("TESSDATA_PREFIX", tessdata_dir);
         }
 
-        let output = command
-            .output()
-            .map_err(|error| format!("Failed to run tesseract CLI: {error}"))?;
+        let output = command.output().map_err(|error| {
+            if error.kind() == std::io::ErrorKind::NotFound {
+                "Tesseract is not installed. Install it (brew install tesseract) or use the native OCR engine.".to_string()
+            } else {
+                format!("Failed to run tesseract CLI: {error}")
+            }
+        })?;
 
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
