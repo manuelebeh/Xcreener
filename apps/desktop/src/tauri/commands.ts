@@ -120,6 +120,11 @@ export function detectSensitiveData(imageData: number[]) {
   });
 }
 
+/** Checks the API signature in Rust; null when the token is missing, forged or expired. */
+export function verifyEntitlement(token: string) {
+  return invoke<import('@/shared/types/ipc').Entitlement | null>('verify_entitlement', { token });
+}
+
 export function classifyContent(imageData: number[]) {
   return invoke<import('@/shared/types/ipc').ClassificationResult>('classify_content_command', {
     imageData,

@@ -63,6 +63,8 @@ export const useCloudAuthStore = create<CloudAuthState>((set) => ({
   },
   signOut: async () => {
     await signOutCloud();
+    const { clearEntitlement } = await import('@/modules/licensing/entitlement');
+    await clearEntitlement();
     set({ isAuthenticated: false, accountLabel: null, error: null });
   },
   setError: (error) => set({ error }),
@@ -78,5 +80,7 @@ export async function completeCloudAuthFromUrl(url: string): Promise<void> {
   const { handleAuthCallback } = await import('./auth');
   await handleAuthCallback(url);
   await useCloudAuthStore.getState().hydrate();
+  const { refreshEntitlement } = await import('@/modules/licensing/entitlement');
+  await refreshEntitlement();
   useCloudAuthStore.setState({ isLoading: false });
 }

@@ -1,6 +1,7 @@
 mod capture;
 mod commands;
 mod classification;
+mod entitlement;
 mod image_processing;
 mod ocr;
 mod overlay;
@@ -24,7 +25,7 @@ use commands::{
     list_monitors_command, list_windows_command, pause_region_recording_command,
     recognize_text_command, resume_region_recording_command, show_capture_overlay, start_capture_command,
     show_live_capture_overlay, start_region_recording_command, stop_region_recording_command,
-    stop_scrolling_capture_command, open_path_command,
+    stop_scrolling_capture_command, open_path_command, verify_entitlement,
 };
 use secure_store::{secure_store_delete, secure_store_get, secure_store_set};
 use shortcuts::{
@@ -128,6 +129,7 @@ pub fn run() {
             crop_image_command,
             compress_export_bytes_command,
             classify_content_command,
+            verify_entitlement,
             update_capture_shortcut,
             secure_store_get,
             secure_store_set,

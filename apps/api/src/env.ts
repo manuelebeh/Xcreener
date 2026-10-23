@@ -51,6 +51,8 @@ export const env = createEnv({
     ATLASSIAN_CLIENT_SECRET: z.string().default(''),
     MS_TEAMS_CLIENT_ID: z.string().default(''),
     MS_TEAMS_CLIENT_SECRET: z.string().default(''),
+    /** Ed25519 PKCS8 PEM signing desktop entitlements (scripts/generate-entitlement-keys.ts). */
+    ENTITLEMENT_PRIVATE_KEY: z.string().default(''),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

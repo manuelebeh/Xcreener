@@ -41,6 +41,8 @@ mp4 = "0.14"
 bytes = "1"
 open = "5"
 keyring = { version = "3", default-features = false, features = ["apple-native", "windows-native", "linux-native"] }
+ring = "0.17"
+base64 = "0.22"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 screencapturekit = "8"

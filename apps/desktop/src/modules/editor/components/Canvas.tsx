@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { RemoteCursorsOverlay } from '@/modules/collab/components/RemoteCursorsOverlay';
 import { useCollabPointerPresence } from '@/modules/collab/hooks/useCollabSession';
 import { useCollabStore } from '@/modules/collab/store';
+import { usePremiumAccess } from '@/modules/licensing/premiumAccess';
 import { RedactionOverlay } from '@/modules/redaction/components/RedactionOverlay';
 import { useSettingsStore } from '@/modules/settings/store';
 import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/settings/watermark';
@@ -48,10 +49,11 @@ export function Canvas() {
     }))
   );
 
+  const premium = usePremiumAccess();
   const [watermarkLogo, setWatermarkLogo] = useState<HTMLImageElement | null>(null);
 
   useEffect(() => {
-    const config = watermarkFromSettings(watermarkSettings);
+    const config = watermarkFromSettings(watermarkSettings, premium);
     if (!config.enabled || !config.logoPath) {
       setWatermarkLogo(null);
       return;
@@ -73,7 +75,7 @@ export function Canvas() {
     return () => {
       cancelled = true;
     };
-  }, [watermarkSettings]);
+  }, [watermarkSettings, premium]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -103,7 +105,7 @@ export function Canvas() {
       transform,
       annotations,
       selectedAnnotationId,
-      watermark: watermarkFromSettings(watermarkSettings),
+      watermark: watermarkFromSettings(watermarkSettings, premium),
       watermarkLogo,
     };
   }, [
@@ -117,6 +119,7 @@ export function Canvas() {
     annotations,
     selectedAnnotationId,
     watermarkSettings,
+    premium,
     watermarkLogo,
   ]);
 
