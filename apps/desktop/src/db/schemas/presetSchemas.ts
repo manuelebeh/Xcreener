@@ -1,8 +1,13 @@
 import { z } from 'zod';
 import { DEFAULT_GRADIENT_PRESET_ID } from '@/modules/editor/engine/gradients';
-import type { ShadowConfig } from '@/modules/editor/types';
+import type { AspectRatio, ShadowConfig } from '@/modules/editor/types';
 
-export const aspectRatioSchema = z.enum(['16:9', '4:3', '1:1', '1.91:1', 'free']);
+const RATIO_PATTERN = /^\d+(\.\d+)?:\d+(\.\d+)?$/;
+
+export const aspectRatioSchema = z.custom<AspectRatio>(
+  (value) => value === 'free' || (typeof value === 'string' && RATIO_PATTERN.test(value)),
+  { message: 'Invalid aspect ratio' }
+);
 
 export const serializableBackgroundSchema = z.discriminatedUnion('type', [
   z.object({
@@ -57,7 +62,7 @@ function parseJson(json: string): unknown {
   return JSON.parse(json) as unknown;
 }
 
-export function parseStoredAspectRatio(value: string | null): z.infer<typeof aspectRatioSchema> {
+export function parseStoredAspectRatio(value: string | null): AspectRatio {
   const result = aspectRatioSchema.safeParse(value);
   return result.success ? result.data : '16:9';
 }

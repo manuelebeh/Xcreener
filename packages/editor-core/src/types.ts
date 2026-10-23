@@ -30,9 +30,22 @@ export interface ShadowConfig {
   color: string;
 }
 
-export type AspectRatio = '16:9' | '4:3' | '1:1' | '1.91:1' | 'free';
+export type AspectRatio = `${number}:${number}` | 'free';
 
 export type PresetCategory = 'social' | 'standard' | 'custom';
+
+export type SocialNetwork =
+  | 'twitter'
+  | 'linkedin'
+  | 'instagram'
+  | 'facebook'
+  | 'youtube'
+  | 'threads'
+  | 'reddit'
+  | 'pinterest'
+  | 'snapchat'
+  | 'producthunt'
+  | 'dribbble';
 
 export interface FramePreset {
   id: string;
@@ -42,6 +55,7 @@ export interface FramePreset {
   height: number;
   aspectRatio: AspectRatio;
   icon?: string;
+  network?: SocialNetwork;
 }
 
 export interface ScreenshotTransform {

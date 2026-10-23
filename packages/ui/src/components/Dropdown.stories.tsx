@@ -20,3 +20,14 @@ export const Default: Story = {
     ],
   },
 };
+
+export const WithHints: Story = {
+  args: {
+    trigger: <Button variant="secondary">LinkedIn</Button>,
+    items: [
+      { label: 'Image / link', value: 'linkedin', hint: '1200×627' },
+      { label: 'Square', value: 'linkedin-square', hint: '1080×1080' },
+      { label: 'Portrait / carousel', value: 'linkedin-portrait', hint: '1080×1350' },
+    ],
+  },
+};

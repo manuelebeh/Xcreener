@@ -2,7 +2,8 @@ import { spacing } from '@snapglow/design-tokens/tokens.native';
 import {
   BUILT_IN_PRESETS,
   FREE_PRESET_ID,
-  SOCIAL_PRESETS,
+  getNetworkPresets,
+  SOCIAL_NETWORKS,
   STANDARD_PRESETS,
 } from '@snapglow/editor-core';
 import { Button, useTheme } from '@snapglow/ui-native';
@@ -45,7 +46,7 @@ function PresetSection({
             }}
             style={styles.item}
           >
-            {preset.name}
+            {preset.width > 0 ? `${preset.name} · ${preset.width}×${preset.height}` : preset.name}
           </Button>
         ))}
       </View>
@@ -67,11 +68,14 @@ export function PresetPicker({ visible, onClose }: PresetPickerProps) {
             </Button>
           </View>
           <ScrollView contentContainerStyle={styles.content}>
-            <PresetSection
-              title="Social"
-              presetIds={SOCIAL_PRESETS.map((p) => p.id)}
-              onSelect={onClose}
-            />
+            {SOCIAL_NETWORKS.map((network) => (
+              <PresetSection
+                key={network.id}
+                title={network.name}
+                presetIds={getNetworkPresets(network.id).map((p) => p.id)}
+                onSelect={onClose}
+              />
+            ))}
             <PresetSection
               title="Ratios"
               presetIds={STANDARD_PRESETS.map((p) => p.id)}
