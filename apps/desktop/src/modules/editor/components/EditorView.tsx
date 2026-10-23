@@ -8,7 +8,7 @@ import { RedactionBar } from '@/modules/redaction/components/RedactionBar';
 import { useAutoRedaction } from '@/modules/redaction/hooks/useAutoRedaction';
 import { StyleSuggestionBar } from '@/modules/style-suggestion/components/StyleSuggestionBar';
 import { useAutoStyleSuggestion } from '@/modules/style-suggestion/hooks/useAutoStyleSuggestion';
-import { TextExtractionBar } from '@/modules/text-extraction/components/TextExtractionBar';
+import { TextExtractionBar, useAutoTextExtraction } from '@/modules/text-extraction';
 import { useCustomPresetsLoader } from '../hooks/useCustomPresets';
 import { useEditorStore } from '../store';
 import { AnnotationToolbar, AnnotationToolStrip } from './AnnotationToolbar';
@@ -21,6 +21,7 @@ export function EditorView() {
   useCustomPresetsLoader();
   useAutoRedaction();
   useAutoStyleSuggestion();
+  useAutoTextExtraction();
   const hasScreenshot = useEditorStore((s) => s.screenshot !== null);
   const documentId = useCollabStore((s) => s.documentId);
   useCollabSession(documentId);

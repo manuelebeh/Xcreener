@@ -43,7 +43,7 @@ export function HistoryCard({
     >
       <button
         type="button"
-        className="block w-full flex-1 text-left"
+        className="sg-focus-ring block w-full flex-1 text-left"
         onClick={onSelect}
         onDoubleClick={onOpen}
         aria-label={`Preview capture ${capture.filename}`}

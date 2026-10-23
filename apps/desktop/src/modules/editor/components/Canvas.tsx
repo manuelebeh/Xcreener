@@ -7,7 +7,7 @@ import { usePremiumAccess } from '@/modules/licensing/premiumAccess';
 import { RedactionOverlay } from '@/modules/redaction/components/RedactionOverlay';
 import { useSettingsStore } from '@/modules/settings/store';
 import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/settings/watermark';
-import { TextSelectionOverlay } from '@/modules/text-extraction/components/TextSelectionOverlay';
+import { TextLayer } from '@/modules/text-extraction/components/TextLayer';
 import { computeLayout } from '../engine/computeLayout';
 import { fitPreviewSize } from '../engine/fitPreviewSize';
 import { getPresetById, getPresetLabel } from '../engine/presets';
@@ -248,7 +248,7 @@ export function Canvas() {
               onClose={() => setTextEditRequest(null)}
             />
             <RedactionOverlay displayScale={displayScale} />
-            <TextSelectionOverlay displayScale={displayScale} />
+            <TextLayer displayScale={displayScale} />
           </div>
         ) : screenshot ? (
           <p className="text-sm text-muted">Preparing preview…</p>

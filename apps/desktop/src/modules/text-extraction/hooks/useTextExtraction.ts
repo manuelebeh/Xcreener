@@ -1,4 +1,3 @@
-import { lineId } from '@snapglow/ocr-core';
 import { useCallback } from 'react';
 import { useEditorStore } from '@/modules/editor/store';
 import { screenshotToPngBytes } from '@/modules/redaction/utils/screenshotToPngBytes';
@@ -13,13 +12,11 @@ export function useTextExtraction() {
       return;
     }
 
-    const { clear, setStatus, setLines, setError, setSelectionEnabled } =
-      useTextExtractionStore.getState();
+    const { clear, setStatus, setLines, setError } = useTextExtractionStore.getState();
     const { ocrEngine, ocrLanguages } = useSettingsStore.getState();
 
     clear();
     setStatus('scanning');
-    setSelectionEnabled(true);
 
     try {
       const bytes = await screenshotToPngBytes(screenshot);
@@ -30,18 +27,19 @@ export function useTextExtraction() {
           .map((language) => language.trim())
           .filter(Boolean),
       });
+      // A new capture or a Balance swap replaced the bitmap: these lines no longer line up.
+      if (useEditorStore.getState().screenshot !== screenshot) {
+        return;
+      }
       setLines(lines);
     } catch (error) {
+      if (useEditorStore.getState().screenshot !== screenshot) {
+        return;
+      }
       const message = error instanceof Error ? error.message : String(error);
       setError(message);
     }
   }, []);
 
-  const toggleLine = useCallback((lineIdValue: string, range = false) => {
-    useTextExtractionStore.getState().toggleLineSelection(lineIdValue, range);
-  }, []);
-
-  const getLineId = useCallback((line: Parameters<typeof lineId>[0]) => lineId(line), []);
-
-  return { scan, toggleLine, getLineId };
+  return { scan };
 }
