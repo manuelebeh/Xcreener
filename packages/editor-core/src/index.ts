@@ -100,3 +100,10 @@ export {
   DEFAULT_TRANSFORM,
   DEFAULT_WATERMARK,
 } from './types';
+export {
+  computeWatermarkBox,
+  WATERMARK_FONT_SIZE,
+  WATERMARK_PADDING,
+  type WatermarkBox,
+  watermarkLabel,
+} from './watermark';

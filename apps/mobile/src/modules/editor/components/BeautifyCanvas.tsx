@@ -20,11 +20,15 @@ import {
 import {
   type Annotation,
   computeLayout,
+  computeWatermarkBox,
   fitGpuTextureSize,
   fitPreviewSize,
   getGradientPreset,
   getResizeHandles,
   type RenderInput,
+  WATERMARK_FONT_SIZE,
+  type WatermarkConfig,
+  watermarkLabel,
 } from '@snapglow/editor-core';
 import { forwardRef, useImperativeHandle, useMemo } from 'react';
 import { PixelRatio, View } from 'react-native';
@@ -158,6 +162,55 @@ function SelectionHandles({ annotation }: { annotation: Annotation }) {
   );
 }
 
+/** Same badge as render-core drawWatermark. Mobile only shows it on free plans, without a logo. */
+function WatermarkLayer({
+  config,
+  canvasWidth,
+  canvasHeight,
+}: {
+  config: WatermarkConfig;
+  canvasWidth: number;
+  canvasHeight: number;
+}) {
+  const font = useMemo(
+    () => matchFont({ fontFamily: 'System', fontSize: WATERMARK_FONT_SIZE, fontWeight: '600' }),
+    []
+  );
+  const label = watermarkLabel(config);
+  if (!config.enabled || !label) {
+    return null;
+  }
+
+  const box = computeWatermarkBox(
+    config,
+    canvasWidth,
+    canvasHeight,
+    font.measureText(label).width,
+    false
+  );
+  const { ascent, descent } = font.getMetrics();
+
+  return (
+    <Group opacity={Math.min(1, Math.max(0, config.opacity / 100))}>
+      <RoundedRect
+        x={box.x}
+        y={box.y}
+        width={box.width}
+        height={box.height}
+        r={8}
+        color="rgba(0, 0, 0, 0.35)"
+      />
+      <SkiaText
+        x={box.textX}
+        y={box.centerY - (ascent + descent) / 2}
+        text={label}
+        font={font}
+        color="#ffffff"
+      />
+    </Group>
+  );
+}
+
 function SceneContent({ input, image }: { input: RenderInput; image: SkImage }) {
   const layout = useMemo(() => computeLayout(input), [input]);
   const { canvasWidth, canvasHeight, screenshot } = layout;
@@ -269,6 +322,14 @@ function SceneContent({ input, image }: { input: RenderInput; image: SkImage }) 
       {vectorAnnotations.map((annotation) => (
         <AnnotationLayer key={annotation.id} annotation={annotation} />
       ))}
+
+      {input.watermark ? (
+        <WatermarkLayer
+          config={input.watermark}
+          canvasWidth={canvasWidth}
+          canvasHeight={canvasHeight}
+        />
+      ) : null}
 
       {selected ? <SelectionHandles annotation={selected} /> : null}
     </Group>
