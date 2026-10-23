@@ -77,4 +77,5 @@ export const SETTING_KEYS = {
   activeWorkspaceId: 'activeWorkspaceId',
   useTeamBrandKit: 'useTeamBrandKit',
   brandKitCache: 'brandKitCache',
+  entitlementToken: 'entitlementToken',
 } as const;

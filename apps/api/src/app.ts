@@ -16,6 +16,7 @@ import { registerBillingRoutes } from './routes/billing';
 import { registerCollabRoutes } from './routes/collab';
 import { registerCollectionRoutes } from './routes/collections';
 import { registerEmbedRoutes } from './routes/embeds';
+import { registerEntitlementRoutes } from './routes/entitlement';
 import { registerHealthRoutes } from './routes/health';
 import { registerIntegrationRoutes } from './routes/integrations';
 import { registerLibraryRoutes } from './routes/library';
@@ -71,7 +72,8 @@ export async function buildApp(options: BuildAppOptions) {
   await registerHealthRoutes(app, { db: options.db });
   await registerShareRoutes(app, { db: options.db, storage });
   await registerEmbedRoutes(app, { db: options.db, storage });
-  await registerIntegrationRoutes(app);
+  await registerIntegrationRoutes(app, { db: options.db });
+  await registerEntitlementRoutes(app, { db: options.db });
   await registerLibraryRoutes(app, { db: options.db, storage });
   await registerCollectionRoutes(app, { db: options.db });
   await registerWorkspaceRoutes(app, { db: options.db, storage });

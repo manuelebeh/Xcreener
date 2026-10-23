@@ -1,5 +1,6 @@
 mod capture;
 mod classification;
+mod entitlement;
 mod image_processing;
 mod ocr;
 mod overlay_layout;
@@ -15,6 +16,7 @@ pub use capture::{
     stop_region_recording_command, stop_scrolling_capture_command, open_path_command,
 };
 pub use classification::classify_content_command;
+pub use entitlement::verify_entitlement;
 pub use image_processing::{
     compress_export_bytes_command, crop_image_command, detect_content_bounds_command,
 };

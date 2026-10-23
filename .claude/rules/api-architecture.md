@@ -85,6 +85,7 @@ pnpm --filter @snapglow/api db:migrate
 | GET | `/v1/sync/library` | Bearer JWT | Library sync pull |
 | DELETE | `/v1/library/:id` | Bearer JWT | Delete a library item (sync) |
 | GET/PUT | `/v1/users/me/settings` | Bearer JWT | Cross-device settings sync |
+| GET | `/v1/me/entitlement` | Bearer JWT | Ed25519-signed plan token (7 days) the desktop verifies offline |
 | GET | `/v1/templates`, `/v1/templates/:slug` | No | Template marketplace listing and detail |
 | POST | `/v1/templates` | Bearer JWT | Submit a template |
 | POST | `/v1/webhooks/rewardful` | Rewardful sig | Affiliate events (fails closed without a secret) |
@@ -99,6 +100,7 @@ Optional header `X-Workspace-Id` scopes library/share uploads and collab documen
 - Workspace authz via `requireWorkspaceRole` / `can()` from `@snapglow/team-core`
 - Privacy: uploads only from authenticated clients; explicit consent in desktop UI
 - Integration OAuth secrets live in API env only; access tokens stored on desktop
+- Paid features: Jira / Confluence / Teams OAuth require Team Pro (checked in `/v1/integrations/*`); desktop plan comes only from `/v1/me/entitlement`, signed with `ENTITLEMENT_PRIVATE_KEY` and verified in Rust with `SNAPGLOW_ENTITLEMENT_PUBLIC_KEY`
 - Link expiry: `1h`, `24h`, `7d`, `permanent` (see `packages/cloud-core`)
 
 ## Related

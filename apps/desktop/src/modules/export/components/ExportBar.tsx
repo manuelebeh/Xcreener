@@ -6,21 +6,13 @@ import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { ask } from '@tauri-apps/plugin-dialog';
 import { useCallback, useRef, useState } from 'react';
 import { captureExportCompleted } from '@/integrations/posthog/events';
-import {
-  captureExperimentExposure,
-  capturePaywallShown,
-  getPaywallExperimentVariant,
-} from '@/integrations/posthog/experiments';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { revokeShare, uploadShare } from '@/modules/cloud/uploadShare';
 import { useEditorStore } from '@/modules/editor/store';
 import { SendToIntegrationDialog } from '@/modules/integrations/components/SendToIntegrationDialog';
 import { useIntegrationsStore } from '@/modules/integrations/store';
-import {
-  hasEnterpriseIntegrationsAccess,
-  hasPremiumAccess,
-} from '@/modules/licensing/premiumAccess';
+import { hasEnterpriseIntegrationsAccess } from '@/modules/licensing/premiumAccess';
 import { useExportRender } from '../hooks/useExportRender';
 import { useExportStore } from '../store';
 import { copyExportToClipboard } from '../utils/copyExport';
@@ -60,25 +52,6 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
   const runExport = useCallback(
     async (action: 'save' | 'copy' | 'drag' | 'share' | 'send', provider?: IntegrationProvider) => {
       if (!screenshot || isExporting) {
-        return;
-      }
-
-      const paywallVariant = getPaywallExperimentVariant();
-      captureExperimentExposure('paywall-timing-v1', paywallVariant);
-
-      if (
-        !hasPremiumAccess() &&
-        paywallVariant === 'export_limit_message' &&
-        (action === 'save' ||
-          action === 'copy' ||
-          action === 'drag' ||
-          action === 'share' ||
-          action === 'send')
-      ) {
-        capturePaywallShown('export_limit_message');
-        setLastMessage(
-          'Upgrade to Team Starter to export without limits. Open Settings → Team → Billing.'
-        );
         return;
       }
 

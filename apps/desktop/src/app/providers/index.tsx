@@ -8,6 +8,7 @@ import { PostHogProvider } from '@/integrations/posthog/provider';
 import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/updateCaptureShortcut';
 import { detectLicenseSource } from '@/modules/licensing/detectLicenseSource';
+import { loadStoredEntitlement, refreshEntitlement } from '@/modules/licensing/entitlement';
 import { syncAutostart } from '@/modules/settings/autostart';
 import { useSettingsStore } from '@/modules/settings/store';
 import { TeamOnboardingHost } from '@/modules/team/components/TeamOnboardingHost';
@@ -43,6 +44,10 @@ export function AppProviders({ children }: AppProvidersProps) {
         if (!cancelled) {
           hydrate(settings);
           await hydrateTeamFromSettings(settings.activeWorkspaceId || null);
+          await loadStoredEntitlement();
+          refreshEntitlement().catch((error) => {
+            console.debug('[SnapGlow] Entitlement refresh skipped', error);
+          });
         }
 
         try {

@@ -5651,6 +5651,7 @@ dependencies = [
 name = "snapglow-desktop"
 version = "0.1.0"
 dependencies = [
+ "base64 0.22.1",
  "bytes",
  "gif 0.13.3",
  "image",
@@ -5666,6 +5667,7 @@ dependencies = [
  "openh264",
  "png 0.17.16",
  "regex",
+ "ring",
  "screencapturekit",
  "serde",
  "serde_json",
