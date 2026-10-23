@@ -45,6 +45,8 @@ jobs:
       - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional here: without it, smoke builds treat every account as free.
+          SNAPGLOW_ENTITLEMENT_PUBLIC_KEY: ${{ vars.SNAPGLOW_ENTITLEMENT_PUBLIC_KEY }}
         with:
           projectPath: apps/desktop
           args: ${{ matrix.args }}
