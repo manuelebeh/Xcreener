@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { bootstrapAccount } from '@/modules/account';
 import { useShareImport } from '@/modules/capture/hooks/useShareImport';
 
 export { ErrorBoundary } from 'expo-router';
@@ -14,6 +15,15 @@ SplashScreen.preventAutoHideAsync();
 
 function ShareImportListener() {
   useShareImport();
+  return null;
+}
+
+function AccountBootstrap() {
+  useEffect(() => {
+    bootstrapAccount().catch((error) => {
+      console.debug('[SnapGlow] Account bootstrap skipped', error);
+    });
+  }, []);
   return null;
 }
 
@@ -28,6 +38,7 @@ export default function RootLayout() {
         <SnapGlowI18nProvider>
           <SnapGlowThemeProvider>
             <ShareImportListener />
+            <AccountBootstrap />
             <Stack>
               <Stack.Screen name="index" options={{ title: 'SnapGlow' }} />
               <Stack.Screen name="import" options={{ title: 'Import' }} />

@@ -86,6 +86,9 @@ export function ExportBar({ canvasRef }: ExportBarProps) {
         </Button>
       </View>
       {status ? <Text style={{ color: colors.muted, fontSize: 13 }}>{status}</Text> : null}
+      {exportInput?.watermark ? (
+        <Text style={{ color: colors.muted, fontSize: 13 }}>Free plan: SnapGlow watermark</Text>
+      ) : null}
     </View>
   );
 }

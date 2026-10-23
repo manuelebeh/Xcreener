@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./entitlement": "./src/entitlement.ts"
   },
   "scripts": {
     "build": "echo 'source-only package'",
@@ -18,5 +19,8 @@
     "@snapglow/typescript-config": "workspace:*",
     "typescript": "^6.0.2",
     "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@noble/curves": "2.4.0"
   }
 }
