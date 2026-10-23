@@ -63,6 +63,8 @@ interface EditorState {
   padding: number;
   paddingTouched: boolean;
   screenshot: ImageBitmap | null;
+  /** Bumped on every new capture, not when replaceScreenshot swaps the bitmap. */
+  captureId: number;
   background: BackgroundConfig;
   borderRadius: number;
   shadow: ShadowConfig;
@@ -76,7 +78,8 @@ interface EditorState {
   history: { past: Annotation[][]; future: Annotation[][] };
   setPadding: (padding: number) => void;
   setScreenshot: (screenshot: ImageBitmap | null) => void;
-  cropScreenshot: (screenshot: ImageBitmap) => void;
+  /** Swaps the bitmap of the current capture, keeping padding, transform and annotations. */
+  replaceScreenshot: (screenshot: ImageBitmap) => void;
   updateBackground: (
     background: Partial<BackgroundConfig> & { type: BackgroundConfig['type'] }
   ) => void;
@@ -114,6 +117,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   padding: 40,
   paddingTouched: false,
   screenshot: null,
+  captureId: 0,
   background: DEFAULT_BACKGROUND,
   borderRadius: DEFAULT_BORDER_RADIUS,
   shadow: DEFAULT_SHADOW,
@@ -138,6 +142,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     if (!screenshot) {
       set({
         screenshot: null,
+        captureId: previous.captureId + 1,
         background: DEFAULT_BACKGROUND,
         borderRadius: DEFAULT_BORDER_RADIUS,
         shadow: DEFAULT_SHADOW,
@@ -154,6 +159,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const padding = autoPadding(screenshot);
     set({
       screenshot,
+      captureId: previous.captureId + 1,
       background: DEFAULT_BACKGROUND,
       borderRadius: DEFAULT_BORDER_RADIUS,
       shadow: DEFAULT_SHADOW,
@@ -167,19 +173,12 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     });
   },
 
-  cropScreenshot: (screenshot) => {
-    const previous = get();
-    if (previous.screenshot && previous.screenshot !== screenshot) {
-      previous.screenshot.close();
+  replaceScreenshot: (screenshot) => {
+    const previous = get().screenshot;
+    if (previous && previous !== screenshot) {
+      previous.close();
     }
-
-    const padding = autoPadding(screenshot);
-    set({
-      screenshot,
-      padding,
-      paddingTouched: false,
-      transform: DEFAULT_TRANSFORM,
-    });
+    set({ screenshot });
   },
 
   updateBackground: (background) => {

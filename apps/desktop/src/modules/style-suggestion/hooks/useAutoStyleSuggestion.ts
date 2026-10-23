@@ -6,21 +6,22 @@ import { useStyleSuggestionScan } from './useStyleSuggestion';
 
 export function useAutoStyleSuggestion(): void {
   const autoStyleSuggestion = useSettingsStore((s) => s.autoStyleSuggestion);
-  const screenshot = useEditorStore((s) => s.screenshot);
+  // Keyed on the capture, not the bitmap: Balance/Inset swaps should not reset the suggestion.
+  const captureId = useEditorStore((s) => (s.screenshot ? s.captureId : null));
   const { scan } = useStyleSuggestionScan();
   const pendingRef = useRef(false);
-  const lastScreenshotRef = useRef<ImageBitmap | null>(null);
+  const lastCaptureRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (screenshot !== lastScreenshotRef.current) {
-      lastScreenshotRef.current = screenshot;
+    if (captureId !== lastCaptureRef.current) {
+      lastCaptureRef.current = captureId;
       useStyleSuggestionStore.getState().clear();
       pendingRef.current = false;
     }
-  }, [screenshot]);
+  }, [captureId]);
 
   useEffect(() => {
-    if (!autoStyleSuggestion || !screenshot || pendingRef.current) {
+    if (!autoStyleSuggestion || captureId === null || pendingRef.current) {
       return;
     }
 
@@ -33,5 +34,5 @@ export function useAutoStyleSuggestion(): void {
         pendingRef.current = false;
       }
     })();
-  }, [autoStyleSuggestion, scan, screenshot]);
+  }, [autoStyleSuggestion, captureId, scan]);
 }

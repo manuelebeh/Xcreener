@@ -35,8 +35,7 @@ Typed wrappers live in `apps/desktop/src/tauri/commands.ts`. All `invoke` calls 
 | `get_capture_overlay_bounds` | `commands/capture.rs` | Live | `()` → `CaptureOverlayBounds` |
 | `detect_sensitive_data` | `commands/redaction.rs` | Live | `imageData: number[]` → `SensitiveRegion[]` |
 | `recognize_text_command` | `commands/ocr.rs` | Live (Sprint 2b.2) | `{ imageData, options }` → `TextLine[]` (copy-text OCR; shared engine in `src-tauri/src/ocr/`) |
-| `detect_content_bounds_command` | `commands/image_processing.rs` | Live (Sprint 2b.2) | `imageData: number[]` → `ContentBounds` |
-| `crop_image_command` | `commands/image_processing.rs` | Live (Sprint 2b.2) | `{ imageData, bounds }` → `number[]` (PNG bytes) |
+| `analyze_content_command` | `commands/image_processing.rs` | Live (replaces `detect_content_bounds_command` + `crop_image_command`) | `imageData: number[]` → `ContentAnalysis` (`bounds`, RGBA `background`) |
 | `compress_export_bytes_command` | `commands/image_processing.rs` | Live (Sprint 2b.2) | `{ imageData, format, quality }` → `number[]` — optional post-pass after frontend canvas render |
 | `classify_content_command` | `commands/classification.rs` | Live (Sprint 2b.1) | `imageData: number[]` → `ClassificationResult` |
 | `export_image` | `commands/export.rs` | Live (path write helper) | `{ imageData, format, quality, path }` — compresses then writes file; primary export UI still uses frontend render + `compress_export_bytes_command` |

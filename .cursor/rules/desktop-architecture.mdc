@@ -16,7 +16,7 @@ src/
 │   ├── routes.tsx          # React Router routes
 │   └── providers/          # Bootstrap (DB init, etc.)
 ├── modules/                # Domain modules
-│   ├── auto-crop/          # Trim empty margins from a capture
+│   ├── balance/            # Equal margins around the capture content
 │   ├── capture/            # Screen capture orchestration
 │   ├── cloud/              # Auth0 login, shares, library sync
 │   ├── collab/             # Real-time annotation, comments, notifications

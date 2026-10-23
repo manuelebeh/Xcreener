@@ -7,6 +7,8 @@ import { useRedactionScan } from './useRedactionScan';
 export function useAutoRedaction(): void {
   const autoRedaction = useSettingsStore((s) => s.autoRedaction);
   const screenshot = useEditorStore((s) => s.screenshot);
+  // Balance/Inset swap the bitmap without a new capture: masks already follow, so only rescan new captures.
+  const captureId = useEditorStore((s) => (s.screenshot ? s.captureId : null));
   const { scan, maskAll } = useRedactionScan();
   const pendingRef = useRef(false);
   const lastScreenshotRef = useRef<ImageBitmap | null>(null);
@@ -20,7 +22,7 @@ export function useAutoRedaction(): void {
   }, [screenshot]);
 
   useEffect(() => {
-    if (!autoRedaction || !screenshot || pendingRef.current) {
+    if (!autoRedaction || captureId === null || pendingRef.current) {
       return;
     }
 
@@ -34,5 +36,5 @@ export function useAutoRedaction(): void {
         pendingRef.current = false;
       }
     })();
-  }, [autoRedaction, maskAll, scan, screenshot]);
+  }, [autoRedaction, captureId, maskAll, scan]);
 }
