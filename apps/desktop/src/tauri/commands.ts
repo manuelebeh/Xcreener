@@ -141,16 +141,9 @@ export function recognizeText(
   });
 }
 
-export function detectContentBounds(imageData: number[]) {
-  return invoke<import('@/shared/types/ipc').ContentBounds>('detect_content_bounds_command', {
+export function analyzeContent(imageData: number[]) {
+  return invoke<import('@/shared/types/ipc').ContentAnalysis>('analyze_content_command', {
     imageData,
-  });
-}
-
-export function cropImage(imageData: number[], bounds: import('@/shared/types/ipc').ContentBounds) {
-  return invoke<number[]>('crop_image_command', {
-    imageData,
-    bounds,
   });
 }
 

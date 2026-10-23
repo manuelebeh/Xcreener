@@ -127,6 +127,13 @@ export interface ContentBounds {
   height: number;
 }
 
+export interface ContentAnalysis {
+  /** Tight box around everything that differs from the background. */
+  bounds: ContentBounds;
+  /** RGBA background color sampled from the four corners. */
+  background: [number, number, number, number];
+}
+
 export type ContentClass = 'code' | 'ui' | 'terminal' | 'photo' | 'diagram' | 'text';
 
 export interface ClassificationResult {

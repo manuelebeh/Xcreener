@@ -19,6 +19,15 @@ pub struct ContentBounds {
     pub height: u32,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct ContentAnalysis {
+    /// Tight box around everything that differs from the background.
+    pub bounds: ContentBounds,
+    /// RGBA background color sampled from the four corners.
+    pub background: [u8; 4],
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct RecognizeTextOptions {

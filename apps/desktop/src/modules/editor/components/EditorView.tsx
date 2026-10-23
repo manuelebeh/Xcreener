@@ -1,4 +1,4 @@
-import { AutoCropBar } from '@/modules/auto-crop/components/AutoCropBar';
+import { BalanceBar } from '@/modules/balance';
 import { CollabBar } from '@/modules/collab/components/CollabBar';
 import { CommentsPanel } from '@/modules/collab/components/CommentsPanel';
 import { useCollabSession } from '@/modules/collab/hooks/useCollabSession';
@@ -54,11 +54,11 @@ export function EditorView() {
               <EditorSection title="Style" testId="style-bar-section">
                 <StyleBar embedded />
               </EditorSection>
+              <EditorSection title="Balance" testId="balance-bar-section">
+                <BalanceBar embedded />
+              </EditorSection>
               <EditorSection title="Annotation options" testId="annotation-toolbar-section">
                 <AnnotationToolbar embedded />
-              </EditorSection>
-              <EditorSection title="Auto-crop" testId="auto-crop-section">
-                <AutoCropBar embedded />
               </EditorSection>
               <EditorSection title="Sensitive data" testId="redaction-bar-section">
                 <RedactionBar embedded />
