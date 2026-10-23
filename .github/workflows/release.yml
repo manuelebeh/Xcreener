@@ -41,9 +41,22 @@ jobs:
         if: runner.os == 'macOS'
         run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
 
+      # Without this key the app rejects every entitlement, so paying users would be
+      # treated as free (forced watermark). Public value: a repo variable, not a secret.
+      - name: Require entitlement public key
+        shell: bash
+        env:
+          SNAPGLOW_ENTITLEMENT_PUBLIC_KEY: ${{ vars.SNAPGLOW_ENTITLEMENT_PUBLIC_KEY }}
+        run: |
+          if [ -z "$SNAPGLOW_ENTITLEMENT_PUBLIC_KEY" ]; then
+            echo "::error::Set the SNAPGLOW_ENTITLEMENT_PUBLIC_KEY repository variable (apps/api/scripts/generate-entitlement-keys.ts)."
+            exit 1
+          fi
+
       - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SNAPGLOW_ENTITLEMENT_PUBLIC_KEY: ${{ vars.SNAPGLOW_ENTITLEMENT_PUBLIC_KEY }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           # Platform code signing: leave unset until secrets exist. Empty APPLE_*

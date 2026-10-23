@@ -102,6 +102,21 @@ export TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/snapglow.key)"
 pnpm --filter @snapglow/desktop tauri build
 ```
 
+## 7. Paid-plan entitlements (Ed25519)
+
+The desktop app only trusts a paid plan signed by the API (`GET /v1/me/entitlement`) and checks the signature in Rust (`src-tauri/src/entitlement.rs`). This key pair is separate from the updater key.
+
+```bash
+pnpm --filter @snapglow/api exec tsx scripts/generate-entitlement-keys.ts
+```
+
+| Value | Where | Secret? |
+|-------|-------|---------|
+| `ENTITLEMENT_PRIVATE_KEY` | API environment (prod host, `apps/api/.env.local` in dev) | Yes |
+| `SNAPGLOW_ENTITLEMENT_PUBLIC_KEY` | GitHub → Settings → Variables (Actions), read by `release.yml` / `build.yml`; your shell for local builds | No |
+
+`release.yml` fails when the variable is missing: a build without it treats every paying account as free. Rotating the pair logs every desktop out of its paid plan until it reaches the API again.
+
 ## References
 
 - [ADR-005](./adr/005-distribution-updates-and-signing.md)
