@@ -9,7 +9,7 @@ import { loadWatermarkLogoImage, watermarkFromSettings } from '@/modules/setting
 import { TextSelectionOverlay } from '@/modules/text-extraction/components/TextSelectionOverlay';
 import { computeLayout } from '../engine/computeLayout';
 import { fitPreviewSize } from '../engine/fitPreviewSize';
-import { getPresetById } from '../engine/presets';
+import { getPresetById, getPresetLabel } from '../engine/presets';
 import {
   type TextEditRequest,
   useAnnotationInteraction,
@@ -209,7 +209,7 @@ export function Canvas() {
     ? `${layout.canvasWidth} × ${layout.canvasHeight}px · final render`
     : null;
 
-  const presetLabel = frame?.name ?? 'Free';
+  const presetLabel = frame ? getPresetLabel(frame) : 'Free';
 
   return (
     <section className="flex h-full min-h-0 w-full flex-col" aria-label="Export preview">

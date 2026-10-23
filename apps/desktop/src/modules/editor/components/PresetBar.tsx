@@ -1,44 +1,113 @@
-import { Tooltip, TooltipProvider } from '@snapglow/ui';
+import { Dropdown, Tooltip, TooltipProvider } from '@snapglow/ui';
 import { clsx } from 'clsx';
-import type { ReactNode } from 'react';
-import { FREE_PRESET_ID, SOCIAL_PRESETS, STANDARD_PRESETS } from '../engine/presets';
+import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import {
+  FREE_PRESET_ID,
+  getNetworkPresets,
+  getPresetLabel,
+  SOCIAL_NETWORKS,
+  SOCIAL_PRESETS,
+  STANDARD_PRESETS,
+} from '../engine/presets';
 import { useEditorStore } from '../store';
 import type { FramePreset } from '../types';
 import { PresetPicker } from './PresetPicker';
 import { SocialIcon } from './SocialIcons';
 
+function formatSize(preset: FramePreset) {
+  return `${preset.width}×${preset.height}`;
+}
+
+function BarButton({
+  isActive,
+  className,
+  ...props
+}: { isActive: boolean } & ComponentPropsWithoutRef<'button'>) {
+  return (
+    <button
+      type="button"
+      className={clsx(
+        'sg-focus-ring flex h-8 min-w-8 cursor-pointer items-center justify-center whitespace-nowrap rounded-md px-2 text-xs font-medium tabular-nums transition-colors',
+        isActive
+          ? 'bg-primary text-primary-foreground'
+          : 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1]',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
 function PresetButton({
   preset,
+  label,
   isActive,
   onSelect,
   icon,
 }: {
   preset: FramePreset;
+  label?: string;
   isActive: boolean;
   onSelect: () => void;
   icon?: ReactNode;
 }) {
-  const displayLabel = icon ?? preset.name;
-  const tooltip =
-    preset.width > 0 ? `${preset.name} · ${preset.width}×${preset.height}` : preset.name;
+  const name = label ?? preset.name;
+  const tooltip = preset.width > 0 ? `${name} · ${formatSize(preset)}` : name;
 
   return (
     <Tooltip content={tooltip}>
-      <button
-        type="button"
-        aria-label={preset.name}
-        aria-pressed={isActive}
-        className={clsx(
-          'sg-focus-ring flex h-8 min-w-8 items-center justify-center whitespace-nowrap rounded-md px-2 text-xs font-medium tabular-nums transition-colors',
-          isActive
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-foreground/[0.06] text-foreground hover:bg-foreground/[0.1]'
-        )}
-        onClick={onSelect}
-      >
-        {displayLabel}
-      </button>
+      <BarButton aria-label={name} aria-pressed={isActive} isActive={isActive} onClick={onSelect}>
+        {icon ?? name}
+      </BarButton>
     </Tooltip>
+  );
+}
+
+function NetworkButton({
+  network,
+  selectedPresetId,
+  onSelect,
+}: {
+  network: (typeof SOCIAL_NETWORKS)[number];
+  selectedPresetId: string | null;
+  onSelect: (presetId: string) => void;
+}) {
+  const variants = getNetworkPresets(network.id);
+  const isActive = variants.some((preset) => preset.id === selectedPresetId);
+  const icon = <SocialIcon network={network.id} />;
+
+  const [preset] = variants;
+  if (!preset) {
+    return null;
+  }
+
+  if (variants.length === 1) {
+    return (
+      <PresetButton
+        preset={preset}
+        label={`${network.name} ${preset.name}`}
+        isActive={isActive}
+        onSelect={() => onSelect(preset.id)}
+        icon={icon}
+      />
+    );
+  }
+
+  return (
+    <Dropdown
+      modal={false}
+      trigger={
+        <BarButton aria-label={`${network.name} formats`} isActive={isActive}>
+          {icon}
+        </BarButton>
+      }
+      items={variants.map((preset) => ({
+        label: preset.name,
+        value: preset.id,
+        hint: formatSize(preset),
+      }))}
+      onSelect={onSelect}
+    />
   );
 }
 
@@ -49,18 +118,18 @@ export function PresetBar({ embedded = false }: { embedded?: boolean }) {
   const standardWithoutFree = STANDARD_PRESETS.filter((p) => p.id !== FREE_PRESET_ID);
   const freePreset = STANDARD_PRESETS.find((p) => p.id === FREE_PRESET_ID);
   const isFree = selectedPresetId === null;
+  const selectedSocial = SOCIAL_PRESETS.find((p) => p.id === selectedPresetId);
 
   const content = (
     <div className="flex w-full flex-wrap items-center gap-1.5" data-testid="preset-bar">
       {!embedded ? <span className="mr-1 text-xs font-medium text-muted">Format</span> : null}
 
-      {SOCIAL_PRESETS.map((preset) => (
-        <PresetButton
-          key={preset.id}
-          preset={preset}
-          isActive={selectedPresetId === preset.id}
-          onSelect={() => setPreset(preset.id)}
-          icon={<SocialIcon presetId={preset.id} />}
+      {SOCIAL_NETWORKS.map((network) => (
+        <NetworkButton
+          key={network.id}
+          network={network}
+          selectedPresetId={selectedPresetId}
+          onSelect={setPreset}
         />
       ))}
 
@@ -81,6 +150,12 @@ export function PresetBar({ embedded = false }: { embedded?: boolean }) {
           isActive={isFree}
           onSelect={() => setPreset(FREE_PRESET_ID)}
         />
+      ) : null}
+
+      {selectedSocial ? (
+        <span className="w-full text-xs text-muted tabular-nums">
+          {getPresetLabel(selectedSocial)} · {formatSize(selectedSocial)}
+        </span>
       ) : null}
 
       <div className="mt-1 w-full">

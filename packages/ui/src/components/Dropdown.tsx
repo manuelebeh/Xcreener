@@ -6,6 +6,8 @@ import { focusRingClasses } from '../lib/focusRing';
 export interface DropdownItem {
   label: string;
   value: string;
+  /** Secondary text shown on the right, e.g. a size or shortcut. */
+  hint?: string;
   disabled?: boolean;
 }
 
@@ -14,11 +16,13 @@ export interface DropdownProps {
   items: DropdownItem[];
   onSelect?: (value: string) => void;
   className?: string;
+  /** When false, a click outside closes the menu and still reaches what was clicked. */
+  modal?: boolean;
 }
 
-export function Dropdown({ trigger, items, onSelect, className }: DropdownProps) {
+export function Dropdown({ trigger, items, onSelect, className, modal = true }: DropdownProps) {
   return (
-    <DropdownMenuPrimitive.Root>
+    <DropdownMenuPrimitive.Root modal={modal}>
       <DropdownMenuPrimitive.Trigger asChild>{trigger}</DropdownMenuPrimitive.Trigger>
       <DropdownMenuPrimitive.Portal>
         <DropdownMenuPrimitive.Content
@@ -33,13 +37,16 @@ export function Dropdown({ trigger, items, onSelect, className }: DropdownProps)
               key={item.value}
               disabled={item.disabled}
               className={clsx(
-                'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm',
+                'relative flex cursor-pointer select-none items-center gap-4 rounded-sm px-2 py-1.5 text-sm',
                 focusRingClasses,
                 'focus:bg-brand-100 data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
               )}
               onSelect={() => onSelect?.(item.value)}
             >
               {item.label}
+              {item.hint ? (
+                <span className="ml-auto text-xs text-muted tabular-nums">{item.hint}</span>
+              ) : null}
             </DropdownMenuPrimitive.Item>
           ))}
         </DropdownMenuPrimitive.Content>

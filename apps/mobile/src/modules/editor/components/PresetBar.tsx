@@ -1,5 +1,5 @@
 import { spacing } from '@snapglow/design-tokens/tokens.native';
-import { BUILT_IN_PRESETS, FREE_PRESET_ID } from '@snapglow/editor-core';
+import { BUILT_IN_PRESETS, FREE_PRESET_ID, SOCIAL_NETWORKS } from '@snapglow/editor-core';
 import { Button, useTheme } from '@snapglow/ui-native';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -42,7 +42,7 @@ export function PresetBar() {
             onPress={() => setPreset(preset.id === FREE_PRESET_ID ? null : preset.id)}
             style={styles.chip}
           >
-            {preset.name}
+            {SOCIAL_NETWORKS.find((network) => network.id === preset.network)?.name ?? preset.name}
           </Button>
         ))}
       </ScrollView>

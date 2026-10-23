@@ -45,7 +45,11 @@ describe('presetSchemas', () => {
 
   it('parses aspect ratio or defaults to 16:9', () => {
     expect(parseStoredAspectRatio('1:1')).toBe('1:1');
+    expect(parseStoredAspectRatio('1.91:1')).toBe('1.91:1');
+    expect(parseStoredAspectRatio('4:5')).toBe('4:5');
+    expect(parseStoredAspectRatio('free')).toBe('free');
     expect(parseStoredAspectRatio('invalid')).toBe('16:9');
+    expect(parseStoredAspectRatio('4:')).toBe('16:9');
     expect(parseStoredAspectRatio(null)).toBe('16:9');
   });
 

@@ -19,6 +19,8 @@ const ASPECT_RATIO_OPTIONS: { value: AspectRatio; label: string; width: number; 
     { value: '4:3', label: '4:3', width: 1600, height: 1200 },
     { value: '1:1', label: '1:1', width: 1080, height: 1080 },
     { value: '1.91:1', label: '1.91:1', width: 1200, height: 630 },
+    { value: '4:5', label: '4:5', width: 1080, height: 1350 },
+    { value: '9:16', label: '9:16', width: 1080, height: 1920 },
   ];
 
 function parseCustomDbId(id: string): number | null {
