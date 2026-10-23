@@ -106,7 +106,7 @@ Requires Xcode (iOS) or Android Studio (Android). See [`.cursor/rules/mobile-arc
 
 ## Architecture
 
-- Module layout: `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings,cloud,style-suggestion,text-extraction,auto-crop}/`
+- Module layout: `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings,cloud,style-suggestion,text-extraction,balance}/`
 - ADR: [`docs/internal/technical/adr/001-monorepo-and-module-architecture.md`](docs/internal/technical/adr/001-monorepo-and-module-architecture.md)
 - ADR: [`docs/internal/technical/adr/002-design-tokens-ui-and-web.md`](docs/internal/technical/adr/002-design-tokens-ui-and-web.md)
 - ADR: [`docs/internal/technical/adr/003-desktop-ipc-and-events.md`](docs/internal/technical/adr/003-desktop-ipc-and-events.md)
