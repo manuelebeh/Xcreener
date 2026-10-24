@@ -126,10 +126,17 @@ jobs:
       - name: Install dependencies
         run: mise run install
 
-      # Advisory only until the Expo toolchain advisories (apps/mobile) are cleared.
+      # Blocking. Reviewed exceptions (Expo toolchain, nitro-nightly's Azure storage driver) are
+      # listed in pnpm.auditConfig.ignoreGhsas in the root package.json.
       - name: Dependency audit (production)
-        continue-on-error: true
         run: mise exec -- pnpm audit --prod --audit-level high
+
+      # Reviewed exceptions live in apps/desktop/src-tauri/.cargo/audit.toml.
+      - name: Rust dependency audit
+        working-directory: apps/desktop/src-tauri
+        run: |
+          cargo install cargo-audit --locked
+          cargo audit
 
       - name: Secret scan
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
