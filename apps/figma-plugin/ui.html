@@ -31,6 +31,10 @@
         border-radius: 8px;
         border: 1px solid #ddd;
       }
+      #status {
+        margin-top: 12px;
+        min-height: 16px;
+      }
       #captures {
         margin-top: 12px;
         max-height: 160px;
@@ -61,8 +65,9 @@
     <hr />
     <button id="importSelection">Import selection → SnapGlow</button>
     <button id="refreshCaptures">Refresh captures</button>
+    <div id="status"></div>
     <div id="captures"></div>
     <img id="preview" alt="" hidden />
-    <script src="dist/ui.js"></script>
+    <!-- ui-script -->
   </body>
 </html>
