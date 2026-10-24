@@ -1,15 +1,13 @@
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import type { FastifyInstance } from 'fastify';
 import { parse as parseYaml } from 'yaml';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 function loadOpenApiSpec(): Record<string, unknown> {
-  const specPath = join(__dirname, '../../openapi/public.yaml');
+  // Relative to the package root, like `./drizzle`, so it resolves from src/ and the dist bundle.
+  const specPath = join(process.cwd(), 'openapi/public.yaml');
   const raw = readFileSync(specPath, 'utf8');
   return parseYaml(raw) as Record<string, unknown>;
 }
