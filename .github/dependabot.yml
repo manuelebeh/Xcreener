@@ -6,7 +6,17 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
+    # Expo SDK pins these: bump them with `expo install` during an SDK upgrade, not one by one.
+    ignore:
+      - dependency-name: 'expo*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-native*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@react-native*'
+        update-types: ['version-update:semver-major']
     groups:
+      wdio:
+        patterns: ['@wdio/*']
       npm-minor-and-patch:
         update-types: [minor, patch]
 
