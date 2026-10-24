@@ -21,6 +21,7 @@ import {
   captureScrollingWindow,
   getWindowAtPoint,
   hideCaptureOverlay,
+  listWindows,
   pauseRegionRecording,
   resumeRegionRecording,
   startRegionRecording,
@@ -42,6 +43,12 @@ import { useCaptureStore } from '../store';
 import { toOverlayRect } from '../toOverlayRect';
 import { isLiveOverlayMode, needsNativeCapture } from '../utils/captureFlow';
 import { normalizeTargetForMediaKind } from '../utils/captureModes';
+import {
+  defaultSelection,
+  isArrowKey,
+  nextWindow,
+  nudgeSelection,
+} from '../utils/keyboardSelection';
 import { CaptureCountdown } from './CaptureCountdown';
 import { CaptureProgress } from './CaptureProgress';
 import { CaptureToolbar } from './CaptureToolbar';
@@ -109,6 +116,9 @@ export function CaptureOverlay() {
   const setCaptureProgress = useCaptureStore((s) => s.setCaptureProgress);
   const reset = useCaptureStore((s) => s.reset);
   const finishRecordingRef = useRef<() => Promise<void>>(async () => {});
+  const rootRef = useRef<HTMLDivElement>(null);
+  // Window list for Tab cycling, fetched once per selection mode.
+  const windowsRef = useRef<{ mode: CaptureMode; windows: WindowInfo[] } | null>(null);
   const [revealed, setRevealed] = useState(false);
   const [recordingAnchorMs, setRecordingAnchorMs] = useState<number | null>(null);
   const [viewport, setViewport] = useState<OverlayViewport>(() =>
@@ -744,6 +754,25 @@ export function CaptureOverlay() {
     };
   }, [bounds]);
 
+  // Keyboard alternative to dragging and hovering (WCAG 2.5.7, 2.1.1).
+  useEffect(() => {
+    if (revealed) {
+      rootRef.current?.focus({ preventScroll: true });
+    }
+  }, [revealed]);
+
+  const cycleWindow = useCallback(
+    async (reverse: boolean) => {
+      if (windowsRef.current?.mode !== activeMode) {
+        windowsRef.current = { mode: activeMode, windows: await listWindows() };
+      }
+      const next = nextWindow(windowsRef.current.windows, hoveredWindow?.id ?? null, reverse);
+      setHoveredWindow(next);
+      return next;
+    },
+    [activeMode, hoveredWindow, setHoveredWindow]
+  );
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -759,6 +788,39 @@ export function CaptureOverlay() {
 
       if (isCapturing) {
         return;
+      }
+
+      // Arrows and Tab drive the selection only from the overlay surface, so the
+      // toolbar keeps its own keyboard behavior.
+      const onSurface = event.target === rootRef.current || event.target === document.body;
+
+      if (
+        onSurface &&
+        isArrowKey(event.key) &&
+        (activeMode === 'region' || activeMode === 'menu')
+      ) {
+        event.preventDefault();
+        setSelection(
+          selection
+            ? nudgeSelection(
+                selection,
+                event.key,
+                { shift: event.shiftKey, alt: event.altKey },
+                viewport
+              )
+            : defaultSelection(viewport)
+        );
+        return;
+      }
+
+      if (onSurface && event.key === 'Tab' && isWindowSelectionMode(activeMode)) {
+        // Past the last window, Tab moves focus on to the toolbar.
+        const cached = windowsRef.current?.mode === activeMode ? windowsRef.current.windows : null;
+        if (!cached || nextWindow(cached, hoveredWindow?.id ?? null, event.shiftKey)) {
+          event.preventDefault();
+          void cycleWindow(event.shiftKey);
+          return;
+        }
       }
 
       const canConfirmRegion =
@@ -780,12 +842,15 @@ export function CaptureOverlay() {
     handleCancelRecording,
     handleConfirm,
     handleStopScroll,
+    cycleWindow,
     hoveredWindow,
     isCapturing,
     isVideo,
     progressHudMode,
     scrollFinishing,
     selection,
+    setSelection,
+    viewport,
   ]);
 
   if (!bounds) {
@@ -835,13 +900,22 @@ export function CaptureOverlay() {
   const toolbarContainerStyle = captureToolbarContainerStyle(bounds, monitors, viewport);
   const toolbarStyle = captureToolbarStyle();
   const dimOpacity = isLiveOverlayMode(activeMode, liveOverlay) ? 'bg-black/45' : 'bg-black/25';
+  const announcement =
+    (activeMode === 'region' || activeMode === 'menu') && selection
+      ? `Selection ${Math.round(selection.width)} by ${Math.round(selection.height)}`
+      : isWindowSelectionMode(activeMode) && hoveredWindow
+        ? `Window ${hoveredWindow.title || 'untitled'}`
+        : '';
 
   return (
     <div
+      ref={rootRef}
       data-testid="capture-overlay"
       role="application"
       aria-label="Screen capture overlay"
-      className="relative h-full w-full overflow-hidden text-white"
+      aria-describedby="capture-overlay-keys"
+      tabIndex={-1}
+      className="relative h-full w-full overflow-hidden text-white outline-none"
       style={{
         opacity: revealed ? 1 : 0,
         pointerEvents: revealed && !isCapturing ? 'auto' : 'none',
@@ -873,6 +947,13 @@ export function CaptureOverlay() {
         />
       ) : null}
       <div className={`pointer-events-none absolute inset-0 z-[1] ${dimOpacity}`} />
+      <p id="capture-overlay-keys" className="sr-only">
+        Arrow keys move the selection, Alt with arrow keys resizes it, Shift makes steps of 10
+        pixels. Tab goes through windows. Enter captures, Escape cancels.
+      </p>
+      <div className="sr-only" aria-live="polite">
+        {announcement}
+      </div>
 
       <div style={toolbarContainerStyle}>
         <div style={toolbarStyle}>
