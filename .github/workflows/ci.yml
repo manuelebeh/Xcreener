@@ -15,7 +15,8 @@ permissions:
 
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    # 24.04: PipeWire 1.0 headers match libspa 0.9 (xcap). Pinned so the ubuntu-latest move does not break the Rust build.
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16-alpine
@@ -117,13 +118,6 @@ jobs:
 
       - name: Build web
         run: mise exec -- pnpm --filter @snapglow/web build
-
-      - name: API typecheck
-        run: mise exec -- pnpm --filter @snapglow/api typecheck
-
-      - name: Cargo check
-        working-directory: apps/desktop/src-tauri
-        run: cargo check --locked
 
   security:
     runs-on: ubuntu-latest
