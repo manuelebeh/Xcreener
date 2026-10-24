@@ -1,35 +1,40 @@
-const params = new URLSearchParams(window.location.search);
-const sessionId = params.get('session') ?? '';
+const connectButton = document.getElementById('connectNotion');
+const apiKeyInput = document.getElementById('apiKey');
+const loadCapturesButton = document.getElementById('loadCaptures');
+const capturesEl = document.getElementById('captures');
+const pageSelect = document.getElementById('pageSelect');
+const insertButton = document.getElementById('insertEmbed');
+const statusEl = document.getElementById('status');
 
-const connectButton = document.getElementById('connectNotion') as HTMLButtonElement;
-const apiKeyInput = document.getElementById('apiKey') as HTMLInputElement;
-const baseUrlInput = document.getElementById('baseUrl') as HTMLInputElement;
-const loadCapturesButton = document.getElementById('loadCaptures') as HTMLButtonElement;
-const capturesEl = document.getElementById('captures') as HTMLDivElement;
-const pageSelect = document.getElementById('pageSelect') as HTMLSelectElement;
-const insertButton = document.getElementById('insertEmbed') as HTMLButtonElement;
-const statusEl = document.getElementById('status') as HTMLParagraphElement;
+let selectedCaptureId = null;
 
-let selectedCaptureId: string | null = null;
-
-function setStatus(message: string) {
+function setStatus(message) {
   statusEl.textContent = message;
+}
+
+function postJson(path, body) {
+  return fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
 }
 
 connectButton.onclick = () => {
   window.location.href = '/oauth/start';
 };
 
+// The Notion session lives in an HttpOnly cookie set by /oauth/callback.
 async function loadPages() {
-  if (!sessionId) {
+  const response = await fetch('/api/pages');
+  if (response.status === 401) {
     return;
   }
-  const response = await fetch(`/api/pages?session=${encodeURIComponent(sessionId)}`);
   if (!response.ok) {
     setStatus('Failed to load Notion pages.');
     return;
   }
-  const payload = (await response.json()) as { pages: Array<{ id: string; url: string }> };
+  const payload = await response.json();
   pageSelect.innerHTML = '';
   for (const page of payload.pages) {
     const option = document.createElement('option');
@@ -38,27 +43,23 @@ async function loadPages() {
     pageSelect.appendChild(option);
   }
   insertButton.disabled = !selectedCaptureId || pageSelect.value === '';
+  setStatus('Connected to Notion.');
 }
 
 loadCapturesButton.onclick = async () => {
   const apiKey = apiKeyInput.value.trim();
-  const baseUrl = baseUrlInput.value.trim();
   if (!apiKey) {
     setStatus('Enter your SnapGlow API key.');
     return;
   }
 
-  const response = await fetch(
-    `/api/captures?apiKey=${encodeURIComponent(apiKey)}&baseUrl=${encodeURIComponent(baseUrl)}`
-  );
+  const response = await postJson('/api/captures', { apiKey });
   if (!response.ok) {
     setStatus('Failed to load captures.');
     return;
   }
 
-  const payload = (await response.json()) as {
-    items: Array<{ id: string; title: string | null; createdAt: string }>;
-  };
+  const payload = await response.json();
 
   capturesEl.innerHTML = '';
   for (const item of payload.items) {
@@ -80,38 +81,29 @@ loadCapturesButton.onclick = async () => {
 };
 
 insertButton.onclick = async () => {
-  if (!selectedCaptureId || !pageSelect.value || !sessionId) {
+  if (!selectedCaptureId || !pageSelect.value) {
     return;
   }
 
   insertButton.disabled = true;
   setStatus('Publishing and inserting embed…');
 
-  const response = await fetch('/api/embed', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      session: sessionId,
-      pageId: pageSelect.value,
-      apiKey: apiKeyInput.value.trim(),
-      baseUrl: baseUrlInput.value.trim(),
-      captureId: selectedCaptureId,
-    }),
+  const response = await postJson('/api/embed', {
+    pageId: pageSelect.value,
+    apiKey: apiKeyInput.value.trim(),
+    captureId: selectedCaptureId,
   });
 
   if (!response.ok) {
-    const payload = (await response.json()) as { error?: string };
+    const payload = await response.json().catch(() => ({}));
     setStatus(payload.error ?? 'Embed failed.');
     insertButton.disabled = false;
     return;
   }
 
-  const payload = (await response.json()) as { embedUrl: string };
+  const payload = await response.json();
   setStatus(`Embed inserted: ${payload.embedUrl}`);
   insertButton.disabled = false;
 };
 
-if (sessionId) {
-  void loadPages();
-  setStatus('Connected to Notion.');
-}
+void loadPages();
