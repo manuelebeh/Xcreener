@@ -7,6 +7,8 @@ const testContext = vi.hoisted(() => ({
     auth0Sub: 'auth0|admin',
     email: 'admin@test.com',
   },
+  /** Email carried by the token when it differs from the stored one (undefined = same). */
+  tokenEmail: undefined as string | null | undefined,
 }));
 
 vi.mock('drizzle-orm', async (importOriginal) => {
@@ -37,7 +39,10 @@ vi.mock('../plugins/auth', () => ({
     request.authUser = {
       id: '',
       auth0Sub: testContext.currentAuthUser.auth0Sub,
-      email: testContext.currentAuthUser.email,
+      email:
+        testContext.tokenEmail === undefined
+          ? testContext.currentAuthUser.email
+          : testContext.tokenEmail,
     };
   },
   upsertAuthUser: async () => testContext.currentAuthUser,
@@ -61,6 +66,7 @@ describe('workspace routes', () => {
       auth0Sub: 'auth0|admin',
       email: 'admin@test.com',
     };
+    testContext.tokenEmail = undefined;
     Object.keys(testContext.whereCapture).forEach((key) => {
       delete testContext.whereCapture[key];
     });
@@ -149,6 +155,53 @@ describe('workspace routes', () => {
     expect(acceptResponse.json().role).toBe('viewer');
     expect(state.members).toHaveLength(2);
     expect(state.invitations[0]?.acceptedAt).not.toBeNull();
+
+    await app.close();
+  });
+
+  it('refuses an email invitation when the token email is not verified', async () => {
+    state.workspaces.push({
+      id: '00000000-0000-4000-8000-000000000001',
+      name: 'Acme',
+      slug: 'acme',
+      plan: 'team_pro',
+      auth0OrgId: null,
+      createdBy: 'user-admin',
+      createdAt: new Date('2026-06-27T12:00:00.000Z'),
+      updatedAt: new Date('2026-06-27T12:00:00.000Z'),
+    });
+    state.members.push({
+      workspaceId: '00000000-0000-4000-8000-000000000001',
+      userId: 'user-admin',
+      role: 'admin',
+      joinedAt: new Date('2026-06-27T12:00:00.000Z'),
+    });
+
+    const app = await buildTestApp(state, testContext.whereCapture);
+    const inviteResponse = await app.inject({
+      method: 'POST',
+      url: '/v1/workspaces/00000000-0000-4000-8000-000000000001/invitations',
+      headers: { authorization: 'Bearer test-token' },
+      payload: { email: 'viewer@test.com', role: 'viewer' },
+    });
+    const invitation = inviteResponse.json();
+
+    // The stored row still has the address, but this token's email is unverified (null).
+    testContext.currentAuthUser = {
+      id: 'user-viewer',
+      auth0Sub: 'auth0|viewer',
+      email: 'viewer@test.com',
+    };
+    testContext.tokenEmail = null;
+
+    const acceptResponse = await app.inject({
+      method: 'POST',
+      url: `/v1/invitations/${invitation.token}/accept`,
+      headers: { authorization: 'Bearer test-token' },
+    });
+
+    expect(acceptResponse.statusCode).toBe(403);
+    expect(state.members).toHaveLength(1);
 
     await app.close();
   });
