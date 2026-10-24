@@ -55,12 +55,17 @@ pub fn e2e_inject_screenshot(
 }
 
 #[tauri::command]
-pub fn e2e_temp_export_path() -> Result<String, String> {
+pub fn e2e_temp_export_path(app: AppHandle) -> Result<String, String> {
     if !cfg!(debug_assertions) {
         return Err("e2e helpers are only available in debug builds".into());
     }
 
-    let path = std::env::temp_dir().join(format!("snapglow-e2e-export-{}.png", std::process::id()));
+    // Inside $APPDATA: the main window's fs scope does not include the temp directory.
+    let path = app
+        .path()
+        .app_data_dir()
+        .map_err(|error| error.to_string())?
+        .join(format!("snapglow-e2e-export-{}.png", std::process::id()));
     Ok(path.to_string_lossy().into_owned())
 }
 

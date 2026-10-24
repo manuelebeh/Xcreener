@@ -52,7 +52,7 @@ Shared packages: `@snapglow/style-suggestion-core`, `@snapglow/ocr-core`.
 - Capture history: `src/db/captures.ts` (retention 30, frontend-only)
 - Settings keys (2b.2): `ocrEngine`, `ocrLanguages`, `smartCompression`
 - Capabilities: `capabilities/default.json` (window `main`: `sql:default` + `sql:allow-execute`, fs, clipboard, opener) and `capabilities/overlay.json` (window `capture-overlay`: events and window show/hide only)
-- Tokens: Auth0 and integration tokens live in the OS keychain through `src-tauri/src/secure_store.rs` (`secure_store_get/set/delete`), not in the SQLite settings table
+- Tokens: Auth0 and integration tokens live in the OS keychain through `src-tauri/src/secure_store.rs` (`secure_store_get/set/delete`, names limited to `ALLOWED_NAMES`), not in the SQLite settings table
 
 ## Tauri features & security
 
