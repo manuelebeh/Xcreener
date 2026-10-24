@@ -68,7 +68,7 @@ describe('stressCaptures', () => {
     });
 
     for (let index = 0; index < 50; index += 1) {
-      persistCapture({ bytes: [1, 2, 3, index], width: 100, height: 100 });
+      persistCapture({ bytes: new Uint8Array([1, 2, 3, index]), width: 100, height: 100 });
     }
 
     await flushPersistQueue();

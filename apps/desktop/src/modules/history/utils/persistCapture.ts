@@ -7,7 +7,7 @@ import { deleteCaptureFiles, writeCaptureFiles } from './captureFiles';
 import { generateCaptureFilename } from './filenames';
 
 export interface PersistCaptureInput {
-  bytes: number[];
+  bytes: Uint8Array;
   width: number;
   height: number;
 }
@@ -25,7 +25,7 @@ function captureFingerprint(bytes: Uint8Array | number[]): string {
 async function indexCaptureOcr(id: number, pngBytes: Uint8Array): Promise<string | null> {
   try {
     const { ocrEngine, ocrLanguages } = useSettingsStore.getState();
-    const lines = await recognizeText(Array.from(pngBytes), {
+    const lines = await recognizeText(pngBytes, {
       engine: ocrEngine,
       languages: ocrLanguages
         .split('+')
@@ -45,7 +45,7 @@ async function indexCaptureOcr(id: number, pngBytes: Uint8Array): Promise<string
 
 async function persistCaptureInternal(input: PersistCaptureInput): Promise<void> {
   const now = new Date();
-  const pngBytes = new Uint8Array(input.bytes);
+  const pngBytes = input.bytes;
   const { capturePath, thumbnailPath } = await writeCaptureFiles(
     pngBytes,
     input.width,

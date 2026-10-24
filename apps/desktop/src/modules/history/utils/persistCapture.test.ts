@@ -32,7 +32,7 @@ describe('persistCapture', () => {
   });
 
   it('writes files, inserts capture, and prunes history', async () => {
-    persistCapture({ bytes: [137, 80, 78, 71], width: 800, height: 600 });
+    persistCapture({ bytes: new Uint8Array([137, 80, 78, 71]), width: 800, height: 600 });
     await flushPersistQueue();
 
     expect(writeCaptureFiles).toHaveBeenCalledWith(
@@ -63,7 +63,7 @@ describe('persistCapture', () => {
       },
     ]);
 
-    persistCapture({ bytes: [1, 2, 3], width: 100, height: 100 });
+    persistCapture({ bytes: new Uint8Array([1, 2, 3]), width: 100, height: 100 });
     await flushPersistQueue();
 
     expect(deleteCaptureFiles).toHaveBeenCalledWith('/tmp/old.png', '/tmp/old.webp');

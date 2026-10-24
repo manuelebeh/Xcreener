@@ -3,7 +3,7 @@ import { getImageDimensionsFromPng } from './image';
 
 describe('getImageDimensionsFromPng', () => {
   it('reads width and height from the PNG IHDR chunk', () => {
-    const bytes = new Array<number>(24).fill(0);
+    const bytes = new Uint8Array(24);
     bytes[16] = 0;
     bytes[17] = 0;
     bytes[18] = 1;
@@ -17,6 +17,6 @@ describe('getImageDimensionsFromPng', () => {
   });
 
   it('returns null for invalid payloads', () => {
-    expect(getImageDimensionsFromPng([1, 2, 3])).toBeNull();
+    expect(getImageDimensionsFromPng(new Uint8Array([1, 2, 3]))).toBeNull();
   });
 });

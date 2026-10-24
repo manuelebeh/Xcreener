@@ -3,7 +3,7 @@ import type { RenderInput } from '@/modules/editor/types';
 import { exportRenderInput, renderToExportCanvas } from './canvasExport';
 
 vi.mock('@/tauri/commands', () => ({
-  compressExportBytes: vi.fn(async (imageData: number[]) => imageData),
+  compressExportBytes: vi.fn(async (imageData: Uint8Array) => imageData.slice().buffer),
 }));
 
 vi.mock('@/modules/settings/store', () => ({
