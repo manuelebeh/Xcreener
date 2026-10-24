@@ -2,6 +2,7 @@ import { buildApp } from './app';
 import { createDb, runMigrations } from './db/migrate';
 import { env } from './env';
 import { closeRedis, getRedis } from './services/redis';
+import { closeRenderPool } from './services/render-pool';
 import { purgeExpiredShares } from './services/share-cleanup';
 import { StorageService } from './services/storage';
 
@@ -26,6 +27,7 @@ async function main() {
   const shutdown = async () => {
     clearInterval(cleanup);
     await app.close();
+    await closeRenderPool();
     await closeRedis();
     await client.end();
     process.exit(0);
