@@ -35,7 +35,7 @@ export const Route = createFileRoute('/sitemap/xml')({
   server: {
     handlers: {
       GET: () => {
-        const staticPaths = ['/', '/help', '/marketplace', '/affiliates', '/blog', '/redeem'];
+        const staticPaths = ['/', '/help', '/marketplace', '/affiliates', '/blog'];
         const helpSlugs = getHelpArticles().map((a) => `/help/${a.slug}`);
         const blogPosts = getBlogPosts();
 
