@@ -55,18 +55,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <PostHogProvider>
             {children}
             <ConsentBanner />
-            <TanStackDevtools
-              config={{
-                position: 'bottom-right',
-              }}
-              plugins={[
-                {
-                  name: 'Tanstack Router',
-                  render: <TanStackRouterDevtoolsPanel />,
-                },
-                TanStackQueryDevtools,
-              ]}
-            />
+            {import.meta.env.DEV ? (
+              <TanStackDevtools
+                config={{
+                  position: 'bottom-right',
+                }}
+                plugins={[
+                  {
+                    name: 'Tanstack Router',
+                    render: <TanStackRouterDevtoolsPanel />,
+                  },
+                  TanStackQueryDevtools,
+                ]}
+              />
+            ) : null}
           </PostHogProvider>
         </SnapGlowI18nProvider>
         <Scripts />

@@ -8,7 +8,12 @@ import {
 } from '@snapglow/editor-core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createComment, fetchCollabDocument, fetchComments, fetchNotifications } from './api';
-import { getValidAccessToken, isWebAuthConfigured, startWebAuthLogin } from './auth';
+import {
+  getValidAccessToken,
+  isWebAuthConfigured,
+  startWebAuthLogin,
+  trySilentWebAuthLogin,
+} from './auth';
 import { collabClient } from './client';
 import { drawAnnotations } from './drawAnnotations';
 import { useCollabStore } from './store';
@@ -43,6 +48,9 @@ export function CollabEditor({ documentId }: { documentId: string }) {
       try {
         const token = await getValidAccessToken();
         if (!token) {
+          if (isWebAuthConfigured() && trySilentWebAuthLogin(window.location.pathname)) {
+            return;
+          }
           setAuthRequired(true);
           setLoading(false);
           return;
@@ -72,7 +80,7 @@ export function CollabEditor({ documentId }: { documentId: string }) {
           return;
         }
         imageRef.current = image;
-        collabClient.connect(documentId, token);
+        collabClient.connect(documentId, getValidAccessToken);
         setLoading(false);
       } catch (loadError) {
         if (!cancelled) {
