@@ -1,9 +1,23 @@
 import type { ReactNode } from 'react';
 
-export function SettingsGroup({ title, children }: { title: string; children: ReactNode }) {
+interface SettingsGroupProps {
+  title: string;
+  description?: string;
+  /** Small control aligned right of the title (e.g. Refresh). */
+  action?: ReactNode;
+  children: ReactNode;
+}
+
+export function SettingsGroup({ title, description, action, children }: SettingsGroupProps) {
   return (
     <section className="space-y-2">
-      <h2 className="px-1 text-xs font-semibold text-muted">{title}</h2>
+      <div className="flex items-end justify-between gap-4 px-1">
+        <div className="min-w-0">
+          <h2 className="text-xs font-semibold text-muted">{title}</h2>
+          {description ? <p className="mt-0.5 text-xs text-muted">{description}</p> : null}
+        </div>
+        {action}
+      </div>
       <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
         {children}
       </div>
@@ -16,7 +30,7 @@ interface SettingsRowProps {
   hint?: string;
   /** Id of the control the label describes. */
   htmlFor?: string;
-  children: ReactNode;
+  children?: ReactNode;
   /** Extra content under the row (validation messages). */
   footer?: ReactNode;
 }
@@ -31,7 +45,7 @@ export function SettingsRow({ label, hint, htmlFor, children, footer }: Settings
           </label>
           {hint ? <p className="mt-0.5 text-xs text-muted">{hint}</p> : null}
         </div>
-        <div className="flex shrink-0 items-center gap-2">{children}</div>
+        {children ? <div className="flex shrink-0 items-center gap-2">{children}</div> : null}
       </div>
       {footer ? <div className="mt-2">{footer}</div> : null}
     </div>
@@ -44,6 +58,7 @@ interface SettingsToggleProps {
   hint?: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  disabled?: boolean;
   testId?: string;
 }
 
@@ -53,6 +68,7 @@ export function SettingsToggle({
   hint,
   checked,
   onChange,
+  disabled,
   testId,
 }: SettingsToggleProps) {
   return (
@@ -71,10 +87,11 @@ export function SettingsToggle({
         id={id}
         type="checkbox"
         checked={checked}
+        disabled={disabled}
         onChange={(event) => onChange(event.target.checked)}
         aria-labelledby={`${id}-label`}
         aria-describedby={hint ? `${id}-hint` : undefined}
-        className="sg-focus-ring size-4 shrink-0 cursor-pointer accent-primary"
+        className="sg-focus-ring size-4 shrink-0 cursor-pointer accent-primary disabled:cursor-not-allowed disabled:opacity-50"
         data-testid={testId}
       />
     </div>
