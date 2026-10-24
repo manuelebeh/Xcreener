@@ -21,7 +21,7 @@
     "global-shortcut:default",
     "autostart:default",
     "updater:default",
-    "process:default",
+    "process:allow-restart",
     "clipboard-manager:default",
     "clipboard-manager:allow-write-image",
     "dialog:default",
@@ -33,18 +33,11 @@
     "fs:allow-mkdir",
     "fs:allow-remove",
     "fs:allow-copy-file",
-    "fs:allow-exists",
     {
       "identifier": "fs:scope-appdata-recursive",
       "allow": [
         {
           "path": "$APPDATA/**"
-        },
-        {
-          "path": "$TEMP/**"
-        },
-        {
-          "path": "$TMP/**"
         }
       ]
     }

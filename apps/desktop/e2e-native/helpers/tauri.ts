@@ -5,12 +5,13 @@ type TauriInvoke = (command: string, args?: Record<string, unknown>) => Promise<
 export async function tauriInvoke(command: string, args?: Record<string, unknown>) {
   return browser.execute(
     (cmd, payload) => {
-      const tauri = (window as Window & { __TAURI__?: { core: { invoke: TauriInvoke } } })
-        .__TAURI__;
-      if (!tauri?.core?.invoke) {
+      // Always injected, unlike window.__TAURI__ (withGlobalTauri is off).
+      const internals = (window as Window & { __TAURI_INTERNALS__?: { invoke: TauriInvoke } })
+        .__TAURI_INTERNALS__;
+      if (!internals?.invoke) {
         throw new Error('Tauri invoke is not available in this webview');
       }
-      return tauri.core.invoke(cmd, payload);
+      return internals.invoke(cmd, payload);
     },
     command,
     args
