@@ -2,6 +2,7 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import {
   defaultExportQuality,
   type ExportFormat,
+  MAX_RENDER_PIXELS,
   mimeTypeForExportFormat,
 } from '@snapglow/api-core';
 import type { CollabDocumentState } from '@snapglow/collab-core';
@@ -18,6 +19,15 @@ export interface RenderExportOptions {
   quality?: number;
   brandKitWatermark?: BrandKitWatermark | null;
   brandKitLogoBuffer?: Buffer | null;
+}
+
+/** Thrown before allocating a canvas over the pixel budget. Fastify answers with `statusCode`. */
+export class RenderTooLargeError extends Error {
+  readonly statusCode = 413;
+
+  constructor() {
+    super('Export is too large to render');
+  }
 }
 
 export interface RenderExportResult {
@@ -64,6 +74,9 @@ export async function renderCaptureExport(
   );
 
   const layout = computeLayout(renderInput);
+  if (layout.canvasWidth * layout.canvasHeight > MAX_RENDER_PIXELS) {
+    throw new RenderTooLargeError();
+  }
 
   const canvas = createCanvas(layout.canvasWidth, layout.canvasHeight);
   const ctx = canvas.getContext('2d');
