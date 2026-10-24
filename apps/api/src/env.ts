@@ -4,7 +4,8 @@ import { z } from 'zod';
 export const env = createEnv({
   server: {
     PORT: z.coerce.number().default(8787),
-    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    // Unset means production: CSP, HSTS and signed webhooks stay on unless dev opts out.
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('production'),
     DATABASE_URL: z.string().min(1),
     REDIS_URL: z.string().min(1),
     AUTH0_DOMAIN: z.string().min(1),
