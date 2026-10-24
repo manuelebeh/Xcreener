@@ -9,11 +9,15 @@
 import { createHmac } from 'node:crypto';
 import type { AddressInfo } from 'node:net';
 import { eq } from 'drizzle-orm';
+import Stripe from 'stripe';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import WebSocket from 'ws';
 
 vi.hoisted(() => {
   process.env.REWARDFUL_WEBHOOK_SECRET = 'rewardful-test-secret';
+  process.env.STRIPE_SECRET_KEY = 'sk_test_offline';
+  process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test';
+  process.env.STRIPE_PRICE_TEAM_PRO = 'price_team_pro';
 });
 
 // A bearer token is "<auth0Sub>" or "<auth0Sub>@<expiresAtSeconds>".
@@ -45,6 +49,7 @@ vi.mock('../plugins/auth', async (importOriginal) => {
   };
 });
 
+import { defaultCollabDocumentState } from '@snapglow/collab-core';
 import { buildApp } from '../app';
 import { createDb } from '../db/migrate';
 import * as schema from '../db/schema';
@@ -451,5 +456,259 @@ describe.skipIf(!databaseUrl)('API security regressions (Postgres)', () => {
     const expiredClose = new Promise<number>((resolve) => short.socket.once('close', resolve));
     short.socket.send(JSON.stringify({ type: 'presence:update', presence: {} }));
     expect(await expiredClose).toBe(4401);
+  });
+
+  describe('collab REST validation', () => {
+    async function editableDocument(slug: string) {
+      const owner = await upsertAuthUser(db, alice, null);
+      const [workspace] = await db
+        .insert(schema.workspaces)
+        .values({ name: 'collab', slug: `${slug}-${run}`, plan: 'team_pro', createdBy: owner.id })
+        .returning();
+      const workspaceId = workspace?.id ?? '';
+      await db
+        .insert(schema.workspaceMembers)
+        .values({ workspaceId, userId: owner.id, role: 'admin' });
+      const [doc] = await db
+        .insert(schema.collabDocuments)
+        .values({
+          workspaceId,
+          createdBy: owner.id,
+          screenshotStorageKey: `collab-${slug}-${run}`,
+          screenshotMimeType: 'image/png',
+          screenshotByteSize: 1,
+          documentState: defaultCollabDocumentState(10, 10),
+          version: 3,
+        })
+        .returning();
+      return { workspaceId, documentId: doc?.id ?? '' };
+    }
+
+    function patch(documentId: string, payload: unknown) {
+      return app.inject({
+        method: 'PATCH',
+        url: `/v1/collab/documents/${documentId}`,
+        headers: { authorization: `Bearer ${alice}` },
+        payload: payload as Record<string, unknown>,
+      });
+    }
+
+    it('refuses snapshots over the annotation cap or with malformed fields', async () => {
+      const { documentId } = await editableDocument('patch');
+      const state = defaultCollabDocumentState(10, 10);
+      const annotations = Array.from({ length: 501 }, (_, index) => ({
+        id: `a-${index}`,
+        type: 'rect',
+      }));
+
+      expect(
+        (await patch(documentId, { documentState: { ...state, annotations } })).statusCode
+      ).toBe(400);
+      expect(
+        (await patch(documentId, { documentState: { ...state, screenshotWidth: 'NaN' } }))
+          .statusCode
+      ).toBe(400);
+      expect((await patch(documentId, { title: { nested: 1 } })).statusCode).toBe(400);
+
+      const [after] = await db
+        .select()
+        .from(schema.collabDocuments)
+        .where(eq(schema.collabDocuments.id, documentId));
+      expect(after?.version).toBe(3);
+      expect(after?.title).toBeNull();
+    });
+
+    it('rejects a snapshot based on a stale version', async () => {
+      const { documentId } = await editableDocument('stale');
+      const state = defaultCollabDocumentState(10, 10);
+
+      const stale = await patch(documentId, { documentState: state, expectedVersion: 2 });
+      expect(stale.statusCode).toBe(409);
+
+      const fresh = await patch(documentId, { documentState: state, expectedVersion: 3 });
+      expect(fresh.statusCode).toBe(200);
+      expect(fresh.json().version).toBe(4);
+    });
+
+    it('refuses to create a document with an invalid state', async () => {
+      const { workspaceId } = await editableDocument('create');
+      const upload = multipartBody(
+        { documentState: JSON.stringify({ junk: true, annotations: 'not-an-array' }) },
+        Buffer.from('png'),
+        'image/png'
+      );
+      const response = await app.inject({
+        method: 'POST',
+        url: '/v1/collab/documents',
+        headers: {
+          authorization: `Bearer ${alice}`,
+          'x-workspace-id': workspaceId,
+          ...upload.headers,
+        },
+        payload: upload.payload,
+      });
+      expect(response.statusCode).toBe(400);
+    });
+  });
+
+  describe('workspace admin and invitations', () => {
+    it('refuses to demote or remove the last admin', async () => {
+      const owner = await upsertAuthUser(db, alice, null);
+      const [workspace] = await db
+        .insert(schema.workspaces)
+        .values({ name: 'admins', slug: `admins-${run}`, createdBy: owner.id })
+        .returning();
+      const workspaceId = workspace?.id ?? '';
+      await db
+        .insert(schema.workspaceMembers)
+        .values({ workspaceId, userId: owner.id, role: 'admin' });
+
+      const demote = await app.inject({
+        method: 'PATCH',
+        url: `/v1/workspaces/${workspaceId}/members/${owner.id}`,
+        headers: { authorization: `Bearer ${alice}` },
+        payload: { role: 'viewer' },
+      });
+      expect(demote.statusCode).toBe(409);
+
+      const remove = await app.inject({
+        method: 'DELETE',
+        url: `/v1/workspaces/${workspaceId}/members/${owner.id}`,
+        headers: { authorization: `Bearer ${alice}` },
+      });
+      expect(remove.statusCode).toBe(409);
+    });
+
+    it('lets only one user join through a link invitation accepted concurrently', async () => {
+      const owner = await upsertAuthUser(db, alice, null);
+      const [workspace] = await db
+        .insert(schema.workspaces)
+        .values({ name: 'link', slug: `link-${run}`, plan: 'team_pro', createdBy: owner.id })
+        .returning();
+      const workspaceId = workspace?.id ?? '';
+      await db
+        .insert(schema.workspaceMembers)
+        .values({ workspaceId, userId: owner.id, role: 'admin' });
+      const token = `link${run}`;
+      await db.insert(schema.invitations).values({
+        workspaceId,
+        role: 'viewer',
+        token,
+        invitedBy: owner.id,
+        expiresAt: new Date(Date.now() + 3600_000),
+      });
+
+      const joiners = Array.from({ length: 5 }, (_, index) => `auth0|joiner-${index}-${run}`);
+      const responses = await Promise.all(
+        joiners.map((sub) =>
+          app.inject({
+            method: 'POST',
+            url: `/v1/invitations/${token}/accept`,
+            headers: { authorization: `Bearer ${sub}` },
+          })
+        )
+      );
+
+      expect(responses.filter((response) => response.statusCode === 200)).toHaveLength(1);
+      const members = await db
+        .select()
+        .from(schema.workspaceMembers)
+        .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
+      expect(members).toHaveLength(2);
+    });
+  });
+
+  describe('Stripe webhook', () => {
+    async function paidWorkspace(slug: string) {
+      const owner = await upsertAuthUser(db, alice, null);
+      const [workspace] = await db
+        .insert(schema.workspaces)
+        .values({ name: 'billing', slug: `${slug}-${run}`, plan: 'team_pro', createdBy: owner.id })
+        .returning();
+      return workspace?.id ?? '';
+    }
+
+    function sendEvent(
+      type: 'customer.subscription.updated' | 'customer.subscription.deleted',
+      workspaceId: string,
+      status: Stripe.Subscription.Status,
+      created: number,
+      id = `evt_${crypto.randomUUID()}`
+    ) {
+      const payload = JSON.stringify({
+        id,
+        object: 'event',
+        type,
+        created,
+        data: {
+          object: {
+            id: `sub_${workspaceId}`,
+            object: 'subscription',
+            status,
+            customer: 'cus_test',
+            metadata: { workspaceId },
+            items: { data: [{ price: { id: 'price_team_pro' }, quantity: 3 }] },
+          },
+        },
+      });
+      const signature = Stripe.webhooks.generateTestHeaderString({ payload, secret: 'whsec_test' });
+      return app.inject({
+        method: 'POST',
+        url: '/v1/billing/webhook',
+        headers: { 'content-type': 'application/json', 'stripe-signature': signature },
+        payload,
+      });
+    }
+
+    async function planOf(workspaceId: string) {
+      const [row] = await db
+        .select({ plan: schema.workspaces.plan })
+        .from(schema.workspaces)
+        .where(eq(schema.workspaces.id, workspaceId));
+      return row?.plan;
+    }
+
+    it('drops paid features when the subscription becomes unpaid', async () => {
+      const workspaceId = await paidWorkspace('unpaid');
+      const now = Math.floor(Date.now() / 1000);
+
+      const response = await sendEvent('customer.subscription.updated', workspaceId, 'unpaid', now);
+
+      expect(response.statusCode).toBe(200);
+      expect(await planOf(workspaceId)).toBe('free');
+    });
+
+    it('ignores an older event that arrives after a cancellation', async () => {
+      const workspaceId = await paidWorkspace('late');
+      const now = Math.floor(Date.now() / 1000);
+
+      await sendEvent('customer.subscription.updated', workspaceId, 'active', now - 100);
+      await sendEvent('customer.subscription.deleted', workspaceId, 'canceled', now);
+      const late = await sendEvent(
+        'customer.subscription.updated',
+        workspaceId,
+        'active',
+        now - 50
+      );
+
+      expect(late.statusCode).toBe(200);
+      expect(await planOf(workspaceId)).toBe('free');
+    });
+
+    it('treats a replayed event as a no-op', async () => {
+      const workspaceId = await paidWorkspace('replay');
+      const now = Math.floor(Date.now() / 1000);
+
+      await sendEvent('customer.subscription.updated', workspaceId, 'active', now, 'evt_same');
+      await sendEvent('customer.subscription.updated', workspaceId, 'active', now, 'evt_same');
+
+      expect(await planOf(workspaceId)).toBe('team_pro');
+      const subscriptions = await db
+        .select()
+        .from(schema.workspaceSubscriptions)
+        .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId));
+      expect(subscriptions).toHaveLength(1);
+      expect(subscriptions[0]?.status).toBe('active');
+    });
   });
 });
