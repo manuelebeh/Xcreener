@@ -10,13 +10,11 @@ const SERVICE: &str = "app.snapglow.desktop";
 const CHUNK_BYTES: usize = 1000;
 const MAX_CHUNKS: usize = 64;
 
+/// The only names the WebView may touch. Any other keychain entry stays out of reach.
+const ALLOWED_NAMES: &[&str] = &["cloud.tokens", "integrations.tokens"];
+
 fn validate_name(name: &str) -> Result<(), String> {
-    let valid = !name.is_empty()
-        && name.len() <= 64
-        && name
-            .bytes()
-            .all(|b| b.is_ascii_alphanumeric() || b == b'.' || b == b'_' || b == b'-');
-    if valid {
+    if ALLOWED_NAMES.contains(&name) || (cfg!(test) && name == "snapglow-test.roundtrip") {
         Ok(())
     } else {
         Err("Invalid secret name".into())
@@ -145,11 +143,13 @@ mod tests {
     }
 
     #[test]
-    fn rejects_unsafe_secret_names() {
+    fn accepts_only_allowlisted_names() {
         assert!(validate_name("cloud.tokens").is_ok());
+        assert!(validate_name("integrations.tokens").is_ok());
         assert!(validate_name("").is_err());
         assert!(validate_name("../etc").is_err());
-        assert!(validate_name(&"a".repeat(65)).is_err());
+        assert!(validate_name("cloud.tokens.0").is_err());
+        assert!(validate_name("other-app.password").is_err());
     }
 
     /// Touches the real OS keychain: `cargo test -- --ignored keychain_roundtrip`.
