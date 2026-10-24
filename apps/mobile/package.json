@@ -13,7 +13,7 @@
     "format": "biome check --write ."
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-async-storage/async-storage": "3.1.1",
     "@shopify/react-native-skia": "2.6.2",
     "@snapglow/design-tokens": "workspace:*",
     "@snapglow/editor-core": "workspace:*",
