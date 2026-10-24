@@ -7,6 +7,7 @@ import Fastify from 'fastify';
 import type * as schema from './db/schema';
 import { env } from './env';
 import { getAllowedCorsOrigins, isOriginAllowed } from './lib/cors';
+import { serializeRequest } from './lib/log-redact';
 import { registerCollabWebSocket } from './plugins/collab-ws';
 import { registerOpenApiDocs } from './plugins/openapi-docs';
 import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
@@ -35,7 +36,7 @@ interface BuildAppOptions {
 
 export async function buildApp(options: BuildAppOptions) {
   const app = Fastify({
-    logger: process.env.NODE_ENV !== 'test',
+    logger: process.env.NODE_ENV !== 'test' && { serializers: { req: serializeRequest } },
     bodyLimit: 100 * 1024 * 1024,
   });
 
