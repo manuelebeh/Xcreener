@@ -63,53 +63,68 @@ export interface PublishCaptureResponse {
   expiresAt: null;
 }
 
+/** Annotations per document, shared by the REST, WebSocket and public API paths. */
+export const MAX_COLLAB_ANNOTATIONS = 500;
+
+/** Output canvas budget for server rendering (about 6300 x 6300). */
+export const MAX_RENDER_PIXELS = 40_000_000;
+
+// Bounds sit well above what the editor UI produces (padding slider 0-200, frames up to 1920 px)
+// and far below what would stall the server renderer.
+const MAX_SCREENSHOT_SIDE = 16_384;
+const MAX_FRAME_SIDE = 8192;
+
+const boundedNumber = (min: number, max: number) => z.number().finite().min(min).max(max);
+
 const shadowSchema = z.object({
-  opacity: z.number(),
-  blur: z.number(),
-  offsetX: z.number(),
-  offsetY: z.number(),
-  color: z.string(),
+  opacity: boundedNumber(0, 1),
+  blur: boundedNumber(0, 256),
+  offsetX: boundedNumber(-256, 256),
+  offsetY: boundedNumber(-256, 256),
+  color: z.string().max(64),
 });
 
 const transformSchema = z.object({
-  scale: z.number(),
-  offsetX: z.number(),
-  offsetY: z.number(),
+  scale: boundedNumber(0.05, 20),
+  offsetX: boundedNumber(-MAX_SCREENSHOT_SIDE, MAX_SCREENSHOT_SIDE),
+  offsetY: boundedNumber(-MAX_SCREENSHOT_SIDE, MAX_SCREENSHOT_SIDE),
 });
 
 const frameSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+  id: z.string().max(128),
+  name: z.string().max(128),
   category: z.enum(['social', 'standard', 'custom']),
-  width: z.number(),
-  height: z.number(),
-  aspectRatio: z.enum(['16:9', '4:3', '1:1', '1.91:1', 'free']),
-  icon: z.string().optional(),
+  width: boundedNumber(1, MAX_FRAME_SIDE),
+  height: boundedNumber(1, MAX_FRAME_SIDE),
+  // Mirrors editor-core `AspectRatio` (`${number}:${number}` | 'free').
+  aspectRatio: z.union([z.literal('free'), z.string().regex(/^\d+(\.\d+)?:\d+(\.\d+)?$/)]),
+  icon: z.string().max(128).optional(),
+  network: z.string().max(32).optional(),
 });
 
 const backgroundSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('gradient'), presetId: z.string() }),
-  z.object({ type: z.literal('solid'), color: z.string() }),
-  z.object({ type: z.literal('image'), sourceId: z.string().nullable() }),
+  z.object({ type: z.literal('gradient'), presetId: z.string().max(128) }),
+  z.object({ type: z.literal('solid'), color: z.string().max(64) }),
+  z.object({ type: z.literal('image'), sourceId: z.string().max(128).nullable() }),
 ]);
 
 const annotationSchema = z
   .object({
-    id: z.string(),
-    type: z.string(),
+    id: z.string().min(1).max(128),
+    type: z.string().max(32),
   })
   .passthrough();
 
 export const collabDocumentStateSchema = z.object({
-  screenshotWidth: z.number().positive(),
-  screenshotHeight: z.number().positive(),
+  screenshotWidth: boundedNumber(1, MAX_SCREENSHOT_SIDE),
+  screenshotHeight: boundedNumber(1, MAX_SCREENSHOT_SIDE),
   background: backgroundSchema,
-  padding: z.number().min(0),
-  borderRadius: z.number().min(0),
+  padding: boundedNumber(0, 1024),
+  borderRadius: boundedNumber(0, 512),
   shadow: shadowSchema,
   frame: frameSchema.nullable(),
   transform: transformSchema,
-  annotations: z.array(annotationSchema),
+  annotations: z.array(annotationSchema).max(MAX_COLLAB_ANNOTATIONS),
 });
 
 export const beautifyCaptureSchema = z.object({

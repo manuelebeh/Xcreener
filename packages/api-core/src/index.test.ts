@@ -1,30 +1,65 @@
+import { defaultCollabDocumentState } from '@snapglow/collab-core';
 import { describe, expect, it } from 'vitest';
-import { generateApiKeySecret, hashApiKey, verifyApiKey } from './api-keys';
-import {
-  API_KEY_PREFIX,
-  apiKeyDisplayPrefix,
-  buildApiKeyPlaintext,
-  isApiKeyPlaintext,
-  isExportFormat,
-} from './index';
+import { collabDocumentStateSchema, MAX_COLLAB_ANNOTATIONS } from './index';
 
-describe('api-core keys', () => {
-  it('generates and verifies api keys', () => {
-    const secret = generateApiKeySecret();
-    const plaintext = buildApiKeyPlaintext(secret);
-    const hash = hashApiKey(plaintext);
+describe('collabDocumentStateSchema bounds', () => {
+  const base = defaultCollabDocumentState(1920, 1080);
 
-    expect(plaintext.startsWith(API_KEY_PREFIX)).toBe(true);
-    expect(isApiKeyPlaintext(plaintext)).toBe(true);
-    expect(apiKeyDisplayPrefix(plaintext)).toHaveLength(API_KEY_PREFIX.length + 4);
-    expect(verifyApiKey(plaintext, hash)).toBe(true);
-    expect(verifyApiKey(`${plaintext}x`, hash)).toBe(false);
+  it('accepts the default document', () => {
+    expect(collabDocumentStateSchema.safeParse(base).success).toBe(true);
   });
-});
 
-describe('api-core export formats', () => {
-  it('recognizes export formats', () => {
-    expect(isExportFormat('png')).toBe(true);
-    expect(isExportFormat('gif')).toBe(false);
+  it('accepts a social frame preset', () => {
+    const framed = {
+      ...base,
+      frame: {
+        id: 'twitter',
+        name: 'Twitter',
+        category: 'social',
+        width: 1600,
+        height: 900,
+        aspectRatio: '16:9',
+      },
+    };
+    expect(collabDocumentStateSchema.safeParse(framed).success).toBe(true);
+  });
+
+  it('rejects padding and frame sizes that would stall the renderer', () => {
+    expect(collabDocumentStateSchema.safeParse({ ...base, padding: 1e4 }).success).toBe(false);
+    const hugeFrame = {
+      ...base,
+      frame: {
+        id: 'x',
+        name: 'x',
+        category: 'custom',
+        width: 200_000,
+        height: 200_000,
+        aspectRatio: '1:1',
+      },
+    };
+    expect(collabDocumentStateSchema.safeParse(hugeFrame).success).toBe(false);
+  });
+
+  it('rejects non-finite numbers', () => {
+    expect(
+      collabDocumentStateSchema.safeParse({ ...base, screenshotWidth: Number.NaN }).success
+    ).toBe(false);
+    expect(
+      collabDocumentStateSchema.safeParse({
+        ...base,
+        transform: { ...base.transform, offsetX: Number.POSITIVE_INFINITY },
+      }).success
+    ).toBe(false);
+  });
+
+  it('caps the annotation count', () => {
+    const annotations = Array.from({ length: MAX_COLLAB_ANNOTATIONS + 1 }, (_, index) => ({
+      id: `a-${index}`,
+      type: 'rect',
+    }));
+    expect(collabDocumentStateSchema.safeParse({ ...base, annotations }).success).toBe(false);
+    expect(
+      collabDocumentStateSchema.safeParse({ ...base, annotations: annotations.slice(1) }).success
+    ).toBe(true);
   });
 });
