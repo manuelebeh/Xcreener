@@ -49,6 +49,8 @@ vi.mock('../plugins/auth', async (importOriginal) => {
   };
 });
 
+import { apiKeyDisplayPrefix, buildApiKeyPlaintext } from '@snapglow/api-core';
+import { generateApiKeySecret, hashApiKey } from '@snapglow/api-core/api-keys';
 import { defaultCollabDocumentState } from '@snapglow/collab-core';
 import { buildApp } from '../app';
 import { createDb } from '../db/migrate';
@@ -65,7 +67,7 @@ const storage = {
   ensureBucket: async () => {},
   uploadObject: async () => {},
   getPresignedUrl: async () => 'https://storage.test/asset',
-  getObject: async () => Buffer.from(''),
+  getObject: async (key: string) => Buffer.from(`object:${key}`),
   deleteObject: async (key: string) => {
     deletedObjects.push(key);
   },
@@ -177,6 +179,110 @@ describe.skipIf(!databaseUrl)('API security regressions (Postgres)', () => {
       .from(schema.libraryItemCollections)
       .where(eq(schema.libraryItemCollections.collectionId, collectionId));
     expect(links).toHaveLength(0);
+  });
+
+  it('streams library assets only to the owner and workspace members', async () => {
+    const owner = await upsertAuthUser(db, alice, null);
+    const outsider = await upsertAuthUser(db, bob, null);
+    const [item] = await db
+      .insert(schema.libraryItems)
+      .values({ userId: owner.id, storageKey: `lib-${run}`, mimeType: 'image/png', byteSize: 3 })
+      .returning();
+    const [gone] = await db
+      .insert(schema.libraryItems)
+      .values({
+        userId: owner.id,
+        storageKey: `gone-${run}`,
+        mimeType: 'image/png',
+        byteSize: 3,
+        deletedAt: new Date(),
+      })
+      .returning();
+
+    const own = await app.inject({
+      method: 'GET',
+      url: `/v1/library/${item?.id}/content`,
+      headers: { authorization: `Bearer ${alice}` },
+    });
+    expect(own.statusCode).toBe(200);
+    expect(own.headers['content-type']).toBe('image/png');
+    expect(own.body).toBe(`object:lib-${run}`);
+
+    const foreign = await app.inject({
+      method: 'GET',
+      url: `/v1/library/${item?.id}/content`,
+      headers: { authorization: `Bearer ${bob}` },
+    });
+    expect(foreign.statusCode).toBe(404);
+    expect(outsider.id).not.toBe(owner.id);
+
+    const deleted = await app.inject({
+      method: 'GET',
+      url: `/v1/library/${gone?.id}/content`,
+      headers: { authorization: `Bearer ${alice}` },
+    });
+    expect(deleted.statusCode).toBe(404);
+  });
+
+  it('streams public API exports only to keys of the capture workspace', async () => {
+    const owner = await upsertAuthUser(db, alice, null);
+    async function workspaceWithKey(slug: string) {
+      const [workspace] = await db
+        .insert(schema.workspaces)
+        .values({ name: slug, slug: `${slug}-${run}`, plan: 'team_pro', createdBy: owner.id })
+        .returning();
+      const secret = buildApiKeyPlaintext(generateApiKeySecret());
+      const [key] = await db
+        .insert(schema.apiKeys)
+        .values({
+          workspaceId: workspace?.id ?? '',
+          name: slug,
+          keyPrefix: apiKeyDisplayPrefix(secret),
+          keyHash: hashApiKey(secret),
+          createdBy: owner.id,
+        })
+        .returning();
+      return { workspaceId: workspace?.id ?? '', keyId: key?.id ?? '', secret };
+    }
+    const mine = await workspaceWithKey('export-a');
+    const other = await workspaceWithKey('export-b');
+    const [exported, pending] = await db
+      .insert(schema.apiCaptures)
+      .values([
+        {
+          workspaceId: mine.workspaceId,
+          apiKeyId: mine.keyId,
+          storageKey: `api-src-${run}`,
+          exportStorageKey: `api-captures/${mine.workspaceId}/x/export.webp`,
+          documentState: defaultCollabDocumentState(10, 10) as never,
+          mimeType: 'image/png',
+          byteSize: 3,
+        },
+        {
+          workspaceId: mine.workspaceId,
+          apiKeyId: mine.keyId,
+          storageKey: `api-src2-${run}`,
+          documentState: defaultCollabDocumentState(10, 10) as never,
+          mimeType: 'image/png',
+          byteSize: 3,
+        },
+      ])
+      .returning();
+
+    function download(id: string | undefined, secret: string) {
+      return app.inject({
+        method: 'GET',
+        url: `/v1/public/captures/${id}/export/content`,
+        headers: { authorization: `Bearer ${secret}` },
+      });
+    }
+
+    const ok = await download(exported?.id, mine.secret);
+    expect(ok.statusCode).toBe(200);
+    expect(ok.headers['content-type']).toBe('image/webp');
+    expect(ok.body).toBe(`object:api-captures/${mine.workspaceId}/x/export.webp`);
+    expect((await download(exported?.id, other.secret)).statusCode).toBe(404);
+    expect((await download(pending?.id, mine.secret)).statusCode).toBe(404);
   });
 
   it('does not expose template author emails publicly', async () => {

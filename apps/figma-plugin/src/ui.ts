@@ -83,11 +83,8 @@ async function placeCapture(captureId: string) {
 
   await run('Placing capture…', async () => {
     const exported = await client.captures.export(captureId, { format: 'png' });
-    const response = await fetch(exported.exportUrl);
-    if (!response.ok) {
-      throw new Error(`Download failed with status ${response.status}`);
-    }
-    const bytes = new Uint8Array(await response.arrayBuffer());
+    // The manifest only allows the API origin, so bytes come from the API, not storage.
+    const bytes = new Uint8Array(await client.captures.downloadExport(captureId));
     postToPlugin({
       type: 'place-image',
       payload: { bytes, width: exported.width, height: exported.height },
@@ -112,10 +109,14 @@ async function importSelection(bytes: Uint8Array, name: string) {
 
     setStatus('Beautifying…');
     await client.captures.beautify(uploaded.id, state, { title: name });
-    const exported = await client.captures.export(uploaded.id, { format: 'png' });
+    await client.captures.export(uploaded.id, { format: 'png' });
+    const exportBytes = await client.captures.downloadExport(uploaded.id);
 
     previewEl.hidden = false;
-    previewEl.src = exported.exportUrl;
+    if (previewEl.src.startsWith('blob:')) {
+      URL.revokeObjectURL(previewEl.src);
+    }
+    previewEl.src = URL.createObjectURL(new Blob([exportBytes], { type: 'image/png' }));
     setStatus('Imported.');
   });
 }

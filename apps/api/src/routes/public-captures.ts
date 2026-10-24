@@ -313,6 +313,42 @@ export async function registerPublicCaptureRoutes(
     return toCaptureResponse(options.storage, capture);
   });
 
+  // Plugins whose network allowlist only covers the API origin download exports here.
+  app.get(
+    '/v1/public/captures/:id/export/content',
+    { preHandler: apiKeyAuth },
+    async (request, reply) => {
+      const apiKey = request.apiKey;
+      const workspaceId = request.apiWorkspaceId;
+      const { id } = request.params as { id: string };
+      if (!apiKey || !workspaceId) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+
+      const generalLimit = await checkApiGeneralRateLimit(apiKey.id);
+      if (!generalLimit.allowed) {
+        return sendRateLimitReply(reply, generalLimit.retryAfterSec);
+      }
+
+      const rows = await options.db
+        .select({ exportStorageKey: schema.apiCaptures.exportStorageKey })
+        .from(schema.apiCaptures)
+        .where(and(eq(schema.apiCaptures.id, id), eq(schema.apiCaptures.workspaceId, workspaceId)))
+        .limit(1);
+
+      const exportKey = rows[0]?.exportStorageKey;
+      if (!exportKey) {
+        return reply.code(404).send({ error: 'Export not found' });
+      }
+
+      const body = await options.storage.getObject(exportKey);
+      return reply
+        .header('Content-Type', exportMimeType(exportKey))
+        .header('Cache-Control', 'private, no-store')
+        .send(body);
+    }
+  );
+
   app.patch('/v1/public/captures/:id', { preHandler: apiKeyAuth }, async (request, reply) => {
     const apiKey = request.apiKey;
     const workspaceId = request.apiWorkspaceId;

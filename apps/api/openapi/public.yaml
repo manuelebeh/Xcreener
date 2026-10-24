@@ -318,6 +318,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExportResponse'
+  /v1/public/captures/{id}/export/content:
+    get:
+      summary: Download the last export
+      description: Bytes of the most recent export, served by the API so clients only need the API origin.
+      operationId: downloadCaptureExport
+      tags: [Captures]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Exported image
+          content:
+            image/png:
+              schema: { type: string, format: binary }
+            image/jpeg:
+              schema: { type: string, format: binary }
+            image/webp:
+              schema: { type: string, format: binary }
+        '404':
+          description: Capture not found or not exported yet
   /v1/public/captures/{id}/publish:
     post:
       summary: Publish capture as permanent embed share
