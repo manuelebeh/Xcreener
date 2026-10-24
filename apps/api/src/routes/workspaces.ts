@@ -10,7 +10,7 @@ import {
   type WorkspaceResponse,
   type WorkspaceRole,
 } from '@snapglow/team-core';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import { nanoid } from 'nanoid';
@@ -26,6 +26,9 @@ interface WorkspaceRouteOptions {
   db: PostgresJsDatabase<typeof schema>;
   storage: StorageService;
 }
+
+type Database = PostgresJsDatabase<typeof schema>;
+type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
 
 function slugifyName(name: string): string {
   return name
@@ -61,7 +64,7 @@ async function uniqueSlug(
 }
 
 async function countWorkspaceMembers(
-  db: PostgresJsDatabase<typeof schema>,
+  db: Database | Transaction,
   workspaceId: string
 ): Promise<number> {
   const rows = await db
@@ -69,6 +72,20 @@ async function countWorkspaceMembers(
     .from(schema.workspaceMembers)
     .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
   return rows.length;
+}
+
+/** True when `userId` is the only admin: demoting or removing them would leave nobody to manage billing. */
+async function isLastAdmin(db: Database, workspaceId: string, userId: string): Promise<boolean> {
+  const admins = await db
+    .select({ userId: schema.workspaceMembers.userId })
+    .from(schema.workspaceMembers)
+    .where(
+      and(
+        eq(schema.workspaceMembers.workspaceId, workspaceId),
+        eq(schema.workspaceMembers.role, 'admin')
+      )
+    );
+  return admins.length === 1 && admins[0]?.userId === userId;
 }
 
 async function toWorkspaceResponse(
@@ -300,6 +317,9 @@ export async function registerWorkspaceRoutes(
       if (!body.role || !isWorkspaceRole(body.role)) {
         return reply.code(400).send({ error: 'Invalid role' });
       }
+      if (body.role !== 'admin' && (await isLastAdmin(options.db, workspaceId, userId))) {
+        return reply.code(409).send({ error: 'A workspace needs at least one admin' });
+      }
 
       const [updated] = await options.db
         .update(schema.workspaceMembers)
@@ -341,6 +361,9 @@ export async function registerWorkspaceRoutes(
       const { userId } = request.params as { userId: string };
       if (!workspaceId) {
         return reply.code(403).send({ error: 'Forbidden' });
+      }
+      if (await isLastAdmin(options.db, workspaceId, userId)) {
+        return reply.code(409).send({ error: 'A workspace needs at least one admin' });
       }
 
       const deleted = await options.db
@@ -457,7 +480,7 @@ export async function registerWorkspaceRoutes(
 
       const { token } = request.params as { token: string };
       const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
-      if (!(await allowOrReply(reply, 'invite-accept', user.id, 20, 3600))) {
+      if (!(await allowOrReply(reply, 'invite-accept', user.id, 20, 3600, { failClosed: true }))) {
         return reply;
       }
 
@@ -493,33 +516,48 @@ export async function registerWorkspaceRoutes(
         return reply.code(409).send({ error: 'Already a workspace member' });
       }
 
-      const workspaceRows = await options.db
-        .select()
-        .from(schema.workspaces)
-        .where(eq(schema.workspaces.id, invitation.workspaceId))
-        .limit(1);
-      const workspace = workspaceRows[0];
-      if (!workspace) {
-        return reply.code(404).send({ error: 'Workspace not found' });
-      }
+      // The workspace row lock serializes accepts, so the member limit holds; the conditional
+      // update makes a link invitation single use even under concurrent accepts.
+      const result = await options.db.transaction(async (tx) => {
+        const [workspace] = await tx
+          .select()
+          .from(schema.workspaces)
+          .where(eq(schema.workspaces.id, invitation.workspaceId))
+          .limit(1)
+          .for('update');
+        if (!workspace) {
+          return { status: 404 as const, error: 'Workspace not found' };
+        }
 
-      const memberCount = await countWorkspaceMembers(options.db, invitation.workspaceId);
-      if (isMemberLimitReached(workspace.plan, memberCount)) {
-        return reply.code(403).send({ error: 'Member limit reached for workspace plan' });
-      }
+        const memberCount = await countWorkspaceMembers(tx, invitation.workspaceId);
+        if (isMemberLimitReached(workspace.plan, memberCount)) {
+          return { status: 403 as const, error: 'Member limit reached for workspace plan' };
+        }
 
-      await options.db.insert(schema.workspaceMembers).values({
-        workspaceId: invitation.workspaceId,
-        userId: user.id,
-        role: invitation.role,
+        const [claimed] = await tx
+          .update(schema.invitations)
+          .set({ acceptedAt: new Date() })
+          .where(
+            and(eq(schema.invitations.id, invitation.id), isNull(schema.invitations.acceptedAt))
+          )
+          .returning();
+        if (!claimed) {
+          return { status: 409 as const, error: 'Invitation already accepted' };
+        }
+
+        await tx.insert(schema.workspaceMembers).values({
+          workspaceId: invitation.workspaceId,
+          userId: user.id,
+          role: invitation.role,
+        });
+        return { status: 200 as const, workspace };
       });
 
-      await options.db
-        .update(schema.invitations)
-        .set({ acceptedAt: new Date() })
-        .where(eq(schema.invitations.id, invitation.id));
+      if (result.status !== 200) {
+        return reply.code(result.status).send({ error: result.error });
+      }
 
-      const response = await toWorkspaceResponse(options.db, workspace, invitation.role);
+      const response = await toWorkspaceResponse(options.db, result.workspace, invitation.role);
       return reply.send(response);
     }
   );
