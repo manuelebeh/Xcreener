@@ -25,7 +25,7 @@ Modules in the app: capture (photo, region recording, scrolling capture), editor
 The name SnapGlow, the current warm-amber OKLCH palette and IBM Plex type are evidence, not constraints. Binding (user, 2026-10-13): the redesign must stay close to category standards so existing users keep their habits. Screen structure and interaction follow familiar photo and screenshot editors (top toolbar, centered canvas, grouped right inspector, status bar). No experimental metaphors or unconventional navigation.
 
 ## Evidence on Hand
-Existing design system in `/DESIGN.md` and `packages/design-tokens/tokens.json`. Product specs in `docs/product/`. No testimonials, customer numbers or benchmarks on hand; none may be invented.
+Existing design system in `/DESIGN.md` and `packages/design-tokens/tokens.json`. Product specs in `docs/internal/product/`. No testimonials, customer numbers or benchmarks on hand; none may be invented.
 
 ## Product Principles
 1. The image is the subject; interface chrome recedes while editing.
