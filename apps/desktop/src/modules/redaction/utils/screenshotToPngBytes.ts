@@ -1,6 +1,6 @@
 import { canvasToPngBlob, createExportCanvas } from '@/modules/export/utils/canvasExport';
 
-export async function screenshotToPngBytes(screenshot: ImageBitmap): Promise<number[]> {
+export async function screenshotToPngBytes(screenshot: ImageBitmap): Promise<Uint8Array> {
   const canvas = createExportCanvas(screenshot.width, screenshot.height);
 
   const ctx = canvas.getContext('2d') as
@@ -14,5 +14,5 @@ export async function screenshotToPngBytes(screenshot: ImageBitmap): Promise<num
   ctx.drawImage(screenshot, 0, 0);
   const blob = await canvasToPngBlob(canvas);
   const buffer = await blob.arrayBuffer();
-  return Array.from(new Uint8Array(buffer));
+  return new Uint8Array(buffer);
 }

@@ -9,21 +9,28 @@ use crate::capture::{
     CaptureRecordingCompletePayload, MonitorInfo, WindowInfo,
 };
 use crate::overlay;
+use tauri::ipc::Response;
 use tauri::{AppHandle, Manager};
 
 #[tauri::command]
-pub async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>, String> {
-    capture_region_impl(x, y, width, height).map_err(|error| error.into_message())
+pub async fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Response, String> {
+    capture_region_impl(x, y, width, height)
+        .map(Response::new)
+        .map_err(|error| error.into_message())
 }
 
 #[tauri::command]
-pub async fn capture_window(window_id: u64) -> Result<Vec<u8>, String> {
-    capture_window_impl(window_id).map_err(|error| error.into_message())
+pub async fn capture_window(window_id: u64) -> Result<Response, String> {
+    capture_window_impl(window_id)
+        .map(Response::new)
+        .map_err(|error| error.into_message())
 }
 
 #[tauri::command]
-pub async fn capture_fullscreen(display_id: u32) -> Result<Vec<u8>, String> {
-    capture_fullscreen_impl(display_id).map_err(|error| error.into_message())
+pub async fn capture_fullscreen(display_id: u32) -> Result<Response, String> {
+    capture_fullscreen_impl(display_id)
+        .map(Response::new)
+        .map_err(|error| error.into_message())
 }
 
 #[tauri::command]
@@ -79,16 +86,16 @@ pub async fn show_live_capture_overlay(app: AppHandle) -> Result<CaptureOverlayB
 pub async fn capture_native_command(
     app: AppHandle,
     request: CaptureNativeRequest,
-) -> Result<Vec<u8>, String> {
-    capture_native_impl(&app, request)
+) -> Result<Response, String> {
+    capture_native_impl(&app, request).map(Response::new)
 }
 
 #[tauri::command]
 pub async fn capture_scrolling_window_command(
     app: AppHandle,
     window: WindowInfo,
-) -> Result<Vec<u8>, String> {
-    capture_scrolling_window_impl(&app, window)
+) -> Result<Response, String> {
+    capture_scrolling_window_impl(&app, window).map(Response::new)
 }
 
 #[tauri::command]

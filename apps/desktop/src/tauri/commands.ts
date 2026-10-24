@@ -1,4 +1,6 @@
 import { invoke } from '@tauri-apps/api/core';
+// Image bytes go as raw bodies (Uint8Array in, ArrayBuffer out), not JSON number arrays.
+
 import type {
   CaptureMetadata,
   CaptureOverlayBounds,
@@ -7,7 +9,7 @@ import type {
 } from '@/shared/types/ipc';
 
 export function captureRegion(x: number, y: number, width: number, height: number) {
-  return invoke<number[]>('capture_region', {
+  return invoke<ArrayBuffer>('capture_region', {
     x: Math.round(x),
     y: Math.round(y),
     width: Math.round(width),
@@ -16,11 +18,11 @@ export function captureRegion(x: number, y: number, width: number, height: numbe
 }
 
 export function captureWindow(windowId: number) {
-  return invoke<number[]>('capture_window', { windowId });
+  return invoke<ArrayBuffer>('capture_window', { windowId });
 }
 
 export function captureFullscreen(displayId: number) {
-  return invoke<number[]>('capture_fullscreen', { displayId });
+  return invoke<ArrayBuffer>('capture_fullscreen', { displayId });
 }
 
 export function listMonitors() {
@@ -67,11 +69,20 @@ export function cancelCaptureOverlay() {
 }
 
 export function captureNative(request: import('@/shared/types/ipc').CaptureNativeRequest) {
-  return invoke<number[]>('capture_native_command', { request });
+  return invoke<ArrayBuffer>('capture_native_command', { request });
 }
 
 export function captureScrollingWindow(window: import('@/shared/types/ipc').WindowInfo) {
-  return invoke<number[]>('capture_scrolling_window_command', { window });
+  return invoke<ArrayBuffer>('capture_scrolling_window_command', { window });
+}
+
+/** Hands a finished capture to the main window, which reads it with takeCaptureImage. */
+export function stashCaptureImage(bytes: Uint8Array) {
+  return invoke<void>('stash_capture_image', bytes);
+}
+
+export function takeCaptureImage() {
+  return invoke<ArrayBuffer>('take_capture_image');
 }
 
 export function cancelLiveCapture() {
@@ -114,10 +125,8 @@ export function showLiveCaptureOverlay() {
   return invoke<CaptureOverlayBounds>('show_live_capture_overlay');
 }
 
-export function detectSensitiveData(imageData: number[]) {
-  return invoke<import('@/shared/types/ipc').SensitiveRegion[]>('detect_sensitive_data', {
-    imageData,
-  });
+export function detectSensitiveData(imageData: Uint8Array) {
+  return invoke<import('@/shared/types/ipc').SensitiveRegion[]>('detect_sensitive_data', imageData);
 }
 
 /** Checks the API signature in Rust; null when the token is missing, forged or expired. */
@@ -125,33 +134,29 @@ export function verifyEntitlement(token: string) {
   return invoke<import('@/shared/types/ipc').Entitlement | null>('verify_entitlement', { token });
 }
 
-export function classifyContent(imageData: number[]) {
-  return invoke<import('@/shared/types/ipc').ClassificationResult>('classify_content_command', {
-    imageData,
-  });
+export function classifyContent(imageData: Uint8Array) {
+  return invoke<import('@/shared/types/ipc').ClassificationResult>(
+    'classify_content_command',
+    imageData
+  );
 }
 
 export function recognizeText(
-  imageData: number[],
+  imageData: Uint8Array,
   options: import('@/shared/types/ipc').RecognizeTextOptions
 ) {
-  return invoke<import('@/shared/types/ipc').TextLine[]>('recognize_text_command', {
-    imageData,
-    options,
+  return invoke<import('@/shared/types/ipc').TextLine[]>('recognize_text_command', imageData, {
+    headers: { options: JSON.stringify(options) },
   });
 }
 
-export function analyzeContent(imageData: number[]) {
-  return invoke<import('@/shared/types/ipc').ContentAnalysis>('analyze_content_command', {
-    imageData,
-  });
+export function analyzeContent(imageData: Uint8Array) {
+  return invoke<import('@/shared/types/ipc').ContentAnalysis>('analyze_content_command', imageData);
 }
 
-export function compressExportBytes(imageData: number[], format: string, quality: number) {
-  return invoke<number[]>('compress_export_bytes_command', {
-    imageData,
-    format,
-    quality,
+export function compressExportBytes(imageData: Uint8Array, format: string, quality: number) {
+  return invoke<ArrayBuffer>('compress_export_bytes_command', imageData, {
+    headers: { format, quality: String(Math.round(quality)) },
   });
 }
 

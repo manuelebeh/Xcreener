@@ -62,7 +62,7 @@ export async function cropObjectUrlToPngBytes(
   objectUrl: string,
   rect: { x: number; y: number; width: number; height: number },
   displaySize?: { width: number; height: number }
-): Promise<{ bytes: number[]; width: number; height: number }> {
+): Promise<{ bytes: Uint8Array; width: number; height: number }> {
   const image = await loadImage(objectUrl);
   const displayWidth = displaySize?.width ?? image.width;
   const displayHeight = displaySize?.height ?? image.height;
@@ -106,14 +106,14 @@ export async function cropObjectUrlToPngBytes(
 
   const buffer = await blob.arrayBuffer();
   return {
-    bytes: Array.from(new Uint8Array(buffer)),
+    bytes: new Uint8Array(buffer),
     width: sourceWidth,
     height: sourceHeight,
   };
 }
 
 export function getImageDimensionsFromPng(
-  bytes: number[]
+  bytes: Uint8Array
 ): { width: number; height: number } | null {
   if (bytes.length < 24) {
     return null;

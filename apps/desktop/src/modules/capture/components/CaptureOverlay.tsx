@@ -25,6 +25,7 @@ import {
   pauseRegionRecording,
   resumeRegionRecording,
   startRegionRecording,
+  stashCaptureImage,
   stopRegionRecording,
   stopScrollingCapture,
 } from '@/tauri/commands';
@@ -56,10 +57,10 @@ import { MonitorHighlight } from './MonitorHighlight';
 import { RegionSelector } from './RegionSelector';
 import { WindowHighlight } from './WindowHighlight';
 
-async function publishCapture(bytes: number[]) {
+async function publishCapture(bytes: Uint8Array) {
   const dimensions = getImageDimensionsFromPng(bytes);
+  await stashCaptureImage(bytes);
   await emit('capture-image', {
-    bytes,
     width: dimensions?.width ?? 0,
     height: dimensions?.height ?? 0,
   });
@@ -248,7 +249,7 @@ export function CaptureOverlay() {
   }, [setProgressHudMode]);
 
   const finishCapture = useCallback(
-    async (bytes: number[]) => {
+    async (bytes: Uint8Array) => {
       await hideCaptureOverlay();
       await publishCapture(bytes);
       reset();
@@ -306,7 +307,7 @@ export function CaptureOverlay() {
       setScrollFrame(null);
 
       try {
-        const bytes = await captureNative(request);
+        const bytes = new Uint8Array(await captureNative(request));
         await finishCapture(bytes);
       } catch (failure) {
         await handleCaptureFailure(failure);
@@ -326,7 +327,7 @@ export function CaptureOverlay() {
 
       try {
         await emit('capture-progress', { phase: 'scroll', current: 0 });
-        const bytes = await captureScrollingWindow(window);
+        const bytes = new Uint8Array(await captureScrollingWindow(window));
         await finishCapture(bytes);
       } catch (failure) {
         await handleCaptureFailure(failure);

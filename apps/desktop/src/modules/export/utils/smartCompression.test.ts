@@ -3,8 +3,8 @@ import { bytesToBlob } from '@/shared/utils/image';
 import { maybeCompressExportBlob } from './smartCompression';
 
 vi.mock('@/tauri/commands', () => ({
-  compressExportBytes: vi.fn(async (imageData: number[]) =>
-    imageData.slice(0, Math.floor(imageData.length * 0.6))
+  compressExportBytes: vi.fn(
+    async (imageData: Uint8Array) => imageData.slice(0, Math.floor(imageData.length * 0.6)).buffer
   ),
 }));
 

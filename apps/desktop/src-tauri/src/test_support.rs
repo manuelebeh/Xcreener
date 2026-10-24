@@ -7,7 +7,6 @@ use crate::overlay;
 
 #[derive(Serialize, Clone)]
 struct CaptureImagePayload {
-    bytes: Vec<u8>,
     width: u32,
     height: u32,
 }
@@ -43,10 +42,10 @@ pub fn e2e_inject_screenshot(
     }
 
     crate::tray::show_main_window(&app);
+    crate::commands::raw_ipc::set_pending_capture(png_bytes);
     app.emit(
         "capture-image",
         CaptureImagePayload {
-            bytes: png_bytes,
             width,
             height,
         },
