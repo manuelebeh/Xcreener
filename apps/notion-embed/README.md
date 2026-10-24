@@ -14,10 +14,13 @@ Insert enriched SnapGlow embed blocks into Notion pages using the public API and
 export NOTION_CLIENT_ID=...
 export NOTION_CLIENT_SECRET=...
 export WEB_PUBLIC_URL=http://localhost:3000
+export SNAPGLOW_API_URL=http://localhost:8787   # the only API the server talks to
 pnpm --filter @snapglow/notion-embed dev
 ```
 
 Open http://localhost:3456
+
+The server binds to `127.0.0.1` (`NOTION_EMBED_HOST` to change it). It has no authentication of its own: do not expose it on a public interface. The Notion session is an `HttpOnly` cookie that expires after one hour.
 
 ## Flow
 
