@@ -43,6 +43,7 @@ async function capturePostHogEvent(
       properties: { ...properties, $lib: 'api' },
       distinct_id: String(properties.affiliate_token ?? properties.referral_id ?? 'affiliate'),
     }),
+    signal: AbortSignal.timeout(5_000),
   }).catch(() => undefined);
 }
 
@@ -78,7 +79,6 @@ export async function registerAffiliateRoutes(app: FastifyInstance) {
       await capturePostHogEvent('affiliate_referred', {
         affiliate_token: payload.object?.referral?.token,
         referral_id: payload.object?.referral?.id,
-        email: payload.object?.email,
       });
     }
 
