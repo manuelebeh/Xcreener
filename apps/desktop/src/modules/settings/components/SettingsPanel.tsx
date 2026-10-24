@@ -2,7 +2,7 @@ import { LOCALE_LABELS, SUPPORTED_LOCALES, useTranslation } from '@snapglow/i18n
 import { Button, Input, Select } from '@snapglow/ui';
 import { useState } from 'react';
 import { setSetting } from '@/db';
-import { isAnalyticsActive } from '@/integrations/observability';
+import { isAnalyticsActive, setObservabilityEnabled } from '@/integrations/observability';
 import { captureTestEvent } from '@/integrations/posthog/events';
 import { checkForAppUpdate } from '@/integrations/updater';
 import { updateCaptureShortcut } from '@/modules/capture/hooks/useGlobalShortcut';
@@ -92,6 +92,7 @@ export function SettingsPanel() {
   async function handleAnalyticsChange(enabled: boolean) {
     setAnalyticsEnabled(enabled);
     await setSetting(SETTING_KEYS.analyticsEnabled, String(enabled));
+    await setObservabilityEnabled(enabled);
   }
 
   async function handleAutoRedactionChange(enabled: boolean) {
