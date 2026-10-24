@@ -10,7 +10,10 @@ export const ENTITLEMENT_TTL_SECONDS = 7 * 24 * 60 * 60;
 
 const PLAN_RANK: Record<WorkspacePlan, number> = { free: 0, team_starter: 1, team_pro: 2 };
 
-/** Highest plan across every workspace the user belongs to. */
+/**
+ * Highest plan across the workspaces where the user is an editor or admin. Viewers are
+ * not paid seats, so a viewer role alone gives the free plan.
+ */
 export async function bestPlanForUser(
   db: PostgresJsDatabase<typeof schema>,
   userId: string
@@ -21,10 +24,12 @@ export async function bestPlanForUser(
     .innerJoin(schema.workspaces, eq(schema.workspaces.id, schema.workspaceMembers.workspaceId))
     .where(eq(schema.workspaceMembers.userId, userId));
 
-  return rows.reduce<WorkspacePlan>(
-    (best, row) => (PLAN_RANK[row.workspace.plan] > PLAN_RANK[best] ? row.workspace.plan : best),
-    'free'
-  );
+  return rows
+    .filter((row) => row.role !== 'viewer')
+    .reduce<WorkspacePlan>(
+      (best, row) => (PLAN_RANK[row.workspace.plan] > PLAN_RANK[best] ? row.workspace.plan : best),
+      'free'
+    );
 }
 
 /** EdDSA JWT the desktop verifies with the matching public key. Null when no key is configured. */

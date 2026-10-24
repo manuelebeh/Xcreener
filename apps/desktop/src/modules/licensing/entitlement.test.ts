@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const settings = vi.hoisted(() => new Map<string, string>());
-// Tokens the fake Rust verifier accepts; anything else is "forged".
+// Tokens the fake Rust verifier accepts (issued to user-1); anything else is "forged".
 const signedTokens = vi.hoisted(
   () => new Map<string, { plan: 'free' | 'team_starter' | 'team_pro'; expiresAt: number }>()
 );
@@ -14,7 +14,8 @@ vi.mock('@/db', () => ({
   },
 }));
 vi.mock('@/tauri/commands', () => ({
-  verifyEntitlement: async (token: string) => signedTokens.get(token) ?? null,
+  verifyEntitlement: async (token: string, userId: string) =>
+    userId === 'user-1' ? (signedTokens.get(token) ?? null) : null,
 }));
 vi.mock('@/modules/cloud/auth', () => ({ getValidAccessToken: async () => auth.accessToken }));
 vi.mock('@/modules/cloud/config', async (importOriginal) => ({
@@ -44,6 +45,7 @@ function mockFetch(response: Response | Error) {
 describe('entitlement', () => {
   beforeEach(() => {
     settings.clear();
+    settings.set('entitlementUserId', 'user-1');
     signedTokens.clear();
     auth.accessToken = 'access';
     useEntitlementStore.setState({ entitlement: null });
@@ -68,6 +70,16 @@ describe('entitlement', () => {
     expect(hasPremiumAccess()).toBe(false);
   });
 
+  it('treats a token copied from another account as free', async () => {
+    signedTokens.set('pro-token', { plan: 'team_pro', expiresAt: IN_A_WEEK });
+    settings.set('entitlementToken', 'pro-token');
+    settings.set('entitlementUserId', 'user-2');
+
+    await loadStoredEntitlement();
+
+    expect(hasPremiumAccess()).toBe(false);
+  });
+
   it('ignores a licenseSource edited in the settings table', () => {
     useSettingsStore.getState().hydrate({ ...DEFAULT_APP_SETTINGS, licenseSource: 'setapp' });
     expect(hasPremiumAccess()).toBe(false);
@@ -75,11 +87,16 @@ describe('entitlement', () => {
 
   it('stores and applies a fresh token from the API', async () => {
     signedTokens.set('starter-token', { plan: 'team_starter', expiresAt: IN_A_WEEK });
-    mockFetch(new Response(JSON.stringify({ token: 'starter-token', plan: 'team_starter' })));
+    mockFetch(
+      new Response(
+        JSON.stringify({ token: 'starter-token', plan: 'team_starter', userId: 'user-1' })
+      )
+    );
 
     await refreshEntitlement();
 
     expect(settings.get('entitlementToken')).toBe('starter-token');
+    expect(settings.get('entitlementUserId')).toBe('user-1');
     expect(hasPremiumAccess()).toBe(true);
   });
 

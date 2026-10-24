@@ -14,14 +14,20 @@ interface EntitlementState {
 
 export const useEntitlementStore = create<EntitlementState>(() => ({ entitlement: null }));
 
-async function applyToken(token: string | null): Promise<void> {
-  const entitlement = token ? await verifyEntitlement(token) : null;
+async function applyToken(token: string | null, userId: string | null): Promise<void> {
+  const entitlement = token && userId ? await verifyEntitlement(token, userId) : null;
   useEntitlementStore.setState({ entitlement });
 }
 
-/** Boot: trust only what still verifies. A forged or edited token falls back to free. */
+/**
+ * Boot: trust only what still verifies. A forged or edited token, or one issued to another
+ * account, falls back to free.
+ */
 export async function loadStoredEntitlement(): Promise<void> {
-  await applyToken(await getSetting(SETTING_KEYS.entitlementToken));
+  await applyToken(
+    await getSetting(SETTING_KEYS.entitlementToken),
+    await getSetting(SETTING_KEYS.entitlementUserId)
+  );
 }
 
 /** Online: fetch a fresh token. Network or server errors keep the cached one (offline grace). */
@@ -48,13 +54,15 @@ export async function refreshEntitlement(): Promise<void> {
     return;
   }
 
-  const { token } = (await response.json()) as { token: string };
+  const { token, userId } = (await response.json()) as { token: string; userId: string };
   await setSetting(SETTING_KEYS.entitlementToken, token);
-  await applyToken(token);
+  await setSetting(SETTING_KEYS.entitlementUserId, userId);
+  await applyToken(token, userId);
 }
 
 export async function clearEntitlement(): Promise<void> {
   await setSetting(SETTING_KEYS.entitlementToken, '');
+  await setSetting(SETTING_KEYS.entitlementUserId, '');
   useEntitlementStore.setState({ entitlement: null });
 }
 

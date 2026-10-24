@@ -7,6 +7,8 @@ import * as auth from './auth';
 import { getApiUrl, getEntitlementPublicKey } from './config';
 
 const ENTITLEMENT_TOKEN_KEY = 'snapglow:entitlementToken';
+/** Internal user id the API returned with the token; the token's `sub` must match it. */
+const ENTITLEMENT_USER_KEY = 'snapglow:entitlementUserId';
 
 interface AccountState {
   signedIn: boolean;
@@ -27,16 +29,21 @@ function nowSeconds(): number {
   return Math.floor(Date.now() / 1000);
 }
 
-/** Verifies on every load: an edited or copied token fails and falls back to free. */
-function applyToken(token: string | null): void {
+/**
+ * Verifies on every load: an edited token, or one issued to another account, fails and
+ * falls back to free.
+ */
+function applyToken(token: string | null, userId: string | null): void {
   const publicKey = getEntitlementPublicKey();
   const entitlement =
-    token && publicKey ? verifyEntitlementToken(token, publicKey, nowSeconds()) : null;
+    token && userId && publicKey
+      ? verifyEntitlementToken(token, publicKey, nowSeconds(), userId)
+      : null;
   useAccountStore.setState({ entitlement });
 }
 
 async function clearEntitlement(): Promise<void> {
-  await AsyncStorage.removeItem(ENTITLEMENT_TOKEN_KEY);
+  await AsyncStorage.multiRemove([ENTITLEMENT_TOKEN_KEY, ENTITLEMENT_USER_KEY]);
   useAccountStore.setState({ entitlement: null });
 }
 
@@ -65,14 +72,21 @@ async function refreshEntitlement(): Promise<void> {
     return;
   }
 
-  const { token } = (await response.json()) as { token: string };
-  await AsyncStorage.setItem(ENTITLEMENT_TOKEN_KEY, token);
-  applyToken(token);
+  const { token, userId } = (await response.json()) as { token: string; userId: string };
+  await AsyncStorage.multiSet([
+    [ENTITLEMENT_TOKEN_KEY, token],
+    [ENTITLEMENT_USER_KEY, userId],
+  ]);
+  applyToken(token, userId);
 }
 
 /** App launch: apply the cached plan first so the editor never waits on the network. */
 export async function bootstrapAccount(): Promise<void> {
-  applyToken(await AsyncStorage.getItem(ENTITLEMENT_TOKEN_KEY));
+  const [[, token], [, userId]] = await AsyncStorage.multiGet([
+    ENTITLEMENT_TOKEN_KEY,
+    ENTITLEMENT_USER_KEY,
+  ]);
+  applyToken(token, userId);
   await refreshEntitlement();
 }
 

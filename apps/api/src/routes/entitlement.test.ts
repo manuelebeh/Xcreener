@@ -61,7 +61,12 @@ const AUTH = { authorization: 'Bearer test-token' };
 let publicKey: CryptoKey;
 let privatePem: string;
 
-function addWorkspace(state: MemoryState, id: string, plan: WorkspacePlan) {
+function addWorkspace(
+  state: MemoryState,
+  id: string,
+  plan: WorkspacePlan,
+  role: 'admin' | 'editor' | 'viewer' = 'admin'
+) {
   const at = new Date('2026-06-27T12:00:00.000Z');
   state.workspaces.push({
     id,
@@ -73,7 +78,7 @@ function addWorkspace(state: MemoryState, id: string, plan: WorkspacePlan) {
     createdAt: at,
     updatedAt: at,
   });
-  state.members.push({ workspaceId: id, userId: 'user-admin', role: 'admin', joinedAt: at });
+  state.members.push({ workspaceId: id, userId: 'user-admin', role, joinedAt: at });
 }
 
 describe('entitlement and enterprise integration checks', () => {
@@ -113,12 +118,28 @@ describe('entitlement and enterprise integration checks', () => {
     const response = await app.inject({ method: 'GET', url: '/v1/me/entitlement', headers: AUTH });
 
     expect(response.statusCode).toBe(200);
-    const { token, plan } = response.json() as { token: string; plan: string };
+    const { token, plan, userId } = response.json() as {
+      token: string;
+      plan: string;
+      userId: string;
+    };
     expect(plan).toBe('team_pro');
+    expect(userId).toBe('user-admin');
     const { payload, protectedHeader } = await jwtVerify(token, publicKey);
     expect(protectedHeader.alg).toBe('EdDSA');
     expect(payload).toMatchObject({ sub: 'user-admin', plan: 'team_pro' });
     expect((payload.exp ?? 0) - (payload.iat ?? 0)).toBe(7 * 24 * 60 * 60);
+  });
+
+  it('does not give a paid plan to a viewer', async () => {
+    addWorkspace(state, 'ws-pro', 'team_pro', 'viewer');
+    addWorkspace(state, 'ws-starter', 'team_starter', 'editor');
+    const app = await buildTestApp(state, testContext.whereCapture);
+
+    const response = await app.inject({ method: 'GET', url: '/v1/me/entitlement', headers: AUTH });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({ plan: 'team_starter' });
   });
 
   it('signs free without a workspace', async () => {
