@@ -43,6 +43,11 @@ vi.mock('../plugins/auth', () => ({
   upsertAuthUser: async () => testContext.currentAuthUser,
 }));
 
+// Hermetic: the invitation route is rate limited, and Redis is not available in unit tests.
+vi.mock('../services/redis', () => ({
+  checkRateLimit: async () => ({ allowed: true, retryAfterSec: 0 }),
+}));
+
 import { invitations, workspaceMembers, workspaces } from '../db/schema';
 import { buildTestApp, resetMemoryState } from './workspaces.test-helpers';
 

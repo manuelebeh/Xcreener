@@ -102,6 +102,7 @@ function createMemoryDb(state: MemoryState, whereCapture: Record<string, unknown
   };
 
   const db = {
+    transaction: async <T>(run: (tx: unknown) => Promise<T>): Promise<T> => run(db),
     select: (fields?: Record<string, unknown>) => {
       Object.keys(whereCapture).forEach((key) => {
         delete whereCapture[key];
@@ -124,7 +125,10 @@ function createMemoryDb(state: MemoryState, whereCapture: Record<string, unknown
               activeWhere = { ...whereCapture };
               const run = () => Promise.resolve(executeSelect());
               return Object.assign(run(), {
-                limit: async (limit: number) => executeSelect(limit),
+                limit: (limit: number) => {
+                  const rows = executeSelect(limit);
+                  return Object.assign(Promise.resolve(rows), { for: async () => rows });
+                },
               });
             },
           };
