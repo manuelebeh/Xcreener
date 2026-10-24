@@ -54,6 +54,16 @@ export const env = createEnv({
     ATLASSIAN_CLIENT_SECRET: z.string().default(''),
     MS_TEAMS_CLIENT_ID: z.string().default(''),
     MS_TEAMS_CLIENT_SECRET: z.string().default(''),
+    /**
+     * 32 random bytes, base64 (`openssl rand -base64 32`). Seals provider refresh tokens into the
+     * `refreshHandle` the desktop keeps; empty disables integration token refresh.
+     */
+    INTEGRATION_TOKEN_KEY: z
+      .string()
+      .default('')
+      .refine((value) => value === '' || Buffer.from(value, 'base64').length === 32, {
+        message: 'INTEGRATION_TOKEN_KEY must be 32 bytes, base64-encoded',
+      }),
     /** Ed25519 PKCS8 PEM signing desktop entitlements (scripts/generate-entitlement-keys.ts). */
     ENTITLEMENT_PRIVATE_KEY: z.string().default(''),
   },

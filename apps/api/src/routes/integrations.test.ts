@@ -3,6 +3,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 vi.hoisted(() => {
   process.env.GITHUB_CLIENT_ID = 'gh-client';
   process.env.GITHUB_CLIENT_SECRET = 'gh-secret';
+  process.env.LINEAR_CLIENT_ID = 'linear-client';
+  process.env.LINEAR_CLIENT_SECRET = 'linear-secret';
+  process.env.INTEGRATION_TOKEN_KEY = Buffer.alloc(32, 7).toString('base64');
 });
 
 const pendingStates = new Map<string, string>();
@@ -70,23 +73,42 @@ describe('integration OAuth state binding', () => {
     };
   });
 
-  async function authorize(user: string) {
+  async function authorize(user: string, provider = 'github') {
     const response = await app.inject({
       method: 'GET',
-      url: '/v1/integrations/github/authorize',
+      url: `/v1/integrations/${provider}/authorize`,
       headers: { authorization: `Bearer ${user}` },
     });
     expect(response.statusCode).toBe(200);
     return response.json() as { authorizeUrl: string; state: string };
   }
 
-  function exchange(user: string, payload: Record<string, unknown>) {
+  function exchange(user: string, payload: Record<string, unknown>, provider = 'github') {
     return app.inject({
       method: 'POST',
-      url: '/v1/integrations/github/token',
+      url: `/v1/integrations/${provider}/token`,
       headers: { authorization: `Bearer ${user}` },
       payload,
     });
+  }
+
+  function refresh(user: string, payload: Record<string, unknown>, provider = 'linear') {
+    return app.inject({
+      method: 'POST',
+      url: `/v1/integrations/${provider}/refresh`,
+      headers: { authorization: `Bearer ${user}` },
+      payload,
+    });
+  }
+
+  async function connectLinear(user: string): Promise<string> {
+    fetchMock.mockResolvedValueOnce(
+      Response.json({ access_token: 'lin-1', refresh_token: 'lin-refresh-1', expires_in: 3600 })
+    );
+    const { state } = await authorize(user, 'linear');
+    const response = await exchange(user, { code: 'c1', state }, 'linear');
+    expect(response.statusCode).toBe(200);
+    return (response.json() as { refreshHandle: string }).refreshHandle;
   }
 
   it('sends a PKCE challenge and the verifier on exchange', async () => {
@@ -138,6 +160,67 @@ describe('integration OAuth state binding', () => {
 
   it('refuses an exchange without state', async () => {
     expect((await exchange('alice', { code: 'c1' })).statusCode).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('returns a sealed refresh handle, never the provider refresh token', async () => {
+    fetchMock.mockResolvedValueOnce(
+      Response.json({ access_token: 'lin-1', refresh_token: 'lin-refresh-1', expires_in: 3600 })
+    );
+    const { state } = await authorize('alice', 'linear');
+
+    const response = await exchange('alice', { code: 'c1', state }, 'linear');
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json() as Record<string, unknown>;
+    expect(body.accessToken).toBe('lin-1');
+    expect(body.refreshHandle).toMatch(/^v1\./);
+    expect(body).not.toHaveProperty('refreshToken');
+    expect(response.body).not.toContain('lin-refresh-1');
+  });
+
+  it('refreshes with the handle and rotates it', async () => {
+    const handle = await connectLinear('alice');
+    fetchMock.mockResolvedValueOnce(
+      Response.json({ access_token: 'lin-2', refresh_token: 'lin-refresh-2', expires_in: 3600 })
+    );
+
+    const response = await refresh('alice', { refreshHandle: handle });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json() as { accessToken: string; refreshHandle: string };
+    expect(body.accessToken).toBe('lin-2');
+    expect(body.refreshHandle).not.toBe(handle);
+    expect(response.body).not.toContain('lin-refresh-2');
+    const sent = fetchMock.mock.calls.at(-1)?.[1]?.body as URLSearchParams;
+    expect(sent.get('grant_type')).toBe('refresh_token');
+    expect(sent.get('refresh_token')).toBe('lin-refresh-1');
+    expect(sent.get('client_secret')).toBe('linear-secret');
+  });
+
+  it('refuses a handle used by another account', async () => {
+    const handle = await connectLinear('alice');
+    fetchMock.mockClear();
+
+    const response = await refresh('mallory', { refreshHandle: handle });
+
+    expect(response.statusCode).toBe(400);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('asks to reconnect when the provider refuses the refresh token', async () => {
+    const handle = await connectLinear('alice');
+    fetchMock.mockResolvedValueOnce(Response.json({ error: 'invalid_grant' }, { status: 400 }));
+
+    const response = await refresh('alice', { refreshHandle: handle });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({ error: 'Reconnect this integration' });
+  });
+
+  it('refuses refresh for providers without expiring tokens', async () => {
+    const response = await refresh('alice', { refreshHandle: 'v1.x' }, 'github');
+    expect(response.statusCode).toBe(400);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
