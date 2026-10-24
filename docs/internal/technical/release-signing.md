@@ -13,14 +13,20 @@ pnpm --filter @snapglow/desktop tauri signer generate -w ~/.tauri/snapglow.key
 ```
 
 - **Public key:** committed in `apps/desktop/src-tauri/tauri.conf.json` → `plugins.updater.pubkey`
-- **Private key:** GitHub secret `TAURI_SIGNING_PRIVATE_KEY` (contents of `.key` file, or path via `TAURI_SIGNING_PRIVATE_KEY_PATH` in local builds)
+- **Private key:** secret `TAURI_SIGNING_PRIVATE_KEY` of the GitHub environment `release` (contents of `.key` file, or path via `TAURI_SIGNING_PRIVATE_KEY_PATH` in local builds)
 - **Password:** `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` if the key is encrypted
 
 > If the private key is lost, existing installs cannot verify new updates. Rotate pubkey in config and re-release.
 
 ### CI
 
-`.github/workflows/release.yml` passes signing env vars to `tauri-apps/tauri-action`. Required for updater metadata on tag push `v*`.
+`.github/workflows/release.yml` runs on tag push `v*` only, in three jobs:
+
+1. **build**: `pnpm tauri build --no-bundle` per target. No secrets in this job, so no npm package (Vite plugins, transitive dependencies) can read the signing key.
+2. **bundle**: GitHub environment `release`. Downloads the binary, installs `tauri-cli` from crates.io (`cargo install --locked`, same version as `@tauri-apps/cli`), then `cargo tauri bundle` with `createUpdaterArtifacts` and the signing key. Nothing from npm is installed here. Apple and Windows signing secrets go in this job's env.
+3. **publish**: build provenance attestation (`actions/attest-build-provenance`) on every installer and update bundle, `latest.json` for the updater endpoint, draft release.
+
+One-time setup in GitHub → Settings → Environments: create `release`, add required reviewers (and optionally restrict it to tags `v*`), and move `TAURI_SIGNING_PRIVATE_KEY` / `_PASSWORD` (and later `APPLE_*`, `WINDOWS_*`) into it as environment secrets.
 
 ## 2. macOS code signing & notarization
 
@@ -35,7 +41,7 @@ pnpm --filter @snapglow/desktop tauri signer generate -w ~/.tauri/snapglow.key
 
 **Prerequisites:** Apple Developer Program membership ($99/year).
 
-Without these secrets, `build.yml` / `release.yml` produce **unsigned** `.dmg` files (Gatekeeper will block by default). Do not export empty `APPLE_*` env vars in CI: Tauri treats them as present and `security import` fails. Uncomment the Apple block in `release.yml` only after the secrets are set.
+Without these secrets, `build.yml` / `release.yml` produce **unsigned** `.dmg` files (Gatekeeper will block by default). Do not export empty `APPLE_*` env vars in CI: Tauri treats them as present and `security import` fails. Uncomment the Apple block in the `bundle` job of `release.yml` only after the secrets are set in the `release` environment.
 
 ## 3. Windows Authenticode
 
@@ -50,7 +56,7 @@ Without a cert, Windows SmartScreen will warn on first install.
 | Workflow | Trigger | Signing |
 |----------|---------|---------|
 | `build.yml` | Push `main`, `workflow_dispatch` | Unsigned smoke builds |
-| `release.yml` | Tag `v*` | Updater signed if `TAURI_SIGNING_PRIVATE_KEY` set; platform signing if Apple/Windows secrets set |
+| `release.yml` | Tag `v*` only, `bundle` job gated by the `release` environment | Updater signed in the `bundle` job; platform signing if Apple/Windows secrets set |
 
 Releases are created as **drafts** until manually published.
 
@@ -96,10 +102,13 @@ CI runs `.github/workflows/release.yml` → draft release with macOS (aarch64 + 
 
 ## 6. Local release test
 
+Same two steps as CI (build without the key, then bundle with it):
+
 ```bash
-# Set private key for local bundle
+pnpm --filter @snapglow/desktop tauri build --no-bundle --target aarch64-apple-darwin
 export TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/snapglow.key)"
-pnpm --filter @snapglow/desktop tauri build
+pnpm --filter @snapglow/desktop tauri bundle --target aarch64-apple-darwin \
+  --config '{"bundle":{"createUpdaterArtifacts":true}}'
 ```
 
 ## 7. Paid-plan entitlements (Ed25519)

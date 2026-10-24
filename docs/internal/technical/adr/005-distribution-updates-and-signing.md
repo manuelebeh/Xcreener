@@ -19,12 +19,12 @@ Phase 0 requires installable desktop builds and a test update channel before MVP
 | Windows | `.msi` / `.exe` (NSIS) | `windows-latest` |
 
 - **PR / main builds:** `.github/workflows/build.yml` - unsigned smoke builds.
-- **Releases:** `.github/workflows/release.yml` - triggered on tag `v*`; draft GitHub Release; signed updater metadata.
+- **Releases:** `.github/workflows/release.yml` - triggered on tag `v*` only; draft GitHub Release; signed updater metadata. The app is built without secrets, then bundled and signed in a separate job (GitHub environment `release`, required reviewers) that installs the Tauri CLI from crates.io and nothing from npm; artifacts get a build provenance attestation.
 
 ### Tauri updater
 
 - Plugin: `tauri-plugin-updater` + `@tauri-apps/plugin-updater` (frontend).
-- **Signature:** Ed25519 key pair (`tauri signer generate`). Public key in `tauri.conf.json`; private key in GitHub secret `TAURI_SIGNING_PRIVATE_KEY`.
+- **Signature:** Ed25519 key pair (`tauri signer generate`). Public key in `tauri.conf.json`; private key in the `release` environment secret `TAURI_SIGNING_PRIVATE_KEY`.
 - **Endpoint (test channel):** GitHub Releases latest manifest:
   ```
   https://github.com/manuelebeh/ScreenCut/releases/latest/download/latest.json
@@ -47,7 +47,7 @@ Required secrets (future):
 | Secret | Platform |
 |--------|----------|
 | `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`, `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID` | macOS notarization |
-| Windows Authenticode cert (via `tauri-action` env) | Windows |
+| Windows Authenticode cert (bundle job env in `release.yml`) | Windows |
 | `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | Updater manifest |
 
 ### Versioning
