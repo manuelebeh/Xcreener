@@ -1,10 +1,18 @@
-import type { IntegrationProvider } from '@snapglow/integrations-core';
+import {
+  INTEGRATION_LABELS,
+  type IntegrationProvider,
+  type RefreshIntegrationTokenResponse,
+} from '@snapglow/integrations-core';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { getApiUrl } from '@/modules/cloud/config';
 import { deepLinkRoute } from '@/shared/lib/deepLink';
 import { getIntegrationsRedirectUri, isIntegrationsConfigured } from './config';
-import { type StoredIntegrationToken, saveIntegrationToken } from './tokenStorage';
+import {
+  clearIntegrationToken,
+  type StoredIntegrationToken,
+  saveIntegrationToken,
+} from './tokenStorage';
 
 interface PendingIntegrationLogin {
   provider: IntegrationProvider;
@@ -93,6 +101,7 @@ export async function handleIntegrationCallback(
 
   const payload = (await response.json()) as {
     accessToken: string;
+    refreshHandle?: string | null;
     expiresAt?: string | null;
     workspaceName?: string | null;
     metadata?: Record<string, string>;
@@ -100,6 +109,7 @@ export async function handleIntegrationCallback(
 
   const stored: StoredIntegrationToken = {
     accessToken: payload.accessToken,
+    refreshHandle: payload.refreshHandle ?? null,
     expiresAt: payload.expiresAt ?? null,
     accountLabel: payload.workspaceName ?? provider,
     metadata: payload.metadata,
@@ -107,6 +117,67 @@ export async function handleIntegrationCallback(
 
   await saveIntegrationToken(provider, stored);
   return stored;
+}
+
+const refreshing = new Map<IntegrationProvider, Promise<StoredIntegrationToken | null>>();
+
+/**
+ * New provider access token from the API. Null when the user has to reconnect. Calls for the
+ * same provider share one request: providers rotate refresh tokens, so a second refresh with
+ * the old handle would fail.
+ */
+export function refreshIntegrationToken(
+  provider: IntegrationProvider,
+  token: StoredIntegrationToken
+): Promise<StoredIntegrationToken | null> {
+  const inFlight = refreshing.get(provider);
+  if (inFlight) {
+    return inFlight;
+  }
+  const request = requestRefresh(provider, token).finally(() => refreshing.delete(provider));
+  refreshing.set(provider, request);
+  return request;
+}
+
+async function requestRefresh(
+  provider: IntegrationProvider,
+  token: StoredIntegrationToken
+): Promise<StoredIntegrationToken | null> {
+  const accessToken = await getValidAccessToken();
+  if (!accessToken || !token.refreshHandle) {
+    return null;
+  }
+
+  const response = await fetch(`${getApiUrl()}/v1/integrations/${provider}/refresh`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refreshHandle: token.refreshHandle }),
+  });
+
+  if (response.status === 400) {
+    // The provider or the API refused the handle: only reconnecting helps.
+    await clearIntegrationToken(provider);
+    return null;
+  }
+  if (response.status === 503) {
+    return null;
+  }
+  if (!response.ok) {
+    throw new Error(`Failed to refresh ${INTEGRATION_LABELS[provider]}`);
+  }
+
+  const payload = (await response.json()) as RefreshIntegrationTokenResponse;
+  const refreshed: StoredIntegrationToken = {
+    ...token,
+    accessToken: payload.accessToken,
+    refreshHandle: payload.refreshHandle,
+    expiresAt: payload.expiresAt ?? null,
+  };
+  await saveIntegrationToken(provider, refreshed);
+  return refreshed;
 }
 
 export function getPendingIntegrationProvider(): IntegrationProvider | null {

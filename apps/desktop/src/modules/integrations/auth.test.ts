@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const openUrl = vi.hoisted(() => vi.fn(async (_url: string) => {}));
 const saveIntegrationToken = vi.hoisted(() => vi.fn(async () => {}));
+const clearIntegrationToken = vi.hoisted(() => vi.fn(async () => {}));
 
 vi.mock('@tauri-apps/plugin-opener', () => ({ openUrl }));
 vi.mock('@/modules/cloud/auth', () => ({ getValidAccessToken: async () => 'cloud-token' }));
@@ -10,9 +11,9 @@ vi.mock('./config', () => ({
   isIntegrationsConfigured: () => true,
   getIntegrationsRedirectUri: () => 'snapglow://integrations/callback',
 }));
-vi.mock('./tokenStorage', () => ({ saveIntegrationToken }));
+vi.mock('./tokenStorage', () => ({ saveIntegrationToken, clearIntegrationToken }));
 
-import { handleIntegrationCallback, startIntegrationLogin } from './auth';
+import { handleIntegrationCallback, refreshIntegrationToken, startIntegrationLogin } from './auth';
 
 const SERVER_STATE = 'serverissuedstate0123456789';
 
@@ -28,7 +29,7 @@ function mockApi() {
       }
       return Response.json({
         accessToken: 'slack-token',
-        refreshToken: 'slack-refresh',
+        refreshHandle: 'v1.sealed',
         workspaceName: 'Acme',
       });
     })
@@ -39,6 +40,7 @@ describe('integration OAuth flow', () => {
   beforeEach(() => {
     openUrl.mockClear();
     saveIntegrationToken.mockClear();
+    clearIntegrationToken.mockClear();
     mockApi();
   });
 
@@ -55,7 +57,7 @@ describe('integration OAuth flow', () => {
     );
 
     expect(stored?.accessToken).toBe('slack-token');
-    expect(stored).not.toHaveProperty('refreshToken');
+    expect(stored?.refreshHandle).toBe('v1.sealed');
     expect(saveIntegrationToken).toHaveBeenCalledOnce();
   });
 
@@ -65,6 +67,45 @@ describe('integration OAuth flow', () => {
     await expect(
       handleIntegrationCallback('snapglow://integrations/callback?code=abc&state=attacker')
     ).rejects.toThrow('Invalid integration callback');
+    expect(saveIntegrationToken).not.toHaveBeenCalled();
+  });
+
+  it('refreshes once for concurrent callers and keeps the rotated handle', async () => {
+    const fetchMock = vi.fn(async () =>
+      Response.json({ accessToken: 'jira-2', refreshHandle: 'v1.rotated', expiresAt: null })
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const token = { accessToken: 'jira-1', refreshHandle: 'v1.old', metadata: { cloudId: 'c' } };
+
+    const [first, second] = await Promise.all([
+      refreshIntegrationToken('jira', token),
+      refreshIntegrationToken('jira', token),
+    ]);
+
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(first).toEqual({
+      accessToken: 'jira-2',
+      refreshHandle: 'v1.rotated',
+      expiresAt: null,
+      metadata: { cloudId: 'c' },
+    });
+    expect(second).toBe(first);
+    expect(saveIntegrationToken).toHaveBeenCalledWith('jira', first);
+  });
+
+  it('forgets the token when the API asks to reconnect', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Response.json({ error: 'Reconnect this integration' }, { status: 400 }))
+    );
+
+    const result = await refreshIntegrationToken('jira', {
+      accessToken: 'jira-1',
+      refreshHandle: 'v1.old',
+    });
+
+    expect(result).toBeNull();
+    expect(clearIntegrationToken).toHaveBeenCalledWith('jira');
     expect(saveIntegrationToken).not.toHaveBeenCalled();
   });
 });

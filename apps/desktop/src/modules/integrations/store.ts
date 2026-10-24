@@ -2,7 +2,7 @@ import type { IntegrationProvider } from '@snapglow/integrations-core';
 import { INTEGRATION_LABELS, INTEGRATION_PROVIDERS } from '@snapglow/integrations-core';
 import { create } from 'zustand';
 import { isCloudConfigured } from '@/modules/cloud/config';
-import { handleIntegrationCallback, startIntegrationLogin } from './auth';
+import { handleIntegrationCallback, refreshIntegrationToken, startIntegrationLogin } from './auth';
 import { isIntegrationsConfigured } from './config';
 import {
   clearIntegrationToken,
@@ -33,7 +33,7 @@ function toConnectionState(
   provider: IntegrationProvider,
   token: StoredIntegrationToken | null
 ): IntegrationConnectionState {
-  const connected = isIntegrationTokenValid(token);
+  const connected = isIntegrationTokenValid(token) || Boolean(token?.refreshHandle);
   return {
     provider,
     connected,
@@ -104,8 +104,12 @@ export async function requireIntegrationToken(
   provider: IntegrationProvider
 ): Promise<StoredIntegrationToken> {
   const token = await getIntegrationToken(provider);
-  if (!token || !isIntegrationTokenValid(token)) {
+  if (token && isIntegrationTokenValid(token)) {
+    return token;
+  }
+  const refreshed = token?.refreshHandle ? await refreshIntegrationToken(provider, token) : null;
+  if (!refreshed) {
     throw new Error(`Connect ${INTEGRATION_LABELS[provider]} in Settings first`);
   }
-  return token;
+  return refreshed;
 }
