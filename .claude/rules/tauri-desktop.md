@@ -52,7 +52,7 @@ Shared packages: `@snapglow/style-suggestion-core`, `@snapglow/ocr-core`.
 - Capture history: `src/db/captures.ts` (retention 30)
 - Settings keys (2b.2): `ocrEngine`, `ocrLanguages`, `smartCompression`
 - Capabilities: `capabilities/default.json` (window `main`: fs, clipboard, opener; no SQL plugin) and `capabilities/overlay.json` (window `capture-overlay`: events and window show/hide only)
-- Tokens: Auth0 and integration tokens live in the OS keychain through `src-tauri/src/secure_store.rs` (`secure_store_get/set/delete`, names limited to `ALLOWED_NAMES`), not in the SQLite settings table
+- Tokens: Auth0 and integration tokens live in the OS keychain (`src-tauri/src/secure_store.rs`), not in the SQLite settings table. Auth0 is owned by `src-tauri/src/cloud_auth.rs` (PKCE login, code exchange, refresh; config baked in by `build.rs` from `VITE_AUTH0_*`): the WebView only gets the access token through `cloud_access_token`. `secure_store_get/set/delete` are limited to `ALLOWED_NAMES` (integration tokens only)
 
 ## Tauri features & security
 
