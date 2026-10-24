@@ -3,14 +3,11 @@
   "id": "snapglow-import-export",
   "api": "1.0.0",
   "main": "dist/code.js",
-  "ui": "ui.html",
+  "ui": "dist/ui.html",
   "editorType": ["figma"],
   "documentAccess": "dynamic-page",
   "networkAccess": {
-    "allowedDomains": [
-      "https://api.snapglow.app",
-      "http://localhost:8787",
-      "https://*.snapglow.app"
-    ]
+    "allowedDomains": ["https://api.snapglow.app", "https://*.snapglow.app"],
+    "devAllowedDomains": ["http://localhost:8787", "http://localhost:9000"]
   }
 }

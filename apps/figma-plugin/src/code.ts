@@ -1,85 +1,62 @@
-import { buildDesignCaptureState } from '@snapglow/plugin-core';
-import { SnapGlowClient } from '@snapglow/sdk';
+// Main thread: Figma document access only. Network calls live in the UI iframe,
+// because this sandbox has no Blob, FormData, Headers or URLSearchParams.
 
-import uiHtml from '../ui.html';
+const CONFIG_KEY = 'snapglow-config';
 
-figma.showUI(uiHtml, { width: 360, height: 520, themeColors: true });
+figma.showUI(__html__, { width: 360, height: 520, themeColors: true });
 
-figma.ui.onmessage = async (message: { type: string; payload?: unknown }) => {
-  if (message.type === 'import-selection') {
-    await importSelection(message.payload as { apiKey: string; baseUrl: string });
-  }
+type UiMessage =
+  | { type: 'load-config' }
+  | { type: 'save-config'; payload: { apiKey: string; baseUrl: string } }
+  | { type: 'export-selection' }
+  | { type: 'place-image'; payload: { bytes: Uint8Array; width: number; height: number } };
 
-  if (message.type === 'export-to-canvas') {
-    await exportToCanvas(message.payload as { apiKey: string; baseUrl: string; captureId: string });
-  }
+figma.ui.onmessage = async (message: UiMessage) => {
+  try {
+    if (message.type === 'load-config') {
+      const config = await figma.clientStorage.getAsync(CONFIG_KEY);
+      figma.ui.postMessage({ type: 'config', config: config ?? null });
+    }
 
-  if (message.type === 'list-captures') {
-    await listCaptures(message.payload as { apiKey: string; baseUrl: string });
+    if (message.type === 'save-config') {
+      await figma.clientStorage.setAsync(CONFIG_KEY, message.payload);
+      figma.ui.postMessage({ type: 'config-saved' });
+    }
+
+    if (message.type === 'export-selection') {
+      await exportSelection();
+    }
+
+    if (message.type === 'place-image') {
+      placeImage(message.payload);
+    }
+  } catch (error) {
+    figma.ui.postMessage({
+      type: 'error',
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 };
 
-async function importSelection(config: { apiKey: string; baseUrl: string }) {
-  const selection = figma.currentPage.selection;
-  if (selection.length === 0) {
-    figma.ui.postMessage({ type: 'error', message: 'Select a frame or node to import.' });
-    return;
-  }
-
-  const node = selection[0];
+async function exportSelection() {
+  const node = figma.currentPage.selection[0];
   if (!node) {
+    figma.ui.postMessage({ type: 'error', message: 'Select a frame or node to import.' });
     return;
   }
 
   const exportSettings: ExportSettings = { format: 'PNG', constraint: { type: 'SCALE', value: 2 } };
   const bytes = await node.exportAsync(exportSettings);
-  const client = new SnapGlowClient({ apiKey: config.apiKey, baseUrl: config.baseUrl });
-
-  const blob = new Blob([Uint8Array.from(bytes)], { type: 'image/png' });
-  const uploaded = await client.captures.upload(blob, {
-    title: node.name,
-    tags: ['figma'],
-  });
-
-  const state = buildDesignCaptureState(
-    uploaded.documentState.screenshotWidth,
-    uploaded.documentState.screenshotHeight
-  );
-
-  await client.captures.beautify(uploaded.id, state, { title: node.name });
-  const exported = await client.captures.export(uploaded.id, { format: 'png' });
-
-  figma.ui.postMessage({
-    type: 'import-complete',
-    previewUrl: exported.exportUrl,
-    captureId: uploaded.id,
-  });
+  figma.ui.postMessage({ type: 'selection-bytes', bytes, name: node.name });
 }
 
-async function exportToCanvas(config: { apiKey: string; baseUrl: string; captureId: string }) {
-  const client = new SnapGlowClient({ apiKey: config.apiKey, baseUrl: config.baseUrl });
-  const exported = await client.captures.export(config.captureId, { format: 'png' });
-  const response = await fetch(exported.exportUrl);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  const image = figma.createImage(bytes);
+function placeImage(payload: { bytes: Uint8Array; width: number; height: number }) {
+  const image = figma.createImage(payload.bytes);
   const node = figma.createRectangle();
-  node.resize(exported.width, exported.height);
+  node.resize(payload.width, payload.height);
   node.fills = [{ type: 'IMAGE', scaleMode: 'FIT', imageHash: image.hash }];
   node.name = 'SnapGlow capture';
   figma.currentPage.appendChild(node);
   figma.viewport.scrollAndZoomIntoView([node]);
-  figma.ui.postMessage({ type: 'export-complete' });
-}
-
-async function listCaptures(config: { apiKey: string; baseUrl: string }) {
-  const client = new SnapGlowClient({ apiKey: config.apiKey, baseUrl: config.baseUrl });
-  const list = await client.captures.list({ limit: 20 });
-  figma.ui.postMessage({
-    type: 'captures-list',
-    items: list.items.map((item) => ({
-      id: item.id,
-      title: item.title ?? 'Untitled',
-      createdAt: item.createdAt,
-    })),
-  });
+  figma.ui.postMessage({ type: 'image-placed' });
 }

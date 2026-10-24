@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "esbuild src/code.ts --bundle --outfile=dist/code.js --format=iife --target=es2017 --loader:.html=text && esbuild src/ui.ts --bundle --outfile=dist/ui.js --format=iife --target=es2017",
+    "build": "esbuild src/code.ts --bundle --outfile=dist/code.js --format=iife --target=es2017 && esbuild src/ui.ts --bundle --outfile=dist/ui.js --format=iife --target=es2017 && node scripts/inline-ui.mjs",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "format": "biome check --write .",
