@@ -23,7 +23,7 @@ body:
         - Desktop - settings / SQLite (apps/desktop)
         - Desktop - menu bar / system tray / shortcuts
         - Desktop - Tauri / Rust (src-tauri)
-        - Monorepo / CI / tooling (mise, Biome, Husky)
+        - Monorepo / CI / tooling (mise, Biome, git hooks)
         - Documentation
         - Web (apps/web) - landing + share viewer
         - Mobile (apps/mobile)
