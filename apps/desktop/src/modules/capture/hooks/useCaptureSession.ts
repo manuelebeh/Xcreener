@@ -12,7 +12,12 @@ import type {
   CaptureRecordingCompletePayload,
 } from '@/shared/types/ipc';
 import { bytesToImageBitmap } from '@/shared/utils/image';
-import { hideCaptureOverlay, openPath, takeCaptureImage } from '@/tauri/commands';
+import {
+  hideCaptureOverlay,
+  openPath,
+  takeCaptureImage,
+  takeRecordingThumbnail,
+} from '@/tauri/commands';
 import { useCaptureStore } from '../store';
 
 export function useCaptureSession() {
@@ -70,6 +75,9 @@ export function useCaptureSession() {
       try {
         setCaptureProgress(null);
         const payload = event.payload;
+        const thumbnail = payload.hasThumbnail
+          ? await takeRecordingThumbnail().catch(() => null)
+          : null;
         const savedPath = await saveRecordingFile(
           payload.filePath,
           payload.format,
@@ -80,7 +88,7 @@ export function useCaptureSession() {
           format: payload.format,
           width: payload.width,
           height: payload.height,
-          thumbnailPng: payload.thumbnailPng,
+          thumbnailPng: thumbnail ? new Uint8Array(thumbnail) : undefined,
         });
         await hideCaptureOverlay();
         setOverlayVisible(false);

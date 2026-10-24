@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { $, browser, expect } from '@wdio/globals';
-import { tauriInvoke } from '../helpers/tauri';
+import { tauriInvoke, tauriInvokeRaw } from '../helpers/tauri';
 
 const fixtureDir = join(dirname(fileURLToPath(import.meta.url)), '../fixtures');
 const sampleCapture = readFileSync(join(fixtureDir, 'sample-capture.png'));
@@ -14,11 +14,7 @@ describe('SnapGlow capture → beautify → export', () => {
   });
 
   it('injects a screenshot, applies a preset, and exports PNG', async () => {
-    await tauriInvoke('e2e_inject_screenshot', {
-      pngBytes: sampleBytes,
-      width: 800,
-      height: 600,
-    });
+    await tauriInvokeRaw('e2e_inject_screenshot', sampleBytes, { width: '800', height: '600' });
 
     await browser.waitUntil(
       async () => {

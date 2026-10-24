@@ -85,6 +85,14 @@ export function takeCaptureImage() {
   return invoke<ArrayBuffer>('take_capture_image');
 }
 
+export function takeOverlayPreview() {
+  return invoke<ArrayBuffer>('take_overlay_preview');
+}
+
+export function takeRecordingThumbnail() {
+  return invoke<ArrayBuffer>('take_recording_thumbnail');
+}
+
 export function cancelLiveCapture() {
   return invoke<void>('cancel_live_capture_command');
 }
