@@ -45,4 +45,4 @@ else
 fi
 
 echo ""
-echo "Done. Full checklist: docs/internal/technical/security-audit-2026-06.md"
+echo "Done. Full checklist: docs/internal/audits/security-audit-2026-06.md (local, not tracked)"

@@ -31,4 +31,4 @@ Shared types: `@snapglow/cloud-core`.
 ## Docs
 
 - [`.cursor/rules/api-architecture.mdc`](../../.cursor/rules/api-architecture.mdc)
-- [ADR-009](../../docs/internal/technical/adr/009-cloud-api-and-sharing.md)
+- [ADR-009](../../docs/architecture/adr/009-cloud-api-and-sharing.md)
