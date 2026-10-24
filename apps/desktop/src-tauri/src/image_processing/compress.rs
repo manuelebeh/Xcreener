@@ -68,12 +68,11 @@ fn compress_png(image_data: Vec<u8>) -> Result<Vec<u8>, String> {
     encoder.set_trns(&alpha_bytes);
 
     let mut writer = encoder.write_header().map_err(|error| error.to_string())?;
-    let indexed: Vec<u8> = pixels.iter().map(|index| *index as u8).collect();
     writer
-        .write_image_data(&indexed)
+        .write_image_data(&pixels)
         .map_err(|error| error.to_string())?;
+    // Writer::drop writes the closing chunks; it must run before `buffer` is returned.
     drop(writer);
-    drop(cursor);
 
     Ok(buffer)
 }

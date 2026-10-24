@@ -89,7 +89,7 @@ fn avcc_sample_from_annex_b(annex_b: &[u8]) -> Vec<u8> {
             continue;
         };
         // Parameter sets and AUD belong in avcC / sample headers, not per-frame payload.
-        if matches!(nal_type, 7 | 8 | 9) {
+        if matches!(nal_type, 7..=9) {
             continue;
         }
 

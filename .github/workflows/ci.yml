@@ -99,6 +99,12 @@ jobs:
         working-directory: apps/desktop/src-tauri
         run: cargo test --locked
 
+      - name: Rust lint (clippy)
+        working-directory: apps/desktop/src-tauri
+        run: |
+          rustup component add clippy
+          cargo clippy --all-targets --locked -- -D warnings
+
       - name: Build web
         run: mise exec -- pnpm --filter @snapglow/web build
 
