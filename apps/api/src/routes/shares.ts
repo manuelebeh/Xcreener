@@ -16,7 +16,7 @@ import * as schema from '../db/schema';
 import { env } from '../env';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import { getActiveWorkspaceId, resolveMembership } from '../plugins/workspace-auth';
-import { cacheShareMetadata, checkUploadRateLimit } from '../services/redis';
+import { checkUploadRateLimit } from '../services/redis';
 import type { StorageService } from '../services/storage';
 
 const createToken = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 12);
@@ -104,13 +104,6 @@ export async function registerShareRoutes(app: FastifyInstance, options: ShareRo
       url: `${env.WEB_PUBLIC_URL}/s/${share.token}`,
       expiresAt: share.expiresAt?.toISOString() ?? null,
     };
-
-    await cacheShareMetadata(token, {
-      mimeType: share.mimeType,
-      byteSize: share.byteSize,
-      expiresAt: share.expiresAt?.toISOString() ?? null,
-      storageKey: share.storageKey,
-    });
 
     return reply.code(201).send(response);
   });

@@ -77,24 +77,34 @@ export async function checkApiExportRateLimit(apiKeyId: string): Promise<{
   );
 }
 
-export async function cacheShareMetadata(
-  token: string,
-  payload: Record<string, string | number | null>,
-  ttlSeconds = 300
-): Promise<void> {
-  const redis = getRedis();
-  await redis.set(`share:meta:${token}`, JSON.stringify(payload), 'EX', ttlSeconds);
+export interface PendingIntegrationOAuth {
+  userId: string;
+  provider: string;
+  codeVerifier: string;
 }
 
-export async function getCachedShareMetadata(
-  token: string
-): Promise<Record<string, string | number | null> | null> {
+const INTEGRATION_OAUTH_TTL_SEC = 600;
+
+/** Binds an integration OAuth `state` to the user who started the flow (single use, 10 min). */
+export async function savePendingIntegrationOAuth(
+  state: string,
+  pending: PendingIntegrationOAuth
+): Promise<void> {
   const redis = getRedis();
-  const raw = await redis.get(`share:meta:${token}`);
-  if (!raw) {
-    return null;
-  }
-  return JSON.parse(raw) as Record<string, string | number | null>;
+  await redis.set(
+    `integration:oauth:${state}`,
+    JSON.stringify(pending),
+    'EX',
+    INTEGRATION_OAUTH_TTL_SEC
+  );
+}
+
+export async function takePendingIntegrationOAuth(
+  state: string
+): Promise<PendingIntegrationOAuth | null> {
+  const redis = getRedis();
+  const raw = await redis.getdel(`integration:oauth:${state}`);
+  return raw ? (JSON.parse(raw) as PendingIntegrationOAuth) : null;
 }
 
 export async function pingRedis(): Promise<boolean> {

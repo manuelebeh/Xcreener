@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from 'node:crypto';
 import {
   type AuthorizeIntegrationResponse,
   type ExchangeIntegrationTokenResponse,
@@ -15,6 +16,7 @@ import type * as schema from '../db/schema';
 import { env } from '../env';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import { bestPlanForUser } from '../services/entitlement';
+import { savePendingIntegrationOAuth, takePendingIntegrationOAuth } from '../services/redis';
 
 const createState = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 24);
 
@@ -48,6 +50,8 @@ interface ProviderOAuthConfig {
   clientSecret: string;
   scope?: string;
   extraAuthorizeParams?: Record<string, string>;
+  /** Provider documents PKCE (S256) for confidential clients. */
+  pkce?: boolean;
 }
 
 function providerConfig(provider: IntegrationProvider): ProviderOAuthConfig | null {
@@ -85,6 +89,7 @@ function providerConfig(provider: IntegrationProvider): ProviderOAuthConfig | nu
         clientSecret: env.LINEAR_CLIENT_SECRET,
         scope: INTEGRATION_SCOPES.linear,
         extraAuthorizeParams: { response_type: 'code' },
+        pkce: true,
       };
     case 'github':
       if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
@@ -96,6 +101,7 @@ function providerConfig(provider: IntegrationProvider): ProviderOAuthConfig | nu
         clientId: env.GITHUB_CLIENT_ID,
         clientSecret: env.GITHUB_CLIENT_SECRET,
         scope: INTEGRATION_SCOPES.github,
+        pkce: true,
       };
     case 'jira':
     case 'confluence':
@@ -125,11 +131,20 @@ function providerConfig(provider: IntegrationProvider): ProviderOAuthConfig | nu
         clientSecret: env.MS_TEAMS_CLIENT_SECRET,
         scope: INTEGRATION_SCOPES.msteams,
         extraAuthorizeParams: { response_type: 'code' },
+        pkce: true,
       };
   }
 }
 
-function buildAuthorizeUrl(config: ProviderOAuthConfig, state: string): string {
+function codeChallengeFor(codeVerifier: string): string {
+  return createHash('sha256').update(codeVerifier).digest('base64url');
+}
+
+function buildAuthorizeUrl(
+  config: ProviderOAuthConfig,
+  state: string,
+  codeVerifier: string
+): string {
   const redirectUri = env.INTEGRATIONS_REDIRECT_URI || INTEGRATION_REDIRECT_URI;
   const params = new URLSearchParams({
     client_id: config.clientId,
@@ -137,6 +152,9 @@ function buildAuthorizeUrl(config: ProviderOAuthConfig, state: string): string {
     state,
     ...(config.scope ? { scope: config.scope } : {}),
     ...(config.extraAuthorizeParams ?? {}),
+    ...(config.pkce
+      ? { code_challenge: codeChallengeFor(codeVerifier), code_challenge_method: 'S256' }
+      : {}),
   });
 
   if (config.authorizeUrl.includes('notion.com')) {
@@ -149,7 +167,8 @@ function buildAuthorizeUrl(config: ProviderOAuthConfig, state: string): string {
 async function exchangeProviderToken(
   provider: IntegrationProvider,
   config: ProviderOAuthConfig,
-  code: string
+  code: string,
+  codeVerifier: string
 ): Promise<ExchangeIntegrationTokenResponse> {
   const redirectUri = env.INTEGRATIONS_REDIRECT_URI || INTEGRATION_REDIRECT_URI;
 
@@ -191,6 +210,10 @@ async function exchangeProviderToken(
     code,
     redirect_uri: redirectUri,
   });
+
+  if (config.pkce) {
+    body.set('code_verifier', codeVerifier);
+  }
 
   if (provider === 'linear') {
     body.set('grant_type', 'authorization_code');
@@ -319,9 +342,24 @@ export async function registerIntegrationRoutes(
         return reply.code(503).send({ error: 'Integration provider is not configured' });
       }
 
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+
+      // The state is checked here on exchange, not only by the desktop: a code intercepted
+      // through the custom scheme cannot be redeemed by another SnapGlow account.
       const state = createState();
+      const codeVerifier = randomBytes(32).toString('base64url');
+      await savePendingIntegrationOAuth(state, {
+        userId: user.id,
+        provider: rawProvider,
+        codeVerifier,
+      });
+
       const response: AuthorizeIntegrationResponse = {
-        authorizeUrl: buildAuthorizeUrl(config, state),
+        authorizeUrl: buildAuthorizeUrl(config, state, codeVerifier),
         state,
       };
 
@@ -347,13 +385,31 @@ export async function registerIntegrationRoutes(
         return reply.code(503).send({ error: 'Integration provider is not configured' });
       }
 
-      const body = request.body as { code?: string };
-      if (!body?.code) {
+      const body = request.body as { code?: unknown; state?: unknown } | undefined;
+      if (typeof body?.code !== 'string' || !body.code) {
         return reply.code(400).send({ error: 'Missing authorization code' });
+      }
+      if (typeof body.state !== 'string' || !body.state) {
+        return reply.code(400).send({ error: 'Missing OAuth state' });
+      }
+
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      const pending = await takePendingIntegrationOAuth(body.state);
+      if (!pending || pending.userId !== user.id || pending.provider !== rawProvider) {
+        return reply.code(400).send({ error: 'Invalid or expired OAuth state' });
       }
 
       try {
-        const tokens = await exchangeProviderToken(rawProvider, config, body.code);
+        const tokens = await exchangeProviderToken(
+          rawProvider,
+          config,
+          body.code,
+          pending.codeVerifier
+        );
         return reply.send(tokens);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Token exchange failed';
