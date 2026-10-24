@@ -6,12 +6,13 @@ import type { RenderInput } from '../types';
 export function useBeautifyRender(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
   input: RenderInput | null,
-  enabled = true
+  /** On-screen width of the canvas in CSS pixels; 0 while not mounted. */
+  displayWidth: number
 ) {
   const frameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!enabled || !input || !canvasRef.current) {
+    if (displayWidth <= 0 || !input || !canvasRef.current) {
       return;
     }
 
@@ -23,8 +24,11 @@ export function useBeautifyRender(
         return;
       }
 
-      const pixelRatio = window.devicePixelRatio || 1;
       const layout = computeLayout(input);
+      // Size the backing store to the on-screen device pixels. Rendering at full export
+      // size and letting CSS shrink it leaves the downscale to the compositor's cheap
+      // filter, which blurs and aliases the screenshot.
+      const pixelRatio = (displayWidth * (window.devicePixelRatio || 1)) / layout.canvasWidth;
 
       if (import.meta.env.DEV) {
         performance.mark('snapglow-render-start');
@@ -34,6 +38,7 @@ export function useBeautifyRender(
       canvas.height = Math.round(layout.canvasHeight * pixelRatio);
       canvas.style.width = '100%';
       canvas.style.height = '100%';
+      context.imageSmoothingQuality = 'high';
 
       renderFrame(context, input, pixelRatio, canvas);
 
@@ -57,5 +62,5 @@ export function useBeautifyRender(
         cancelAnimationFrame(frameRef.current);
       }
     };
-  }, [enabled, input, canvasRef]);
+  }, [displayWidth, input, canvasRef]);
 }

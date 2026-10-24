@@ -197,7 +197,7 @@ export function Canvas() {
 
   const canvasMounted = displaySize.width > 0;
 
-  useBeautifyRender(canvasRef, renderInput, canvasMounted);
+  useBeautifyRender(canvasRef, renderInput, displaySize.width);
   useScreenshotTransformEnabled(canvasRef, canvasMounted && activeTool === 'move');
   useAnnotationInteraction({
     canvasRef,
