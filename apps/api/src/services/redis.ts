@@ -14,20 +14,38 @@ export function getRedis(): Redis {
   return redisClient;
 }
 
+export interface RateLimitResult {
+  allowed: boolean;
+  retryAfterSec: number;
+  /** Redis could not be reached; `allowed` is then true (fail open) and callers may refuse instead. */
+  unavailable?: boolean;
+}
+
 export async function checkRateLimit(
   scope: string,
   keyId: string,
   limit: number,
   windowSec: number
-): Promise<{ allowed: boolean; retryAfterSec: number }> {
+): Promise<RateLimitResult> {
   const redis = getRedis();
   const redisKey = `rate:${scope}:${keyId}`;
-  const count = await redis.incr(redisKey);
-  if (count === 1) {
-    await redis.expire(redisKey, windowSec);
+
+  let results: [Error | null, unknown][] | null;
+  try {
+    // One round trip: the key is created with its TTL, so it can never be left without one.
+    results = await redis
+      .multi()
+      .set(redisKey, '0', 'EX', windowSec, 'NX')
+      .incr(redisKey)
+      .ttl(redisKey)
+      .exec();
+  } catch (error) {
+    console.error('[rate-limit] Redis unavailable, allowing request', scope, error);
+    return { allowed: true, retryAfterSec: windowSec, unavailable: true };
   }
 
-  const ttl = await redis.ttl(redisKey);
+  const count = Number(results?.[1]?.[1] ?? 0);
+  const ttl = Number(results?.[2]?.[1] ?? -1);
   const retryAfterSec = ttl > 0 ? ttl : windowSec;
 
   return {

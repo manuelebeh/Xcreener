@@ -1,9 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+const multiExec = vi.fn();
+const multiChain = {
+  set: vi.fn(() => multiChain),
+  incr: vi.fn(() => multiChain),
+  ttl: vi.fn(() => multiChain),
+  exec: multiExec,
+};
+
 const redisMock = {
-  incr: vi.fn(),
-  expire: vi.fn(),
-  ttl: vi.fn(),
+  multi: vi.fn(() => multiChain),
   ping: vi.fn(),
   quit: vi.fn(),
 };
@@ -15,33 +21,46 @@ vi.mock('ioredis', () => ({
 describe('checkRateLimit', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    redisMock.incr.mockReset();
-    redisMock.expire.mockReset();
-    redisMock.ttl.mockReset();
+    multiExec.mockReset();
   });
 
-  it('allows requests within limit', async () => {
-    redisMock.incr.mockResolvedValue(1);
-    redisMock.expire.mockResolvedValue(1);
-    redisMock.ttl.mockResolvedValue(60);
+  it('allows requests within limit and creates the key with its TTL', async () => {
+    multiExec.mockResolvedValue([
+      [null, 'OK'],
+      [null, 1],
+      [null, 60],
+    ]);
 
     const { checkRateLimit } = await import('./redis');
     const result = await checkRateLimit('api:general', 'key-1', 120, 60);
 
     expect(result.allowed).toBe(true);
     expect(result.retryAfterSec).toBe(60);
-    expect(redisMock.expire).toHaveBeenCalledWith('rate:api:general:key-1', 60);
+    expect(multiChain.set).toHaveBeenCalledWith('rate:api:general:key-1', '0', 'EX', 60, 'NX');
   });
 
   it('denies requests over limit with retry-after', async () => {
-    redisMock.incr.mockResolvedValue(121);
-    redisMock.ttl.mockResolvedValue(42);
+    multiExec.mockResolvedValue([
+      [null, null],
+      [null, 121],
+      [null, 42],
+    ]);
 
     const { checkRateLimit } = await import('./redis');
     const result = await checkRateLimit('api:general', 'key-1', 120, 60);
 
     expect(result.allowed).toBe(false);
     expect(result.retryAfterSec).toBe(42);
+  });
+
+  it('fails open and flags the outage when Redis is unreachable', async () => {
+    multiExec.mockRejectedValue(new Error('ECONNREFUSED'));
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const { checkRateLimit } = await import('./redis');
+    const result = await checkRateLimit('comment', 'user-1', 60, 60);
+
+    expect(result).toEqual({ allowed: true, retryAfterSec: 60, unavailable: true });
   });
 });
 
