@@ -26,7 +26,11 @@ function mockApi() {
           state: SERVER_STATE,
         });
       }
-      return Response.json({ accessToken: 'slack-token', workspaceName: 'Acme' });
+      return Response.json({
+        accessToken: 'slack-token',
+        refreshToken: 'slack-refresh',
+        workspaceName: 'Acme',
+      });
     })
   );
 }
@@ -51,6 +55,7 @@ describe('integration OAuth flow', () => {
     );
 
     expect(stored?.accessToken).toBe('slack-token');
+    expect(stored).not.toHaveProperty('refreshToken');
     expect(saveIntegrationToken).toHaveBeenCalledOnce();
   });
 

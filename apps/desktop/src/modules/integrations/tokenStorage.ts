@@ -3,7 +3,6 @@ import { readSecret, writeSecret } from '@/shared/lib/secureStorage';
 
 export interface StoredIntegrationToken {
   accessToken: string;
-  refreshToken?: string | null;
   expiresAt?: string | null;
   accountLabel?: string;
   metadata?: Record<string, string>;
@@ -21,11 +20,24 @@ export async function loadIntegrationTokens(): Promise<TokenMap> {
     return {};
   }
 
+  let tokens: Partial<
+    Record<IntegrationProvider, StoredIntegrationToken & { refreshToken?: unknown }>
+  >;
   try {
-    return JSON.parse(raw) as TokenMap;
+    tokens = JSON.parse(raw);
   } catch {
     return {};
   }
+
+  // Older versions also kept the provider refresh token, which nothing on desktop uses.
+  const entries = Object.values(tokens);
+  if (entries.some((token) => token && 'refreshToken' in token)) {
+    for (const token of entries) {
+      delete token?.refreshToken;
+    }
+    await writeSecret(SECRET_NAME, LEGACY_TOKEN_KEY, JSON.stringify(tokens));
+  }
+  return tokens;
 }
 
 export async function saveIntegrationToken(
