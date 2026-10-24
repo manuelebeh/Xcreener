@@ -108,8 +108,9 @@ jobs:
         working-directory: apps/api
         env:
           LOAD_TEST_BASE_URL: http://localhost:8787
+          LOAD_TEST_API_KEY: ${{ steps.seed.outputs.LOAD_TEST_API_KEY }}
+          LOAD_TEST_CAPTURE_ID: ${{ steps.seed.outputs.LOAD_TEST_CAPTURE_ID }}
         run: |
-          eval "$(pnpm exec tsx scripts/seed-load-fixture.ts | grep '^LOAD_TEST_' | xargs -I{} echo export {})"
           k6 run -e BASE_URL="$LOAD_TEST_BASE_URL" \
             -e API_KEY="$LOAD_TEST_API_KEY" \
             -e CAPTURE_ID="$LOAD_TEST_CAPTURE_ID" \
