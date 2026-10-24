@@ -188,6 +188,24 @@ export function secureStoreDelete(name: string) {
   return invoke<void>('secure_store_delete', { name });
 }
 
+// Auth0 session (src-tauri/src/cloud_auth.rs). The refresh token never leaves Rust.
+
+export function cloudAuthStart(organization: string | null) {
+  return invoke<void>('cloud_auth_start', { organization });
+}
+
+export function cloudAuthComplete(url: string) {
+  return invoke<void>('cloud_auth_complete', { url });
+}
+
+export function cloudAccessToken() {
+  return invoke<string | null>('cloud_access_token');
+}
+
+export function cloudSignOut() {
+  return invoke<void>('cloud_sign_out');
+}
+
 // Local library (src-tauri/src/db). Prefer the @/db wrappers over calling these directly.
 
 export function dbInit(defaultSettings: Record<string, string>) {

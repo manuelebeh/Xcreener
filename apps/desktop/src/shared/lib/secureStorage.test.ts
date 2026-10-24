@@ -31,36 +31,40 @@ describe('secureStorage', () => {
   });
 
   it('moves a legacy plaintext row into the keychain on first read', async () => {
-    settings.set('cloudAuthTokens', '{"accessToken":"a"}');
+    settings.set('integrationTokens', '{"accessToken":"a"}');
 
-    expect(await readSecret('cloud.tokens', 'cloudAuthTokens')).toBe('{"accessToken":"a"}');
-    expect(keychain.get('cloud.tokens')).toBe('{"accessToken":"a"}');
-    expect(settings.get('cloudAuthTokens')).toBe('');
-    expect(await readSecret('cloud.tokens', 'cloudAuthTokens')).toBe('{"accessToken":"a"}');
+    expect(await readSecret('integrations.tokens', 'integrationTokens')).toBe(
+      '{"accessToken":"a"}'
+    );
+    expect(keychain.get('integrations.tokens')).toBe('{"accessToken":"a"}');
+    expect(settings.get('integrationTokens')).toBe('');
+    expect(await readSecret('integrations.tokens', 'integrationTokens')).toBe(
+      '{"accessToken":"a"}'
+    );
   });
 
   it('writes to the keychain and leaves nothing in SQLite', async () => {
-    settings.set('cloudAuthTokens', 'old');
-    await writeSecret('cloud.tokens', 'cloudAuthTokens', 'new');
+    settings.set('integrationTokens', 'old');
+    await writeSecret('integrations.tokens', 'integrationTokens', 'new');
 
-    expect(keychain.get('cloud.tokens')).toBe('new');
-    expect(settings.get('cloudAuthTokens')).toBe('');
+    expect(keychain.get('integrations.tokens')).toBe('new');
+    expect(settings.get('integrationTokens')).toBe('');
   });
 
   it('removes both copies', async () => {
-    await writeSecret('cloud.tokens', 'cloudAuthTokens', 'x');
-    await removeSecret('cloud.tokens', 'cloudAuthTokens');
+    await writeSecret('integrations.tokens', 'integrationTokens', 'x');
+    await removeSecret('integrations.tokens', 'integrationTokens');
 
-    expect(keychain.has('cloud.tokens')).toBe(false);
-    expect(await readSecret('cloud.tokens', 'cloudAuthTokens')).toBeNull();
+    expect(keychain.has('integrations.tokens')).toBe(false);
+    expect(await readSecret('integrations.tokens', 'integrationTokens')).toBeNull();
   });
 
   it('falls back to SQLite outside Tauri', async () => {
     runtime.tauri = false;
-    await writeSecret('cloud.tokens', 'cloudAuthTokens', 'dev');
+    await writeSecret('integrations.tokens', 'integrationTokens', 'dev');
 
-    expect(settings.get('cloudAuthTokens')).toBe('dev');
+    expect(settings.get('integrationTokens')).toBe('dev');
     expect(keychain.size).toBe(0);
-    expect(await readSecret('cloud.tokens', 'cloudAuthTokens')).toBe('dev');
+    expect(await readSecret('integrations.tokens', 'integrationTokens')).toBe('dev');
   });
 });
