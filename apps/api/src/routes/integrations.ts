@@ -164,6 +164,8 @@ function buildAuthorizeUrl(
   return `${config.authorizeUrl}?${params.toString()}`;
 }
 
+const PROVIDER_TIMEOUT_MS = 10_000;
+
 async function exchangeProviderToken(
   provider: IntegrationProvider,
   config: ProviderOAuthConfig,
@@ -185,6 +187,7 @@ async function exchangeProviderToken(
         code,
         redirect_uri: redirectUri,
       }),
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -230,6 +233,7 @@ async function exchangeProviderToken(
       Accept: 'application/json',
     },
     body,
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
   });
 
   if (!response.ok) {
@@ -278,8 +282,12 @@ async function exchangeProviderToken(
       'https://api.atlassian.com/oauth/token/accessible-resources',
       {
         headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' },
+        signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       }
     );
+    if (!resourcesResponse.ok) {
+      throw new Error(`${provider} accessible resources lookup failed`);
+    }
     const resources = (await resourcesResponse.json()) as Array<{
       id: string;
       name: string;
@@ -412,8 +420,12 @@ export async function registerIntegrationRoutes(
         );
         return reply.send(tokens);
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Token exchange failed';
-        return reply.code(502).send({ error: message });
+        // Provider messages can carry provider-side detail; keep them in logs only.
+        request.log.warn(
+          { err: error, provider: rawProvider },
+          'Integration token exchange failed'
+        );
+        return reply.code(502).send({ error: 'Token exchange failed' });
       }
     }
   );

@@ -117,6 +117,25 @@ describe('integration OAuth state binding', () => {
     expect((await exchange('alice', { code: 'c2', state })).statusCode).toBe(400);
   });
 
+  it('keeps provider error text out of the response', async () => {
+    fetchMock.mockResolvedValue(
+      new Response('{"error":"internal provider detail"}', { status: 500 })
+    );
+    const { state } = await authorize('alice');
+
+    const response = await exchange('alice', { code: 'c1', state });
+
+    expect(response.statusCode).toBe(502);
+    expect(response.json()).toEqual({ error: 'Token exchange failed' });
+  });
+
+  it('bounds the provider call with a timeout', async () => {
+    const { state } = await authorize('alice');
+    await exchange('alice', { code: 'c1', state });
+
+    expect(fetchMock.mock.calls[0]?.[1]?.signal).toBeInstanceOf(AbortSignal);
+  });
+
   it('refuses an exchange without state', async () => {
     expect((await exchange('alice', { code: 'c1' })).statusCode).toBe(400);
     expect(fetchMock).not.toHaveBeenCalled();

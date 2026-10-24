@@ -25,6 +25,7 @@ export async function createAuth0Organization(
       audience: `https://${env.AUTH0_DOMAIN}/api/v2/`,
       grant_type: 'client_credentials',
     }),
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!tokenResponse.ok) {
@@ -46,6 +47,7 @@ export async function createAuth0Organization(
       name: slug,
       display_name: displayName,
     }),
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!orgResponse.ok) {

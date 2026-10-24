@@ -102,6 +102,7 @@ export async function sendTransactionalEmail(options: {
         subject: options.subject,
         text: options.text,
       }),
+      signal: AbortSignal.timeout(10_000),
     });
     if (!response.ok) {
       console.error('Resend email failed', await response.text());
