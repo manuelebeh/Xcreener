@@ -40,6 +40,28 @@ interface SocketContext {
 
 const MEMBERSHIP_RECHECK_MS = 15_000;
 
+/** An unauthenticated socket is closed after this delay. */
+const AUTH_TIMEOUT_MS = 10_000;
+
+/** Each op is a `SELECT ... FOR UPDATE` transaction, so one socket gets 20 per second (burst 50). */
+const OP_RATE_PER_SEC = 20;
+const OP_BURST = 50;
+
+export function createTokenBucket(ratePerSec: number, burst: number, now = Date.now) {
+  let tokens = burst;
+  let refilledAt = now();
+  return function take(): boolean {
+    const current = now();
+    tokens = Math.min(burst, tokens + ((current - refilledAt) / 1000) * ratePerSec);
+    refilledAt = current;
+    if (tokens < 1) {
+      return false;
+    }
+    tokens -= 1;
+    return true;
+  };
+}
+
 function isMembershipCheckDue(context: SocketContext): boolean {
   return Date.now() - context.checkedAtMs >= MEMBERSHIP_RECHECK_MS;
 }
@@ -71,7 +93,15 @@ export async function registerCollabWebSocket(
 
   app.get(COLLAB_WS_PATH, { websocket: true }, (socket, request) => {
     let context: SocketContext | null = null;
+    // Set before the first await of an auth message, so two auth messages cannot both pass.
+    let authenticating = false;
     let unsubscribe: (() => Promise<void>) | null = null;
+    const takeOpToken = createTokenBucket(OP_RATE_PER_SEC, OP_BURST);
+    const authTimer = setTimeout(() => {
+      if (!context) {
+        socket.close(4401, 'Authentication timeout');
+      }
+    }, AUTH_TIMEOUT_MS);
 
     const cleanup = async () => {
       if (context) {
@@ -88,6 +118,7 @@ export async function registerCollabWebSocket(
     };
 
     socket.on('close', () => {
+      clearTimeout(authTimer);
       cleanup().catch((error) => request.log.error(error));
     });
 
@@ -112,10 +143,11 @@ export async function registerCollabWebSocket(
         }
 
         if (payload.type === 'auth') {
-          if (context) {
+          if (context || authenticating) {
             send(socket, { type: 'auth:error', error: 'Already authenticated' });
             return;
           }
+          authenticating = true;
           try {
             const { payload: jwtPayload } = await jwtVerify(payload.token, jwks, {
               issuer: `https://${env.AUTH0_DOMAIN}/`,
@@ -180,6 +212,7 @@ export async function registerCollabWebSocket(
             };
             await collabRoomHub.setPresence(payload.documentId, user.id, presence);
 
+            clearTimeout(authTimer);
             send(socket, {
               type: 'auth:ok',
               userId: user.id,
@@ -189,12 +222,19 @@ export async function registerCollabWebSocket(
             });
           } catch {
             send(socket, { type: 'auth:error', error: 'Unauthorized' });
+          } finally {
+            authenticating = false;
           }
           return;
         }
 
         if (!context) {
           send(socket, { type: 'error', error: 'Not authenticated' });
+          return;
+        }
+
+        if (payload.type === 'annotation:op' && !takeOpToken()) {
+          send(socket, { type: 'error', error: 'Rate limit exceeded' });
           return;
         }
 
