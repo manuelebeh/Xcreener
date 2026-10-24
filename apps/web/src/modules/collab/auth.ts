@@ -1,4 +1,11 @@
-const STORAGE_KEY = 'snapglow_web_auth_tokens';
+// Tokens live only in memory, out of reach of a script reading localStorage. A reload
+// signs in again silently through the Auth0 session (prompt=none).
+const LEGACY_STORAGE_KEY = 'snapglow_web_auth_tokens';
+const SILENT_TRIED_KEY = 'snapglow_silent_auth_tried';
+
+if (typeof window !== 'undefined') {
+  localStorage.removeItem(LEGACY_STORAGE_KEY);
+}
 
 interface StoredAuthTokens {
   accessToken: string;
@@ -24,30 +31,16 @@ export function isWebAuthConfigured(): boolean {
   );
 }
 
-function loadTokens(): StoredAuthTokens | null {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) {
-    return null;
-  }
-  try {
-    return JSON.parse(raw) as StoredAuthTokens;
-  } catch {
-    return null;
-  }
-}
-
-function saveTokens(tokens: StoredAuthTokens): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
-}
+let memoryTokens: StoredAuthTokens | null = null;
 
 export async function getValidAccessToken(): Promise<string | null> {
-  const tokens = loadTokens();
+  const tokens = memoryTokens;
   if (!tokens) {
     return null;
   }
   if (tokens.expiresAt && tokens.expiresAt <= Date.now() + 30_000) {
     if (!tokens.refreshToken) {
-      localStorage.removeItem(STORAGE_KEY);
+      memoryTokens = null;
       return null;
     }
     const config = getAuth0Config();
@@ -61,7 +54,7 @@ export async function getValidAccessToken(): Promise<string | null> {
       }),
     });
     if (!response.ok) {
-      localStorage.removeItem(STORAGE_KEY);
+      memoryTokens = null;
       return null;
     }
     const payload = (await response.json()) as {
@@ -74,13 +67,16 @@ export async function getValidAccessToken(): Promise<string | null> {
       refreshToken: payload.refresh_token ?? tokens.refreshToken,
       expiresAt: payload.expires_in ? Date.now() + payload.expires_in * 1000 : null,
     };
-    saveTokens(refreshed);
+    memoryTokens = refreshed;
     return refreshed.accessToken;
   }
   return tokens.accessToken;
 }
 
-export async function startWebAuthLogin(returnTo: string): Promise<void> {
+export async function startWebAuthLogin(
+  returnTo: string,
+  options: { silent?: boolean } = {}
+): Promise<void> {
   const config = getAuth0Config();
   const verifier = crypto.randomUUID() + crypto.randomUUID();
   const challenge = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
@@ -102,6 +98,7 @@ export async function startWebAuthLogin(returnTo: string): Promise<void> {
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
     state,
+    ...(options.silent ? { prompt: 'none' } : {}),
   });
   window.location.assign(`https://${config.domain}/authorize?${params.toString()}`);
 }
@@ -136,12 +133,13 @@ export async function handleWebAuthCallback(code: string, state: string): Promis
     expires_in?: number;
   };
 
-  saveTokens({
+  memoryTokens = {
     accessToken: payload.access_token,
     refreshToken: payload.refresh_token ?? null,
     expiresAt: payload.expires_in ? Date.now() + payload.expires_in * 1000 : null,
-  });
+  };
 
+  sessionStorage.removeItem(SILENT_TRIED_KEY);
   sessionStorage.removeItem('snapglow_pkce_verifier');
   sessionStorage.removeItem('snapglow_auth_state');
 }
@@ -154,6 +152,19 @@ export function clearAuthReturnTo(): void {
   sessionStorage.removeItem('snapglow_auth_return_to');
 }
 
+/**
+ * Starts one silent sign-in per tab session. Returns false when it was already tried
+ * (Auth0 answered login_required), so the caller shows the sign-in button instead.
+ */
+export function trySilentWebAuthLogin(returnTo: string): boolean {
+  if (sessionStorage.getItem(SILENT_TRIED_KEY)) {
+    return false;
+  }
+  sessionStorage.setItem(SILENT_TRIED_KEY, '1');
+  void startWebAuthLogin(returnTo, { silent: true });
+  return true;
+}
+
 export function signOutWebAuth(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  memoryTokens = null;
 }
