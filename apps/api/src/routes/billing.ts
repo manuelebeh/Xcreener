@@ -17,6 +17,13 @@ interface BillingRouteOptions {
   stripe?: Stripe;
 }
 
+type Database = PostgresJsDatabase<typeof schema>;
+type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+type SubscriptionStatus = (typeof schema.subscriptionStatusEnum.enumValues)[number];
+
+/** Statuses that keep paid features. `past_due` covers Stripe's retry window before unpaid/cancel. */
+const PAID_STATUSES: ReadonlySet<SubscriptionStatus> = new Set(['active', 'trialing', 'past_due']);
+
 function getStripeClient(): Stripe | null {
   if (!env.STRIPE_SECRET_KEY) {
     return null;
@@ -60,13 +67,13 @@ async function toBillingStatus(
 }
 
 async function updateWorkspacePlan(
-  db: PostgresJsDatabase<typeof schema>,
+  db: Database | Transaction,
   workspaceId: string,
   plan: WorkspacePlan,
   subscription: {
     stripeCustomerId: string;
     stripeSubscriptionId: string;
-    status: 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
+    status: SubscriptionStatus;
     seatCount: number;
     currentPeriodEnd: Date | null;
   }
@@ -114,6 +121,63 @@ function subscriptionPeriodEnd(subscription: Stripe.Subscription): Date | null {
   const end = (subscription as Stripe.Subscription & { current_period_end?: number })
     .current_period_end;
   return end ? new Date(end * 1000) : null;
+}
+
+/** Writes plan and subscription from a Stripe subscription. The plan is paid only while the status allows it. */
+async function syncWorkspaceSubscription(
+  tx: Transaction,
+  workspaceId: string,
+  subscription: Stripe.Subscription,
+  fallbackPlan?: WorkspacePlan
+): Promise<void> {
+  const priceId = subscription.items.data[0]?.price.id ?? '';
+  const paidPlan = planFromPriceId(priceId) ?? fallbackPlan;
+  if (!paidPlan) {
+    return;
+  }
+  const customerId =
+    typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
+  await updateWorkspacePlan(
+    tx,
+    workspaceId,
+    PAID_STATUSES.has(subscription.status) ? paidPlan : 'free',
+    {
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscription.id,
+      status: subscription.status,
+      seatCount: subscription.items.data[0]?.quantity ?? 1,
+      currentPeriodEnd: subscriptionPeriodEnd(subscription),
+    }
+  );
+}
+
+/**
+ * Runs `apply` in one transaction unless a newer Stripe event already updated this workspace.
+ * Stripe does not guarantee delivery order, and retries a failed event for days.
+ */
+async function applyStripeEvent(
+  db: Database,
+  workspaceId: string,
+  event: Stripe.Event,
+  apply: (tx: Transaction) => Promise<void>
+): Promise<void> {
+  const eventCreated = new Date(event.created * 1000);
+  await db.transaction(async (tx) => {
+    const [current] = await tx
+      .select({ lastEventCreated: schema.workspaceSubscriptions.lastEventCreated })
+      .from(schema.workspaceSubscriptions)
+      .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId))
+      .limit(1)
+      .for('update');
+    if (current?.lastEventCreated && eventCreated < current.lastEventCreated) {
+      return;
+    }
+    await apply(tx);
+    await tx
+      .update(schema.workspaceSubscriptions)
+      .set({ lastEventCreated: eventCreated })
+      .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId));
+  });
 }
 
 export async function registerBillingRoutes(app: FastifyInstance, options: BillingRouteOptions) {
@@ -291,20 +355,9 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
 
         if (workspaceId && plan && subscriptionId && customerId) {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-          const priceId = subscription.items.data[0]?.price.id ?? '';
-          const resolvedPlan = planFromPriceId(priceId) ?? plan;
-          await updateWorkspacePlan(options.db, workspaceId, resolvedPlan, {
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscriptionId,
-            status: subscription.status as
-              | 'active'
-              | 'past_due'
-              | 'canceled'
-              | 'trialing'
-              | 'incomplete',
-            seatCount: subscription.items.data[0]?.quantity ?? 1,
-            currentPeriodEnd: subscriptionPeriodEnd(subscription),
-          });
+          await applyStripeEvent(options.db, workspaceId, event, (tx) =>
+            syncWorkspaceSubscription(tx, workspaceId, subscription, plan)
+          );
         }
         break;
       }
@@ -317,37 +370,22 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
         }
 
         if (event.type === 'customer.subscription.deleted') {
-          await options.db
-            .update(schema.workspaces)
-            .set({ plan: 'free', updatedAt: new Date() })
-            .where(eq(schema.workspaces.id, workspaceId));
-          await options.db
-            .update(schema.workspaceSubscriptions)
-            .set({ status: 'canceled', updatedAt: new Date() })
-            .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId));
+          await applyStripeEvent(options.db, workspaceId, event, async (tx) => {
+            await tx
+              .update(schema.workspaces)
+              .set({ plan: 'free', updatedAt: new Date() })
+              .where(eq(schema.workspaces.id, workspaceId));
+            await tx
+              .update(schema.workspaceSubscriptions)
+              .set({ status: 'canceled', updatedAt: new Date() })
+              .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId));
+          });
           break;
         }
 
-        const priceId = subscription.items.data[0]?.price.id ?? '';
-        const plan = planFromPriceId(priceId);
-        if (plan) {
-          const customerId =
-            typeof subscription.customer === 'string'
-              ? subscription.customer
-              : subscription.customer.id;
-          await updateWorkspacePlan(options.db, workspaceId, plan, {
-            stripeCustomerId: customerId,
-            stripeSubscriptionId: subscription.id,
-            status: subscription.status as
-              | 'active'
-              | 'past_due'
-              | 'canceled'
-              | 'trialing'
-              | 'incomplete',
-            seatCount: subscription.items.data[0]?.quantity ?? 1,
-            currentPeriodEnd: subscriptionPeriodEnd(subscription),
-          });
-        }
+        await applyStripeEvent(options.db, workspaceId, event, (tx) =>
+          syncWorkspaceSubscription(tx, workspaceId, subscription)
+        );
         break;
       }
       case 'invoice.payment_failed': {
@@ -360,13 +398,13 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
         if (!subscriptionId) {
           break;
         }
+        // Re-fetched, so the status is current (past_due, unpaid, canceled...), not assumed.
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
         const workspaceId = subscription.metadata?.workspaceId;
         if (workspaceId) {
-          await options.db
-            .update(schema.workspaceSubscriptions)
-            .set({ status: 'past_due', updatedAt: new Date() })
-            .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId));
+          await applyStripeEvent(options.db, workspaceId, event, (tx) =>
+            syncWorkspaceSubscription(tx, workspaceId, subscription)
+          );
         }
         break;
       }
