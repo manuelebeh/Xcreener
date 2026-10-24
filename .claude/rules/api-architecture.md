@@ -79,7 +79,7 @@ pnpm --filter @snapglow/api db:migrate
 | GET | `/v1/public/captures/:id/export/content` | API key | Last export bytes through the API (Figma plugin) |
 | POST | `/v1/public/captures/:id/publish` | API key | Permanent embed share (`/e/:token`) |
 | DELETE | `/v1/public/captures/:id` | API key | Delete capture + blobs |
-| GET | `/v1/embeds/:token` | No | Embed metadata + presigned asset (Notion-friendly CSP) |
+| GET | `/v1/embeds/:token` | No | Embed metadata + presigned asset (framing headers live on the web `/e/:token` page) |
 | GET | `/v1/workspaces/:id/usage` | admin JWT | Team usage reports (`period=7d\|30d\|90d`) |
 | GET/POST | `/v1/workspaces/:id/api-keys` | admin JWT | List / create API keys (Team Pro) |
 | DELETE | `/v1/workspaces/:id/api-keys/:keyId` | admin JWT | Revoke API key |
