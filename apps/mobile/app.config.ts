@@ -72,7 +72,7 @@ const config: ExpoConfig = {
   },
   extra: {
     eas: {
-      projectId: 'snapglow-mobile-placeholder',
+      projectId: '123fa91e-16a5-4934-b239-0fd53b83eeb9',
     },
   },
 };
