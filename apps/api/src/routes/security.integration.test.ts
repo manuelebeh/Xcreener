@@ -8,7 +8,7 @@
  */
 import { createHmac } from 'node:crypto';
 import type { AddressInfo } from 'node:net';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import Stripe from 'stripe';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import WebSocket from 'ws';
@@ -343,6 +343,42 @@ describe.skipIf(!databaseUrl)('API security regressions (Postgres)', () => {
 
     expect(await purgeExpiredShares(db, storage as never)).toBeGreaterThanOrEqual(1);
     expect(deletedObjects).toContain(`shares/${owner.id}/old${run}`);
+  });
+
+  it('keeps purging when an object delete keeps failing', async () => {
+    const owner = await upsertAuthUser(db, alice, null);
+    await db.insert(schema.shares).values([
+      {
+        userId: owner.id,
+        token: `stuck${run}`,
+        storageKey: `shares/${owner.id}/stuck${run}`,
+        mimeType: 'image/png',
+        byteSize: 3,
+        expiresAt: new Date(Date.now() - 2000),
+      },
+      {
+        userId: owner.id,
+        token: `next${run}`,
+        storageKey: `shares/${owner.id}/next${run}`,
+        mimeType: 'image/png',
+        byteSize: 3,
+        expiresAt: new Date(Date.now() - 1000),
+      },
+    ]);
+    const failingStorage = {
+      ...storage,
+      deleteObject: async () => {
+        throw new Error('S3 down');
+      },
+    };
+
+    await purgeExpiredShares(db, failingStorage as never);
+
+    const left = await db
+      .select({ token: schema.shares.token })
+      .from(schema.shares)
+      .where(inArray(schema.shares.token, [`stuck${run}`, `next${run}`]));
+    expect(left).toEqual([]);
   });
 
   it('validates comments and settings payloads', async () => {

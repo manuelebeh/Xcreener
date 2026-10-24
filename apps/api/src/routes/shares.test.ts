@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildApp } from '../app';
 import { shares, users } from '../db/schema';
+import { presignedTtlForShare } from './shares';
 
 describe('share routes', () => {
   it('returns 404 for unknown token', async () => {
@@ -70,5 +71,13 @@ describe('schema exports', () => {
   it('defines users and shares tables', () => {
     expect(users).toBeDefined();
     expect(shares).toBeDefined();
+  });
+
+  it('caps the presigned TTL to the time left on the share', () => {
+    const now = Date.parse('2026-10-24T12:00:00Z');
+    expect(presignedTtlForShare(null, now)).toBe(900);
+    expect(presignedTtlForShare(new Date(now + 3_600_000), now)).toBe(900);
+    expect(presignedTtlForShare(new Date(now + 120_000), now)).toBe(120);
+    expect(presignedTtlForShare(new Date(now + 200), now)).toBe(1);
   });
 });

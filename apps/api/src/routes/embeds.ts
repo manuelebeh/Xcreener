@@ -4,6 +4,7 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import * as schema from '../db/schema';
 import type { StorageService } from '../services/storage';
+import { presignedTtlForShare } from './shares';
 
 interface EmbedRouteOptions {
   db: PostgresJsDatabase<typeof schema>;
@@ -29,7 +30,10 @@ export async function registerEmbedRoutes(app: FastifyInstance, options: EmbedRo
       return reply.code(410).send({ error: 'Embed expired' });
     }
 
-    const assetUrl = await options.storage.getPresignedUrl(share.storageKey);
+    const assetUrl = await options.storage.getPresignedUrl(
+      share.storageKey,
+      presignedTtlForShare(share.expiresAt)
+    );
 
     const response: PublicEmbedResponse = {
       token: share.token,

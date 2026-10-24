@@ -30,6 +30,17 @@ function isAllowedMimeType(value: string): value is ShareMimeType {
   return (ALLOWED_SHARE_MIME_TYPES as readonly string[]).includes(value);
 }
 
+const MAX_PRESIGNED_TTL_SECONDS = 900;
+
+/** A presigned URL must not outlive the share it was issued for. */
+export function presignedTtlForShare(expiresAt: Date | null, now = Date.now()): number {
+  if (!expiresAt) {
+    return MAX_PRESIGNED_TTL_SECONDS;
+  }
+  const remaining = Math.floor((expiresAt.getTime() - now) / 1000);
+  return Math.max(1, Math.min(MAX_PRESIGNED_TTL_SECONDS, remaining));
+}
+
 export async function registerShareRoutes(app: FastifyInstance, options: ShareRouteOptions) {
   app.post('/v1/shares', { preHandler: authenticateRequest }, async (request, reply) => {
     const authUser = request.authUser;
@@ -161,7 +172,10 @@ export async function registerShareRoutes(app: FastifyInstance, options: ShareRo
       return reply.code(410).send({ error: 'Share expired' });
     }
 
-    const assetUrl = await options.storage.getPresignedUrl(share.storageKey);
+    const assetUrl = await options.storage.getPresignedUrl(
+      share.storageKey,
+      presignedTtlForShare(share.expiresAt)
+    );
 
     const response: PublicShareResponse = {
       token: share.token,
