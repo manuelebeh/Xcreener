@@ -35,13 +35,13 @@
     "@snapglow/team-core": "workspace:*",
     "@t3-oss/env-core": "^0.13.10",
     "drizzle-orm": "^0.45.4",
-    "fastify": "^5.12.5",
+    "fastify": "^5.12.6",
     "ioredis": "^5.7.0",
     "jose": "^6.1.0",
     "nanoid": "^5.1.16",
     "postgres": "^3.4.7",
     "stripe": "^18.5.0",
-    "zod": "^4.3.6"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@snapglow/biome-config": "workspace:*",
