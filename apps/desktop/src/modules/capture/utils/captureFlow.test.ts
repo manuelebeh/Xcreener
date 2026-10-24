@@ -35,8 +35,10 @@ describe('captureModes', () => {
 });
 
 describe('captureFlow', () => {
-  it('uses native capture for scroll, menu, delayed photo, and all video modes', () => {
+  it('uses native capture for window, scroll, menu, delayed photo, and all video modes', () => {
     expect(needsNativeCapture('region', 0)).toBe(false);
+    expect(needsNativeCapture('fullscreen', 0)).toBe(false);
+    expect(needsNativeCapture('window', 0)).toBe(true);
     expect(needsNativeCapture('region', 3)).toBe(true);
     expect(needsNativeCapture('scroll', 0)).toBe(true);
     expect(needsNativeCapture('menu', 3)).toBe(true);

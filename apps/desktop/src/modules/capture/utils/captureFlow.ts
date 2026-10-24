@@ -9,7 +9,9 @@ export function needsNativeCapture(
     return true;
   }
 
-  return mode === 'scroll' || mode === 'menu' || delaySecs > 0;
+  // Window captures grab the window itself so rounded corners stay transparent
+  // instead of showing whatever sat behind them in the desktop preview.
+  return mode === 'window' || mode === 'scroll' || mode === 'menu' || delaySecs > 0;
 }
 
 export function isLiveOverlayMode(mode: CaptureMode, liveOverlay: boolean): boolean {

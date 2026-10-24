@@ -30,6 +30,7 @@ class MockOffscreenCanvas {
   getContext() {
     return {
       setTransform: vi.fn(),
+      getTransform: vi.fn(() => ({ a: 1 })),
       clearRect: vi.fn(),
       save: vi.fn(),
       restore: vi.fn(),
