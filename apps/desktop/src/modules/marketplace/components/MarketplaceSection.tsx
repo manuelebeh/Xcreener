@@ -2,6 +2,7 @@ import { templateStyleToCustomPresetInput } from '@snapglow/marketplace-core';
 import { Button } from '@snapglow/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { createCustomPreset } from '@/db/presets';
+import { SettingsGroup, SettingsRow } from '@/shared/components/SettingsGroup';
 import { fetchMarketplaceTemplate, fetchMarketplaceTemplates } from '../api';
 
 export function MarketplaceSection() {
@@ -52,63 +53,69 @@ export function MarketplaceSection() {
   }
 
   return (
-    <section className="space-y-4">
-      <div>
-        <h2 className="text-base font-semibold">Template marketplace</h2>
-        <p className="mt-1 text-sm text-muted">
-          Browse community beautification presets and install them as custom presets.
-        </p>
-      </div>
-
-      {loading ? <p className="text-sm text-muted">Loading templates…</p> : null}
+    <SettingsGroup
+      title="Template marketplace"
+      description="Community beautification presets. Installing one adds it to your custom presets."
+      action={
+        error ? null : (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={loading}
+            onClick={() => void loadTemplates()}
+          >
+            Refresh
+          </Button>
+        )
+      }
+    >
+      {loading ? <SettingsRow label="Loading templates…" /> : null}
       {error ? (
-        <p className="text-sm text-destructive" role="alert">
-          {error}
-        </p>
+        <SettingsRow label="Couldn't load templates" hint={error}>
+          <Button type="button" variant="secondary" size="sm" onClick={() => void loadTemplates()}>
+            Retry
+          </Button>
+        </SettingsRow>
       ) : null}
-
       {!loading && !error && templates.length === 0 ? (
-        <p className="text-sm text-muted">No templates available yet.</p>
+        <SettingsRow label="No templates available yet" />
       ) : null}
 
-      <ul className="space-y-3">
-        {templates.map((item) => {
-          const status = installStatus[item.slug];
-          return (
-            <li
-              key={item.id}
-              className="flex items-center justify-between gap-4 rounded-lg border border-border p-3"
+      {templates.map((item) => {
+        const status = installStatus[item.slug];
+        const failed = status && status !== 'installing' && status !== 'installed';
+        return (
+          <SettingsRow
+            key={item.id}
+            label={item.title}
+            hint={
+              [item.description, item.tags.join(' · ')].filter(Boolean).join(' · ') || undefined
+            }
+            footer={
+              failed ? (
+                <p className="text-xs text-destructive" role="alert">
+                  {status}
+                </p>
+              ) : null
+            }
+          >
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={status === 'installing' || status === 'installed'}
+              onClick={() => void handleInstall(item.slug, item.title)}
             >
-              <div className="min-w-0">
-                <p className="font-medium">{item.title}</p>
-                {item.description ? (
-                  <p className="truncate text-sm text-muted">{item.description}</p>
-                ) : null}
-                {item.tags.length > 0 ? (
-                  <p className="mt-1 text-xs text-muted">{item.tags.join(' · ')}</p>
-                ) : null}
-              </div>
-              <Button
-                type="button"
-                variant={status === 'installed' ? 'secondary' : 'primary'}
-                size="sm"
-                disabled={status === 'installing' || status === 'installed'}
-                onClick={() => void handleInstall(item.slug, item.title)}
-              >
-                {status === 'installed'
-                  ? 'Installed'
-                  : status === 'installing'
-                    ? 'Installing…'
-                    : 'Install'}
-              </Button>
-            </li>
-          );
-        })}
-      </ul>
-
-      <Button type="button" variant="ghost" size="sm" onClick={() => void loadTemplates()}>
-        Refresh
-      </Button>
-    </section>
+              {status === 'installed'
+                ? 'Installed'
+                : status === 'installing'
+                  ? 'Installing…'
+                  : 'Install'}
+            </Button>
+          </SettingsRow>
+        );
+      })}
+    </SettingsGroup>
   );
 }
