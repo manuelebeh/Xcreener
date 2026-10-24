@@ -69,11 +69,21 @@ export interface AuthorizeIntegrationResponse {
 
 export interface ExchangeIntegrationTokenResponse {
   accessToken: string;
-  refreshToken?: string | null;
+  /**
+   * Sealed by the API (bound to the user and provider). Only the API can turn it into a new
+   * access token, through `POST /v1/integrations/:provider/refresh`.
+   */
+  refreshHandle?: string | null;
   expiresAt?: string | null;
   scope?: string;
   workspaceName?: string | null;
   metadata?: Record<string, string>;
+}
+
+export interface RefreshIntegrationTokenResponse {
+  accessToken: string;
+  refreshHandle: string;
+  expiresAt?: string | null;
 }
 
 export function isIntegrationProvider(value: string): value is IntegrationProvider {
