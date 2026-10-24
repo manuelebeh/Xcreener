@@ -1,27 +1,19 @@
-import { getDb } from './connection';
+import type { DbCaptureRow } from '@/shared/types/ipc';
+import {
+  dbCapturesDelete,
+  dbCapturesGet,
+  dbCapturesInsert,
+  dbCapturesList,
+  dbCapturesListByCollection,
+  dbCapturesListByTag,
+  dbCapturesSearch,
+  dbCapturesUidExists,
+  dbCapturesUpdateOcrText,
+  dbCapturesUpdateTags,
+} from '@/tauri/commands';
 import { ensureMigrationsApplied } from './migrate';
 
 const DEFAULT_MAX_CAPTURES = 30;
-
-async function getReadyDb() {
-  await ensureMigrationsApplied();
-  return getDb();
-}
-
-interface CaptureRow {
-  id: number;
-  filename: string;
-  filepath: string;
-  thumbnail: string | null;
-  width: number;
-  height: number;
-  format: string;
-  file_size: number;
-  preset_used: string | null;
-  tags: string | null;
-  ocr_text: string | null;
-  created_at: string;
-}
 
 export interface StoredCapture {
   id: number;
@@ -69,7 +61,7 @@ function parseTags(raw: string | null): string[] {
   return [];
 }
 
-function rowToStored(row: CaptureRow, ocrSnippet?: string | null): StoredCapture {
+function rowToStored(row: DbCaptureRow): StoredCapture {
   return {
     id: row.id,
     filename: row.filename,
@@ -81,174 +73,84 @@ function rowToStored(row: CaptureRow, ocrSnippet?: string | null): StoredCapture
     fileSize: row.file_size,
     tags: parseTags(row.tags),
     ocrText: row.ocr_text,
-    ocrSnippet: ocrSnippet ?? null,
+    ocrSnippet: row.snippet ?? null,
     createdAt: row.created_at,
   };
 }
 
 export async function insertCapture(input: InsertCaptureInput): Promise<number> {
-  const db = await getReadyDb();
-  const tagsJson = JSON.stringify(input.tags ?? []);
-  const result = await db.execute(
-    `INSERT INTO captures (filename, filepath, thumbnail, width, height, format, file_size, tags, uid)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      input.filename,
-      input.filepath,
-      input.thumbnail,
-      input.width,
-      input.height,
-      input.format ?? 'png',
-      input.fileSize,
-      tagsJson,
-      input.uid ?? crypto.randomUUID(),
-    ]
-  );
-
-  const id =
-    result.lastInsertId ??
-    (await db.select<{ id: number }[]>('SELECT id FROM captures ORDER BY id DESC LIMIT 1'))[0]?.id;
-
-  if (id === undefined) {
-    throw new Error('Failed to insert capture');
-  }
-
-  return id;
+  await ensureMigrationsApplied();
+  return dbCapturesInsert({
+    filename: input.filename,
+    filepath: input.filepath,
+    thumbnail: input.thumbnail,
+    width: input.width,
+    height: input.height,
+    fileSize: input.fileSize,
+    format: input.format ?? 'png',
+    tags: JSON.stringify(input.tags ?? []),
+    uid: input.uid ?? crypto.randomUUID(),
+  });
 }
 
 export async function updateCaptureOcrText(id: number, ocrText: string): Promise<void> {
-  const db = await getReadyDb();
-  await db.execute("UPDATE captures SET ocr_text = ?, updated_at = datetime('now') WHERE id = ?", [
-    ocrText,
-    id,
-  ]);
+  await ensureMigrationsApplied();
+  await dbCapturesUpdateOcrText(id, ocrText);
 }
 
 export async function updateCaptureTags(id: number, tags: string[]): Promise<void> {
-  const db = await getReadyDb();
-  await db.execute("UPDATE captures SET tags = ?, updated_at = datetime('now') WHERE id = ?", [
-    JSON.stringify(tags),
-    id,
-  ]);
+  await ensureMigrationsApplied();
+  await dbCapturesUpdateTags(id, JSON.stringify(tags));
 }
 
 export async function listCaptures(limit = DEFAULT_MAX_CAPTURES): Promise<StoredCapture[]> {
-  const db = await getReadyDb();
-  const rows = await db.select<CaptureRow[]>(
-    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
-     FROM captures ORDER BY created_at DESC LIMIT ?`,
-    [limit]
-  );
-  return rows.map((row) => rowToStored(row));
+  await ensureMigrationsApplied();
+  return (await dbCapturesList(limit)).map(rowToStored);
 }
 
+/** Full-text search on OCR text, with a LIKE fallback when the query is not valid FTS5. */
 export async function searchCaptures(
   query: string,
   limit = DEFAULT_MAX_CAPTURES
 ): Promise<StoredCapture[]> {
-  const trimmed = query.trim();
-  if (!trimmed) {
+  if (!query.trim()) {
     return listCaptures(limit);
   }
-
-  const db = await getReadyDb();
-  const ftsQuery = trimmed
-    .split(/\s+/)
-    .map((term) => term.replace(/"/g, '""'))
-    .join(' ');
-
-  try {
-    const rows = await db.select<CaptureRow[]>(
-      `SELECT c.id, c.filename, c.filepath, c.thumbnail, c.width, c.height, c.format, c.file_size,
-              c.preset_used, c.tags, c.ocr_text, c.created_at,
-              snippet(captures_fts, 0, '…', '…', '…', 8) AS snippet
-       FROM captures_fts
-       JOIN captures c ON c.id = captures_fts.rowid
-       WHERE captures_fts MATCH ?
-       ORDER BY rank
-       LIMIT ?`,
-      [ftsQuery, limit]
-    );
-
-    return rows.map((row) =>
-      rowToStored(row, (row as CaptureRow & { snippet?: string }).snippet ?? null)
-    );
-  } catch {
-    const like = `%${trimmed.replace(/%/g, '\\%')}%`;
-    const rows = await db.select<CaptureRow[]>(
-      `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
-       FROM captures
-       WHERE ocr_text LIKE ? OR filename LIKE ?
-       ORDER BY created_at DESC
-       LIMIT ?`,
-      [like, like, limit]
-    );
-    return rows.map((row) => rowToStored(row));
-  }
+  await ensureMigrationsApplied();
+  return (await dbCapturesSearch(query, limit)).map(rowToStored);
 }
 
 export async function listCapturesByTag(
   tag: string,
   limit = DEFAULT_MAX_CAPTURES
 ): Promise<StoredCapture[]> {
-  const db = await getReadyDb();
-  const rows = await db.select<CaptureRow[]>(
-    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
-     FROM captures
-     WHERE tags LIKE ?
-     ORDER BY created_at DESC
-     LIMIT ?`,
-    [`%"${tag.replace(/"/g, '\\"')}"%`, limit]
-  );
-  return rows.map((row) => rowToStored(row));
+  await ensureMigrationsApplied();
+  return (await dbCapturesListByTag(tag, limit)).map(rowToStored);
 }
 
 export async function listCapturesByCollection(
   collectionId: number,
   limit = DEFAULT_MAX_CAPTURES
 ): Promise<StoredCapture[]> {
-  const db = await getReadyDb();
-  const rows = await db.select<CaptureRow[]>(
-    `SELECT c.id, c.filename, c.filepath, c.thumbnail, c.width, c.height, c.format, c.file_size,
-            c.preset_used, c.tags, c.ocr_text, c.created_at
-     FROM captures c
-     JOIN capture_collections cc ON cc.capture_id = c.id
-     WHERE cc.collection_id = ?
-     ORDER BY c.created_at DESC
-     LIMIT ?`,
-    [collectionId, limit]
-  );
-  return rows.map((row) => rowToStored(row));
+  await ensureMigrationsApplied();
+  return (await dbCapturesListByCollection(collectionId, limit)).map(rowToStored);
 }
 
 export async function getCapture(id: number): Promise<StoredCapture | null> {
-  const db = await getReadyDb();
-  const rows = await db.select<CaptureRow[]>(
-    `SELECT id, filename, filepath, thumbnail, width, height, format, file_size, preset_used, tags, ocr_text, created_at
-     FROM captures WHERE id = ? LIMIT 1`,
-    [id]
-  );
-  const row = rows[0];
+  await ensureMigrationsApplied();
+  const row = await dbCapturesGet(id);
   return row ? rowToStored(row) : null;
 }
 
 export async function captureUidExists(uid: string): Promise<boolean> {
-  const db = await getReadyDb();
-  const rows = await db.select<{ id: number }[]>('SELECT id FROM captures WHERE uid = ? LIMIT 1', [
-    uid,
-  ]);
-  return rows.length > 0;
+  await ensureMigrationsApplied();
+  return dbCapturesUidExists(uid);
 }
 
 export async function deleteCaptureRow(id: number): Promise<StoredCapture | null> {
-  const capture = await getCapture(id);
-  if (!capture) {
-    return null;
-  }
-
-  const db = await getReadyDb();
-  await db.execute('DELETE FROM captures WHERE id = ?', [id]);
-  return capture;
+  await ensureMigrationsApplied();
+  const row = await dbCapturesDelete(id);
+  return row ? rowToStored(row) : null;
 }
 
 export async function pruneCaptures(max = DEFAULT_MAX_CAPTURES): Promise<StoredCapture[]> {

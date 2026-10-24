@@ -51,7 +51,7 @@ Cross-cutting:
 - `src/app/` - routing, providers, shell
 - `src/shared/types/` - shared TS types (IPC payloads, settings)
 - `src/tauri/` - typed wrappers for `invoke` and event listeners
-- `src/db/` - SQLite via `@tauri-apps/plugin-sql` (settings, custom presets, capture history)
+- `src/db/` - SQLite wrappers over typed Rust commands in `src-tauri/src/db/` (settings, custom presets, capture history)
 
 Modules expose a public API through `index.ts`; internal files stay colocated (`store.ts`, `components/`, `hooks/`).
 

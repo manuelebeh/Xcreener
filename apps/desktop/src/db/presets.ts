@@ -1,6 +1,7 @@
 import type { CustomPresetStyle } from '@/modules/editor/store';
 import type { AspectRatio, BackgroundConfig, FramePreset } from '@/modules/editor/types';
-import { getDb } from './connection';
+import type { DbCustomPresetRow } from '@/shared/types/ipc';
+import { dbPresetsCreate, dbPresetsDelete, dbPresetsList } from '@/tauri/commands';
 import { ensureMigrationsApplied } from './migrate';
 import {
   createCustomPresetInputSchema,
@@ -13,23 +14,6 @@ import {
 } from './schemas/presetSchemas';
 
 const DEFAULT_BORDER_RADIUS = 12;
-
-async function getReadyDb() {
-  await ensureMigrationsApplied();
-  return getDb();
-}
-
-interface CustomPresetRow {
-  id: number;
-  name: string;
-  width: number | null;
-  height: number | null;
-  aspect_ratio: string | null;
-  background: string;
-  padding: number;
-  border_radius: number;
-  shadow: string;
-}
 
 export interface StoredCustomPreset {
   id: number;
@@ -50,7 +34,7 @@ function serializeBackground(background: BackgroundConfig): SerializableBackgrou
   return parseStoredBackground('{}');
 }
 
-function rowToStored(row: CustomPresetRow): StoredCustomPreset {
+function rowToStored(row: DbCustomPresetRow): StoredCustomPreset {
   const aspectRatio = parseStoredAspectRatio(row.aspect_ratio);
   const width = row.width ?? 1920;
   const height = row.height ?? 1080;
@@ -86,12 +70,8 @@ export function storedToFramePreset(
 }
 
 export async function listCustomPresets(): Promise<StoredCustomPreset[]> {
-  const db = await getReadyDb();
-  const rows = await db.select<CustomPresetRow[]>(
-    `SELECT id, name, width, height, aspect_ratio, background, padding, border_radius, shadow
-     FROM custom_presets ORDER BY created_at DESC`
-  );
-  return rows.map(rowToStored);
+  await ensureMigrationsApplied();
+  return (await dbPresetsList()).map(rowToStored);
 }
 
 export interface CreateCustomPresetInput {
@@ -114,33 +94,17 @@ export async function createCustomPreset(
     },
   });
 
-  const db = await getReadyDb();
-  const background = serializeStoredBackground(parsed.style.background);
-  const shadow = serializeStoredShadow(parsed.style.shadow);
-
-  const result = await db.execute(
-    `INSERT INTO custom_presets (name, width, height, aspect_ratio, background, padding, border_radius, shadow)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      parsed.name,
-      parsed.width,
-      parsed.height,
-      parsed.aspectRatio,
-      background,
-      parsed.style.padding,
-      parsed.style.borderRadius,
-      shadow,
-    ]
-  );
-
-  const id =
-    result.lastInsertId ??
-    (await db.select<{ id: number }[]>('SELECT id FROM custom_presets ORDER BY id DESC LIMIT 1'))[0]
-      ?.id;
-
-  if (id === undefined) {
-    throw new Error('Failed to create custom preset');
-  }
+  await ensureMigrationsApplied();
+  const id = await dbPresetsCreate({
+    name: parsed.name,
+    width: parsed.width,
+    height: parsed.height,
+    aspectRatio: parsed.aspectRatio,
+    background: serializeStoredBackground(parsed.style.background),
+    padding: parsed.style.padding,
+    borderRadius: parsed.style.borderRadius,
+    shadow: serializeStoredShadow(parsed.style.shadow),
+  });
 
   return {
     id,
@@ -153,8 +117,8 @@ export async function createCustomPreset(
 }
 
 export async function deleteCustomPreset(id: number): Promise<void> {
-  const db = await getReadyDb();
-  await db.execute('DELETE FROM custom_presets WHERE id = ?', [id]);
+  await ensureMigrationsApplied();
+  await dbPresetsDelete(id);
 }
 
 export function defaultCreateInputFromStyle(

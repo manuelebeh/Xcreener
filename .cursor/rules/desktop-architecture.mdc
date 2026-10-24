@@ -39,12 +39,11 @@ src/
 ├── tauri/                  # Tauri IPC layer
 │   ├── commands.ts         # Typed invoke() wrappers
 │   └── events.ts           # Event listeners
-├── db/                     # SQLite (@tauri-apps/plugin-sql)
+├── db/                     # SQLite wrappers over the Rust db_* commands (src-tauri/src/db)
 │   ├── index.ts            # initDatabase, getSetting, setSetting, loadAppSettings
 │   ├── captures.ts         # Capture history CRUD + prune (Sprint 1.6)
-│   ├── migrate.ts          # Multi-statement migration runner
-│   ├── connection.ts       # Shared DB connection
-│   └── migrations/         # SQL migrations
+│   ├── migrate.ts          # ensureMigrationsApplied (db_init + default settings)
+│   └── migrations/         # SQL migrations, applied by src-tauri/src/db/migrations.rs
 ├── styles/
 │   ├── global.css
 │   └── theme.css           # Desktop theme overrides (colors, fonts, controls)

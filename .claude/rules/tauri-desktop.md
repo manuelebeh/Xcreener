@@ -47,11 +47,11 @@ Shared packages: `@snapglow/style-suggestion-core`, `@snapglow/ocr-core`.
 
 ## SQLite
 
-- Plugin: `tauri-plugin-sql`, preloaded DB `sqlite:snapglow.db`
-- Migrations: `src/db/migrations/*.sql`, applied via `migrate.ts` (`ensureMigrationsApplied`)
-- Capture history: `src/db/captures.ts` (retention 30, frontend-only)
+- Rust owns `snapglow.db` (`app_config_dir`, rusqlite) in `src-tauri/src/db/`: one typed command per query (`settings_*`, `captures_*`, `collections_*`, `presets_*`). The WebView has no raw SQL; add a command for a new query
+- Migrations: `src/db/migrations/*.sql`, embedded and applied by `src-tauri/src/db/migrations.rs` through `db_init` (`ensureMigrationsApplied` in `migrate.ts`)
+- Capture history: `src/db/captures.ts` (retention 30)
 - Settings keys (2b.2): `ocrEngine`, `ocrLanguages`, `smartCompression`
-- Capabilities: `capabilities/default.json` (window `main`: `sql:default` + `sql:allow-execute`, fs, clipboard, opener) and `capabilities/overlay.json` (window `capture-overlay`: events and window show/hide only)
+- Capabilities: `capabilities/default.json` (window `main`: fs, clipboard, opener; no SQL plugin) and `capabilities/overlay.json` (window `capture-overlay`: events and window show/hide only)
 - Tokens: Auth0 and integration tokens live in the OS keychain through `src-tauri/src/secure_store.rs` (`secure_store_get/set/delete`, names limited to `ALLOWED_NAMES`), not in the SQLite settings table
 
 ## Tauri features & security
