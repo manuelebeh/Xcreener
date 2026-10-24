@@ -42,6 +42,8 @@ export const env = createEnv({
     API_RATE_LIMIT_GENERAL: z.coerce.number().default(120),
     API_RATE_LIMIT_UPLOAD: z.coerce.number().default(20),
     API_RATE_LIMIT_EXPORT: z.coerce.number().default(30),
+    RENDER_WORKERS: z.coerce.number().int().min(1).default(2),
+    RENDER_TIMEOUT_MS: z.coerce.number().int().min(1).default(15_000),
     MARKETPLACE_MODERATOR_SUBS: z.string().default(''),
     REWARDFUL_WEBHOOK_SECRET: z.string().default(''),
     REWARDFUL_API_KEY: z.string().default(''),

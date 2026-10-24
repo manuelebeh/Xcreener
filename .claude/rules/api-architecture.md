@@ -100,6 +100,7 @@ Optional header `X-Workspace-Id` scopes library/share uploads and collab documen
 - Env validated with `@t3-oss/env-core` + Zod (`src/env.ts`)
 - Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`, `@snapglow/team-core`, `@snapglow/collab-core`, `@snapglow/api-core`
 - Server render via `@snapglow/render-core` + `@napi-rs/canvas` for public API export
+- Export renders run in a piscina worker pool (`services/render-pool.ts`, `RENDER_WORKERS`, `RENDER_TIMEOUT_MS`; busy or timed out → 503); upload size checks read the image header (`services/image-dimensions.ts`), never decode
 - Workspace authz via `requireWorkspaceRole` / `can()` from `@snapglow/team-core`
 - Privacy: uploads only from authenticated clients; explicit consent in desktop UI
 - Integration OAuth secrets live in API env only; access tokens stored on desktop

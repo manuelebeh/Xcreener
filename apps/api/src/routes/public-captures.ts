@@ -21,12 +21,14 @@ import * as schema from '../db/schema';
 import { env } from '../env';
 import { parseOptionalDate } from '../lib/dates';
 import { authenticateApiKey, sendRateLimitReply } from '../plugins/api-key-auth';
+import { readImageDimensions } from '../services/image-dimensions';
 import {
   checkApiExportRateLimit,
   checkApiGeneralRateLimit,
   checkApiUploadRateLimit,
 } from '../services/redis';
-import { loadBrandKitLogo, renderCaptureExport } from '../services/render';
+import { loadBrandKitLogo } from '../services/render';
+import { renderCaptureExportInWorker } from '../services/render-pool';
 import type { StorageService } from '../services/storage';
 
 const createShareToken = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 12);
@@ -122,7 +124,7 @@ async function ensureCaptureExport(
   const brandKit = await getBrandKitForWorkspace(db, workspaceId);
   const logoBuffer = await loadBrandKitLogo(storage, brandKit?.logoStorageKey);
 
-  const rendered = await renderCaptureExport({
+  const rendered = await renderCaptureExportInWorker({
     documentState: capture.documentState,
     screenshotBuffer,
     format,
@@ -190,7 +192,10 @@ export async function registerPublicCaptureRoutes(
       ? parseTagsField('value' in tagsField ? tagsField.value : tagsField)
       : [];
 
-    const dims = await readImageDimensions(buffer);
+    const dims = readImageDimensions(buffer);
+    if (!dims) {
+      return reply.code(400).send({ error: 'Unsupported or corrupt image' });
+    }
     if (dims.width * dims.height > MAX_RENDER_PIXELS) {
       return reply.code(413).send({ error: 'Image too large to render' });
     }
@@ -438,7 +443,7 @@ export async function registerPublicCaptureRoutes(
     const brandKit = await getBrandKitForWorkspace(options.db, workspaceId);
     const logoBuffer = await loadBrandKitLogo(options.storage, brandKit?.logoStorageKey);
 
-    const rendered = await renderCaptureExport({
+    const rendered = await renderCaptureExportInWorker({
       documentState: capture.documentState,
       screenshotBuffer,
       format: parsed.data.format,
@@ -578,10 +583,4 @@ export async function registerPublicCaptureRoutes(
 
     return reply.code(204).send();
   });
-}
-
-async function readImageDimensions(buffer: Buffer): Promise<{ width: number; height: number }> {
-  const { loadImage } = await import('@napi-rs/canvas');
-  const image = await loadImage(buffer);
-  return { width: image.width, height: image.height };
 }

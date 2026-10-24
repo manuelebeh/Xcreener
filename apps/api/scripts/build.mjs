@@ -7,8 +7,11 @@ const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url
 const external = Object.keys(pkg.dependencies).filter((name) => !name.startsWith('@snapglow/'));
 
 await build({
-  entryPoints: ['src/index.ts'],
-  outfile: 'dist/index.mjs',
+  // The render worker is its own entry: piscina loads it by path (render-pool.ts).
+  entryPoints: ['src/index.ts', 'src/services/render-worker.ts'],
+  outdir: 'dist',
+  entryNames: '[name]',
+  outExtension: { '.js': '.mjs' },
   bundle: true,
   platform: 'node',
   format: 'esm',
