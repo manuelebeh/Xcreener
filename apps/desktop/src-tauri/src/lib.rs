@@ -1,6 +1,7 @@
 mod capture;
 mod commands;
 mod classification;
+mod db;
 mod entitlement;
 mod image_processing;
 mod ocr;
@@ -28,6 +29,13 @@ use commands::{
     take_overlay_preview, take_recording_thumbnail,
     verify_entitlement,
 };
+use db::{
+    captures_delete, captures_get, captures_insert, captures_list, captures_list_by_collection,
+    captures_list_by_tag, captures_search, captures_uid_exists, captures_update_ocr_text,
+    captures_update_tags, collections_add_capture, collections_create, collections_delete,
+    collections_for_capture, collections_list, collections_remove_capture, collections_rename,
+    db_init, presets_create, presets_delete, presets_list, settings_get, settings_set,
+};
 use secure_store::{secure_store_delete, secure_store_get, secure_store_set};
 use shortcuts::{
     build_global_shortcut_plugin, init_shortcut_state, register_capture_shortcut,
@@ -49,7 +57,7 @@ pub fn run() {
     windows_dpi::ensure_per_monitor_awareness();
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_sql::Builder::default().build())
+        .manage(db::Db::default())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -138,6 +146,29 @@ pub fn run() {
             secure_store_get,
             secure_store_set,
             secure_store_delete,
+            db_init,
+            settings_get,
+            settings_set,
+            captures_insert,
+            captures_update_ocr_text,
+            captures_update_tags,
+            captures_list,
+            captures_search,
+            captures_list_by_tag,
+            captures_list_by_collection,
+            captures_get,
+            captures_uid_exists,
+            captures_delete,
+            collections_list,
+            collections_create,
+            collections_rename,
+            collections_delete,
+            collections_add_capture,
+            collections_remove_capture,
+            collections_for_capture,
+            presets_list,
+            presets_create,
+            presets_delete,
             e2e_show_main_window,
             e2e_emit_capture_triggered,
             e2e_inject_screenshot,
