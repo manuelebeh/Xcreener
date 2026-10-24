@@ -38,7 +38,7 @@ Use `pnpm` only (not `npm` / `yarn`). Prefer root [`mise.toml`](mise.toml) tasks
 | `packages/ui` / `ui-native` | Shared React / RN components |
 | `packages/*-core` | Shared domain libraries (editor, redaction, cloud, …) |
 | `packages/sdk` | Official REST API client |
-| `docs/` | Product and technical specs (incl. ADRs / sprint history) |
+| `docs/` | Architecture + ADRs, guides, product specs, quality (see `docs/README.md`). `docs/internal/` is gitignored (strategy, audits, marketing) |
 
 Path-scoped rules (Cursor): `.cursor/rules/` (architecture + workflow). Claude Code mirrors: `.claude/rules/`. Always-on behavior (Karpathy, no-ai-slop): this file + Cursor `.cursor/rules/` mirrors.
 
@@ -65,7 +65,7 @@ First-party behavioral skills (always relevant; deep detail on demand):
 
 On-demand first-party skills:
 
-- [`platform-audit`](.agents/skills/platform-audit/): read-only full audit (security, perf, architecture, privacy) across desktop, Rust, web, API, mobile, plugins, CI; report goes to `docs/internal/technical/audits/`
+- [`platform-audit`](.agents/skills/platform-audit/): read-only full audit (security, perf, architecture, privacy) across desktop, Rust, web, API, mobile, plugins, CI; report goes to `docs/internal/audits/`
 
 Pinned third-party skills (`skills-lock.json`): [marketingskills](https://github.com/coreyhaines31/marketingskills), [taste-skill](https://github.com/Leonxlnx/taste-skill), [impeccable](https://github.com/pbakaus/impeccable). Update with `npx skills update`.
 
@@ -133,7 +133,7 @@ Write like a clear human. Direct, specific, varied rhythm. For deep rewrites, us
 
 ## Docs
 
-[`README.md`](README.md), [`design.md`](design.md), [`docs/internal/`](docs/internal/) (ADRs and sprint history), [`.cursor/rules/`](.cursor/rules/).
+[`README.md`](README.md), [`design.md`](design.md), [`docs/`](docs/README.md) (architecture, ADRs, guides, product specs), [`.cursor/rules/`](.cursor/rules/).
 
 ## Done checklist
 

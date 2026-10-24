@@ -27,7 +27,7 @@ A partial scope uses the same report format, limited to the relevant sections, a
 
 ## Actual system (verified in the repo; re-check at audit time)
 
-Never assume: re-read manifests, `AGENTS.md`, `README.md`, `design.md`, ADRs in `docs/internal/technical/adr/`, and `docs/internal/technical/Technical Stack - Desktop.md` at the start of every audit; versions move. The repo folder is `screen-cut`, the GitHub repo `ScreenCut`, the product **SnapGlow**: same project.
+Never assume: re-read manifests, `AGENTS.md`, `README.md`, `design.md`, ADRs in `docs/architecture/adr/`, and `docs/architecture/desktop-stack.md` at the start of every audit; versions move. The repo folder is `screen-cut`, the GitHub repo `ScreenCut`, the product **SnapGlow**: same project.
 
 | Part | Location | Observed stack |
 |---|---|---|
@@ -41,7 +41,7 @@ Never assume: re-read manifests, `AGENTS.md`, `README.md`, `design.md`, ADRs in 
 | Tooling | `tools/style-classifier` | Python dataset/model tooling for the style classifier |
 | CI | `.github/workflows/{ci,build,release,e2e-native,api-load,mobile-build,vscode-extension}.yml` | mise, Turborepo, tauri-action, EAS, vsce; no API/web deploy workflow |
 
-Prior work to check against code: `docs/internal/technical/security-audit-2026-06.md` (API only), `accessibility-audit.md`, `release-signing*.md`, `.claude/rules/*.md`.
+Prior work to check against code: `docs/internal/audits/security-audit-2026-06.md` (API only), `docs/quality/accessibility-audit.md`, `docs/guides/release-signing*.md`, `.claude/rules/*.md`.
 
 ## Non-negotiable rules
 
@@ -115,6 +115,6 @@ For an `all` audit in Claude Code, you may parallelize steps 5 to 13 per part (d
 
 ## Deliverable
 
-Write the report to `docs/internal/technical/audits/<YYYY-MM-DD>-platform-audit[-<scope>].md` (the only file created). Structure, finding format, severities, CVSS 4.0, P0-P3 priorities, and closing sections: [references/report-template.md](references/report-template.md). Follow it exactly.
+Write the report to `docs/internal/audits/<YYYY-MM-DD>-platform-audit[-<scope>].md` (the only file created). Structure, finding format, severities, CVSS 4.0, P0-P3 priorities, and closing sections: [references/report-template.md](references/report-template.md). Follow it exactly.
 
 At the end of the conversation, give a few lines: verdict, top 3 actions, report path, and what could not be verified.

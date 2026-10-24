@@ -162,7 +162,7 @@ Existing tests: vitest (desktop, API, packages), Playwright (`apps/desktop/e2e`)
 
 ## 19. Accessibility and technical UX
 
-WCAG 2.2 on critical paths with the keyboard only: capture overlay (keyboard-only region selection?), editor tools, dialogs, focus, labels, contrast, screen reader announcements, reduced motion. Compare with `docs/internal/technical/accessibility-audit.md`. Technical UX: feedback after capture/copy/share, destructive confirmations (delete, revoke), loading/empty/offline/error states, data loss on crash.
+WCAG 2.2 on critical paths with the keyboard only: capture overlay (keyboard-only region selection?), editor tools, dialogs, focus, labels, contrast, screen reader announcements, reduced motion. Compare with `docs/quality/accessibility-audit.md`. Technical UX: feedback after capture/copy/share, destructive confirmations (delete, revoke), loading/empty/offline/error states, data loss on crash.
 
 ## 20. API contracts, dates, i18n, configuration
 

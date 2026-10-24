@@ -1,121 +1,74 @@
 # SnapGlow
 
-Privacy-first screenshot app — capture, beautify, and share. Local-first; optional cloud links (Sprint 2b.5).
+Privacy-first screenshot app: capture, beautify, share. Everything runs on your machine. Cloud links exist, but only when you ask for one.
 
-## Monorepo
+## Repository layout
 
-| Path | Description |
-|------|-------------|
-| `apps/desktop` | Tauri v2 + React (menu-bar desktop app) |
-| `apps/web` | TanStack Start landing + public share viewer (`/s/:token`) |
-| `apps/mobile` | Expo SDK 56 + React Native (`@snapglow/mobile`) |
-| `apps/api` | Fastify API — cloud shares, Auth0 JWT (`@snapglow/api`) |
-| `packages/cloud-core` | Share types, expiry helpers (api + web + desktop) |
-| `packages/design-tokens` | DTCG design tokens → CSS / Tailwind + `tokens.native` |
-| `packages/ui` | Shared React web components + Storybook |
-| `packages/ui-native` | Shared React Native components |
-| `packages/editor-core` | Shared editor logic (layout, presets, annotations) |
-| `packages/redaction-core` | On-device detectors + layout mapping (desktop + mobile) |
-| `packages/style-suggestion-core` | Content class → style mapping (desktop) |
-| `packages/ocr-core` | OCR types + text assembly helpers (desktop copy-text) |
-| `packages/biome-config` | Shared Biome lint/format config |
-| `packages/typescript-config` | Shared TypeScript configs |
+pnpm + Turborepo monorepo, with Node and Rust pinned by [mise](https://mise.jdx.dev/).
 
-See also [`apps/api/README.md`](apps/api/README.md) and [`.cursor/rules/api-architecture.mdc`](.cursor/rules/api-architecture.mdc).
+| Path | What it is |
+|------|------------|
+| `apps/desktop` | Tauri 2 + React menu-bar app (macOS, Windows) |
+| `apps/web` | TanStack Start landing page and public share viewer (`/s/:token`) |
+| `apps/mobile` | Expo SDK 56 + React Native |
+| `apps/api` | Fastify cloud API (shares, Auth0, teams, billing, collab WebSocket) |
+| `apps/vscode-extension` | VS Code capture and beautify plugin |
+| `apps/figma-plugin` | Figma frame import and export |
+| `apps/notion-embed` | Notion OAuth and embeds |
+| `packages/design-tokens` | DTCG tokens, built to CSS and native |
+| `packages/ui`, `packages/ui-native` | Shared React and React Native components |
+| `packages/*-core` | Shared domain libraries (editor, redaction, cloud, collab, sync, team, and more) |
+| `packages/sdk` | Official REST API client |
+| `packages/i18n` | Translations |
+| `packages/biome-config`, `packages/typescript-config` | Shared tooling config |
 
-## Prerequisites
+## Getting started
 
-- [mise](https://mise.jdx.dev/) (recommended) - installs Node 24, pnpm 9, Rust stable
-- Or manually: Node ≥ 24, pnpm 9, Rust stable
-
-## Quick start
+Requires [mise](https://mise.jdx.dev/). It installs Node 24, pnpm 9 and stable Rust. Without mise: Node 24 or later, pnpm 9, Rust stable.
 
 ```bash
 mise trust
 mise install
 mise run install
 mise run install-hooks
-mise run tokens:build
-mise run dev:desktop   # or: mise run dev:web, mise run dev:mobile, mise run dev:api
+mise run tokens:build       # once, before the first dev run
+mise run dev:desktop        # or dev:web, dev:mobile, dev:api
 ```
 
-## Scripts (via mise)
+Use `pnpm`, not `npm` or `yarn`. Add new apps as `dev:*` mise tasks.
 
-| Command | Description |
-|---------|-------------|
-| `mise run dev:desktop` | Start Tauri dev server |
-| `mise run dev:web` | Start landing dev server (port 3000) |
-| `mise run dev:api` | Fastify API + Postgres + Redis + MinIO (port 8787) |
-| `mise run dev:mobile` | Start Expo dev client (Metro) |
-| `mise run dev:mobile:ios` | Build & run iOS simulator (development build) |
-| `mise run dev:mobile:android` | Build & run Android emulator (development build) |
-| `mise run storybook` | UI component library (port 6006) |
+## Commands
+
+| Command | What it does |
+|---------|--------------|
+| `mise run dev:desktop` | Tauri dev app |
+| `mise run dev:web` | Landing page on port 3000 |
+| `mise run dev:api` | Fastify API with Postgres, Redis and MinIO on port 8787 |
+| `mise run dev:mobile` | Expo dev client (Metro) |
+| `mise run dev:mobile:ios` / `dev:mobile:android` | Build and run on a simulator or emulator |
+| `mise run storybook` | UI component library on port 6006 |
 | `mise run tokens:build` | Build design token CSS |
-| `mise run lint` | Biome check (Turbo) |
-| `mise run typecheck` | TypeScript (Turbo) |
-| `mise run test` | Unit tests Vitest (Turbo) |
-| `mise run test:e2e:native` | Native integration tests (WebDriver on Linux/Windows; Rust tests on macOS) |
-| `mise run format` | Biome write (Turbo) |
-| `mise run build:desktop:arm64` | macOS `.dmg` (Apple Silicon) - run on macOS |
-| `mise run build:desktop:intel` | macOS `.dmg` (Intel) - run on macOS |
-| `mise run build:desktop:mac` | Both macOS `.dmg` targets - run on macOS |
-| `mise run build:desktop:windows` | Windows `.msi` + `.exe` - run on Windows |
+| `mise run lint` | Biome check |
+| `mise run typecheck` | TypeScript |
+| `mise run test` | Vitest unit tests |
+| `mise run test:e2e:native` | Native integration tests |
+| `mise run format` | Biome write |
+| `mise run build:desktop:{arm64,intel,mac,windows}` | Release builds, on the matching OS |
 
-Rust: `cd apps/desktop/src-tauri && cargo test`
+Rust tests: `cd apps/desktop/src-tauri && cargo test`. Release builds, CI releases and mobile dev builds: [`docs/guides/desktop-builds.md`](docs/guides/desktop-builds.md).
 
-### Desktop release builds
+## Documentation
 
-Build on the **same OS** as the target (cross-compiling Windows from macOS is not supported here).
+Start at [`docs/README.md`](docs/README.md).
 
-**macOS** - Apple Silicon or Intel dev machine:
-
-```bash
-mise run build:desktop:arm64   # Apple Silicon testers
-mise run build:desktop:intel   # Intel Mac testers
-mise run build:desktop:mac     # both DMGs
-```
-
-Output: `apps/desktop/src-tauri/target/release/bundle/dmg/*.dmg`
-
-**Windows** - dev machine with [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) (WebView2, MSVC):
-
-```bash
-mise run build:desktop:windows
-```
-
-Output:
-
-- `apps/desktop/src-tauri/target/release/bundle/msi/*.msi`
-- `apps/desktop/src-tauri/target/release/bundle/nsis/*.exe`
-
-**All platforms via CI** - tag `v*` → draft GitHub Release with macOS (arm64 + x86_64) + Windows artifacts. Beta installs are unsigned until code-signing certs are configured - see [`docs/internal/technical/release-signing.md`](docs/internal/technical/release-signing.md).
-
-Desktop e2e:
-- Web smoke: `pnpm --filter @snapglow/desktop test:e2e`
-- Native integration: `mise run test:e2e:native` (WebDriver on Linux/Windows; Rust tests on macOS)
-
-Mobile (Expo development builds — not Expo Go):
-
-```bash
-mise run dev:mobile              # Metro dev client
-mise run dev:mobile:ios          # first run runs prebuild + simulator
-mise run dev:mobile:android      # requires Android Studio + emulator
-```
-
-Requires Xcode (iOS) or Android Studio (Android). See [`.cursor/rules/mobile-architecture.mdc`](.cursor/rules/mobile-architecture.mdc).
-
-## Architecture
-
-- Module layout: `apps/desktop/src/modules/{capture,editor,export,history,redaction,settings,cloud,style-suggestion,text-extraction,balance}/`
-- ADR: [`docs/internal/technical/adr/001-monorepo-and-module-architecture.md`](docs/internal/technical/adr/001-monorepo-and-module-architecture.md)
-- ADR: [`docs/internal/technical/adr/002-design-tokens-ui-and-web.md`](docs/internal/technical/adr/002-design-tokens-ui-and-web.md)
-- ADR: [`docs/internal/technical/adr/003-desktop-ipc-and-events.md`](docs/internal/technical/adr/003-desktop-ipc-and-events.md)
-- ADR: [`docs/internal/technical/adr/004-system-integration-tray-shortcuts.md`](docs/internal/technical/adr/004-system-integration-tray-shortcuts.md)
-- ADR: [`docs/internal/technical/adr/005-distribution-updates-and-signing.md`](docs/internal/technical/adr/005-distribution-updates-and-signing.md)
-- ADR: [`docs/internal/technical/adr/009-cloud-api-and-sharing.md`](docs/internal/technical/adr/009-cloud-api-and-sharing.md)
-- Accessibility: [`docs/internal/technical/accessibility-audit.md`](docs/internal/technical/accessibility-audit.md)
-- Agent guide: [`AGENTS.md`](AGENTS.md)
+- Architecture: [desktop stack](docs/architecture/desktop-stack.md), [ADR index](docs/architecture/adr/README.md)
+- Guides: [release signing](docs/guides/release-signing.md), [mobile signing](docs/guides/release-signing-mobile.md), [Auth0 setup](docs/guides/auth0-setup.md)
+- Product: [sprint history](docs/product/sprints.md)
+- Quality: [accessibility audit](docs/quality/accessibility-audit.md)
+- Visual system: [`design.md`](design.md)
+- API: [`apps/api/README.md`](apps/api/README.md)
+- Agents and contributors: [`AGENTS.md`](AGENTS.md). Commits follow Conventional Commits, enforced by the mise hooks.
 
 ## License
 
-Private - see repository owner.
+Private. See the repository owner.

@@ -41,7 +41,7 @@ jobs:
         run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
 
       # Unsigned smoke builds only. Apple/Windows signing lives in release.yml
-      # once certs are provisioned (see docs/internal/technical/release-signing.md).
+      # once certs are provisioned (see docs/guides/release-signing.md).
       - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
