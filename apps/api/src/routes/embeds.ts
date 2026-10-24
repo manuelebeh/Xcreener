@@ -44,11 +44,6 @@ export async function registerEmbedRoutes(app: FastifyInstance, options: EmbedRo
       title: share.title ?? null,
     };
 
-    reply.header(
-      'Content-Security-Policy',
-      "frame-ancestors 'self' https://www.notion.so https://notion.so https://*.notion.so"
-    );
-
     return reply.send(response);
   });
 }
