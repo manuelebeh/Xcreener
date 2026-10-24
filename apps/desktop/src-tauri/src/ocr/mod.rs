@@ -68,7 +68,7 @@ fn resolve_tessdata_dir() -> Option<String> {
 fn needs_tesseract_for_languages(languages: &[String]) -> bool {
     languages.iter().any(|language| {
         let code = language.to_lowercase();
-        code == "deu" || code == "jpn" || code == "ger" || code == "jpn"
+        code == "deu" || code == "jpn" || code == "ger"
     })
 }
 

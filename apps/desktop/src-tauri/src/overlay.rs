@@ -326,7 +326,7 @@ where
         })
         .map_err(|error| error.to_string())?;
 
-        return rx.recv().map_err(|error| error.to_string())?;
+        rx.recv().map_err(|error| error.to_string())?
     }
 
     #[cfg(not(target_os = "macos"))]
