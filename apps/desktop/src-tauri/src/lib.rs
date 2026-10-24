@@ -1,6 +1,7 @@
 mod capture;
 mod commands;
 mod classification;
+mod cloud_auth;
 mod db;
 mod entitlement;
 mod image_processing;
@@ -29,6 +30,7 @@ use commands::{
     take_overlay_preview, take_recording_thumbnail,
     verify_entitlement,
 };
+use cloud_auth::{cloud_access_token, cloud_auth_complete, cloud_auth_start, cloud_sign_out};
 use db::{
     captures_delete, captures_get, captures_insert, captures_list, captures_list_by_collection,
     captures_list_by_tag, captures_search, captures_uid_exists, captures_update_ocr_text,
@@ -58,6 +60,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .manage(db::Db::default())
+        .manage(cloud_auth::CloudAuth::default())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -146,6 +149,10 @@ pub fn run() {
             secure_store_get,
             secure_store_set,
             secure_store_delete,
+            cloud_auth_start,
+            cloud_auth_complete,
+            cloud_access_token,
+            cloud_sign_out,
             db_init,
             settings_get,
             settings_set,

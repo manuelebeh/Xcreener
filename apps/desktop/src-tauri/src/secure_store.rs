@@ -10,11 +10,12 @@ const SERVICE: &str = "app.snapglow.desktop";
 const CHUNK_BYTES: usize = 1000;
 const MAX_CHUNKS: usize = 64;
 
-/// The only names the WebView may touch. Any other keychain entry stays out of reach.
-const ALLOWED_NAMES: &[&str] = &["cloud.tokens", "integrations.tokens"];
+/// The only names the WebView may touch. Any other keychain entry stays out of reach, including
+/// `cloud.tokens`, which only `cloud_auth` reads.
+const ALLOWED_NAMES: &[&str] = &["integrations.tokens"];
 
 fn validate_name(name: &str) -> Result<(), String> {
-    if ALLOWED_NAMES.contains(&name) || (cfg!(test) && name == "snapglow-test.roundtrip") {
+    if ALLOWED_NAMES.contains(&name) {
         Ok(())
     } else {
         Err("Invalid secret name".into())
@@ -59,8 +60,7 @@ fn delete_optional(entry: &Entry) -> Result<(), String> {
     }
 }
 
-fn get(name: &str) -> Result<Option<String>, String> {
-    validate_name(name)?;
+pub(crate) fn get(name: &str) -> Result<Option<String>, String> {
     let Some(count) = read_optional(&entry(name)?)? else {
         return Ok(None);
     };
@@ -77,8 +77,7 @@ fn get(name: &str) -> Result<Option<String>, String> {
     Ok(Some(value))
 }
 
-fn delete(name: &str) -> Result<(), String> {
-    validate_name(name)?;
+pub(crate) fn delete(name: &str) -> Result<(), String> {
     let count = read_optional(&entry(name)?)?
         .and_then(|raw| raw.parse::<usize>().ok())
         .unwrap_or(0)
@@ -89,8 +88,7 @@ fn delete(name: &str) -> Result<(), String> {
     delete_optional(&entry(name)?)
 }
 
-fn set(name: &str, value: &str) -> Result<(), String> {
-    validate_name(name)?;
+pub(crate) fn set(name: &str, value: &str) -> Result<(), String> {
     let chunks = split_chunks(value);
     if chunks.len() > MAX_CHUNKS {
         return Err("Secret too large".into());
@@ -108,23 +106,32 @@ fn set(name: &str, value: &str) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn secure_store_get(name: String) -> Result<Option<String>, String> {
-    tauri::async_runtime::spawn_blocking(move || get(&name))
-        .await
-        .map_err(|error| error.to_string())?
+    tauri::async_runtime::spawn_blocking(move || {
+        validate_name(&name)?;
+        get(&name)
+    })
+    .await
+    .map_err(|error| error.to_string())?
 }
 
 #[tauri::command]
 pub async fn secure_store_set(name: String, value: String) -> Result<(), String> {
-    tauri::async_runtime::spawn_blocking(move || set(&name, &value))
-        .await
-        .map_err(|error| error.to_string())?
+    tauri::async_runtime::spawn_blocking(move || {
+        validate_name(&name)?;
+        set(&name, &value)
+    })
+    .await
+    .map_err(|error| error.to_string())?
 }
 
 #[tauri::command]
 pub async fn secure_store_delete(name: String) -> Result<(), String> {
-    tauri::async_runtime::spawn_blocking(move || delete(&name))
-        .await
-        .map_err(|error| error.to_string())?
+    tauri::async_runtime::spawn_blocking(move || {
+        validate_name(&name)?;
+        delete(&name)
+    })
+    .await
+    .map_err(|error| error.to_string())?
 }
 
 #[cfg(test)]
@@ -144,8 +151,8 @@ mod tests {
 
     #[test]
     fn accepts_only_allowlisted_names() {
-        assert!(validate_name("cloud.tokens").is_ok());
         assert!(validate_name("integrations.tokens").is_ok());
+        assert!(validate_name("cloud.tokens").is_err());
         assert!(validate_name("").is_err());
         assert!(validate_name("../etc").is_err());
         assert!(validate_name("cloud.tokens.0").is_err());
