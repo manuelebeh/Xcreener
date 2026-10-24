@@ -1,10 +1,9 @@
+import { MAX_COLLAB_ANNOTATIONS } from '@snapglow/api-core';
 import type { AnnotationOp, CollabDocumentState } from '@snapglow/collab-core';
 import type { Annotation } from '@snapglow/editor-core';
 import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from '../db/schema';
-
-export const MAX_COLLAB_ANNOTATIONS = 500;
 
 const ANNOTATION_OP_TYPES = new Set(['add', 'update', 'remove', 'batch']);
 

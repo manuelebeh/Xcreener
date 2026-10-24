@@ -4,6 +4,7 @@ import {
   type CaptureResponse,
   type ExportCaptureResponse,
   exportCaptureSchema,
+  MAX_RENDER_PIXELS,
   type PublishCaptureResponse,
 } from '@snapglow/api-core';
 import {
@@ -189,12 +190,16 @@ export async function registerPublicCaptureRoutes(
       ? parseTagsField('value' in tagsField ? tagsField.value : tagsField)
       : [];
 
+    const dims = await readImageDimensions(buffer);
+    if (dims.width * dims.height > MAX_RENDER_PIXELS) {
+      return reply.code(413).send({ error: 'Image too large to render' });
+    }
+
     const captureId = crypto.randomUUID();
     const storageKey = `api-captures/${workspaceId}/${captureId}`;
 
     await options.storage.uploadObject(storageKey, buffer, mimeType);
 
-    const dims = await readImageDimensions(buffer);
     const state = defaultCollabDocumentState(dims.width, dims.height);
 
     const rows = await options.db
