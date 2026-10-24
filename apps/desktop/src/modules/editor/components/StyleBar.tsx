@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { Segmented } from '@/shared/components/Segmented';
 import { SliderField } from '@/shared/components/SliderField';
 import { DEFAULT_SOLID_COLOR, GRADIENT_PRESETS } from '../engine/gradients';
@@ -20,7 +20,13 @@ function backgroundTabFromConfig(background: BackgroundConfig): BackgroundTab {
   return background.type;
 }
 
-export function StyleBar({ embedded = false }: { embedded?: boolean }) {
+interface StyleBarProps {
+  embedded?: boolean;
+  /** Margin controls shown under Padding (Balance), passed in to keep modules decoupled. */
+  marginControls?: ReactNode;
+}
+
+export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
   const background = useEditorStore((s) => s.background);
   const padding = useEditorStore((s) => s.padding);
   const borderRadius = useEditorStore((s) => s.borderRadius);
@@ -180,6 +186,7 @@ export function StyleBar({ embedded = false }: { embedded?: boolean }) {
           max={200}
           onChange={setPadding}
         />
+        {marginControls}
         <SliderField
           label="Corner radius"
           readout={`${borderRadius}px`}

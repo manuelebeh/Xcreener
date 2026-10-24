@@ -46,27 +46,30 @@ export function RedactionBar({ embedded = false }: { embedded?: boolean }) {
           </div>
         </div>
       ) : (
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            onClick={() => void scan()}
-            disabled={status === 'scanning'}
-            data-testid="redaction-scan-button"
-          >
-            {status === 'scanning' ? 'Scanning…' : 'Scan'}
-          </Button>
-          {detections.length > 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-foreground">Sensitive data</span>
+          <span className="flex items-center gap-2">
             <Button
               type="button"
               size="sm"
-              onClick={() => maskAll(false)}
-              data-testid="redaction-mask-all-button"
+              variant="secondary"
+              onClick={() => void scan()}
+              disabled={status === 'scanning'}
+              data-testid="redaction-scan-button"
             >
-              Mask all ({detections.length})
+              {status === 'scanning' ? 'Scanning…' : 'Scan'}
             </Button>
-          ) : null}
+            {detections.length > 0 ? (
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => maskAll(false)}
+                data-testid="redaction-mask-all-button"
+              >
+                Mask all ({detections.length})
+              </Button>
+            ) : null}
+          </span>
         </div>
       )}
 
