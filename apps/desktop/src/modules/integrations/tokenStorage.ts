@@ -3,6 +3,8 @@ import { readSecret, writeSecret } from '@/shared/lib/secureStorage';
 
 export interface StoredIntegrationToken {
   accessToken: string;
+  /** Sealed by the API; only `POST /v1/integrations/:provider/refresh` can use it. */
+  refreshHandle?: string | null;
   expiresAt?: string | null;
   accountLabel?: string;
   metadata?: Record<string, string>;
@@ -29,7 +31,7 @@ export async function loadIntegrationTokens(): Promise<TokenMap> {
     return {};
   }
 
-  // Older versions also kept the provider refresh token, which nothing on desktop uses.
+  // Older versions kept the raw provider refresh token here; refresh now goes through the API.
   const entries = Object.values(tokens);
   if (entries.some((token) => token && 'refreshToken' in token)) {
     for (const token of entries) {
