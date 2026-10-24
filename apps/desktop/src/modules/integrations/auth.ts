@@ -93,7 +93,6 @@ export async function handleIntegrationCallback(
 
   const payload = (await response.json()) as {
     accessToken: string;
-    refreshToken?: string | null;
     expiresAt?: string | null;
     workspaceName?: string | null;
     metadata?: Record<string, string>;
@@ -101,7 +100,6 @@ export async function handleIntegrationCallback(
 
   const stored: StoredIntegrationToken = {
     accessToken: payload.accessToken,
-    refreshToken: payload.refreshToken ?? null,
     expiresAt: payload.expiresAt ?? null,
     accountLabel: payload.workspaceName ?? provider,
     metadata: payload.metadata,
