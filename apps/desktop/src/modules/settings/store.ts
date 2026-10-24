@@ -20,6 +20,7 @@ interface SettingsState extends AppSettings {
   setWatermarkPosition: (watermarkPosition: WatermarkPosition) => void;
   setWatermarkOpacity: (watermarkOpacity: number) => void;
   setUseTeamBrandKit: (useTeamBrandKit: boolean) => void;
+  setCloudLibrarySync: (cloudLibrarySync: boolean) => void;
   setLicenseSource: (licenseSource: AppSettings['licenseSource']) => void;
   setPartnerCode: (partnerCode: string) => void;
   hydrate: (settings: Partial<AppSettings>) => void;
@@ -44,6 +45,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setWatermarkPosition: (watermarkPosition) => set({ watermarkPosition }),
   setWatermarkOpacity: (watermarkOpacity) => set({ watermarkOpacity }),
   setUseTeamBrandKit: (useTeamBrandKit) => set({ useTeamBrandKit }),
+  setCloudLibrarySync: (cloudLibrarySync) => set({ cloudLibrarySync }),
   setLicenseSource: (licenseSource) => set({ licenseSource }),
   setPartnerCode: (partnerCode) => set({ partnerCode }),
   hydrate: (settings) => set((state) => ({ ...state, ...settings })),

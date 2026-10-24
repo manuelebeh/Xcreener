@@ -3,6 +3,7 @@ import { DEFAULT_APP_SETTINGS, SETTING_KEYS } from '@/shared/types/settings';
 import { ensureDbInitialized, getDb } from './connection';
 import migration001 from './migrations/001_init.sql?raw';
 import migration002 from './migrations/002_library_ocr.sql?raw';
+import migration003 from './migrations/003_capture_uid.sql?raw';
 
 const DEFAULT_SETTING_ENTRIES: Record<string, string> = {
   [SETTING_KEYS.theme]: DEFAULT_APP_SETTINGS.theme,
@@ -27,6 +28,7 @@ const DEFAULT_SETTING_ENTRIES: Record<string, string> = {
 const MIGRATIONS: { version: number; sql: string }[] = [
   { version: 1, sql: migration001 },
   { version: 2, sql: migration002 },
+  { version: 3, sql: migration003 },
 ];
 
 /**

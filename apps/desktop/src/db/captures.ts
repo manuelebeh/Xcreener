@@ -47,6 +47,8 @@ export interface InsertCaptureInput {
   fileSize: number;
   format?: string;
   tags?: string[];
+  /** Cross-device id sent to the cloud library as `localId`. Generated when omitted. */
+  uid?: string;
 }
 
 function parseTags(raw: string | null): string[] {
@@ -88,8 +90,8 @@ export async function insertCapture(input: InsertCaptureInput): Promise<number> 
   const db = await getReadyDb();
   const tagsJson = JSON.stringify(input.tags ?? []);
   const result = await db.execute(
-    `INSERT INTO captures (filename, filepath, thumbnail, width, height, format, file_size, tags)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO captures (filename, filepath, thumbnail, width, height, format, file_size, tags, uid)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       input.filename,
       input.filepath,
@@ -99,6 +101,7 @@ export async function insertCapture(input: InsertCaptureInput): Promise<number> 
       input.format ?? 'png',
       input.fileSize,
       tagsJson,
+      input.uid ?? crypto.randomUUID(),
     ]
   );
 
@@ -227,6 +230,14 @@ export async function getCapture(id: number): Promise<StoredCapture | null> {
   );
   const row = rows[0];
   return row ? rowToStored(row) : null;
+}
+
+export async function captureUidExists(uid: string): Promise<boolean> {
+  const db = await getReadyDb();
+  const rows = await db.select<{ id: number }[]>('SELECT id FROM captures WHERE uid = ? LIMIT 1', [
+    uid,
+  ]);
+  return rows.length > 0;
 }
 
 export async function deleteCaptureRow(id: number): Promise<StoredCapture | null> {

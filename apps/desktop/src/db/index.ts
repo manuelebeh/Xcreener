@@ -63,6 +63,7 @@ export async function loadAppSettings(): Promise<AppSettings> {
     watermarkOpacity,
     activeWorkspaceId,
     useTeamBrandKit,
+    cloudLibrarySync,
   ] = await Promise.all([
     getSetting(SETTING_KEYS.theme),
     getSetting(SETTING_KEYS.locale),
@@ -84,6 +85,7 @@ export async function loadAppSettings(): Promise<AppSettings> {
     getSetting(SETTING_KEYS.watermarkOpacity),
     getSetting(SETTING_KEYS.activeWorkspaceId),
     getSetting(SETTING_KEYS.useTeamBrandKit),
+    getSetting(SETTING_KEYS.cloudLibrarySync),
   ]);
 
   const resolvedTheme =
@@ -142,5 +144,6 @@ export async function loadAppSettings(): Promise<AppSettings> {
       : DEFAULT_APP_SETTINGS.watermarkOpacity,
     activeWorkspaceId: activeWorkspaceId ?? DEFAULT_APP_SETTINGS.activeWorkspaceId,
     useTeamBrandKit: parseBoolean(useTeamBrandKit, DEFAULT_APP_SETTINGS.useTeamBrandKit),
+    cloudLibrarySync: parseBoolean(cloudLibrarySync, DEFAULT_APP_SETTINGS.cloudLibrarySync),
   };
 }

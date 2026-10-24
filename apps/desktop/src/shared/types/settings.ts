@@ -30,6 +30,8 @@ export interface AppSettings extends WatermarkSettings {
   ocrLanguages: string;
   activeWorkspaceId: string;
   useTeamBrandKit: boolean;
+  /** Upload each new capture to the personal cloud library. Off unless the user opts in. */
+  cloudLibrarySync: boolean;
 }
 
 export const DEFAULT_APP_SETTINGS: AppSettings = {
@@ -53,6 +55,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   watermarkOpacity: 45,
   activeWorkspaceId: '',
   useTeamBrandKit: true,
+  cloudLibrarySync: false,
 };
 
 export const SETTING_KEYS = {
@@ -76,6 +79,7 @@ export const SETTING_KEYS = {
   watermarkOpacity: 'watermarkOpacity',
   activeWorkspaceId: 'activeWorkspaceId',
   useTeamBrandKit: 'useTeamBrandKit',
+  cloudLibrarySync: 'cloudLibrarySync',
   brandKitCache: 'brandKitCache',
   entitlementToken: 'entitlementToken',
 } as const;

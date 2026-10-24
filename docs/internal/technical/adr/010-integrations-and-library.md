@@ -20,7 +20,7 @@ Sprint 2b.5 delivered Auth0 cloud sharing. Sprint 2b.6 adds third-party send tar
 ### Hybrid library (CL-012)
 
 - **Local:** SQLite `ocr_text` + FTS5 (`captures_fts`), async OCR after `persistCapture`
-- **Cloud (opt-in via Auth0):** Postgres `library_items` + `collections`, background upload in `syncLibrary.ts`, Postgres `to_tsvector` search
+- **Cloud (opt-in):** Postgres `library_items` + `collections`, Postgres `to_tsvector` search. Background upload in `syncLibrary.ts` runs only when the user turns on "Back up new captures" in settings (`cloudLibrarySync`, default off); signing in alone uploads nothing. Background uploads always go to the personal library, never to the active workspace (2026-10-24 audit, FINDING-001).
 - **UI:** History renamed **Library** — OCR search, tag/collection filters, cloud results when signed in
 
 ### Tags & collections (CL-013)
