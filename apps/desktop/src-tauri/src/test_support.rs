@@ -14,6 +14,10 @@ struct CaptureImagePayload {
 
 #[tauri::command]
 pub fn e2e_show_main_window(app: AppHandle) -> Result<(), String> {
+    if !cfg!(debug_assertions) {
+        return Err("e2e helpers are only available in debug builds".into());
+    }
+
     crate::tray::show_main_window(&app);
     Ok(())
 }
@@ -79,6 +83,10 @@ pub fn e2e_file_metadata(path: String) -> Result<(bool, u64), String> {
 
 #[tauri::command]
 pub fn e2e_hide_main_window(app: AppHandle) -> Result<(), String> {
+    if !cfg!(debug_assertions) {
+        return Err("e2e helpers are only available in debug builds".into());
+    }
+
     if let Some(window) = app.get_webview_window("main") {
         window.hide().map_err(|error| error.to_string())?;
     }
@@ -87,6 +95,10 @@ pub fn e2e_hide_main_window(app: AppHandle) -> Result<(), String> {
 
 #[tauri::command]
 pub fn e2e_is_main_window_visible(app: AppHandle) -> Result<bool, String> {
+    if !cfg!(debug_assertions) {
+        return Err("e2e helpers are only available in debug builds".into());
+    }
+
     app.get_webview_window("main")
         .ok_or_else(|| "main window not found".to_string())?
         .is_visible()
