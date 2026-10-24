@@ -246,6 +246,23 @@ pub(crate) fn find_monitor_for_region<'a>(
     })
 }
 
+/// macOS reports monitor geometry in points while `capture_image` returns device pixels.
+/// Scaling captures to the densest monitor keeps Retina pixels instead of halving them.
+fn capture_pixel_scale(monitors: &[MonitorInfo]) -> f64 {
+    if cfg!(target_os = "macos") {
+        monitors
+            .iter()
+            .map(|monitor| monitor.scale_factor)
+            .fold(1.0, f64::max)
+    } else {
+        1.0
+    }
+}
+
+fn scale_px(value: u32, scale: f64) -> u32 {
+    (f64::from(value) * scale).round() as u32
+}
+
 fn normalize_monitor_image(image: RgbaImage, width: u32, height: u32) -> RgbaImage {
     if image.width() == width && image.height() == height {
         image
@@ -265,7 +282,10 @@ pub fn capture_desktop_preview() -> Result<Vec<u8>, CaptureError> {
         return Err(CaptureError::InvalidDimensions);
     }
 
-    let mut canvas = RgbaImage::new(bounds.width, bounds.height);
+    let scale = capture_pixel_scale(&monitors);
+    let canvas_width = scale_px(bounds.width, scale);
+    let canvas_height = scale_px(bounds.height, scale);
+    let mut canvas = RgbaImage::new(canvas_width, canvas_height);
 
     for monitor_info in &monitors {
         let monitor_image = {
@@ -281,22 +301,17 @@ pub fn capture_desktop_preview() -> Result<Vec<u8>, CaptureError> {
                     .ok_or(CaptureError::DisplayNotFound(monitor_info.id))?;
                 normalize_monitor_image(
                     xcap_monitor.capture_image().map_err(map_xcap_error)?,
-                    monitor_info.width,
-                    monitor_info.height,
+                    scale_px(monitor_info.width, scale),
+                    scale_px(monitor_info.height, scale),
                 )
             }
         };
-        let dest_x = monitor_info.x - bounds.x;
-        let dest_y = monitor_info.y - bounds.y;
-        imageops::replace(
-            &mut canvas,
-            &monitor_image,
-            i64::from(dest_x),
-            i64::from(dest_y),
-        );
+        let dest_x = (f64::from(monitor_info.x - bounds.x) * scale).round() as i64;
+        let dest_y = (f64::from(monitor_info.y - bounds.y) * scale).round() as i64;
+        imageops::replace(&mut canvas, &monitor_image, dest_x, dest_y);
     }
 
-    encode_png(canvas.as_raw(), bounds.width, bounds.height)
+    encode_png(canvas.as_raw(), canvas_width, canvas_height)
 }
 
 pub fn capture_region(x: i32, y: i32, width: u32, height: u32) -> Result<Vec<u8>, CaptureError> {
@@ -341,8 +356,76 @@ pub fn capture_window(window_id: u64) -> Result<Vec<u8>, CaptureError> {
             .unwrap_or(false)
     }).ok_or(CaptureError::WindowNotFound(window_id))?;
 
-    let image = window.capture_image().map_err(map_xcap_error)?;
+    #[cfg_attr(not(target_os = "macos"), allow(unused_mut))]
+    let mut image = window.capture_image().map_err(map_xcap_error)?;
+    #[cfg(target_os = "macos")]
+    {
+        unpremultiply_alpha(&mut image);
+        flatten_window_corners(&mut image);
+    }
     encode_png(image.as_raw(), image.width(), image.height())
+}
+
+/// CGWindowListCreateImage returns premultiplied pixels; PNG stores straight alpha.
+/// Without this the anti-aliased rounded window corners get a dark fringe.
+#[cfg(target_os = "macos")]
+fn unpremultiply_alpha(image: &mut RgbaImage) {
+    for pixel in image.pixels_mut() {
+        let alpha = u16::from(pixel[3]);
+        if alpha == 0 || alpha == 255 {
+            continue;
+        }
+        for channel in 0..3 {
+            let value = (u16::from(pixel[channel]) * 255 + alpha / 2) / alpha;
+            pixel[channel] = value.min(255) as u8;
+        }
+    }
+}
+
+/// Pixels inward from a row's first opaque pixel to sample the fill color, past the
+/// window's anti-aliased outline.
+#[cfg(target_os = "macos")]
+const CORNER_FILL_INSET: usize = 4;
+
+/// macOS window captures have transparent rounded corners. Fill each row's transparent
+/// ends with that row's edge color so the capture is a plain rectangle; the editor's
+/// corner radius is the only rounding. Remaining translucent pixels (vibrancy) become opaque.
+#[cfg(target_os = "macos")]
+fn flatten_window_corners(image: &mut RgbaImage) {
+    let width = image.width() as usize;
+    for y in 0..image.height() {
+        let alphas: Vec<u8> = (0..width)
+            .map(|x| image.get_pixel(x as u32, y)[3])
+            .collect();
+        let Some(first) = alphas.iter().position(|&alpha| alpha == 255) else {
+            continue;
+        };
+        let last = alphas
+            .iter()
+            .rposition(|&alpha| alpha == 255)
+            .unwrap_or(first);
+
+        let left_fill = *image.get_pixel((first + CORNER_FILL_INSET).min(last) as u32, y);
+        let right_fill =
+            *image.get_pixel(last.saturating_sub(CORNER_FILL_INSET).max(first) as u32, y);
+        for x in (0..first).chain(last + 1..width) {
+            let fill = if x < first { left_fill } else { right_fill };
+            let pixel = image.get_pixel_mut(x as u32, y);
+            let alpha = u16::from(pixel[3]);
+            for channel in 0..3 {
+                let blended = (u16::from(pixel[channel]) * alpha
+                    + u16::from(fill[channel]) * (255 - alpha)
+                    + 127)
+                    / 255;
+                pixel[channel] = blended as u8;
+            }
+            pixel[3] = 255;
+        }
+    }
+
+    for pixel in image.pixels_mut() {
+        pixel[3] = 255;
+    }
 }
 
 pub fn capture_fullscreen(display_id: u32) -> Result<Vec<u8>, CaptureError> {
@@ -357,10 +440,11 @@ pub fn capture_fullscreen(display_id: u32) -> Result<Vec<u8>, CaptureError> {
     let monitor = xcap_monitors
         .get(display_id as usize)
         .ok_or(CaptureError::DisplayNotFound(display_id))?;
+    let scale = capture_pixel_scale(std::slice::from_ref(monitor_info));
     let image = normalize_monitor_image(
         monitor.capture_image().map_err(map_xcap_error)?,
-        monitor_info.width,
-        monitor_info.height,
+        scale_px(monitor_info.width, scale),
+        scale_px(monitor_info.height, scale),
     );
 
     encode_png(image.as_raw(), image.width(), image.height())
@@ -430,6 +514,64 @@ mod tests {
 
         assert_eq!(local_to_screen(120, 80, &bounds), (2040, 80));
         assert_eq!(screen_to_local(2040, 80, &bounds), (120, 80));
+    }
+
+    #[test]
+    #[cfg(target_os = "macos")]
+    fn capture_scale_uses_densest_monitor_on_macos() {
+        let monitor = |scale_factor| MonitorInfo {
+            id: 0,
+            name: "A".into(),
+            x: 0,
+            y: 0,
+            width: 1512,
+            height: 982,
+            scale_factor,
+            is_primary: true,
+        };
+
+        let scale = capture_pixel_scale(&[monitor(1.0), monitor(2.0)]);
+        assert_eq!(scale, 2.0);
+        assert_eq!(scale_px(1512, scale), 3024);
+    }
+
+    #[test]
+    #[cfg(target_os = "macos")]
+    fn unpremultiplies_partial_alpha() {
+        let mut image = RgbaImage::from_raw(
+            3,
+            1,
+            vec![
+                0, 0, 0, 0, // transparent
+                64, 32, 0, 128, // half alpha, premultiplied
+                10, 20, 30, 255, // opaque
+            ],
+        )
+        .unwrap();
+
+        unpremultiply_alpha(&mut image);
+
+        assert_eq!(
+            image.as_raw(),
+            &vec![0, 0, 0, 0, 128, 64, 0, 128, 10, 20, 30, 255]
+        );
+    }
+
+    #[test]
+    #[cfg(target_os = "macos")]
+    fn flattens_transparent_window_corners_with_row_color() {
+        // One row: transparent, half-alpha, then opaque blue, ending transparent.
+        let mut row = vec![0, 0, 0, 0, 255, 255, 255, 128];
+        row.extend([0, 0, 200, 255].repeat(6));
+        row.extend([0, 0, 0, 0]);
+        let mut image = RgbaImage::from_raw(9, 1, row).unwrap();
+
+        flatten_window_corners(&mut image);
+
+        assert_eq!(image.get_pixel(0, 0).0, [0, 0, 200, 255]);
+        assert_eq!(image.get_pixel(1, 0).0, [128, 128, 228, 255]);
+        assert_eq!(image.get_pixel(8, 0).0, [0, 0, 200, 255]);
+        assert!(image.pixels().all(|pixel| pixel[3] == 255));
     }
 
     fn get_overlay_bounds_from_monitors(monitors: &[MonitorInfo]) -> CaptureOverlayBounds {
