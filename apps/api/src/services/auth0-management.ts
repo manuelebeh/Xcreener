@@ -8,10 +8,8 @@ interface Auth0Organization {
   name: string;
 }
 
-export async function createAuth0Organization(
-  displayName: string,
-  slug: string
-): Promise<Auth0Organization | null> {
+/** Client-credentials token for the Management API, or null when M2M secrets are not set. */
+async function getManagementToken(): Promise<string | null> {
   if (!env.AUTH0_MANAGEMENT_CLIENT_ID || !env.AUTH0_MANAGEMENT_CLIENT_SECRET) {
     return null;
   }
@@ -33,14 +31,22 @@ export async function createAuth0Organization(
   }
 
   const tokenPayload = (await tokenResponse.json()) as { access_token?: string };
-  if (!tokenPayload.access_token) {
+  return tokenPayload.access_token ?? null;
+}
+
+export async function createAuth0Organization(
+  displayName: string,
+  slug: string
+): Promise<Auth0Organization | null> {
+  const accessToken = await getManagementToken();
+  if (!accessToken) {
     return null;
   }
 
   const orgResponse = await fetch(`https://${env.AUTH0_DOMAIN}/api/v2/organizations`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${tokenPayload.access_token}`,
+      Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -55,6 +61,24 @@ export async function createAuth0Organization(
   }
 
   return (await orgResponse.json()) as Auth0Organization;
+}
+
+/** Deletes the Auth0 identity. Returns false when M2M secrets are missing or Auth0 refuses. */
+export async function deleteAuth0User(auth0Sub: string): Promise<boolean> {
+  const accessToken = await getManagementToken();
+  if (!accessToken) {
+    return false;
+  }
+
+  const response = await fetch(
+    `https://${env.AUTH0_DOMAIN}/api/v2/users/${encodeURIComponent(auth0Sub)}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${accessToken}` },
+      signal: AbortSignal.timeout(10_000),
+    }
+  );
+  return response.ok;
 }
 
 export async function resolveWorkspaceByAuth0OrgId(
