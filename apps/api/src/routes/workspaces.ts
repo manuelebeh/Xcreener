@@ -503,7 +503,9 @@ export async function registerWorkspaceRoutes(
         return reply.code(410).send({ error: 'Invitation expired' });
       }
 
-      if (invitation.email && user.email?.toLowerCase() !== invitation.email.toLowerCase()) {
+      // Compare with this token's verified email: the stored one may predate verification.
+      const verifiedEmail = authUser.email?.toLowerCase();
+      if (invitation.email && verifiedEmail !== invitation.email.toLowerCase()) {
         return reply.code(403).send({ error: 'Email does not match invitation' });
       }
 

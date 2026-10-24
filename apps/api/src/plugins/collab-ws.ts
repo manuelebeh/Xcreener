@@ -160,7 +160,7 @@ export async function registerCollabWebSocket(
             }
 
             const email =
-              typeof jwtPayload.email === 'string' && jwtPayload.email_verified !== false
+              typeof jwtPayload.email === 'string' && jwtPayload.email_verified === true
                 ? jwtPayload.email
                 : null;
             const user = await upsertAuthUser(options.db, auth0Sub, email);
