@@ -12,7 +12,7 @@ import type {
   CaptureRecordingCompletePayload,
 } from '@/shared/types/ipc';
 import { bytesToImageBitmap } from '@/shared/utils/image';
-import { hideCaptureOverlay, openPath } from '@/tauri/commands';
+import { hideCaptureOverlay, openPath, takeCaptureImage } from '@/tauri/commands';
 import { useCaptureStore } from '../store';
 
 export function useCaptureSession() {
@@ -43,10 +43,11 @@ export function useCaptureSession() {
     void listen<CaptureImagePayload>('capture-image', async (event) => {
       try {
         setCaptureProgress(null);
-        const bitmap = await bytesToImageBitmap(event.payload.bytes);
+        const bytes = new Uint8Array(await takeCaptureImage());
+        const bitmap = await bytesToImageBitmap(bytes);
         setScreenshot(bitmap);
         persistCapture({
-          bytes: event.payload.bytes,
+          bytes,
           width: event.payload.width,
           height: event.payload.height,
         });

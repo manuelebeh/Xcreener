@@ -13,9 +13,9 @@ export async function maybeCompressExportBlob(
   }
 
   const originalSize = blob.size;
-  const bytes = Array.from(new Uint8Array(await blob.arrayBuffer()));
+  const bytes = new Uint8Array(await blob.arrayBuffer());
   const compressedBytes = await compressExportBytes(bytes, format, quality);
-  const compressedBlob = bytesToBlob(compressedBytes, blob.type);
+  const compressedBlob = bytesToBlob(new Uint8Array(compressedBytes), blob.type);
 
   if (compressedBlob.size >= originalSize) {
     return { blob, compressionPercent: 0 };
