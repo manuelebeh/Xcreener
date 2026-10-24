@@ -1,12 +1,13 @@
 import type { LibraryItemResponse } from '@snapglow/cloud-core';
 import { readFile } from '@tauri-apps/plugin-fs';
-import { getWorkspaceHeaders } from '@/modules/team/headers';
+import { useSettingsStore } from '@/modules/settings/store';
 import { getValidAccessToken } from './auth';
 import { getApiUrl } from './config';
 import { useCloudAuthStore } from './store';
 
 export interface SyncLibraryInput {
-  captureId: number;
+  /** The capture's `uid`, stable across devices (not the per-installation numeric id). */
+  localId: string;
   filepath: string;
   filename: string;
   ocrText?: string | null;
@@ -22,8 +23,15 @@ function enqueueSync(task: () => Promise<void>): void {
   });
 }
 
+/**
+ * Background backup of a new capture. Runs only when the user turned on library backup, and
+ * always targets the personal library: sharing into a workspace is an explicit per-item action.
+ */
 export function syncCaptureToLibrary(input: SyncLibraryInput): void {
   if (!useCloudAuthStore.getState().isAuthenticated) {
+    return;
+  }
+  if (!useSettingsStore.getState().cloudLibrarySync) {
     return;
   }
 
@@ -37,7 +45,7 @@ export function syncCaptureToLibrary(input: SyncLibraryInput): void {
     const blob = new Blob([bytes], { type: input.mimeType ?? 'image/png' });
     const formData = new FormData();
     formData.append('file', blob, input.filename);
-    formData.append('localId', String(input.captureId));
+    formData.append('localId', input.localId);
     if (input.ocrText) {
       formData.append('ocrText', input.ocrText);
     }
@@ -50,7 +58,6 @@ export function syncCaptureToLibrary(input: SyncLibraryInput): void {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        ...getWorkspaceHeaders(),
       },
       body: formData,
     });

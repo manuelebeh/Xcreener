@@ -7,7 +7,7 @@ import {
   type UserSettingsResponse,
 } from '@snapglow/sync-core';
 import { setSetting } from '@/db';
-import { getCapture, insertCapture, pruneCaptures } from '@/db/captures';
+import { captureUidExists, getCapture, insertCapture, pruneCaptures } from '@/db/captures';
 import { writeCaptureFiles } from '@/modules/history/utils/captureFiles';
 import { useSettingsStore } from '@/modules/settings/store';
 import { getWorkspaceHeaders } from '@/modules/team/headers';
@@ -65,7 +65,20 @@ async function readImageDimensions(bytes: Uint8Array): Promise<{ width: number; 
   return dimensions;
 }
 
-async function importSyncedLibraryItem(
+/** Items uploaded before captures had a `uid` carry the uploader's numeric SQLite id. */
+function isLegacyNumericLocalId(localId: string): boolean {
+  return /^\d+$/.test(localId);
+}
+
+async function hasLocalCopy(localId: string): Promise<boolean> {
+  if (isLegacyNumericLocalId(localId)) {
+    return (await getCapture(Number(localId))) !== null;
+  }
+  return captureUidExists(localId);
+}
+
+/** @internal Exported for tests. */
+export async function importSyncedLibraryItem(
   item: SyncLibraryItem,
   pulledIds: Set<string>
 ): Promise<boolean> {
@@ -77,12 +90,9 @@ async function importSyncedLibraryItem(
     return false;
   }
 
-  if (item.localId) {
-    const existing = await getCapture(Number(item.localId));
-    if (existing) {
-      pulledIds.add(item.id);
-      return false;
-    }
+  if (item.localId && (await hasLocalCopy(item.localId))) {
+    pulledIds.add(item.id);
+    return false;
   }
 
   const response = await fetch(item.assetUrl);
@@ -105,6 +115,7 @@ async function importSyncedLibraryItem(
     fileSize: bytes.length,
     format: item.mimeType.includes('jpeg') || item.mimeType.includes('jpg') ? 'jpg' : 'png',
     tags: item.tags,
+    uid: item.localId && !isLegacyNumericLocalId(item.localId) ? item.localId : crypto.randomUUID(),
   });
   await pruneCaptures(30);
   pulledIds.add(item.id);

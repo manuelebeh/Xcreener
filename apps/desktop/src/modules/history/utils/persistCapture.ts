@@ -54,7 +54,9 @@ async function persistCaptureInternal(input: PersistCaptureInput): Promise<void>
   );
 
   const filename = generateCaptureFilename(now);
+  const uid = crypto.randomUUID();
   const captureId = await insertCapture({
+    uid,
     filename,
     filepath: capturePath,
     thumbnail: thumbnailPath,
@@ -71,7 +73,7 @@ async function persistCaptureInternal(input: PersistCaptureInput): Promise<void>
 
   const ocrText = await indexCaptureOcr(captureId, pngBytes);
   syncCaptureToLibrary({
-    captureId,
+    localId: uid,
     filepath: capturePath,
     filename,
     mimeType: 'image/png',

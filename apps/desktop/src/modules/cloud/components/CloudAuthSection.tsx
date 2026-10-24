@@ -1,6 +1,9 @@
 import { Button } from '@snapglow/ui';
 import { useEffect } from 'react';
-import { SettingsGroup, SettingsRow } from '@/shared/components/SettingsGroup';
+import { setSetting } from '@/db';
+import { useSettingsStore } from '@/modules/settings/store';
+import { SettingsGroup, SettingsRow, SettingsToggle } from '@/shared/components/SettingsGroup';
+import { SETTING_KEYS } from '@/shared/types/settings';
 import { useCloudAuthStore } from '../store';
 import { pullCloudSync, startPeriodicSync } from '../syncPull';
 
@@ -15,6 +18,13 @@ export function CloudAuthSection() {
   const lastPulledCount = useCloudAuthStore((state) => state.lastPulledCount);
   const signIn = useCloudAuthStore((state) => state.signIn);
   const signOut = useCloudAuthStore((state) => state.signOut);
+  const cloudLibrarySync = useSettingsStore((state) => state.cloudLibrarySync);
+  const setCloudLibrarySync = useSettingsStore((state) => state.setCloudLibrarySync);
+
+  async function handleCloudLibrarySyncChange(enabled: boolean) {
+    setCloudLibrarySync(enabled);
+    await setSetting(SETTING_KEYS.cloudLibrarySync, String(enabled));
+  }
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -56,7 +66,7 @@ export function CloudAuthSection() {
       <SettingsGroup title="Cloud sharing">
         <SettingsRow
           label="SnapGlow cloud"
-          hint="Sign in to upload captures and create share links. Uploads always need your consent from the editor."
+          hint="Sign in to create share links. Nothing is uploaded unless you share a capture or turn on library backup."
           footer={error || librarySyncError ? errors : null}
         >
           <Button
@@ -93,6 +103,14 @@ export function CloudAuthSection() {
           Sign out
         </Button>
       </SettingsRow>
+      <SettingsToggle
+        id="cloud-library-sync"
+        label="Back up new captures to my cloud library"
+        hint="Uploads the original image and its recognized text to your personal library. Off by default."
+        checked={cloudLibrarySync}
+        onChange={handleCloudLibrarySyncChange}
+        testId="cloud-library-sync-toggle"
+      />
     </SettingsGroup>
   );
 }
