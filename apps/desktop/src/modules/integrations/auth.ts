@@ -81,6 +81,7 @@ export async function handleIntegrationCallback(
     },
     body: JSON.stringify({
       code,
+      state,
       redirectUri: getIntegrationsRedirectUri(),
     }),
   });
