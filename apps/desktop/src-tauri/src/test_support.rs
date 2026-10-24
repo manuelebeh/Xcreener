@@ -1,9 +1,17 @@
 use std::path::PathBuf;
 
 use serde::Serialize;
+use tauri::ipc::Request;
 use tauri::{AppHandle, Emitter, Manager};
 
+use crate::commands::raw_ipc;
 use crate::overlay;
+
+fn parse_dimension(request: &Request<'_>, name: &str) -> Result<u32, String> {
+    raw_ipc::header(request, name)?
+        .parse()
+        .map_err(|_| format!("Invalid {name} header"))
+}
 
 #[derive(Serialize, Clone)]
 struct CaptureImagePayload {
@@ -31,18 +39,17 @@ pub fn e2e_emit_capture_triggered(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn e2e_inject_screenshot(
-    app: AppHandle,
-    png_bytes: Vec<u8>,
-    width: u32,
-    height: u32,
-) -> Result<(), String> {
+pub fn e2e_inject_screenshot(app: AppHandle, request: Request<'_>) -> Result<(), String> {
     if !cfg!(debug_assertions) {
         return Err("e2e helpers are only available in debug builds".into());
     }
 
+    let png_bytes = raw_ipc::body_bytes(&request)?;
+    let width = parse_dimension(&request, "width")?;
+    let height = parse_dimension(&request, "height")?;
+
     crate::tray::show_main_window(&app);
-    crate::commands::raw_ipc::set_pending_capture(png_bytes);
+    raw_ipc::PENDING_CAPTURE.set(png_bytes);
     app.emit(
         "capture-image",
         CaptureImagePayload {

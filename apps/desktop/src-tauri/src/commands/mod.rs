@@ -21,5 +21,7 @@ pub use entitlement::verify_entitlement;
 pub use image_processing::{analyze_content_command, compress_export_bytes_command};
 pub use ocr::recognize_text_command;
 pub use overlay_layout::get_overlay_webview_layout;
-pub use raw_ipc::{stash_capture_image, take_capture_image};
+pub use raw_ipc::{
+    stash_capture_image, take_capture_image, take_overlay_preview, take_recording_thumbnail,
+};
 pub use redaction::detect_sensitive_data;

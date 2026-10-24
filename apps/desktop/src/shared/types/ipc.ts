@@ -49,7 +49,8 @@ export interface CaptureOverlayBounds {
 export interface CaptureOverlayInitPayload {
   bounds: CaptureOverlayBounds;
   monitors: MonitorInfo[];
-  previewPng?: number[];
+  /** Bytes wait in Rust: read them with takeOverlayPreview. */
+  hasPreview?: boolean;
   liveOverlay?: boolean;
   webviewLayout?: OverlayWebviewLayout;
 }
@@ -88,7 +89,8 @@ export interface CaptureRecordingCompletePayload {
   height: number;
   durationMs: number;
   fileSize: number;
-  thumbnailPng?: number[];
+  /** Bytes wait in Rust: read them with takeRecordingThumbnail. */
+  hasThumbnail?: boolean;
 }
 
 export interface OverlayWebviewLayout {

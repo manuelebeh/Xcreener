@@ -13,8 +13,9 @@ pub struct OverlayWebviewLayout {
 pub struct CaptureOverlayInitPayload {
     pub bounds: CaptureOverlayBounds,
     pub monitors: Vec<MonitorInfo>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub preview_png: Option<Vec<u8>>,
+    /// The preview bytes wait in `raw_ipc::OVERLAY_PREVIEW` (`take_overlay_preview`).
+    #[serde(default)]
+    pub has_preview: bool,
     #[serde(default)]
     pub live_overlay: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,8 +137,9 @@ pub struct CaptureRecordingCompletePayload {
     pub height: u32,
     pub duration_ms: u32,
     pub file_size: u64,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub thumbnail_png: Option<Vec<u8>>,
+    /// The thumbnail bytes wait in `raw_ipc::RECORDING_THUMBNAIL` (`take_recording_thumbnail`).
+    #[serde(default)]
+    pub has_thumbnail: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
