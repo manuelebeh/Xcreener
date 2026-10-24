@@ -82,4 +82,6 @@ export const SETTING_KEYS = {
   cloudLibrarySync: 'cloudLibrarySync',
   brandKitCache: 'brandKitCache',
   entitlementToken: 'entitlementToken',
+  /** Internal user id the API returned with the token; the token's `sub` must match it. */
+  entitlementUserId: 'entitlementUserId',
 } as const;

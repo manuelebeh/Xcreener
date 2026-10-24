@@ -27,13 +27,15 @@ function decodeJson(segment: string): Record<string, unknown> | null {
 
 /**
  * Checks a plan token signed by the API (`GET /v1/me/entitlement`). Same rules as the desktop
- * verifier (`src-tauri/src/entitlement.rs`): EdDSA only, strict RFC 8032 signature, unexpired,
- * not issued in the future. Any failure returns null, which callers treat as the free plan.
+ * verifier (`src-tauri/src/entitlement.rs`): EdDSA only, strict RFC 8032 signature, issued
+ * to `expectedUserId` (the `userId` returned next to the token), unexpired, not issued in the
+ * future. Any failure returns null, which callers treat as the free plan.
  */
 export function verifyEntitlementToken(
   token: string,
   publicKeyBase64Url: string,
-  nowSeconds: number
+  nowSeconds: number,
+  expectedUserId: string
 ): VerifiedEntitlement | null {
   const parts = token.split('.');
   if (parts.length !== 3) {
@@ -61,7 +63,10 @@ export function verifyEntitlementToken(
   }
 
   const claims = decodeJson(claimsSegment);
-  const { plan, iat, exp } = claims ?? {};
+  const { sub, plan, iat, exp } = claims ?? {};
+  if (sub !== expectedUserId) {
+    return null;
+  }
   if (typeof plan !== 'string' || !isWorkspacePlan(plan)) {
     return null;
   }

@@ -25,6 +25,7 @@ export async function registerEntitlementRoutes(
       return reply.code(503).send({ error: 'Entitlements are not configured' });
     }
 
-    return reply.send({ token, plan });
+    // Clients store userId with the token and refuse a token whose sub differs.
+    return reply.send({ token, plan, userId: user.id });
   });
 }

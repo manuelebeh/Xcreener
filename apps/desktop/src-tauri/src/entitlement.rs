@@ -29,6 +29,7 @@ struct Header {
 
 #[derive(Deserialize)]
 struct Claims {
+    sub: String,
     plan: String,
     iat: u64,
     exp: u64,
@@ -38,8 +39,9 @@ fn decode_json<T: for<'de> Deserialize<'de>>(segment: &str) -> Option<T> {
     serde_json::from_slice(&URL_SAFE_NO_PAD.decode(segment).ok()?).ok()
 }
 
-/// Checks the EdDSA signature, then the validity window. Any failure means "free".
-pub fn verify(token: &str, public_key: &[u8], now: u64) -> Option<Entitlement> {
+/// Checks the EdDSA signature, that the token was issued to `user_id` (the id the API
+/// returned with it), then the validity window. Any failure means "free".
+pub fn verify(token: &str, user_id: &str, public_key: &[u8], now: u64) -> Option<Entitlement> {
     let mut parts = token.split('.');
     let (header_b64, claims_b64, signature_b64) = (parts.next()?, parts.next()?, parts.next()?);
     if parts.next().is_some() {
@@ -58,6 +60,9 @@ pub fn verify(token: &str, public_key: &[u8], now: u64) -> Option<Entitlement> {
         .ok()?;
 
     let claims: Claims = decode_json(claims_b64)?;
+    if claims.sub != user_id {
+        return None;
+    }
     if claims.exp <= now || claims.iat > now + CLOCK_SKEW_SECONDS {
         return None;
     }
@@ -72,10 +77,10 @@ pub fn verify(token: &str, public_key: &[u8], now: u64) -> Option<Entitlement> {
 }
 
 /// Verifies with the build-time public key and the current clock.
-pub fn verify_now(token: &str) -> Option<Entitlement> {
+pub fn verify_now(token: &str, user_id: &str) -> Option<Entitlement> {
     let public_key = URL_SAFE_NO_PAD.decode(PUBLIC_KEY?).ok()?;
     let now = SystemTime::now().duration_since(UNIX_EPOCH).ok()?.as_secs();
-    verify(token, &public_key, now)
+    verify(token, user_id, &public_key, now)
 }
 
 #[cfg(test)]
@@ -106,7 +111,7 @@ mod tests {
         let keys = key_pair();
         let jwt = token(&keys, "EdDSA", "team_pro", NOW - 10, NOW + 3600);
         assert_eq!(
-            verify(&jwt, keys.public_key().as_ref(), NOW),
+            verify(&jwt, "user-1", keys.public_key().as_ref(), NOW),
             Some(Entitlement {
                 plan: "team_pro".into(),
                 expires_at: NOW + 3600
@@ -126,36 +131,43 @@ mod tests {
         ));
         parts[1] = &forged;
         assert_eq!(
-            verify(&parts.join("."), keys.public_key().as_ref(), NOW),
+            verify(&parts.join("."), "user-1", keys.public_key().as_ref(), NOW),
             None
         );
     }
 
     #[test]
+    fn rejects_a_token_issued_to_another_user() {
+        let keys = key_pair();
+        let jwt = token(&keys, "EdDSA", "team_pro", NOW - 10, NOW + 3600);
+        assert_eq!(verify(&jwt, "user-2", keys.public_key().as_ref(), NOW), None);
+    }
+
+    #[test]
     fn rejects_another_key() {
         let jwt = token(&key_pair(), "EdDSA", "team_pro", NOW - 10, NOW + 3600);
-        assert_eq!(verify(&jwt, key_pair().public_key().as_ref(), NOW), None);
+        assert_eq!(verify(&jwt, "user-1", key_pair().public_key().as_ref(), NOW), None);
     }
 
     #[test]
     fn rejects_other_algorithms() {
         let keys = key_pair();
         let jwt = token(&keys, "HS256", "team_pro", NOW - 10, NOW + 3600);
-        assert_eq!(verify(&jwt, keys.public_key().as_ref(), NOW), None);
+        assert_eq!(verify(&jwt, "user-1", keys.public_key().as_ref(), NOW), None);
     }
 
     #[test]
     fn rejects_expired_tokens() {
         let keys = key_pair();
         let jwt = token(&keys, "EdDSA", "team_pro", NOW - 7200, NOW - 1);
-        assert_eq!(verify(&jwt, keys.public_key().as_ref(), NOW), None);
+        assert_eq!(verify(&jwt, "user-1", keys.public_key().as_ref(), NOW), None);
     }
 
     #[test]
     fn rejects_tokens_issued_in_the_future() {
         let keys = key_pair();
         let jwt = token(&keys, "EdDSA", "team_pro", NOW + 3600, NOW + 7200);
-        assert_eq!(verify(&jwt, keys.public_key().as_ref(), NOW), None);
+        assert_eq!(verify(&jwt, "user-1", keys.public_key().as_ref(), NOW), None);
     }
 
     /// Token and key produced by `jose` exactly like apps/api/src/services/entitlement.ts.
@@ -166,7 +178,7 @@ mod tests {
             .unwrap();
         let jwt = "eyJhbGciOiJFZERTQSJ9.eyJwbGFuIjoidGVhbV9zdGFydGVyIiwic3ViIjoidXNlci0xIiwiaWF0IjoxNzk5OTk5OTkwLCJleHAiOjE4MDAwMDM2MDB9.CJS6QuQ7sujkxOqd3w34rid6hqbQxm56PnYRtCUqPQuWgLkD31YQngWNo4Cv2HH5Zrz7TP9QdQ26f_CjV0-1Cg";
         assert_eq!(
-            verify(jwt, &public_key, NOW),
+            verify(jwt, "user-1", &public_key, NOW),
             Some(Entitlement {
                 plan: "team_starter".into(),
                 expires_at: NOW + 3600
@@ -177,7 +189,7 @@ mod tests {
     #[test]
     fn rejects_malformed_tokens() {
         let keys = key_pair();
-        assert_eq!(verify("not-a-token", keys.public_key().as_ref(), NOW), None);
-        assert_eq!(verify("a.b.c.d", keys.public_key().as_ref(), NOW), None);
+        assert_eq!(verify("not-a-token", "user-1", keys.public_key().as_ref(), NOW), None);
+        assert_eq!(verify("a.b.c.d", "user-1", keys.public_key().as_ref(), NOW), None);
     }
 }
