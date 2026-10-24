@@ -7,6 +7,7 @@ import {
   type IntegrationProvider,
   isEnterpriseIntegrationProvider,
   isIntegrationProvider,
+  type RefreshIntegrationTokenResponse,
 } from '@snapglow/integrations-core';
 import { hasEnterpriseIntegrationsAccess } from '@snapglow/team-core';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -16,6 +17,11 @@ import type * as schema from '../db/schema';
 import { env } from '../env';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import { bestPlanForUser } from '../services/entitlement';
+import {
+  canSealRefreshTokens,
+  openRefreshHandle,
+  sealRefreshToken,
+} from '../services/integration-tokens';
 import { savePendingIntegrationOAuth, takePendingIntegrationOAuth } from '../services/redis';
 
 const createState = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 24);
@@ -166,12 +172,74 @@ function buildAuthorizeUrl(
 
 const PROVIDER_TIMEOUT_MS = 10_000;
 
+/** Providers whose access tokens expire and come with a refresh token. */
+const REFRESHABLE_PROVIDERS: ReadonlySet<IntegrationProvider> = new Set([
+  'linear',
+  'jira',
+  'confluence',
+  'msteams',
+]);
+
+/** What the provider returned. The raw refresh token is sealed before anything reaches the client. */
+type ProviderTokens = Omit<ExchangeIntegrationTokenResponse, 'refreshHandle'> & {
+  refreshToken?: string | null;
+};
+
+/** The provider refused the refresh token (revoked, expired, already rotated). */
+class ProviderRejectedError extends Error {}
+
+async function refreshProviderToken(
+  provider: IntegrationProvider,
+  config: ProviderOAuthConfig,
+  refreshToken: string
+): Promise<{ accessToken: string; refreshToken: string; expiresAt: string | null }> {
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
+    refresh_token: refreshToken,
+  });
+  if (provider === 'msteams' && config.scope) {
+    body.set('scope', config.scope);
+  }
+
+  const response = await fetch(config.tokenUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    body,
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+  });
+
+  if (response.status === 400 || response.status === 401 || response.status === 403) {
+    throw new ProviderRejectedError(`${provider} refused the refresh token`);
+  }
+  if (!response.ok) {
+    throw new Error(`${provider} token refresh failed`);
+  }
+
+  const payload = (await response.json()) as Record<string, unknown>;
+  const accessToken = payload.access_token as string | undefined;
+  const expiresIn = payload.expires_in as number | undefined;
+  if (!accessToken) {
+    throw new Error(`${provider} token missing from refresh response`);
+  }
+  return {
+    accessToken,
+    // Linear, Atlassian and Microsoft rotate refresh tokens; keep the old one if one did not.
+    refreshToken: (payload.refresh_token as string | undefined) ?? refreshToken,
+    expiresAt: expiresIn ? new Date(Date.now() + expiresIn * 1000).toISOString() : null,
+  };
+}
+
 async function exchangeProviderToken(
   provider: IntegrationProvider,
   config: ProviderOAuthConfig,
   code: string,
   codeVerifier: string
-): Promise<ExchangeIntegrationTokenResponse> {
+): Promise<ProviderTokens> {
   const redirectUri = env.INTEGRATIONS_REDIRECT_URI || INTEGRATION_REDIRECT_URI;
 
   if (provider === 'notion') {
@@ -412,13 +480,17 @@ export async function registerIntegrationRoutes(
       }
 
       try {
-        const tokens = await exchangeProviderToken(
+        const { refreshToken, ...tokens } = await exchangeProviderToken(
           rawProvider,
           config,
           body.code,
           pending.codeVerifier
         );
-        return reply.send(tokens);
+        const response: ExchangeIntegrationTokenResponse = {
+          ...tokens,
+          refreshHandle: refreshToken ? sealRefreshToken(refreshToken, user.id, rawProvider) : null,
+        };
+        return reply.send(response);
       } catch (error) {
         // Provider messages can carry provider-side detail; keep them in logs only.
         request.log.warn(
@@ -426,6 +498,61 @@ export async function registerIntegrationRoutes(
           'Integration token exchange failed'
         );
         return reply.code(502).send({ error: 'Token exchange failed' });
+      }
+    }
+  );
+
+  app.post(
+    '/v1/integrations/:provider/refresh',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const { provider: rawProvider } = request.params as { provider: string };
+      if (!isIntegrationProvider(rawProvider) || !REFRESHABLE_PROVIDERS.has(rawProvider)) {
+        return reply.code(400).send({ error: 'This integration does not refresh tokens' });
+      }
+
+      if (await lacksEnterpriseAccess(options.db, request, rawProvider)) {
+        return reply.code(403).send({ error: ENTERPRISE_PLAN_ERROR });
+      }
+
+      const config = providerConfig(rawProvider);
+      if (!config || !canSealRefreshTokens()) {
+        return reply.code(503).send({ error: 'Integration refresh is not configured' });
+      }
+
+      const body = request.body as { refreshHandle?: unknown } | undefined;
+      if (typeof body?.refreshHandle !== 'string' || !body.refreshHandle) {
+        return reply.code(400).send({ error: 'Missing refresh handle' });
+      }
+
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      const refreshToken = openRefreshHandle(body.refreshHandle, user.id, rawProvider);
+      if (!refreshToken) {
+        return reply.code(400).send({ error: 'Reconnect this integration' });
+      }
+
+      try {
+        const refreshed = await refreshProviderToken(rawProvider, config, refreshToken);
+        const refreshHandle = sealRefreshToken(refreshed.refreshToken, user.id, rawProvider);
+        if (!refreshHandle) {
+          return reply.code(503).send({ error: 'Integration refresh is not configured' });
+        }
+        const response: RefreshIntegrationTokenResponse = {
+          accessToken: refreshed.accessToken,
+          refreshHandle,
+          expiresAt: refreshed.expiresAt,
+        };
+        return reply.send(response);
+      } catch (error) {
+        if (error instanceof ProviderRejectedError) {
+          return reply.code(400).send({ error: 'Reconnect this integration' });
+        }
+        request.log.warn({ err: error, provider: rawProvider }, 'Integration token refresh failed');
+        return reply.code(502).send({ error: 'Token refresh failed' });
       }
     }
   );
