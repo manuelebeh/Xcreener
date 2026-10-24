@@ -1,0 +1,12 @@
+.git
+**/node_modules
+**/dist
+**/.output
+**/.turbo
+.codegraph
+**/.env
+**/.env.*
+!**/.env.example
+apps/desktop/src-tauri/target
+apps/mobile/ios
+apps/mobile/android
