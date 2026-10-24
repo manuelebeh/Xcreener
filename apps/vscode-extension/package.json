@@ -68,9 +68,9 @@
     "@snapglow/biome-config": "workspace:*",
     "@snapglow/typescript-config": "workspace:*",
     "@types/node": "^22.10.2",
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.140.0",
     "@vscode/vsce": "^3.6.0",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.2",
     "typescript": "^6.0.2",
     "vitest": "^3.2.4"
   }

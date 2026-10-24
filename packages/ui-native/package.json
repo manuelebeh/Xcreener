@@ -22,9 +22,9 @@
   "devDependencies": {
     "@snapglow/biome-config": "workspace:*",
     "@snapglow/typescript-config": "workspace:*",
-    "@types/react": "^19.2.0",
-    "react": "^19.2.0",
-    "react-native": "^0.85.0",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.1",
+    "react-native": "^0.88.0",
     "typescript": "^6.0.2"
   }
 }

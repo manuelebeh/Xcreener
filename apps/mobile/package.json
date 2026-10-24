@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@shopify/react-native-skia": "2.6.2",
+    "@shopify/react-native-skia": "2.14.0",
     "@snapglow/design-tokens": "workspace:*",
     "@snapglow/editor-core": "workspace:*",
     "@snapglow/i18n": "workspace:*",
@@ -36,20 +36,20 @@
     "expo-splash-screen": "~56.0.10",
     "expo-status-bar": "~56.0.4",
     "expo-web-browser": "~56.0.6",
-    "react": "19.2.3",
-    "react-native": "0.85.3",
+    "react": "19.3.1",
+    "react-native": "0.88.0",
     "react-native-gesture-handler": "~2.31.1",
-    "react-native-reanimated": "4.3.1",
-    "react-native-safe-area-context": "~5.7.0",
-    "react-native-screens": "4.25.2",
-    "react-native-worklets": "0.8.3",
+    "react-native-reanimated": "4.7.1",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "4.30.0",
+    "react-native-worklets": "0.13.0",
     "snapglow-ocr": "file:./modules/snapglow-ocr",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@snapglow/biome-config": "workspace:*",
     "@snapglow/typescript-config": "workspace:*",
-    "@types/react": "~19.2.2",
+    "@types/react": "~19.3.0",
     "typescript": "~6.0.3"
   }
 }

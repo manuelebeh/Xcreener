@@ -10,11 +10,11 @@
     "postinstall": "pnpm --filter @snapglow/design-tokens build"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.0.6",
+    "@biomejs/biome": "^2.6.2",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
     "lint-staged": "^16.1.2",
-    "turbo": "^2.5.4"
+    "turbo": "^2.11.10"
   },
   "packageManager": "pnpm@9.15.9",
   "engines": {
