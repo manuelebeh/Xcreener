@@ -322,6 +322,48 @@ export async function registerLibraryRoutes(app: FastifyInstance, options: Libra
     return reply.send(await toLibraryItemResponse(options.db, options.storage, item));
   });
 
+  // Streams the asset through the API so clients only need the API origin in their CSP.
+  app.get(
+    '/v1/library/:id/content',
+    { preHandler: authenticateRequest },
+    async (request, reply) => {
+      const authUser = request.authUser;
+      if (!authUser) {
+        return reply.code(401).send({ error: 'Unauthorized' });
+      }
+
+      const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
+      const { id } = request.params as { id: string };
+
+      const rows = await options.db
+        .select()
+        .from(schema.libraryItems)
+        .where(eq(schema.libraryItems.id, id))
+        .limit(1);
+      const item = rows[0];
+
+      if (!item || item.deletedAt) {
+        return reply.code(404).send({ error: 'Library item not found' });
+      }
+
+      if (item.userId !== user.id) {
+        if (!item.workspaceId) {
+          return reply.code(404).send({ error: 'Library item not found' });
+        }
+        const role = await resolveMembership(options.db, item.workspaceId, user.id);
+        if (!role) {
+          return reply.code(404).send({ error: 'Library item not found' });
+        }
+      }
+
+      const body = await options.storage.getObject(item.storageKey);
+      return reply
+        .header('Content-Type', item.mimeType)
+        .header('Cache-Control', 'private, no-store')
+        .send(body);
+    }
+  );
+
   app.patch('/v1/library/:id', { preHandler: authenticateRequest }, async (request, reply) => {
     const authUser = request.authUser;
     if (!authUser) {

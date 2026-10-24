@@ -15,6 +15,11 @@ vi.mock('@/db/captures', () => ({
   pruneCaptures: vi.fn(async () => []),
 }));
 
+vi.mock('./config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./config')>()),
+  getApiUrl: () => 'https://api.test',
+}));
+
 vi.mock('@/modules/history/utils/captureFiles', () => ({
   writeCaptureFiles: vi.fn(async () => ({
     capturePath: '/tmp/c.png',
@@ -38,6 +43,8 @@ function item(localId: string | null): SyncLibraryItem {
   };
 }
 
+const headers = { Authorization: 'Bearer token', 'X-Workspace-Id': 'ws-1' };
+
 describe('importSyncedLibraryItem', () => {
   beforeEach(() => {
     getCapture.mockReset();
@@ -58,7 +65,7 @@ describe('importSyncedLibraryItem', () => {
     getCapture.mockResolvedValue({ id: 5 });
     captureUidExists.mockResolvedValue(false);
 
-    const imported = await importSyncedLibraryItem(item('uid-from-device-b'), new Set());
+    const imported = await importSyncedLibraryItem(item('uid-from-device-b'), new Set(), headers);
 
     expect(imported).toBe(true);
     expect(getCapture).not.toHaveBeenCalled();
@@ -67,11 +74,21 @@ describe('importSyncedLibraryItem', () => {
     );
   });
 
+  it('downloads the asset through the API with the auth headers', async () => {
+    captureUidExists.mockResolvedValue(false);
+
+    await importSyncedLibraryItem(item('uid-api'), new Set(), headers);
+
+    expect(fetch).toHaveBeenCalledWith('https://api.test/v1/library/cloud-uid-api/content', {
+      headers,
+    });
+  });
+
   it('skips a capture whose uid is already stored locally', async () => {
     captureUidExists.mockResolvedValue(true);
     const pulledIds = new Set<string>();
 
-    const imported = await importSyncedLibraryItem(item('uid-known'), pulledIds);
+    const imported = await importSyncedLibraryItem(item('uid-known'), pulledIds, headers);
 
     expect(imported).toBe(false);
     expect(insertCapture).not.toHaveBeenCalled();
@@ -81,7 +98,7 @@ describe('importSyncedLibraryItem', () => {
   it('keeps matching legacy numeric local ids by local capture id', async () => {
     getCapture.mockResolvedValue({ id: 5 });
 
-    const imported = await importSyncedLibraryItem(item('5'), new Set());
+    const imported = await importSyncedLibraryItem(item('5'), new Set(), headers);
 
     expect(imported).toBe(false);
     expect(getCapture).toHaveBeenCalledWith(5);

@@ -37,6 +37,7 @@ pnpm --filter @snapglow/api db:migrate
 | POST | `/v1/library` | Bearer JWT | Upload library item (idempotent via `localId`) |
 | GET | `/v1/library` | Bearer JWT | Search library (`q`, `tag`, `collection`) |
 | GET | `/v1/library/:id` | Bearer JWT | Item metadata + presigned URL |
+| GET | `/v1/library/:id/content` | Bearer JWT | Item bytes through the API (desktop sync pull) |
 | PATCH | `/v1/library/:id` | Bearer JWT | Update tags / collections |
 | GET | `/v1/collections` | Bearer JWT | List collections |
 | POST | `/v1/collections` | Bearer JWT | Create collection |
@@ -75,6 +76,7 @@ pnpm --filter @snapglow/api db:migrate
 | GET | `/v1/public/captures/:id` | API key | Capture metadata + presigned screenshot URL |
 | PATCH | `/v1/public/captures/:id` | API key | Apply beautify `documentState` |
 | POST | `/v1/public/captures/:id/export` | API key | Server render export (PNG/JPG/WebP) |
+| GET | `/v1/public/captures/:id/export/content` | API key | Last export bytes through the API (Figma plugin) |
 | POST | `/v1/public/captures/:id/publish` | API key | Permanent embed share (`/e/:token`) |
 | DELETE | `/v1/public/captures/:id` | API key | Delete capture + blobs |
 | GET | `/v1/embeds/:token` | No | Embed metadata + presigned asset (Notion-friendly CSP) |
