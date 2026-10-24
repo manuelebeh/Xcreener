@@ -67,7 +67,7 @@
     "@wdio/cli": "^9",
     "@wdio/globals": "^9",
     "@wdio/local-runner": "^9",
-    "@wdio/mocha-framework": "^9",
+    "@wdio/mocha-framework": "^10",
     "@wdio/spec-reporter": "^9",
     "tailwindcss": "^4.1.11",
     "tsx": "^4",
