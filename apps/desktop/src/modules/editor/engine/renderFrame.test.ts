@@ -28,6 +28,7 @@ function baseInput(overrides: Partial<RenderInput> = {}): RenderInput {
 function createMockContext(): CanvasRenderingContext2D {
   return {
     setTransform: vi.fn(),
+    getTransform: vi.fn(() => ({ a: 1 })),
     clearRect: vi.fn(),
     createLinearGradient: vi.fn(() => ({
       addColorStop: vi.fn(),
