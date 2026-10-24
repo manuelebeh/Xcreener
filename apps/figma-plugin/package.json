@@ -14,10 +14,10 @@
     "@snapglow/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.119.0",
+    "@figma/plugin-typings": "^1.142.0",
     "@snapglow/biome-config": "workspace:*",
     "@snapglow/typescript-config": "workspace:*",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.28.2",
     "typescript": "^6.0.2",
     "vitest": "^3.2.4"
   }
