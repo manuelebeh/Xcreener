@@ -51,6 +51,25 @@ export function initObservability(analyticsEnabled: boolean): void {
   initialized = true;
 }
 
+/** Applies the analytics toggle right away: opting out stops Sentry and PostHog without a restart. */
+export async function setObservabilityEnabled(analyticsEnabled: boolean): Promise<void> {
+  if (analyticsEnabled) {
+    if (posthog.__loaded) {
+      posthog.opt_in_capturing();
+    }
+    initObservability(true);
+    return;
+  }
+
+  if (posthog.__loaded) {
+    posthog.opt_out_capturing();
+  }
+  if (initialized) {
+    await Sentry.close();
+    initialized = false;
+  }
+}
+
 export function resetObservabilityForTests(): void {
   initialized = false;
 }
