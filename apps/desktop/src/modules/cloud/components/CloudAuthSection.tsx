@@ -1,5 +1,6 @@
 import { Button } from '@snapglow/ui';
 import { useEffect } from 'react';
+import { SettingsGroup, SettingsRow } from '@/shared/components/SettingsGroup';
 import { useCloudAuthStore } from '../store';
 import { pullCloudSync, startPeriodicSync } from '../syncPull';
 
@@ -24,70 +25,74 @@ export function CloudAuthSection() {
 
   if (!configured) {
     return (
-      <div className="rounded-md border border-border p-3">
-        <p className="m-0 text-sm font-medium">Cloud sharing</p>
-        <p className="mt-1 text-xs text-muted">
-          Set VITE_AUTH0_* and VITE_API_URL in `.env.local` to enable cloud links.
-        </p>
-      </div>
+      <SettingsGroup title="Cloud sharing">
+        <SettingsRow
+          label="Not configured"
+          hint="Set VITE_AUTH0_* and VITE_API_URL in .env.local to enable cloud links."
+        />
+      </SettingsGroup>
     );
   }
 
-  return (
-    <div className="rounded-md border border-border p-3">
-      <p className="m-0 text-sm font-medium">Cloud sharing</p>
-      <p className="mt-1 text-xs text-muted">
-        Sign in to upload captures and create shareable links. Uploads require your explicit consent
-        from the editor.
-      </p>
-      {isAuthenticated ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted">{accountLabel ?? 'Signed in'}</span>
-          <Button type="button" variant="secondary" size="sm" onClick={() => signOut()}>
-            Sign out
-          </Button>
-        </div>
-      ) : (
-        <Button
-          type="button"
-          size="sm"
-          className="mt-3"
-          disabled={isLoading}
-          onClick={() => signIn()}
-          data-testid="cloud-sign-in-button"
-        >
-          {isLoading ? 'Waiting for browser…' : 'Sign in with Auth0'}
-        </Button>
-      )}
+  const errors = (
+    <>
       {error ? (
-        <p className="mt-2 text-xs text-destructive" role="alert">
+        <p className="text-xs text-destructive" role="alert">
           {error.includes('PKCE') || error.includes('state')
             ? 'Sign-in expired or was interrupted. Close the browser tab and try again.'
             : error}
         </p>
       ) : null}
-      {isAuthenticated && lastLibrarySyncAt ? (
-        <p className="mt-2 text-xs text-muted">
-          Last sync: {new Date(lastLibrarySyncAt).toLocaleString()}
-          {lastPulledCount > 0 ? ` · ${lastPulledCount} updates pulled` : ''}
-        </p>
-      ) : null}
-      {isAuthenticated ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mt-2"
-          onClick={() => void pullCloudSync()}
-        >
-          Sync now
-        </Button>
-      ) : null}
       {librarySyncError ? (
-        <p className="mt-2 text-xs text-destructive" role="alert">
+        <p className="text-xs text-destructive" role="alert">
           Library sync failed: {librarySyncError}
         </p>
       ) : null}
-    </div>
+    </>
+  );
+
+  if (!isAuthenticated) {
+    return (
+      <SettingsGroup title="Cloud sharing">
+        <SettingsRow
+          label="SnapGlow cloud"
+          hint="Sign in to upload captures and create share links. Uploads always need your consent from the editor."
+          footer={error || librarySyncError ? errors : null}
+        >
+          <Button
+            type="button"
+            size="sm"
+            disabled={isLoading}
+            onClick={() => signIn()}
+            data-testid="cloud-sign-in-button"
+          >
+            {isLoading ? 'Waiting for browser…' : 'Sign in with Auth0'}
+          </Button>
+        </SettingsRow>
+      </SettingsGroup>
+    );
+  }
+
+  const syncHint = lastLibrarySyncAt
+    ? `Last sync ${new Date(lastLibrarySyncAt).toLocaleString()}${
+        lastPulledCount > 0 ? ` · ${lastPulledCount} updates pulled` : ''
+      }`
+    : 'Not synced yet';
+
+  return (
+    <SettingsGroup title="Cloud sharing">
+      <SettingsRow
+        label={accountLabel ?? 'Signed in'}
+        hint={syncHint}
+        footer={error || librarySyncError ? errors : null}
+      >
+        <Button type="button" variant="ghost" size="sm" onClick={() => void pullCloudSync()}>
+          Sync now
+        </Button>
+        <Button type="button" variant="secondary" size="sm" onClick={() => signOut()}>
+          Sign out
+        </Button>
+      </SettingsRow>
+    </SettingsGroup>
   );
 }

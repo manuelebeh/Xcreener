@@ -32,7 +32,7 @@ shared tokens from `packages/design-tokens/tokens.json` for this app only
 - **Inspector order** · suggestion banner (only when present) → Annotation options (only when the blur tool or a shape is selected) → Format → Style (Balance "Equal margins" sits under Padding) → Text (copy text, then Sensitive data) → Export
 - **No placeholder sections** · a section with nothing to act on is not rendered; actions about sharing rather than the image (collaboration, comments) live in the stage tool strip, not the inspector
 - **Empty state** · no capture: inspector shows one line of guidance, no empty sections
-- **Library / Settings** · scroll inside the window, shared `max-w-5xl` left edge; Settings content is a `max-w-2xl` column of grouped rows (label left, control right)
+- **Library / Settings** · scroll inside the window; Library uses a `max-w-5xl` column, Settings a centered `max-w-2xl` column where every section is a `SettingsGroup` (`@/shared/components/SettingsGroup`): 12px label outside, one bordered card of rows (label left, control right)
 
 ## Typography
 
@@ -76,7 +76,7 @@ Radius: 6px controls, 10px panels. Hairlines 1px. One accent (blue) for selectio
 
 ## Known gaps
 
-- Capture overlay layout, Cloud / Team / Integrations / Marketplace / Watermark settings sections and `HistoryPreview` have not been restyled or reviewed.
+- Capture overlay layout and `HistoryPreview` have not been restyled or reviewed. Team workspace sub-panels (members, brand kit, billing, API keys, usage) sit inside a `SettingsGroup` card but keep their old inner layout.
 - Shortcut field shows the raw Tauri format; a key recorder is not built.
 - No zoom control: the preview fits the window (status bar shows Fit %).
 - `.impeccable/design.json` has not been generated for this system.

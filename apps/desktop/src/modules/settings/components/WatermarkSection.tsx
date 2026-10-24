@@ -2,6 +2,7 @@ import { Button, Input, Select, Slider } from '@snapglow/ui';
 import { open } from '@tauri-apps/plugin-dialog';
 import { setSetting } from '@/db';
 import { usePremiumAccess } from '@/modules/licensing/premiumAccess';
+import { SettingsGroup, SettingsRow, SettingsToggle } from '@/shared/components/SettingsGroup';
 import { SETTING_KEYS, type WatermarkPosition } from '@/shared/types/settings';
 import { useSettingsStore } from '../store';
 
@@ -38,92 +39,77 @@ export function WatermarkSection() {
   }
 
   return (
-    <div className="rounded-md border border-border p-3">
-      <p className="m-0 text-sm font-medium">Export watermark</p>
-      <p className="mt-1 text-xs text-muted">
-        Applied on export, share links, and integration uploads.
-      </p>
-      {locked ? (
-        <p className="mt-2 text-xs text-muted" role="status">
-          Free plans show the SnapGlow watermark. You can choose its corner. Removing or customizing
-          it requires Team Starter or Pro: Settings → Team → Billing.
-        </p>
-      ) : null}
+    <SettingsGroup
+      title="Export watermark"
+      description="Applied on exports, share links, and integration uploads."
+    >
+      <SettingsToggle
+        id="watermark-enabled"
+        label="Show watermark on exports"
+        hint={
+          locked
+            ? 'Free plans always show the SnapGlow watermark; you can pick its corner. Team Starter or Pro unlocks removal and customization (Team → Billing).'
+            : undefined
+        }
+        checked={locked || watermarkEnabled}
+        disabled={locked}
+        onChange={async (next) => {
+          setWatermarkEnabled(next);
+          await setSetting(SETTING_KEYS.watermarkEnabled, String(next));
+        }}
+        testId="watermark-enabled-toggle"
+      />
 
-      <label className="mt-3 flex items-center gap-2 text-sm font-medium">
-        <input
-          type="checkbox"
-          checked={locked || watermarkEnabled}
-          disabled={locked}
-          onChange={async (event) => {
-            const next = event.target.checked;
-            setWatermarkEnabled(next);
-            await setSetting(SETTING_KEYS.watermarkEnabled, String(next));
-          }}
-          className="sg-focus-ring size-4 rounded border-border"
-          data-testid="watermark-enabled-toggle"
-        />
-        Show watermark on exports
-      </label>
-
-      <div className="mt-3 space-y-3">
-        <div>
-          <label htmlFor="watermark-name" className="block text-sm font-medium">
-            Display name
-            <Input
-              id="watermark-name"
-              value={watermarkDisplayName}
-              disabled={locked}
-              onChange={async (event) => {
-                setWatermarkDisplayName(event.target.value);
-                await setSetting(SETTING_KEYS.watermarkDisplayName, event.target.value);
-              }}
-              className="mt-2"
-            />
-          </label>
+      <SettingsRow label="Display name" htmlFor="watermark-name">
+        <div className="w-60">
+          <Input
+            id="watermark-name"
+            value={watermarkDisplayName}
+            disabled={locked}
+            onChange={async (event) => {
+              setWatermarkDisplayName(event.target.value);
+              await setSetting(SETTING_KEYS.watermarkDisplayName, event.target.value);
+            }}
+          />
         </div>
+      </SettingsRow>
 
-        <div>
-          <label htmlFor="watermark-url" className="block text-sm font-medium">
-            URL (optional)
-            <Input
-              id="watermark-url"
-              value={watermarkUrl}
-              disabled={locked}
-              onChange={async (event) => {
-                setWatermarkUrl(event.target.value);
-                await setSetting(SETTING_KEYS.watermarkUrl, event.target.value);
-              }}
-              className="mt-2"
-              placeholder="https://snapglow.app"
-            />
-          </label>
+      <SettingsRow label="URL" hint="Optional" htmlFor="watermark-url">
+        <div className="w-60">
+          <Input
+            id="watermark-url"
+            value={watermarkUrl}
+            disabled={locked}
+            onChange={async (event) => {
+              setWatermarkUrl(event.target.value);
+              await setSetting(SETTING_KEYS.watermarkUrl, event.target.value);
+            }}
+            placeholder="https://snapglow.app"
+          />
         </div>
+      </SettingsRow>
 
-        <div>
-          <label htmlFor="watermark-position" className="block text-sm font-medium">
-            Position
-            <Select
-              id="watermark-position"
-              value={watermarkPosition}
-              onChange={async (event) => {
-                const value = event.target.value as WatermarkPosition;
-                setWatermarkPosition(value);
-                await setSetting(SETTING_KEYS.watermarkPosition, value);
-              }}
-              className="mt-2"
-            >
-              <option value="top-left">Top left</option>
-              <option value="top-right">Top right</option>
-              <option value="bottom-left">Bottom left</option>
-              <option value="bottom-right">Bottom right</option>
-            </Select>
-          </label>
+      <SettingsRow label="Position" htmlFor="watermark-position">
+        <div className="w-60">
+          <Select
+            id="watermark-position"
+            value={watermarkPosition}
+            onChange={async (event) => {
+              const value = event.target.value as WatermarkPosition;
+              setWatermarkPosition(value);
+              await setSetting(SETTING_KEYS.watermarkPosition, value);
+            }}
+          >
+            <option value="top-left">Top left</option>
+            <option value="top-right">Top right</option>
+            <option value="bottom-left">Bottom left</option>
+            <option value="bottom-right">Bottom right</option>
+          </Select>
         </div>
+      </SettingsRow>
 
-        <div>
-          {/* biome-ignore lint/a11y/noLabelWithoutControl: Slider is a custom control without native id */}
-          <label className="block text-sm font-medium">Opacity ({watermarkOpacity}%)</label>
+      <SettingsRow label="Opacity">
+        <div className="flex w-60 items-center gap-3">
           <Slider
             min={10}
             max={100}
@@ -135,27 +121,24 @@ export function WatermarkSection() {
               setWatermarkOpacity(next);
               await setSetting(SETTING_KEYS.watermarkOpacity, String(next));
             }}
-            className="mt-2"
           />
+          <span className="w-10 shrink-0 text-right text-xs text-muted tabular-nums">
+            {watermarkOpacity}%
+          </span>
         </div>
+      </SettingsRow>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={locked}
-            onClick={() => void handleLogoPick()}
-          >
-            Choose logo
-          </Button>
-          {watermarkLogoPath ? (
-            <span className="truncate text-xs text-muted">{watermarkLogoPath}</span>
-          ) : (
-            <span className="text-xs text-muted">No logo selected</span>
-          )}
-        </div>
-      </div>
-    </div>
+      <SettingsRow label="Logo" hint={watermarkLogoPath || 'No logo selected'}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          disabled={locked}
+          onClick={() => void handleLogoPick()}
+        >
+          Choose logo
+        </Button>
+      </SettingsRow>
+    </SettingsGroup>
   );
 }
