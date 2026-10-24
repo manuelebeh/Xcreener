@@ -1,6 +1,5 @@
 import { BalanceBar } from '@/modules/balance';
-import { CollabBar } from '@/modules/collab/components/CollabBar';
-import { CommentsPanel } from '@/modules/collab/components/CommentsPanel';
+import { CollabMenu } from '@/modules/collab/components/CollabMenu';
 import { useCollabSession } from '@/modules/collab/hooks/useCollabSession';
 import { useCollabStore } from '@/modules/collab/store';
 import { ExportBar } from '@/modules/export/components/ExportBar';
@@ -11,7 +10,11 @@ import { useAutoStyleSuggestion } from '@/modules/style-suggestion/hooks/useAuto
 import { TextExtractionBar, useAutoTextExtraction } from '@/modules/text-extraction';
 import { useCustomPresetsLoader } from '../hooks/useCustomPresets';
 import { useEditorStore } from '../store';
-import { AnnotationToolbar, AnnotationToolStrip } from './AnnotationToolbar';
+import {
+  AnnotationToolbar,
+  AnnotationToolStrip,
+  useHasAnnotationOptions,
+} from './AnnotationToolbar';
 import { Canvas } from './Canvas';
 import { EditorSection, EditorToolsPanel } from './EditorSection';
 import { PresetBar } from './PresetBar';
@@ -23,6 +26,7 @@ export function EditorView() {
   useAutoStyleSuggestion();
   useAutoTextExtraction();
   const hasScreenshot = useEditorStore((s) => s.screenshot !== null);
+  const hasAnnotationOptions = useHasAnnotationOptions();
   const documentId = useCollabStore((s) => s.documentId);
   useCollabSession(documentId);
 
@@ -30,8 +34,9 @@ export function EditorView() {
     <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(300px,340px)]">
       <div className="flex min-h-0 min-w-0 flex-col">
         {hasScreenshot ? (
-          <div className="flex h-10 shrink-0 items-center border-b border-border bg-background px-3">
+          <div className="flex h-10 shrink-0 items-center justify-between gap-2 border-b border-border bg-background px-3">
             <AnnotationToolStrip />
+            <CollabMenu />
           </div>
         ) : null}
         <div className="min-h-0 flex-1">
@@ -49,27 +54,24 @@ export function EditorView() {
               <div className="px-4 py-3 empty:hidden">
                 <StyleSuggestionBar embedded />
               </div>
+              {hasAnnotationOptions ? (
+                <EditorSection title="Annotation options" testId="annotation-toolbar-section">
+                  <AnnotationToolbar embedded />
+                </EditorSection>
+              ) : null}
               <EditorSection title="Format" testId="preset-bar-section">
                 <PresetBar embedded />
               </EditorSection>
               <EditorSection title="Style" testId="style-bar-section">
-                <StyleBar embedded />
+                <StyleBar embedded marginControls={<BalanceBar embedded />} />
               </EditorSection>
-              <EditorSection title="Balance" testId="balance-bar-section">
-                <BalanceBar embedded />
-              </EditorSection>
-              <EditorSection title="Annotation options" testId="annotation-toolbar-section">
-                <AnnotationToolbar embedded />
-              </EditorSection>
-              <EditorSection title="Sensitive data" testId="redaction-bar-section">
-                <RedactionBar embedded />
-              </EditorSection>
-              <EditorSection title="Text extraction" testId="text-extraction-section">
-                <TextExtractionBar embedded />
-              </EditorSection>
-              <EditorSection title="Collaboration" testId="collab-bar-section">
-                <CollabBar embedded />
-                <CommentsPanel />
+              <EditorSection title="Text" testId="text-section">
+                <div className="space-y-4">
+                  <TextExtractionBar embedded />
+                  <div className="border-t border-border pt-3">
+                    <RedactionBar embedded />
+                  </div>
+                </div>
               </EditorSection>
             </EditorToolsPanel>
           ) : (

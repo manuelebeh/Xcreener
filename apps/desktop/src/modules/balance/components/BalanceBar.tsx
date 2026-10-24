@@ -23,8 +23,11 @@ export function BalanceBar({ embedded = false }: { embedded?: boolean }) {
   }
 
   const content = (
-    <div className="w-full space-y-2" data-testid="balance-bar">
-      <label className="flex items-center gap-2 text-xs text-foreground">
+    <div className="w-full space-y-1" data-testid="balance-bar">
+      <label
+        className="flex w-fit items-center gap-2 text-xs text-foreground"
+        title="Centers the content by trimming every margin to the smallest one"
+      >
         <input
           type="checkbox"
           checked={balance}
@@ -34,11 +37,8 @@ export function BalanceBar({ embedded = false }: { embedded?: boolean }) {
           data-testid="balance-toggle"
         />
         Equal margins
+        <span className="text-muted">· centers the content</span>
       </label>
-
-      <p className="text-xs text-muted">
-        Centers the content by trimming every margin to the smallest one.
-      </p>
 
       {status === 'analyzing' ? (
         <p className="text-xs text-muted" role="status">

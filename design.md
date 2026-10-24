@@ -27,9 +27,10 @@ shared tokens from `packages/design-tokens/tokens.json` for this app only
 - **Window** · full-height, no page scroll; default 1120x740, minimum 900x600
 - **Toolbar** · `AppTopNav`: wordmark left, segmented Editor / Library / Settings centered, New capture (Tauri only) and notifications right
 - **Editor** · two columns: stage left, 320 to 340px inspector right
-  - Stage: persistent annotation tool strip (tools, undo, redo) on top, capture centered on a darker neutral, status bar below (preset, size, Fit %)
+  - Stage: persistent annotation tool strip (tools, undo, redo; Collaborate popover on the right when signed in to the cloud) on top, capture centered on a darker neutral, status bar below (preset, size, Fit %)
   - Inspector: scrolling collapsible sections, **Export pinned at the foot** and never collapsible
-- **Inspector order** · suggestion banner (only when present) → Format → Style → Annotation options → Auto-crop → Sensitive data → Text extraction → Collaboration → Export
+- **Inspector order** · suggestion banner (only when present) → Annotation options (only when the blur tool or a shape is selected) → Format → Style (Balance "Equal margins" sits under Padding) → Text (copy text, then Sensitive data) → Export
+- **No placeholder sections** · a section with nothing to act on is not rendered; actions about sharing rather than the image (collaboration, comments) live in the stage tool strip, not the inspector
 - **Empty state** · no capture: inspector shows one line of guidance, no empty sections
 - **Library / Settings** · scroll inside the window, shared `max-w-5xl` left edge; Settings content is a `max-w-2xl` column of grouped rows (label left, control right)
 
