@@ -1,27 +1,29 @@
 name: Release
 
+# Three jobs so the updater key never meets npm code:
+#   build   - compiles the app (pnpm, Vite, cargo) with no secrets
+#   bundle  - environment `release` (required reviewers): bundles and signs with the
+#             Tauri CLI built from crates.io; installs nothing from npm
+#   publish - provenance attestation, latest.json, draft GitHub release
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  release-tauri:
-    permissions:
-      contents: write
+  build:
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: macos-latest
-            args: --target aarch64-apple-darwin
+            target: aarch64-apple-darwin
           - platform: macos-latest
-            args: --target x86_64-apple-darwin
+            target: x86_64-apple-darwin
           - platform: windows-latest
-            args: ''
+            target: x86_64-pc-windows-msvc
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -37,9 +39,8 @@ jobs:
       - name: Build design tokens
         run: mise run tokens:build
 
-      - name: Install Rust targets (macOS)
-        if: runner.os == 'macOS'
-        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - name: Install Rust target
+        run: rustup target add ${{ matrix.target }}
 
       # Without this key the app rejects every entitlement, so paying users would be
       # treated as free (forced watermark). Public value: a repo variable, not a secret.
@@ -53,13 +54,61 @@ jobs:
             exit 1
           fi
 
-      - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
+      - name: Build app (no bundle, no signing)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SNAPGLOW_ENTITLEMENT_PUBLIC_KEY: ${{ vars.SNAPGLOW_ENTITLEMENT_PUBLIC_KEY }}
+        run: mise exec -- pnpm --filter @snapglow/desktop tauri build --no-bundle --ci --target ${{ matrix.target }}
+
+      # The frontend is embedded in the binary; dist/ only satisfies the CLI's
+      # frontendDist check in the bundle job. Paths are kept relative to apps/desktop.
+      - name: Upload binary
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: binary-${{ matrix.target }}
+          path: |
+            apps/desktop/dist
+            apps/desktop/src-tauri/target/${{ matrix.target }}/release/snapglow-desktop
+            apps/desktop/src-tauri/target/${{ matrix.target }}/release/snapglow-desktop.exe
+          if-no-files-found: error
+          retention-days: 1
+
+  bundle:
+    needs: build
+    environment: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            updater: darwin-aarch64
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+            updater: darwin-x86_64
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            updater: windows-x86_64
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Download binary
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: binary-${{ matrix.target }}
+          path: apps/desktop
+
+      - name: Install Tauri CLI from crates.io
+        run: cargo install tauri-cli --version 2.11.2 --locked
+
+      - name: Bundle and sign
+        working-directory: apps/desktop/src-tauri
+        shell: bash
+        env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          # Platform code signing: leave unset until secrets exist. Empty APPLE_*
+          # Platform code signing: leave unset until the certificates exist. Empty APPLE_*
           # makes Tauri call `security import` and fail the bundle step.
           # APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           # APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
@@ -69,11 +118,88 @@ jobs:
           # APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           # WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           # WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          chmod +x "target/${{ matrix.target }}/release/snapglow-desktop" 2>/dev/null || true
+          cargo tauri bundle --ci --target ${{ matrix.target }} \
+            --config '{"bundle":{"createUpdaterArtifacts":true}}'
+
+      # Both macOS targets produce SnapGlow.app.tar.gz: give each a unique release name.
+      - name: Collect release files
+        shell: bash
+        run: |
+          bundle="apps/desktop/src-tauri/target/${{ matrix.target }}/release/bundle"
+          mkdir -p out
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            cp "$bundle"/dmg/*.dmg out/
+            cp "$bundle/macos/SnapGlow.app.tar.gz" "out/SnapGlow_${{ matrix.updater }}.app.tar.gz"
+            cp "$bundle/macos/SnapGlow.app.tar.gz.sig" "out/SnapGlow_${{ matrix.updater }}.app.tar.gz.sig"
+          else
+            cp "$bundle"/msi/*.msi "$bundle"/msi/*.msi.sig out/
+            cp "$bundle"/nsis/*-setup.exe "$bundle"/nsis/*-setup.exe.sig out/
+          fi
+          ls -l out
+
+      - name: Upload release files
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          projectPath: apps/desktop
-          tagName: ${{ github.ref_name }}
-          releaseName: 'SnapGlow ${{ github.ref_name }}'
-          releaseBody: 'See the assets to download and install this version.'
-          releaseDraft: true
-          prerelease: false
-          args: ${{ matrix.args }}
+          name: release-${{ matrix.updater }}
+          path: out/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: bundle
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download release files
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: release-*
+          path: out
+          merge-multiple: true
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            out/*.dmg
+            out/*.app.tar.gz
+            out/*.msi
+            out/*-setup.exe
+
+      - name: Write latest.json
+        shell: bash
+        env:
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          cd out
+          base="https://github.com/$REPO/releases/download/$TAG"
+          entry() {
+            jq -n --arg url "$base/$1" --rawfile sig "$1.sig" '{url: $url, signature: ($sig | rtrimstr("\n"))}'
+          }
+          setup=$(ls *-setup.exe)
+          jq -n \
+            --arg version "${TAG#v}" \
+            --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --argjson arm "$(entry SnapGlow_darwin-aarch64.app.tar.gz)" \
+            --argjson intel "$(entry SnapGlow_darwin-x86_64.app.tar.gz)" \
+            --argjson win "$(entry "$setup")" \
+            '{version: $version, pub_date: $date, platforms: {"darwin-aarch64": $arm, "darwin-x86_64": $intel, "windows-x86_64": $win}}' \
+            > latest.json
+          cat latest.json
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" out/* \
+            --repo "${{ github.repository }}" \
+            --draft \
+            --title "SnapGlow $TAG" \
+            --notes "See the assets to download and install this version."
