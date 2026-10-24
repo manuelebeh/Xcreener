@@ -198,6 +198,10 @@ fn finalize_region_recording(
         state.region.height,
     )
     .ok();
+    let has_thumbnail = thumbnail_png.is_some();
+    if let Some(png) = thumbnail_png {
+        crate::commands::raw_ipc::RECORDING_THUMBNAIL.set(png);
+    }
 
     let payload = CaptureRecordingCompletePayload {
         file_path: stable_path.to_string_lossy().into_owned(),
@@ -206,7 +210,7 @@ fn finalize_region_recording(
         height: state.height,
         duration_ms,
         file_size,
-        thumbnail_png,
+        has_thumbnail,
     };
 
     let _ = app.emit("capture-recording-complete", payload.clone());

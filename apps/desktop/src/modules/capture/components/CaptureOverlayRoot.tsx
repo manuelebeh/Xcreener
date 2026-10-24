@@ -2,7 +2,7 @@ import { listen } from '@tauri-apps/api/event';
 import { useEffect, useLayoutEffect } from 'react';
 import type { CaptureOverlayInitPayload, OverlayWebviewLayout } from '@/shared/types/ipc';
 import { bytesToObjectUrl } from '@/shared/utils/image';
-import { captureOverlayReady } from '@/tauri/commands';
+import { captureOverlayReady, takeOverlayPreview } from '@/tauri/commands';
 import { useCaptureStore } from '../store';
 import { CaptureOverlay } from './CaptureOverlay';
 
@@ -22,7 +22,14 @@ export function CaptureOverlayRoot() {
     let unlistenInit: (() => void) | undefined;
     let unlistenPresented: (() => void) | undefined;
 
-    listen<CaptureOverlayInitPayload>('capture-overlay-init', (event) => {
+    listen<CaptureOverlayInitPayload>('capture-overlay-init', async (event) => {
+      if (cancelled) {
+        return;
+      }
+
+      const preview = event.payload.hasPreview
+        ? await takeOverlayPreview().catch(() => null)
+        : null;
       if (cancelled) {
         return;
       }
@@ -36,9 +43,7 @@ export function CaptureOverlayRoot() {
       setBounds(event.payload.bounds);
       setMonitors(event.payload.monitors);
       setLiveOverlay(Boolean(event.payload.liveOverlay));
-      setPreviewUrl(
-        event.payload.previewPng?.length ? bytesToObjectUrl(event.payload.previewPng) : null
-      );
+      setPreviewUrl(preview?.byteLength ? bytesToObjectUrl(new Uint8Array(preview)) : null);
       setActiveMode('region');
       setMediaKind('photo');
     }).then((fn) => {

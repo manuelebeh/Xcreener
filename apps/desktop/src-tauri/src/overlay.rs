@@ -174,6 +174,11 @@ fn show_prepared_overlay(
 
     let _ = overlay.hide();
 
+    let has_preview = preview_png.is_some();
+    if let Some(png) = preview_png {
+        crate::commands::raw_ipc::OVERLAY_PREVIEW.set(png);
+    }
+
     sync_overlay_geometry(&overlay, &bounds, &monitors)?;
 
     overlay
@@ -182,7 +187,7 @@ fn show_prepared_overlay(
             CaptureOverlayInitPayload {
                 bounds: bounds.clone(),
                 monitors,
-                preview_png,
+                has_preview,
                 live_overlay,
                 webview_layout: None,
             },

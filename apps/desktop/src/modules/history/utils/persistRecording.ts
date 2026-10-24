@@ -11,7 +11,7 @@ export interface PersistRecordingInput {
   format: CaptureRecordOutputFormat;
   width: number;
   height: number;
-  thumbnailPng?: number[];
+  thumbnailPng?: Uint8Array;
 }
 
 let persistQueue: Promise<void> = Promise.resolve();
@@ -31,7 +31,7 @@ async function persistRecordingInternal(input: PersistRecordingInput): Promise<v
   let thumbnail: string | null = null;
   if (input.thumbnailPng && input.thumbnailPng.length > 0) {
     const thumbnailBytes = await generateThumbnailBytes(
-      new Uint8Array(input.thumbnailPng),
+      input.thumbnailPng,
       input.width,
       input.height
     );
