@@ -88,6 +88,16 @@ jobs:
           S3_SECRET_KEY: minioadmin
         run: mise exec -- pnpm --filter @snapglow/api db:migrate
 
+      # schema.ts, the SQL migrations and drizzle/meta must agree: a schema change without its
+      # generated migration (or a stale snapshot) fails here instead of on the next db:generate.
+      - name: API migration drift check
+        working-directory: apps/api
+        run: |
+          mise exec -- pnpm exec drizzle-kit check
+          mise exec -- pnpm exec drizzle-kit generate --name drift_check
+          git status --porcelain -- drizzle
+          test -z "$(git status --porcelain -- drizzle)"
+
       - name: Unit and integration tests
         run: mise run test
 

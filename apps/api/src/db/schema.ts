@@ -1,9 +1,12 @@
 import type { CollabDocumentState } from '@snapglow/collab-core';
 import type { TemplateStyle } from '@snapglow/marketplace-core';
 import type { BrandKitColors, BrandKitFonts, BrandKitWatermark } from '@snapglow/team-core';
+import { sql } from 'drizzle-orm';
 import {
+  type AnyPgColumn,
   bigint,
   boolean,
+  index,
   integer,
   jsonb,
   pgEnum,
@@ -23,6 +26,9 @@ export const subscriptionStatusEnum = pgEnum('subscription_status', [
   'canceled',
   'trialing',
   'incomplete',
+  'incomplete_expired',
+  'unpaid',
+  'paused',
 ]);
 
 export const notificationTypeEnum = pgEnum('notification_type', [
@@ -73,7 +79,10 @@ export const workspaceMembers = pgTable(
     role: workspaceRoleEnum('role').notNull(),
     joinedAt: timestamp('joined_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [primaryKey({ columns: [table.workspaceId, table.userId] })]
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.userId] }),
+    index('workspace_members_user_id_idx').on(table.userId),
+  ]
 );
 
 export const invitations = pgTable(
@@ -93,7 +102,10 @@ export const invitations = pgTable(
     acceptedAt: timestamp('accepted_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [uniqueIndex('invitations_token_idx').on(table.token)]
+  (table) => [
+    uniqueIndex('invitations_token_idx').on(table.token),
+    index('invitations_workspace_id_idx').on(table.workspaceId),
+  ]
 );
 
 export const brandKits = pgTable('brand_kits', {
@@ -116,6 +128,8 @@ export const workspaceSubscriptions = pgTable('workspace_subscriptions', {
   status: subscriptionStatusEnum('status'),
   seatCount: integer('seat_count').default(1).notNull(),
   currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }),
+  /** `created` of the last Stripe event applied, so a late older event cannot undo a newer one. */
+  lastEventCreated: timestamp('last_event_created', { withTimezone: true }),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
@@ -135,7 +149,10 @@ export const shares = pgTable(
     expiresAt: timestamp('expires_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [uniqueIndex('shares_token_idx').on(table.token)]
+  (table) => [
+    uniqueIndex('shares_token_idx').on(table.token),
+    index('shares_expires_at_idx').on(table.expiresAt).where(sql`${table.expiresAt} IS NOT NULL`),
+  ]
 );
 
 export const libraryItems = pgTable(
@@ -158,7 +175,15 @@ export const libraryItems = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [uniqueIndex('library_items_user_local_id_idx').on(table.userId, table.localId)]
+  (table) => [
+    uniqueIndex('library_items_user_local_id_idx').on(table.userId, table.localId),
+    index('library_items_user_created_idx').on(table.userId, table.createdAt),
+    index('library_items_workspace_created_idx').on(table.workspaceId, table.createdAt.desc()),
+    index('library_items_ocr_text_idx').using(
+      'gin',
+      sql`to_tsvector('english', coalesce(${table.ocrText}, ''))`
+    ),
+  ]
 );
 
 export const collections = pgTable(
@@ -188,57 +213,71 @@ export const libraryItemCollections = pgTable(
   (table) => [primaryKey({ columns: [table.libraryItemId, table.collectionId] })]
 );
 
-export const collabDocuments = pgTable('collab_documents', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  workspaceId: uuid('workspace_id')
-    .notNull()
-    .references(() => workspaces.id, { onDelete: 'cascade' }),
-  libraryItemId: uuid('library_item_id').references(() => libraryItems.id, {
-    onDelete: 'set null',
-  }),
-  createdBy: uuid('created_by')
-    .notNull()
-    .references(() => users.id, { onDelete: 'restrict' }),
-  title: text('title'),
-  screenshotStorageKey: text('screenshot_storage_key').notNull(),
-  screenshotMimeType: text('screenshot_mime_type').notNull(),
-  screenshotByteSize: bigint('screenshot_byte_size', { mode: 'number' }).notNull(),
-  documentState: jsonb('document_state')
-    .$type<CollabDocumentState>()
-    .default({} as CollabDocumentState)
-    .notNull(),
-  version: bigint('version', { mode: 'number' }).default(0).notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+export const collabDocuments = pgTable(
+  'collab_documents',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    libraryItemId: uuid('library_item_id').references(() => libraryItems.id, {
+      onDelete: 'set null',
+    }),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+    title: text('title'),
+    screenshotStorageKey: text('screenshot_storage_key').notNull(),
+    screenshotMimeType: text('screenshot_mime_type').notNull(),
+    screenshotByteSize: bigint('screenshot_byte_size', { mode: 'number' }).notNull(),
+    documentState: jsonb('document_state')
+      .$type<CollabDocumentState>()
+      .default({} as CollabDocumentState)
+      .notNull(),
+    version: bigint('version', { mode: 'number' }).default(0).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index('collab_documents_workspace_id_idx').on(table.workspaceId)]
+);
 
-export const comments = pgTable('comments', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  documentId: uuid('document_id')
-    .notNull()
-    .references(() => collabDocuments.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  parentId: uuid('parent_id'),
-  body: text('body').notNull(),
-  anchor: jsonb('anchor').$type<{ x: number; y: number } | null>(),
-  mentionUserIds: jsonb('mention_user_ids').$type<string[]>().default([]).notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-  deletedAt: timestamp('deleted_at', { withTimezone: true }),
-});
+export const comments = pgTable(
+  'comments',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    documentId: uuid('document_id')
+      .notNull()
+      .references(() => collabDocuments.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    parentId: uuid('parent_id').references((): AnyPgColumn => comments.id, {
+      onDelete: 'set null',
+    }),
+    body: text('body').notNull(),
+    anchor: jsonb('anchor').$type<{ x: number; y: number } | null>(),
+    mentionUserIds: jsonb('mention_user_ids').$type<string[]>().default([]).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true }),
+  },
+  (table) => [index('comments_document_id_idx').on(table.documentId)]
+);
 
-export const notifications = pgTable('notifications', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  type: notificationTypeEnum('type').notNull(),
-  payload: jsonb('payload').$type<Record<string, unknown>>().default({}).notNull(),
-  readAt: timestamp('read_at', { withTimezone: true }),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+export const notifications = pgTable(
+  'notifications',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: notificationTypeEnum('type').notNull(),
+    payload: jsonb('payload').$type<Record<string, unknown>>().default({}).notNull(),
+    readAt: timestamp('read_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index('notifications_user_id_idx').on(table.userId)]
+);
 
 export const apiKeys = pgTable(
   'api_keys',
@@ -257,7 +296,10 @@ export const apiKeys = pgTable(
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [uniqueIndex('api_keys_key_hash_idx').on(table.keyHash)]
+  (table) => [
+    uniqueIndex('api_keys_key_hash_idx').on(table.keyHash),
+    index('api_keys_workspace_id_idx').on(table.workspaceId),
+  ]
 );
 
 export const userSettings = pgTable(
@@ -270,7 +312,10 @@ export const userSettings = pgTable(
     value: jsonb('value').notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [primaryKey({ columns: [table.userId, table.key] })]
+  (table) => [
+    primaryKey({ columns: [table.userId, table.key] }),
+    index('user_settings_updated_at_idx').on(table.updatedAt),
+  ]
 );
 
 export const templateListings = pgTable(
@@ -293,30 +338,41 @@ export const templateListings = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [uniqueIndex('template_listings_slug_idx').on(table.slug)]
+  (table) => [
+    uniqueIndex('template_listings_slug_idx').on(table.slug),
+    index('template_listings_status_idx').on(table.status),
+    index('template_listings_featured_idx').on(table.featured),
+  ]
 );
 
-export const apiCaptures = pgTable('api_captures', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  workspaceId: uuid('workspace_id')
-    .notNull()
-    .references(() => workspaces.id, { onDelete: 'cascade' }),
-  apiKeyId: uuid('api_key_id')
-    .notNull()
-    .references(() => apiKeys.id, { onDelete: 'restrict' }),
-  storageKey: text('storage_key').notNull(),
-  exportStorageKey: text('export_storage_key'),
-  documentState: jsonb('document_state')
-    .$type<CollabDocumentState>()
-    .default({} as CollabDocumentState)
-    .notNull(),
-  mimeType: text('mime_type').notNull(),
-  byteSize: bigint('byte_size', { mode: 'number' }).notNull(),
-  title: text('title'),
-  tags: jsonb('tags').$type<string[]>().default([]).notNull(),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+export const apiCaptures = pgTable(
+  'api_captures',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    workspaceId: uuid('workspace_id')
+      .notNull()
+      .references(() => workspaces.id, { onDelete: 'cascade' }),
+    apiKeyId: uuid('api_key_id')
+      .notNull()
+      .references(() => apiKeys.id, { onDelete: 'restrict' }),
+    storageKey: text('storage_key').notNull(),
+    exportStorageKey: text('export_storage_key'),
+    documentState: jsonb('document_state')
+      .$type<CollabDocumentState>()
+      .default({} as CollabDocumentState)
+      .notNull(),
+    mimeType: text('mime_type').notNull(),
+    byteSize: bigint('byte_size', { mode: 'number' }).notNull(),
+    title: text('title'),
+    tags: jsonb('tags').$type<string[]>().default([]).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index('api_captures_workspace_id_idx').on(table.workspaceId),
+    index('api_captures_created_at_idx').on(table.createdAt.desc()),
+  ]
+);
 
 export type User = typeof users.$inferSelect;
 export type Workspace = typeof workspaces.$inferSelect;

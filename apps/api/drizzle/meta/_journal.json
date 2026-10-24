@@ -57,6 +57,13 @@
       "when": 1757000000000,
       "tag": "0007_user_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792848815247,
+      "tag": "0008_stripe_status_and_indexes",
+      "breakpoints": true
     }
   ]
 }
