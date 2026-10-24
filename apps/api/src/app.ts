@@ -11,6 +11,7 @@ import { serializeRequest } from './lib/log-redact';
 import { registerCollabWebSocket } from './plugins/collab-ws';
 import { registerOpenApiDocs } from './plugins/openapi-docs';
 import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
+import { registerAccountRoutes } from './routes/account';
 import { registerAffiliateRoutes } from './routes/affiliates';
 import { registerApiKeyRoutes } from './routes/api-keys';
 import { registerBillingRoutes } from './routes/billing';
@@ -87,6 +88,7 @@ export async function buildApp(options: BuildAppOptions) {
   await registerPublicCaptureRoutes(app, { db: options.db, storage });
   await registerTemplateRoutes(app, { db: options.db });
   await registerSyncRoutes(app, { db: options.db, storage });
+  await registerAccountRoutes(app, { db: options.db, storage });
   if (env.NODE_ENV !== 'test') {
     await registerOpenApiDocs(app);
   }

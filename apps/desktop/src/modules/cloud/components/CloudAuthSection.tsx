@@ -1,9 +1,11 @@
 import { Button } from '@snapglow/ui';
-import { useEffect } from 'react';
+import { ask } from '@tauri-apps/plugin-dialog';
+import { useEffect, useState } from 'react';
 import { setSetting } from '@/db';
 import { useSettingsStore } from '@/modules/settings/store';
 import { SettingsGroup, SettingsRow, SettingsToggle } from '@/shared/components/SettingsGroup';
 import { SETTING_KEYS } from '@/shared/types/settings';
+import { deleteCloudAccount } from '../deleteAccount';
 import { useCloudAuthStore } from '../store';
 import { pullCloudSync, startPeriodicSync } from '../syncPull';
 
@@ -20,10 +22,38 @@ export function CloudAuthSection() {
   const signOut = useCloudAuthStore((state) => state.signOut);
   const cloudLibrarySync = useSettingsStore((state) => state.cloudLibrarySync);
   const setCloudLibrarySync = useSettingsStore((state) => state.setCloudLibrarySync);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   async function handleCloudLibrarySyncChange(enabled: boolean) {
     setCloudLibrarySync(enabled);
     await setSetting(SETTING_KEYS.cloudLibrarySync, String(enabled));
+  }
+
+  async function handleDeleteAccount() {
+    const confirmed = await ask(
+      'This permanently deletes your SnapGlow cloud account, your cloud library, share links and any workspace where you are the only member. Captures saved on this device are kept.',
+      {
+        title: 'Delete cloud account',
+        kind: 'warning',
+        okLabel: 'Delete account',
+        cancelLabel: 'Cancel',
+      }
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteCloudAccount();
+      await signOut();
+    } catch (cause) {
+      setDeleteError(cause instanceof Error ? cause.message : 'Account deletion failed');
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   useEffect(() => {
@@ -111,6 +141,28 @@ export function CloudAuthSection() {
         onChange={handleCloudLibrarySyncChange}
         testId="cloud-library-sync-toggle"
       />
+      <SettingsRow
+        label="Delete cloud account"
+        hint="Erases your account and everything stored in SnapGlow cloud. Local captures stay."
+        footer={
+          deleteError ? (
+            <p className="text-xs text-destructive" role="alert">
+              {deleteError}
+            </p>
+          ) : null
+        }
+      >
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          disabled={isDeleting}
+          onClick={() => void handleDeleteAccount()}
+          data-testid="cloud-delete-account-button"
+        >
+          {isDeleting ? 'Deleting…' : 'Delete account'}
+        </Button>
+      </SettingsRow>
     </SettingsGroup>
   );
 }

@@ -87,6 +87,7 @@ pnpm --filter @snapglow/api db:migrate
 | GET | `/v1/sync/library` | Bearer JWT | Library sync pull |
 | DELETE | `/v1/library/:id` | Bearer JWT | Delete a library item (sync) |
 | GET/PUT | `/v1/users/me/settings` | Bearer JWT | Cross-device settings sync |
+| DELETE | `/v1/users/me` | Bearer JWT | Erase the account: cloud data, solo workspaces (Stripe cancelled), Auth0 identity when M2M secrets are set; 409 while sole admin of a team |
 | GET | `/v1/me/entitlement` | Bearer JWT | Ed25519-signed plan token (7 days) the desktop verifies offline |
 | GET | `/v1/templates`, `/v1/templates/:slug` | No | Template marketplace listing and detail |
 | POST | `/v1/templates` | Bearer JWT | Submit a template |

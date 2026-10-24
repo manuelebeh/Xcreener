@@ -95,6 +95,38 @@ export async function signOut(): Promise<void> {
   useAccountStore.setState({ signedIn: false, error: null });
 }
 
+/** Erases the cloud account on the API, then signs out. Local edits stay on the device. */
+export async function deleteAccount(): Promise<void> {
+  useAccountStore.setState({ busy: true, error: null });
+  try {
+    const accessToken = await auth.getValidAccessToken();
+    if (!accessToken) {
+      throw new Error('Sign in first');
+    }
+    const response = await fetch(`${getApiUrl()}/v1/users/me`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => null)) as {
+        error?: string;
+        workspaces?: { name: string }[];
+      } | null;
+      const names = payload?.workspaces?.map((workspace) => workspace.name).join(', ');
+      throw new Error(
+        names
+          ? `Make another member an admin of ${names} before deleting your account.`
+          : (payload?.error ?? `Account deletion failed (${response.status})`)
+      );
+    }
+    await signOut();
+  } catch (error) {
+    useAccountStore.setState({ error: error instanceof Error ? error.message : String(error) });
+  } finally {
+    useAccountStore.setState({ busy: false });
+  }
+}
+
 export function usePremiumAccess(): boolean {
   const entitlement = useAccountStore((state) => state.entitlement);
   return Boolean(
