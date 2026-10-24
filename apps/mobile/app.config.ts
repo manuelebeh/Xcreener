@@ -16,7 +16,6 @@ const config: ExpoConfig = {
     buildNumber: '1',
     infoPlist: {
       NSPhotoLibraryAddUsageDescription: 'SnapGlow saves edited screenshots to your photo library.',
-      NSPhotoLibraryUsageDescription: 'SnapGlow saves edited screenshots to your photo library.',
     },
   },
   android: {
@@ -45,7 +44,8 @@ const config: ExpoConfig = {
     [
       'expo-media-library',
       {
-        photosPermission: 'Allow SnapGlow to save edited screenshots to your photo library.',
+        // Save-only (saveToPhotos asks for write access): false keeps the read key out of Info.plist.
+        photosPermission: false,
         savePhotosPermission: 'Allow SnapGlow to save edited screenshots to your photo library.',
       },
     ],
