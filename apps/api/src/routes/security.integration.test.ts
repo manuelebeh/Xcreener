@@ -56,6 +56,7 @@ import { buildApp } from '../app';
 import { createDb } from '../db/migrate';
 import * as schema from '../db/schema';
 import { upsertAuthUser } from '../plugins/auth';
+import { BillingCancellationError, deleteUserAccount } from '../services/account-deletion';
 import { applyAnnotationOpToDocument } from '../services/collab-ops';
 import { purgeExpiredShares } from '../services/share-cleanup';
 
@@ -851,6 +852,217 @@ describe.skipIf(!databaseUrl)('API security regressions (Postgres)', () => {
         .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId));
       expect(subscriptions).toHaveLength(1);
       expect(subscriptions[0]?.status).toBe('active');
+    });
+  });
+
+  describe('account deletion', () => {
+    async function workspace(
+      slug: string,
+      createdBy: string,
+      members: [string, 'admin' | 'viewer'][]
+    ) {
+      const [row] = await db
+        .insert(schema.workspaces)
+        .values({ name: slug, slug: `${slug}-${run}`, plan: 'team_pro', createdBy })
+        .returning();
+      const id = row?.id ?? '';
+      await db
+        .insert(schema.workspaceMembers)
+        .values(members.map(([userId, role]) => ({ workspaceId: id, userId, role })));
+      return id;
+    }
+
+    async function collabDocument(workspaceId: string, createdBy: string) {
+      const [doc] = await db
+        .insert(schema.collabDocuments)
+        .values({
+          workspaceId,
+          createdBy,
+          screenshotStorageKey: `collab/${workspaceId}/${crypto.randomUUID()}`,
+          screenshotMimeType: 'image/png',
+          screenshotByteSize: 1,
+          documentState: defaultCollabDocumentState(10, 10) as never,
+        })
+        .returning();
+      return doc;
+    }
+
+    async function apiKey(workspaceId: string, createdBy: string) {
+      const plaintext = buildApiKeyPlaintext(generateApiKeySecret());
+      const [key] = await db
+        .insert(schema.apiKeys)
+        .values({
+          workspaceId,
+          name: 'key',
+          keyPrefix: apiKeyDisplayPrefix(plaintext),
+          keyHash: hashApiKey(plaintext),
+          createdBy,
+        })
+        .returning();
+      return key;
+    }
+
+    it('erases the user, their solo workspace and objects, and hands team data to an admin', async () => {
+      const user = await upsertAuthUser(db, `auth0|erase-${run}`, null);
+      const heir = await upsertAuthUser(db, `auth0|heir-${run}`, null);
+      const [item] = await db
+        .insert(schema.libraryItems)
+        .values({
+          userId: user.id,
+          storageKey: `library/${user.id}/a`,
+          mimeType: 'image/png',
+          byteSize: 3,
+        })
+        .returning();
+      await db.insert(schema.shares).values({
+        userId: user.id,
+        token: `erase${run}`,
+        storageKey: `shares/${user.id}/erase${run}`,
+        mimeType: 'image/png',
+        byteSize: 3,
+      });
+
+      const solo = await workspace('solo', user.id, [[user.id, 'admin']]);
+      await db.insert(schema.workspaceSubscriptions).values({
+        workspaceId: solo,
+        stripeSubscriptionId: `sub_${run}`,
+        status: 'active',
+      });
+      const soloDoc = await collabDocument(solo, user.id);
+      const soloKey = await apiKey(solo, user.id);
+      await db.insert(schema.apiCaptures).values({
+        workspaceId: solo,
+        apiKeyId: soloKey?.id ?? '',
+        storageKey: `api-captures/${solo}/c`,
+        exportStorageKey: `api-captures/${solo}/c/export.png`,
+        documentState: defaultCollabDocumentState(10, 10) as never,
+        mimeType: 'image/png',
+        byteSize: 3,
+      });
+
+      const team = await workspace('team', user.id, [
+        [user.id, 'admin'],
+        [heir.id, 'admin'],
+      ]);
+      const teamDoc = await collabDocument(team, user.id);
+      const teamKey = await apiKey(team, user.id);
+      await db.insert(schema.invitations).values({
+        workspaceId: team,
+        role: 'viewer',
+        token: `inv-${run}`,
+        invitedBy: user.id,
+        expiresAt: new Date(Date.now() + 3_600_000),
+      });
+      await db
+        .insert(schema.comments)
+        .values({ documentId: teamDoc?.id ?? '', userId: user.id, body: 'mine' });
+
+      const cancel = vi.fn(async () => ({}));
+      const result = await deleteUserAccount(
+        db,
+        storage as never,
+        { subscriptions: { cancel } } as never,
+        user.id
+      );
+
+      expect(result).toEqual({ status: 'deleted', orphanedObjects: 0 });
+      expect(cancel).toHaveBeenCalledWith(`sub_${run}`);
+      expect(await db.select().from(schema.users).where(eq(schema.users.id, user.id))).toEqual([]);
+      expect(
+        await db.select().from(schema.workspaces).where(eq(schema.workspaces.id, solo))
+      ).toEqual([]);
+      const [teamRow] = await db
+        .select()
+        .from(schema.workspaces)
+        .where(eq(schema.workspaces.id, team));
+      expect(teamRow?.createdBy).toBe(heir.id);
+      const [teamDocRow] = await db
+        .select()
+        .from(schema.collabDocuments)
+        .where(eq(schema.collabDocuments.id, teamDoc?.id ?? ''));
+      expect(teamDocRow?.createdBy).toBe(heir.id);
+      const [teamKeyRow] = await db
+        .select()
+        .from(schema.apiKeys)
+        .where(eq(schema.apiKeys.id, teamKey?.id ?? ''));
+      expect(teamKeyRow?.revokedAt).not.toBeNull();
+      expect(
+        await db
+          .select()
+          .from(schema.libraryItems)
+          .where(eq(schema.libraryItems.id, item?.id ?? ''))
+      ).toEqual([]);
+      expect(
+        await db.select().from(schema.comments).where(eq(schema.comments.userId, user.id))
+      ).toEqual([]);
+      expect(deletedObjects).toEqual(
+        expect.arrayContaining([
+          `library/${user.id}/a`,
+          `shares/${user.id}/erase${run}`,
+          soloDoc?.screenshotStorageKey,
+          `api-captures/${solo}/c`,
+          `api-captures/${solo}/c/export.png`,
+        ])
+      );
+      expect(deletedObjects).not.toContain(teamDoc?.screenshotStorageKey);
+    });
+
+    it('refuses while the user is the only admin of a team', async () => {
+      const sub = `auth0|lone-admin-${run}`;
+      const user = await upsertAuthUser(db, sub, null);
+      const viewer = await upsertAuthUser(db, `auth0|viewer-${run}`, null);
+      const team = await workspace('lone', user.id, [
+        [user.id, 'admin'],
+        [viewer.id, 'viewer'],
+      ]);
+
+      const response = await app.inject({
+        method: 'DELETE',
+        url: '/v1/users/me',
+        headers: { authorization: `Bearer ${sub}` },
+      });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.json().workspaces).toEqual([{ id: team, name: 'lone' }]);
+      expect(await db.select().from(schema.users).where(eq(schema.users.id, user.id))).toHaveLength(
+        1
+      );
+    });
+
+    it('keeps everything when a paid solo workspace cannot be cancelled', async () => {
+      const user = await upsertAuthUser(db, `auth0|nostripe-${run}`, null);
+      const solo = await workspace('nostripe', user.id, [[user.id, 'admin']]);
+      await db.insert(schema.workspaceSubscriptions).values({
+        workspaceId: solo,
+        stripeSubscriptionId: `sub_ns_${run}`,
+        status: 'active',
+      });
+
+      await expect(deleteUserAccount(db, storage as never, null, user.id)).rejects.toBeInstanceOf(
+        BillingCancellationError
+      );
+      expect(
+        await db.select().from(schema.workspaces).where(eq(schema.workspaces.id, solo))
+      ).toHaveLength(1);
+    });
+
+    it('deletes through the route and is idempotent', async () => {
+      const sub = `auth0|route-erase-${run}`;
+      await upsertAuthUser(db, sub, null);
+      const request = {
+        method: 'DELETE' as const,
+        url: '/v1/users/me',
+        headers: { authorization: `Bearer ${sub}` },
+      };
+
+      const first = await app.inject(request);
+      expect(first.statusCode).toBe(200);
+      expect(first.json()).toEqual({ deleted: true, identityDeleted: false });
+
+      expect((await app.inject(request)).statusCode).toBe(204);
+      expect(await db.select().from(schema.users).where(eq(schema.users.auth0Sub, sub))).toEqual(
+        []
+      );
     });
   });
 });

@@ -1,11 +1,22 @@
 import { spacing } from '@snapglow/design-tokens/tokens.native';
 import { Button, useTheme } from '@snapglow/ui-native';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { isAccountConfigured } from '../config';
-import { signIn, signOut, useAccountStore, usePremiumAccess } from '../store';
+import { deleteAccount, signIn, signOut, useAccountStore, usePremiumAccess } from '../store';
 
 const PLAN_LABELS = { free: 'Free', team_starter: 'Team Starter', team_pro: 'Team Pro' } as const;
+
+function confirmDeleteAccount() {
+  Alert.alert(
+    'Delete cloud account',
+    'This permanently deletes your SnapGlow cloud account and the data stored with it. Edits saved on this phone are kept.',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete account', style: 'destructive', onPress: () => void deleteAccount() },
+    ]
+  );
+}
 
 export function AccountSection() {
   const { colors } = useTheme();
@@ -34,9 +45,14 @@ export function AccountSection() {
         </Text>
       )}
       {signedIn ? (
-        <Button variant="secondary" onPress={() => void signOut()}>
-          Sign out
-        </Button>
+        <>
+          <Button variant="secondary" onPress={() => void signOut()}>
+            Sign out
+          </Button>
+          <Button variant="ghost" disabled={busy} onPress={confirmDeleteAccount}>
+            Delete cloud account
+          </Button>
+        </>
       ) : (
         <Button variant="primary" disabled={busy} onPress={() => void signIn()}>
           {busy ? 'Signing in…' : 'Sign in'}
