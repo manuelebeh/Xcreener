@@ -4,6 +4,11 @@ import { invoke } from '@tauri-apps/api/core';
 import type {
   CaptureMetadata,
   CaptureOverlayBounds,
+  DbCaptureRow,
+  DbCollectionRow,
+  DbCreatePresetInput,
+  DbCustomPresetRow,
+  DbInsertCaptureInput,
   MonitorInfo,
   WindowInfo,
 } from '@/shared/types/ipc';
@@ -181,6 +186,100 @@ export function secureStoreSet(name: string, value: string) {
 
 export function secureStoreDelete(name: string) {
   return invoke<void>('secure_store_delete', { name });
+}
+
+// Local library (src-tauri/src/db). Prefer the @/db wrappers over calling these directly.
+
+export function dbInit(defaultSettings: Record<string, string>) {
+  return invoke<void>('db_init', { defaultSettings });
+}
+
+export function dbSettingsGet(key: string) {
+  return invoke<string | null>('settings_get', { key });
+}
+
+export function dbSettingsSet(key: string, value: string) {
+  return invoke<void>('settings_set', { key, value });
+}
+
+export function dbCapturesInsert(input: DbInsertCaptureInput) {
+  return invoke<number>('captures_insert', { input });
+}
+
+export function dbCapturesUpdateOcrText(id: number, ocrText: string) {
+  return invoke<void>('captures_update_ocr_text', { id, ocrText });
+}
+
+export function dbCapturesUpdateTags(id: number, tags: string) {
+  return invoke<void>('captures_update_tags', { id, tags });
+}
+
+export function dbCapturesList(limit: number) {
+  return invoke<DbCaptureRow[]>('captures_list', { limit });
+}
+
+export function dbCapturesSearch(query: string, limit: number) {
+  return invoke<DbCaptureRow[]>('captures_search', { query, limit });
+}
+
+export function dbCapturesListByTag(tag: string, limit: number) {
+  return invoke<DbCaptureRow[]>('captures_list_by_tag', { tag, limit });
+}
+
+export function dbCapturesListByCollection(collectionId: number, limit: number) {
+  return invoke<DbCaptureRow[]>('captures_list_by_collection', { collectionId, limit });
+}
+
+export function dbCapturesGet(id: number) {
+  return invoke<DbCaptureRow | null>('captures_get', { id });
+}
+
+export function dbCapturesUidExists(uid: string) {
+  return invoke<boolean>('captures_uid_exists', { uid });
+}
+
+export function dbCapturesDelete(id: number) {
+  return invoke<DbCaptureRow | null>('captures_delete', { id });
+}
+
+export function dbCollectionsList() {
+  return invoke<DbCollectionRow[]>('collections_list');
+}
+
+export function dbCollectionsCreate(name: string) {
+  return invoke<DbCollectionRow>('collections_create', { name });
+}
+
+export function dbCollectionsRename(id: number, name: string) {
+  return invoke<void>('collections_rename', { id, name });
+}
+
+export function dbCollectionsDelete(id: number) {
+  return invoke<void>('collections_delete', { id });
+}
+
+export function dbCollectionsAddCapture(captureId: number, collectionId: number) {
+  return invoke<void>('collections_add_capture', { captureId, collectionId });
+}
+
+export function dbCollectionsRemoveCapture(captureId: number, collectionId: number) {
+  return invoke<void>('collections_remove_capture', { captureId, collectionId });
+}
+
+export function dbCollectionsForCapture(captureId: number) {
+  return invoke<number[]>('collections_for_capture', { captureId });
+}
+
+export function dbPresetsList() {
+  return invoke<DbCustomPresetRow[]>('presets_list');
+}
+
+export function dbPresetsCreate(input: DbCreatePresetInput) {
+  return invoke<number>('presets_create', { input });
+}
+
+export function dbPresetsDelete(id: number) {
+  return invoke<void>('presets_delete', { id });
 }
 
 export type { CaptureMetadata };

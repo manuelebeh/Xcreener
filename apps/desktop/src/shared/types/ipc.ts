@@ -168,3 +168,65 @@ export interface Entitlement {
   /** Unix seconds. */
   expiresAt: number;
 }
+
+/** Rows returned by the `src-tauri/src/db` commands (column names as in SQLite). */
+export interface DbCaptureRow {
+  id: number;
+  filename: string;
+  filepath: string;
+  thumbnail: string | null;
+  width: number;
+  height: number;
+  format: string;
+  file_size: number;
+  preset_used: string | null;
+  tags: string | null;
+  ocr_text: string | null;
+  created_at: string;
+  /** Only set by `captures_search` on a full-text match. */
+  snippet?: string | null;
+}
+
+export interface DbInsertCaptureInput {
+  filename: string;
+  filepath: string;
+  thumbnail: string | null;
+  width: number;
+  height: number;
+  fileSize: number;
+  format: string;
+  /** JSON array of tag strings. */
+  tags: string;
+  uid: string;
+}
+
+export interface DbCollectionRow {
+  id: number;
+  name: string;
+  created_at: string;
+}
+
+export interface DbCustomPresetRow {
+  id: number;
+  name: string;
+  width: number | null;
+  height: number | null;
+  aspect_ratio: string | null;
+  background: string;
+  padding: number;
+  border_radius: number;
+  shadow: string;
+}
+
+export interface DbCreatePresetInput {
+  name: string;
+  width: number;
+  height: number;
+  aspectRatio: string;
+  /** JSON. */
+  background: string;
+  padding: number;
+  borderRadius: number;
+  /** JSON. */
+  shadow: string;
+}

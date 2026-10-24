@@ -74,6 +74,8 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 
 **Phase 0:** SQLite via `@tauri-apps/plugin-sql` in `apps/desktop/src/db/`. Migrations in `migrations/001_init.sql`; `migrate.ts` applies statements one-by-one (`sql:allow-execute`). Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is required (e.g. autostart read at boot without webview).
 
+**2026-10 (audit FINDING-011):** the SQL plugin is gone. Rust opens `snapglow.db` with rusqlite (`src-tauri/src/db/`), applies the same `migrations/*.sql` in `db_init`, and exposes one typed command per query. `src/db/*.ts` keep their API and call those commands, so the WebView can no longer run arbitrary SQL.
+
 ### Capture history (Sprint 1.6)
 
 Frontend-only - no Rust IPC:

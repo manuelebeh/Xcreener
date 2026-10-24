@@ -7,10 +7,8 @@ import {
   type ThemePreference,
   type WatermarkPosition,
 } from '@/shared/types/settings';
-import { DB_URL, getDb } from './connection';
+import { dbSettingsGet, dbSettingsSet } from '@/tauri/commands';
 import { ensureMigrationsApplied } from './migrate';
-
-export { DB_URL, getDb };
 
 export async function initDatabase(): Promise<void> {
   await ensureMigrationsApplied();
@@ -18,20 +16,12 @@ export async function initDatabase(): Promise<void> {
 
 export async function getSetting(key: string): Promise<string | null> {
   await ensureMigrationsApplied();
-  const db = await getDb();
-  const rows = await db.select<{ value: string }[]>('SELECT value FROM settings WHERE key = ?', [
-    key,
-  ]);
-  return rows[0]?.value ?? null;
+  return dbSettingsGet(key);
 }
 
 export async function setSetting(key: string, value: string): Promise<void> {
   await ensureMigrationsApplied();
-  const db = await getDb();
-  await db.execute(
-    'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value',
-    [key, value]
-  );
+  await dbSettingsSet(key, value);
 }
 
 function parseBoolean(value: string | null, fallback: boolean): boolean {

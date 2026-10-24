@@ -126,9 +126,10 @@
 | `@tauri-apps/plugin-clipboard-manager` | Copier/coller vers le presse-papier système |
 | `@tauri-apps/plugin-notification` | Notifications système (upload terminé, etc.) |
 | `@tauri-apps/plugin-shell` | Ouvrir des URLs externes, glisser-déposer |
-| `@tauri-apps/plugin-sql` | Base de données SQLite locale |
 | `@tauri-apps/plugin-updater` | Mises à jour automatiques |
 | `@tauri-apps/plugin-fs` | Accès au filesystem (export, import de fonds) |
+
+La base SQLite locale n'est pas un plugin : Rust l'ouvre avec rusqlite (`src-tauri/src/db/`) et expose une commande typée par requête.
 | `@tauri-apps/plugin-dialog` | Dialogues natifs (sauvegarder sous, ouvrir fichier) |
 | `@tauri-apps/plugin-autostart` | Lancement au démarrage du système |
 | `@tauri-apps/plugin-os` | Détection de l'OS, version, architecture |
@@ -737,8 +738,6 @@ jobs:
     "global-shortcut:default",
     "clipboard-manager:default",
     "clipboard-manager:allow-write-image",
-    "sql:default",
-    "sql:allow-execute",
     "fs:default",
     "fs:allow-read-file",
     "fs:allow-write-file",
