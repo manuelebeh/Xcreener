@@ -16,11 +16,11 @@ describe('integration token storage', () => {
     secrets.clear();
   });
 
-  it('drops refresh tokens kept by older versions', async () => {
+  it('drops raw refresh tokens kept by older versions and keeps the sealed handle', async () => {
     secrets.set(
       'integrations.tokens',
       JSON.stringify({
-        slack: { accessToken: 'a', refreshToken: 'r', accountLabel: 'Acme' },
+        slack: { accessToken: 'a', refreshToken: 'r', refreshHandle: 'v1.h', accountLabel: 'Acme' },
         notion: { accessToken: 'b', refreshToken: null },
       })
     );
@@ -28,7 +28,7 @@ describe('integration token storage', () => {
     const tokens = await loadIntegrationTokens();
 
     expect(tokens).toEqual({
-      slack: { accessToken: 'a', accountLabel: 'Acme' },
+      slack: { accessToken: 'a', refreshHandle: 'v1.h', accountLabel: 'Acme' },
       notion: { accessToken: 'b' },
     });
     expect(secrets.get('integrations.tokens')).not.toContain('refreshToken');
