@@ -22,7 +22,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
 
   if (annotation.type === 'text') {
     return (
-      <div className="flex flex-wrap items-end gap-3 border-t border-border pt-3">
+      <div className="flex flex-wrap items-end gap-3">
         <label className="space-y-1 text-xs">
           <span className="text-muted">Font size</span>
           <input
@@ -69,7 +69,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
 
   if (annotation.type === 'highlight') {
     return (
-      <div className="flex flex-wrap items-end gap-3 border-t border-border pt-3">
+      <div className="flex flex-wrap items-end gap-3">
         <label className="space-y-1 text-xs">
           <span className="text-muted">Color</span>
           <input
@@ -99,7 +99,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
 
   if (annotation.type === 'blur') {
     return (
-      <div className="flex flex-wrap items-end gap-3 border-t border-border pt-3">
+      <div className="flex flex-wrap items-end gap-3">
         <div className="flex gap-1">
           {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
             <Button
@@ -139,7 +139,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
     annotation.type === 'line'
   ) {
     return (
-      <div className="flex flex-wrap items-end gap-3 border-t border-border pt-3">
+      <div className="flex flex-wrap items-end gap-3">
         <label className="space-y-1 text-xs">
           <span className="text-muted">Stroke</span>
           <input
@@ -258,6 +258,16 @@ export function AnnotationToolStrip() {
   );
 }
 
+/** True when the blur tool or a selected shape has options to show; the inspector hides the section otherwise. */
+export function useHasAnnotationOptions(): boolean {
+  return useEditorStore(
+    (s) =>
+      s.screenshot !== null &&
+      ((s.activeTool === 'blur' && s.selectedAnnotationId === null) ||
+        s.annotations.some((annotation) => annotation.id === s.selectedAnnotationId))
+  );
+}
+
 export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) {
   const screenshot = useEditorStore((s) => s.screenshot);
   const activeTool = useEditorStore((s) => s.activeTool);
@@ -269,12 +279,11 @@ export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) 
   const selectedAnnotation = annotations.find(
     (annotation) => annotation.id === selectedAnnotationId
   );
+  const showBlurDefaults = activeTool === 'blur' && !selectedAnnotation;
 
-  if (!screenshot) {
+  if (!screenshot || (!showBlurDefaults && !selectedAnnotation)) {
     return null;
   }
-
-  const showBlurDefaults = activeTool === 'blur' && !selectedAnnotation;
 
   const toolbar = (
     <div className="w-full space-y-3" data-testid="annotation-options">
@@ -308,12 +317,6 @@ export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) 
       ) : null}
 
       {selectedAnnotation ? <SelectedAnnotationPanel annotation={selectedAnnotation} /> : null}
-
-      {!showBlurDefaults && !selectedAnnotation ? (
-        <p className="text-xs text-muted">
-          Pick a tool in the toolbar above the canvas. Options for the selected shape appear here.
-        </p>
-      ) : null}
     </div>
   );
 
