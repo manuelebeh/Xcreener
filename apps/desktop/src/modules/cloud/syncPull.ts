@@ -80,9 +80,10 @@ async function hasLocalCopy(localId: string): Promise<boolean> {
 /** @internal Exported for tests. */
 export async function importSyncedLibraryItem(
   item: SyncLibraryItem,
-  pulledIds: Set<string>
+  pulledIds: Set<string>,
+  headers: Record<string, string>
 ): Promise<boolean> {
-  if (item.deletedAt || !item.assetUrl) {
+  if (item.deletedAt) {
     return false;
   }
 
@@ -95,7 +96,8 @@ export async function importSyncedLibraryItem(
     return false;
   }
 
-  const response = await fetch(item.assetUrl);
+  // The release CSP only allows the API origin, so the asset comes through the API.
+  const response = await fetch(`${getApiUrl()}/v1/library/${item.id}/content`, { headers });
   if (!response.ok) {
     return false;
   }
@@ -122,13 +124,16 @@ export async function importSyncedLibraryItem(
   return true;
 }
 
-async function applySyncedLibraryItems(items: SyncLibraryItem[]): Promise<number> {
+async function applySyncedLibraryItems(
+  items: SyncLibraryItem[],
+  headers: Record<string, string>
+): Promise<number> {
   const pulledIds = getPulledLibraryIds();
   let imported = 0;
 
   for (const item of items) {
     try {
-      const didImport = await importSyncedLibraryItem(item, pulledIds);
+      const didImport = await importSyncedLibraryItem(item, pulledIds, headers);
       if (didImport) {
         imported += 1;
       }
@@ -165,7 +170,7 @@ export async function pullCloudSync(): Promise<void> {
   if (libraryResponse.ok) {
     const libraryPayload = (await libraryResponse.json()) as SyncLibraryResponse;
     await setStoredCursor(LIBRARY_CURSOR_KEY, libraryPayload.cursor);
-    await applySyncedLibraryItems(libraryPayload.items);
+    await applySyncedLibraryItems(libraryPayload.items, headers);
     useCloudAuthStore.getState().setLibrarySyncStatus({
       at: new Date().toISOString(),
       error: null,

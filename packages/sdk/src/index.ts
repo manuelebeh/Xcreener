@@ -86,11 +86,18 @@ export class SnapGlowClient {
       opts?: { title?: string; tags?: string[] }
     ) => this.beautifyCapture(id, config, opts),
     export: (id: string, opts?: ExportCaptureOptions) => this.exportCapture(id, opts),
+    /** Bytes of the last export, served by the API instead of a storage URL. */
+    downloadExport: (id: string) => this.downloadExport(id),
     publish: (id: string) => this.publishCapture(id),
     delete: (id: string) => this.deleteCapture(id),
   };
 
   private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
+    const response = await this.send(path, init);
+    return parseJsonResponse<T>(response);
+  }
+
+  private async send(path: string, init: RequestInit = {}): Promise<Response> {
     const headers = new Headers(init.headers);
     headers.set('Authorization', `Bearer ${this.apiKey}`);
 
@@ -114,7 +121,7 @@ export class SnapGlowClient {
       throw new ApiError(message, response.status, body);
     }
 
-    return parseJsonResponse<T>(response);
+    return response;
   }
 
   private async uploadCapture(
@@ -178,6 +185,11 @@ export class SnapGlowClient {
         quality: opts?.quality,
       }),
     });
+  }
+
+  private async downloadExport(id: string): Promise<ArrayBuffer> {
+    const response = await this.send(`/v1/public/captures/${id}/export/content`);
+    return response.arrayBuffer();
   }
 
   private async publishCapture(id: string): Promise<PublishCaptureResponse> {

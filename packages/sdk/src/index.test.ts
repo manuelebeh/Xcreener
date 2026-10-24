@@ -96,4 +96,22 @@ describe('SnapGlowClient', () => {
       expect.objectContaining({ method: 'POST' })
     );
   });
+
+  it('downloads export bytes through the API with the key', async () => {
+    const fetchImpl = vi.fn(
+      async (_url: string, _init?: RequestInit) =>
+        new Response(new Uint8Array([1, 2, 3]), { headers: { 'Content-Type': 'image/png' } })
+    );
+
+    const client = new SnapGlowClient({
+      apiKey: 'sg_live_testsecret',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+
+    const bytes = await client.captures.downloadExport('cap-1');
+    expect([...new Uint8Array(bytes)]).toEqual([1, 2, 3]);
+    const [url, init] = fetchImpl.mock.calls[0] ?? [];
+    expect(url).toContain('/v1/public/captures/cap-1/export/content');
+    expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer sg_live_testsecret');
+  });
 });
