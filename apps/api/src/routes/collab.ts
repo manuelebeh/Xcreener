@@ -1,4 +1,9 @@
-import { ALLOWED_SHARE_MIME_TYPES, type ShareMimeType } from '@snapglow/cloud-core';
+import { collabDocumentStateSchema } from '@snapglow/api-core';
+import {
+  ALLOWED_SHARE_MIME_TYPES,
+  maxBytesForMime,
+  type ShareMimeType,
+} from '@snapglow/cloud-core';
 import {
   buildCollabUrl,
   type CollabDocumentResponse,
@@ -41,6 +46,23 @@ const commentCreateSchema = z.object({
 });
 
 const commentUpdateSchema = z.object({ body: commentBodySchema });
+
+const documentTitleSchema = z.string().max(200).nullable();
+
+const documentPatchSchema = z.object({
+  documentState: collabDocumentStateSchema.optional(),
+  title: documentTitleSchema.optional(),
+  /** When sent, the snapshot is refused (409) if another write landed since the client read it. */
+  expectedVersion: z.number().int().min(0).optional(),
+});
+
+const linkLibrarySchema = z.object({ libraryItemId: z.string().uuid() });
+
+/** Same bounds as the WebSocket and public API paths (2026-10-24 audit, FINDING-004). */
+function parseDocumentState(value: unknown): CollabDocumentState | null {
+  const parsed = collabDocumentStateSchema.safeParse(value);
+  return parsed.success ? (parsed.data as unknown as CollabDocumentState) : null;
+}
 
 function isAllowedMimeType(value: string): value is ShareMimeType {
   return (ALLOWED_SHARE_MIME_TYPES as readonly string[]).includes(value);
@@ -187,30 +209,46 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
     }
 
     const buffer = await multipart.toBuffer();
+    if (buffer.byteLength > maxBytesForMime(mimeType)) {
+      return reply.code(413).send({ error: 'File too large' });
+    }
     const titleField = multipart.fields.title;
     const stateField = multipart.fields.documentState;
     const widthField = multipart.fields.screenshotWidth;
     const heightField = multipart.fields.screenshotHeight;
 
-    const title =
+    const parsedTitle = documentTitleSchema.safeParse(
       titleField && 'value' in titleField && typeof titleField.value === 'string'
         ? titleField.value
-        : null;
+        : null
+    );
+    if (!parsedTitle.success) {
+      return reply.code(400).send({ error: 'Invalid title' });
+    }
+    const title = parsedTitle.data;
 
-    let documentState: CollabDocumentState = defaultCollabDocumentState(800, 600);
+    let rawState: unknown = defaultCollabDocumentState(800, 600);
     if (stateField && 'value' in stateField && typeof stateField.value === 'string') {
       try {
-        documentState = JSON.parse(stateField.value) as CollabDocumentState;
+        rawState = JSON.parse(stateField.value);
       } catch {
         return reply.code(400).send({ error: 'Invalid documentState JSON' });
       }
     }
 
-    if (widthField && 'value' in widthField && typeof widthField.value === 'string') {
-      documentState.screenshotWidth = Number(widthField.value) || documentState.screenshotWidth;
+    if (rawState && typeof rawState === 'object') {
+      const state = rawState as Partial<CollabDocumentState>;
+      if (widthField && 'value' in widthField && typeof widthField.value === 'string') {
+        state.screenshotWidth = Number(widthField.value) || state.screenshotWidth;
+      }
+      if (heightField && 'value' in heightField && typeof heightField.value === 'string') {
+        state.screenshotHeight = Number(heightField.value) || state.screenshotHeight;
+      }
     }
-    if (heightField && 'value' in heightField && typeof heightField.value === 'string') {
-      documentState.screenshotHeight = Number(heightField.value) || documentState.screenshotHeight;
+
+    const documentState = parseDocumentState(rawState);
+    if (!documentState) {
+      return reply.code(400).send({ error: 'Invalid documentState' });
     }
 
     const storageKey = `collab/${workspaceId}/${crypto.randomUUID()}`;
@@ -282,24 +320,51 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
         return reply.code(403).send({ error: 'Forbidden' });
       }
 
-      const body = request.body as { documentState?: CollabDocumentState; title?: string };
-      const updates: Partial<typeof schema.collabDocuments.$inferInsert> = {
-        updatedAt: new Date(),
-      };
-      if (body.title !== undefined) {
-        updates.title = body.title;
+      const parsed = documentPatchSchema.safeParse(request.body);
+      if (!parsed.success) {
+        return reply.code(400).send({ error: 'Invalid request body' });
       }
-      if (body.documentState) {
-        updates.documentState = body.documentState;
-        updates.version = access.doc.version + 1;
+      const body = parsed.data;
+
+      // Same lock as the WebSocket op path, so a snapshot and a concurrent op cannot both
+      // write version N + 1.
+      const result = await options.db.transaction(async (tx) => {
+        const [current] = await tx
+          .select()
+          .from(schema.collabDocuments)
+          .where(eq(schema.collabDocuments.id, id))
+          .limit(1)
+          .for('update');
+        if (!current) {
+          return { status: 404 as const };
+        }
+        if (body.expectedVersion !== undefined && body.expectedVersion !== current.version) {
+          return { status: 409 as const, version: current.version };
+        }
+
+        const updates: Partial<typeof schema.collabDocuments.$inferInsert> = {
+          updatedAt: new Date(),
+        };
+        if (body.title !== undefined) {
+          updates.title = body.title;
+        }
+        if (body.documentState) {
+          updates.documentState = body.documentState as unknown as CollabDocumentState;
+          updates.version = current.version + 1;
+        }
+
+        const [row] = await tx
+          .update(schema.collabDocuments)
+          .set(updates)
+          .where(eq(schema.collabDocuments.id, id))
+          .returning();
+        return { status: 200 as const, row };
+      });
+
+      if (result.status === 409) {
+        return reply.code(409).send({ error: 'Document changed', version: result.version });
       }
-
-      const [updated] = await options.db
-        .update(schema.collabDocuments)
-        .set(updates)
-        .where(eq(schema.collabDocuments.id, id))
-        .returning();
-
+      const updated = result.status === 200 ? result.row : undefined;
       if (!updated) {
         return reply.code(404).send({ error: 'Document not found' });
       }
@@ -319,7 +384,11 @@ export async function registerCollabRoutes(app: FastifyInstance, options: Collab
 
       const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
       const { id } = request.params as { id: string };
-      const body = request.body as { libraryItemId: string };
+      const parsedBody = linkLibrarySchema.safeParse(request.body);
+      if (!parsedBody.success) {
+        return reply.code(400).send({ error: 'Invalid request body' });
+      }
+      const body = parsedBody.data;
       const access = await resolveDocumentAccess(options.db, id, user.id);
       if (!access) {
         return reply.code(404).send({ error: 'Document not found' });
