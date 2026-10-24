@@ -39,7 +39,7 @@ Updater signing is **distinct** from macOS Developer ID / Windows Authenticode c
 Until certificates are available:
 
 - Builds remain **unsigned** (Gatekeeper / SmartScreen warnings expected).
-- `docs/internal/technical/release-signing.md` documents required secrets.
+- `docs/guides/release-signing.md` documents required secrets.
 - CI uses conditional env blocks - signing activates when secrets are present.
 
 Required secrets (future):
@@ -63,6 +63,6 @@ Required secrets (future):
 
 ## References
 
-- [release-signing.md](../release-signing.md)
+- [release-signing.md](../../guides/release-signing.md)
 - [ADR-001](./001-monorepo-and-module-architecture.md)
-- [Technical Stack - Desktop.md](../Technical%20Stack%20-%20Desktop.md) §9
+- [Technical Stack - Desktop.md](../desktop-stack.md) §9

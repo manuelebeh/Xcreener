@@ -102,6 +102,6 @@ done
 
 ## Related
 
-- [listing-checklist.md](../store/listing-checklist.md) — screenshots, copy, assets
-- [device-matrix.md](../qa/device-matrix.md) — QA matrix
+- [listing-checklist.md](../../apps/mobile/docs/store/listing-checklist.md) — screenshots, copy, assets
+- [device-matrix.md](../../apps/mobile/docs/qa/device-matrix.md) — QA matrix
 - Desktop signing: [release-signing.md](./release-signing.md)

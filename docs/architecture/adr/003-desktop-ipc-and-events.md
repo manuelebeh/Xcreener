@@ -102,4 +102,4 @@ Frontend-only - no Rust IPC:
 - [ADR-004](./004-system-integration-tray-shortcuts.md)
 - [ADR-006](./006-native-capture-overlay.md)
 - [ADR-007](./007-live-capture-flows.md)
-- [Technical Stack - Desktop.md](../Technical%20Stack%20-%20Desktop.md)
+- [Technical Stack - Desktop.md](../desktop-stack.md)

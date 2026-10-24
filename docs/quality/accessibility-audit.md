@@ -54,5 +54,5 @@
 
 ## References
 
-- [ADR-002](./adr/002-design-tokens-ui-and-web.md)
+- [ADR-002](../architecture/adr/002-design-tokens-ui-and-web.md)
 - [WCAG 2.1 Quick Reference](https://www.w3.org/WAI/WCAG21/quickref/)

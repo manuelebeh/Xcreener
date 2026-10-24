@@ -48,3 +48,6 @@ apps/desktop/.impeccable/mocks/
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Private docs (strategy, audits, marketing); never commit
+docs/internal/

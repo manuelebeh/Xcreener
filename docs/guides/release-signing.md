@@ -128,6 +128,6 @@ pnpm --filter @snapglow/api exec tsx scripts/generate-entitlement-keys.ts
 
 ## References
 
-- [ADR-005](./adr/005-distribution-updates-and-signing.md)
+- [ADR-005](../architecture/adr/005-distribution-updates-and-signing.md)
 - [Tauri updater](https://v2.tauri.app/plugin/updater/)
 - [Tauri signing](https://v2.tauri.app/security/signer/)

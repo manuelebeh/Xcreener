@@ -3,7 +3,7 @@
 > Architecture technique détaillée pour les applications desktop SnapGlow
 > **Version :** 1.0 | **Date :** Juin 2026 | **Statut :** Brouillon
 
-← [[Cahier des Charges]] | → [[Sprints & Implementations]]
+← Cahier des Charges | → [Sprints & Implementations](../product/sprints.md)
 
 ---
 
@@ -781,11 +781,11 @@ jobs:
 
 ## Documents liés
 
-- [[Cahier des Charges]] - Point d'entrée documentation
-- [[Product Requirements]] - Exigences produit
-- [[Sprints & Implementations]] - Planning de développement
-- [[Cahier des Charges]] - Spécifications originales
-- [[Competitive Analysis]] - Benchmarking concurrents
+- Cahier des Charges - Point d'entrée documentation
+- Product Requirements (private, `docs/internal/`)
+- [Sprints & Implementations](../product/sprints.md) - Planning de développement
+- Cahier des Charges - Spécifications originales
+- Competitive Analysis - Benchmarking concurrents
 
 ---
 

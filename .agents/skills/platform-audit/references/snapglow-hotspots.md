@@ -2,7 +2,7 @@
 
 Spotted while writing this skill. These are **leads, not findings**: each starts as `POSSIBLE` and must be confirmed or dismissed with evidence. The code may have changed since.
 
-A previous API-only audit exists: `docs/internal/technical/security-audit-2026-06.md` (2026-06-27). Re-verify every item it marks `Fixed`, `Accepted`, or `OK` against current code instead of copying its conclusions. It left the desktop, mobile, and extension surfaces out of scope.
+A previous API-only audit exists: `docs/internal/audits/security-audit-2026-06.md` (2026-06-27). Re-verify every item it marks `Fixed`, `Accepted`, or `OK` against current code instead of copying its conclusions. It left the desktop, mobile, and extension surfaces out of scope.
 
 ## Desktop (Tauri 2)
 

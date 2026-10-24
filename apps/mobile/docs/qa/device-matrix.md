@@ -56,4 +56,4 @@ Record after testing on real devices:
 | iOS | preview / development | 0.1.0 | — |
 | Android | preview / development | 0.1.0 | — |
 
-> TestFlight + Play Internal uploads blocked until Apple Developer + Google Play accounts are active (see [release-signing-mobile.md](../../../docs/internal/technical/release-signing-mobile.md)).
+> TestFlight + Play Internal uploads blocked until Apple Developer + Google Play accounts are active (see [release-signing-mobile.md](../../../docs/guides/release-signing-mobile.md)).

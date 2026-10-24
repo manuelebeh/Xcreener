@@ -60,4 +60,4 @@ Global key injection in CI is unreliable - covered by IPC test hooks + Rust test
 ## References
 
 - [ADR-003](./003-desktop-ipc-and-events.md)
-- [accessibility-audit.md](../accessibility-audit.md)
+- [accessibility-audit.md](../../quality/accessibility-audit.md)

@@ -46,7 +46,7 @@ export async function authenticateRequest(
     }
 
     // Invitations match on email, so only an address Auth0 says is verified counts.
-    // The post-login Action must add `email_verified` next to `email` (docs/internal/technical/auth0-setup.md).
+    // The post-login Action must add `email_verified` next to `email` (docs/guides/auth0-setup.md).
     const email =
       typeof payload.email === 'string' && payload.email_verified === true ? payload.email : null;
     const auth0OrgId =

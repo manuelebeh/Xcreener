@@ -3,7 +3,7 @@
 > Plan de développement détaillé, sprints, livrables et dépendances
 > **Version :** 1.0 | **Date :** Juin 2026 | **Statut :** Brouillon
 
-← [[Product Requirements]] | → [[Technical Stack - Desktop]]
+← Product Requirements (private) | → [Technical Stack - Desktop](../architecture/desktop-stack.md)
 
 ---
 
@@ -222,10 +222,10 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code, 2026-06-16)**
 
-- **Accessibilité** : `@storybook/addon-a11y`, token `focus-ring`, composant `Label`, fixes focus/reduced-motion ; [`accessibility-audit.md`](../technical/accessibility-audit.md)
+- **Accessibilité** : `@storybook/addon-a11y`, token `focus-ring`, composant `Label`, fixes focus/reduced-motion ; [`accessibility-audit.md`](../quality/accessibility-audit.md)
 - **ADRs** : ADR-003 (IPC/events), ADR-004 (tray/shortcuts/autostart), ADR-005 (updater/releases/signing) ; ADR-006 (capture overlay) ajouté en Sprint 1.1
 - **Updater** : `tauri-plugin-updater`, GitHub Releases endpoint, `release.yml`, bouton Settings « Check for updates »
-- **Signing** : [`release-signing.md`](../technical/release-signing.md) ; CI conditionnelle (builds non signés tant que certs absents)
+- **Signing** : [`release-signing.md`](../guides/release-signing.md) ; CI conditionnelle (builds non signés tant que certs absents)
 - **Tests natifs** : `cargo test` shortcuts, WebDriver e2e (`e2e-native/`, `e2e-native.yml`), hooks IPC debug ; Playwright smoke en CI
 
 **Reporté**
@@ -606,7 +606,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 | Statut | ID | Tâche | Priorité | Estimation | Dépendance |
 |---|---|---|---|---|---|
 | `[ ]` | L-006 | Préparer les assets Product Hunt (logo, tagline, screenshots, vidéo) | P0 | 2j | L-005 |
-| `[ ]` | L-007 | Préparer le deal AppSumo (page, pricing 19$ OTP, description) | P0 | 2j | L-005 |
+| `[ ]` | L-007 | Préparer le deal AppSumo (page, description) | P0 | 2j | L-005 |
 | `[ ]` | L-008 | Lancement Product Hunt (minuit PST) + monitoring | P0 | 1j | L-006 |
 | `[ ]` | L-009 | Activation AppSumo le même jour | P0 | 1j | L-007 |
 | `[ ]` | L-010 | Outreach : newsletters tech, Reddit (r/macapps, r/SideProject, r/webdev) | P1 | 2j | L-008 |
@@ -653,7 +653,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 - **`tools/style-classifier/sources.json`** : manifeste des sources publiques recherchées et documentées (license + usage commercial) pour les 6 classes
 - **`scripts/fetch_dataset.py`** : télécharge `ui` ([WebUI](https://huggingface.co/datasets/biglab/webui-7k)), `photo` ([Unsplash Lite](https://huggingface.co/datasets/1aurent/unsplash-lite)), `text` ([DocLayNet](https://huggingface.co/datasets/pierreguillou/DocLayNet-base), CDLA-Permissive) → `dataset/raw/<class>/` ; auto-détection colonne image, dedup, normalisation PNG ; écrit `SOURCES.lock.json` (provenance)
 - **`scripts/synthesize.py`** : génère `code`/`terminal`/`diagram` (license-clean) via Pygments + Graphviz (fallback matplotlib/networkx) - smoke test OK (PNG valides)
-- **Conformité normes** : on-device, pas de PII, images non commitées (`.gitignore`), licences tracées - voir [`tools/style-classifier/DATASET.md`](../../../tools/style-classifier/DATASET.md)
+- **Conformité normes** : on-device, pas de PII, images non commitées (`.gitignore`), licences tracées - voir [`tools/style-classifier/DATASET.md`](../../tools/style-classifier/DATASET.md)
 - **Reste à faire (machine réseau + CPU/GPU)** : `pip install -r requirements.txt` → `fetch_dataset.py --limit 1500` → `collect.py` → `train.py` → `evaluate.py` (gate ≥ 80 %) → `export.py`
 
 **En attente (bloquant prod ML)**
@@ -711,7 +711,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 
 **Livré (code + QA manuelle, 2026-06-20)**
 
-- **ADR-007** : flux live capture (preview crop vs native grab) - [007-live-capture-flows.md](../technical/adr/007-live-capture-flows.md)
+- **ADR-007** : flux live capture (preview crop vs native grab) - [007-live-capture-flows.md](../architecture/adr/007-live-capture-flows.md)
 - **Rust** : `capture/native.rs` (`capture_native_command`), `capture/scroll.rs` + `capture/stitch.rs` (`capture_scrolling_window_command`), `resolve_window` (WindowInfo, exclusion fenêtres SnapGlow), scroll plateforme macOS (CGEvent clavier Home / ⌘↑ / Page Down) + Windows (`VK_HOME` / `VK_NEXT`)
 - **Overlay** : modes **Scroll** et **Menu** ; dropdown **Delay** (Off / 3s / 5s / 10s) ; countdown overlay ; HUD flottant scroll (pastille + **Done** + état « Finishing capture… »)
 - **Menu** : overlay live sans preview, délai 3s par défaut, capture region ou fenêtre après countdown
@@ -950,7 +950,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 **Livraison (2026-06-27)**
 
 - **T-019** : k6 scenarios (`apps/api/load/`), seed fixture, `mise run load:api`, CI hebdo `.github/workflows/api-load.yml`, Vitest rate-limit tests
-- **T-020** : `docs/internal/technical/security-audit-2026-06.md`, `@fastify/helmet`, CORS allowlist (`CORS_ORIGINS`), `apps/api/scripts/security-scan.sh`
+- **T-020** : security audit 2026-06, `@fastify/helmet`, CORS allowlist (`CORS_ORIGINS`), `apps/api/scripts/security-scan.sh`
 - **T-021** : `TeamOnboardingWizard` (7 steps), auto-trigger `TeamOnboardingHost`, relance depuis Settings
 - **T-022** : Help center web `/help` + 11 articles Markdown, lien landing + desktop wizard
 - **T-023** : Stripe Customer Portal API + desktop, rename workspace, empty/error states team/collab/cloud/intégrations, WS reconnect banner
@@ -1058,7 +1058,7 @@ PHASE 4 - Scale               M15-M18   (8 sprints)     Marketplace + i18n
 
 **Livraison (2026-06-27)**
 
-- **Blog** : `/blog`, `/blog/:slug`, `docs/internal/marketing/seo-playbook.md`
+- **Blog** : `/blog`, `/blog/:slug`, SEO playbook
 - **Articles** : Xnapper alternative Windows, beautify social
 
 ### Sprint 4.15-4.16 (Semaines 71-74) - A/B tests PostHog
@@ -1131,11 +1131,11 @@ CL-001 (backend) ──── CL-003 (auth) ──── T-001 (multi-tenant) �
 
 ## Documents liés
 
-- [[Cahier des Charges]] - Point d'entrée documentation
-- [[Product Requirements]] - Exigences produit détaillées
-- [[Technical Stack - Desktop]] - Architecture technique desktop
-- [[Cahier des Charges]] - Spécifications originales
-- [[Market Analysis]] - Analyse de marché
+- Cahier des Charges - Point d'entrée documentation
+- Product Requirements (private, `docs/internal/`)
+- [Technical Stack - Desktop](../architecture/desktop-stack.md) - Architecture technique desktop
+- Cahier des Charges - Spécifications originales
+- Market Analysis - Analyse de marché
 
 ---
 
