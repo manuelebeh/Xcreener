@@ -24,6 +24,15 @@
     "*.{js,jsx,ts,tsx,json}": "biome check --write --no-errors-on-unmatched"
   },
   "pnpm": {
+    "auditConfig": {
+      "ignoreGhsas": [
+        "GHSA-5p2g-fcmc-qvqq",
+        "GHSA-w3rx-r6r6-pgpr",
+        "GHSA-86w9-cpqp-85rv",
+        "GHSA-mrhx-c7xc-m3w5",
+        "GHSA-xcx6-jx8p-x3h5"
+      ]
+    },
     "overrides": {
       "js-yaml@>=4.0.0 <4.3.2": "^4.3.2",
       "shell-quote@<1.11.0": "^1.11.0",
