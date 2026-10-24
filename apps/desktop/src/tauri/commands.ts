@@ -129,9 +129,12 @@ export function detectSensitiveData(imageData: Uint8Array) {
   return invoke<import('@/shared/types/ipc').SensitiveRegion[]>('detect_sensitive_data', imageData);
 }
 
-/** Checks the API signature in Rust; null when the token is missing, forged or expired. */
-export function verifyEntitlement(token: string) {
-  return invoke<import('@/shared/types/ipc').Entitlement | null>('verify_entitlement', { token });
+/** Checks the API signature in Rust; null when the token is missing, forged, expired or not issued to userId. */
+export function verifyEntitlement(token: string, userId: string) {
+  return invoke<import('@/shared/types/ipc').Entitlement | null>('verify_entitlement', {
+    token,
+    userId,
+  });
 }
 
 export function classifyContent(imageData: Uint8Array) {
