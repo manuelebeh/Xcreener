@@ -5,6 +5,14 @@ import { removeCapture } from '../utils/removeCapture';
 
 const UNDO_MS = 8000;
 
+/** Deletes for real, keeping the capture out of reloaded lists until the database agrees. */
+function commitDelete(id: number): void {
+  const { releaseHidden, setError } = useHistoryStore.getState();
+  removeCapture(id)
+    .catch((error: unknown) => setError(error instanceof Error ? error.message : String(error)))
+    .finally(() => releaseHidden(id));
+}
+
 interface PendingDelete {
   capture: StoredCapture;
   timerId: ReturnType<typeof setTimeout>;
@@ -19,7 +27,7 @@ export function useDeferredDelete() {
 
   const flushPending = useCallback((entry: PendingDelete) => {
     clearTimeout(entry.timerId);
-    void removeCapture(entry.capture.id);
+    commitDelete(entry.capture.id);
   }, []);
 
   const requestDelete = useCallback(
@@ -31,7 +39,7 @@ export function useDeferredDelete() {
       removeCaptureFromList(capture.id);
 
       const timerId = setTimeout(() => {
-        void removeCapture(capture.id);
+        commitDelete(capture.id);
         pendingRef.current = null;
         setPending(null);
       }, UNDO_MS);
