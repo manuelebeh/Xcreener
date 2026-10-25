@@ -50,7 +50,7 @@ export function BillingSection() {
       </p>
       {billing?.seatMismatch ? (
         <p className="text-xs text-destructive" role="alert">
-          Seat count is lower than member count. Update subscription in Stripe.
+          Fewer seats than editors and admins. Update subscription in Stripe.
         </p>
       ) : null}
       {!isPaidPlan(activeWorkspace.plan) ? (
