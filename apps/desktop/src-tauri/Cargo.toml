@@ -43,7 +43,7 @@ bytes = "1"
 open = "5"
 keyring = { version = "3", default-features = false, features = ["apple-native", "windows-native", "linux-native"] }
 ring = "0.17"
-base64 = "0.22"
+base64 = "0.23"
 # Same reqwest/rustls setup as tauri-plugin-updater, so no extra crates.
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls-no-provider"] }
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
