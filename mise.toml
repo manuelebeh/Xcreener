@@ -37,6 +37,8 @@ cd apps/api && \
 "build:desktop:prep:windows" = "rustup target add x86_64-pc-windows-msvc"
 pre-commit = "pnpm exec lint-staged"
 commit-msg = "pnpm exec commitlint --edit"
+# Trunk-based: this is the last check before main. Only packages changed since origin/main.
+pre-push = { env = { TURBO_SCM_BASE = "origin/main" }, run = "pnpm turbo typecheck test --affected" }
 
 [tasks."build:desktop:arm64"]
 depends = ["tokens:build", "build:desktop:prep:mac"]
@@ -58,4 +60,6 @@ run = '''
 mise generate git-pre-commit --write --task=pre-commit
 printf '%s\n' '#!/bin/sh' 'exec mise run commit-msg -- "$1"' > .git/hooks/commit-msg
 chmod +x .git/hooks/commit-msg
+printf '%s\n' '#!/bin/sh' 'exec mise run pre-push' > .git/hooks/pre-push
+chmod +x .git/hooks/pre-push
 '''
