@@ -1,6 +1,6 @@
 # Entitlement test fixtures: a JWT and Ed25519 public key generated for the tests, not the production key.
-3cca5a648f0bb899cb12e16da23c5f70d79638d2:packages/team-core/src/entitlement.test.ts:generic-api-key:44
-0f1196fa88364efd2d5c4f0bada4417707809799:packages/team-core/src/entitlement.test.ts:jwt:42
-0f1196fa88364efd2d5c4f0bada4417707809799:packages/team-core/src/entitlement.test.ts:generic-api-key:44
-722dd2e17cda8e588b81bff71b51158f007da612:apps/desktop/src/modules/licensing/entitlement.test.ts:jwt:64
-722dd2e17cda8e588b81bff71b51158f007da612:apps/desktop/src-tauri/src/entitlement.rs:jwt:167
+cbf526d74954b2e8bb73ef2ae0da0d421731c9d1:packages/team-core/src/entitlement.test.ts:generic-api-key:44
+b1ab047703f33c19dc2ffce5d4195e0cd035cf5a:packages/team-core/src/entitlement.test.ts:jwt:42
+b1ab047703f33c19dc2ffce5d4195e0cd035cf5a:packages/team-core/src/entitlement.test.ts:generic-api-key:44
+e68b65544a78ec8b143c22a7ff35fe55751ea2b1:apps/desktop/src-tauri/src/entitlement.rs:jwt:167
+e68b65544a78ec8b143c22a7ff35fe55751ea2b1:apps/desktop/src/modules/licensing/entitlement.test.ts:jwt:64
