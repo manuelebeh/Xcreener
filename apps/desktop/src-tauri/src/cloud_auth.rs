@@ -9,13 +9,11 @@ use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use base64::Engine;
 use ring::digest::{digest, SHA256};
 use ring::rand::{SecureRandom, SystemRandom};
-use rusqlite::OptionalExtension;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tauri::{AppHandle, State};
 use tauri_plugin_opener::OpenerExt;
 
-use crate::db::{with_conn, Db};
 use crate::secure_store;
 
 // Same values as the WebView's VITE_AUTH0_*, baked in by build.rs so the WebView cannot
@@ -26,8 +24,6 @@ const AUDIENCE: Option<&str> = option_env!("SNAPGLOW_AUTH0_AUDIENCE");
 
 const REDIRECT_URI: &str = "snapglow://auth/callback";
 const SECRET_NAME: &str = "cloud.tokens";
-/// SQLite settings key used before the keychain. Moved into the keychain on first load.
-const LEGACY_SETTING_KEY: &str = "cloudAuthTokens";
 /// Refresh this long before expiry so the token is still valid when the WebView uses it.
 const REFRESH_MARGIN_MS: i64 = 30_000;
 
@@ -228,43 +224,15 @@ async fn save(tokens: &Tokens) -> Result<(), String> {
     keychain(move || secure_store::set(SECRET_NAME, &raw)).await
 }
 
-async fn load(db: &Db) -> Result<Option<Tokens>, String> {
-    let raw = match keychain(|| secure_store::get(SECRET_NAME)).await? {
-        Some(raw) => raw,
-        None => {
-            let legacy = with_conn(db, |conn| {
-                conn.query_row(
-                    "SELECT value FROM settings WHERE key = ?1",
-                    [LEGACY_SETTING_KEY],
-                    |row| row.get::<_, String>(0),
-                )
-                .optional()
-            })?;
-            let Some(legacy) = legacy.filter(|value| !value.is_empty()) else {
-                return Ok(None);
-            };
-            let value = legacy.clone();
-            keychain(move || secure_store::set(SECRET_NAME, &value)).await?;
-            clear_legacy(db)?;
-            legacy
-        }
+async fn load() -> Result<Option<Tokens>, String> {
+    let Some(raw) = keychain(|| secure_store::get(SECRET_NAME)).await? else {
+        return Ok(None);
     };
     Ok(serde_json::from_str(&raw).ok())
 }
 
-fn clear_legacy(db: &Db) -> Result<(), String> {
-    with_conn(db, |conn| {
-        conn.execute(
-            "UPDATE settings SET value = '' WHERE key = ?1",
-            [LEGACY_SETTING_KEY],
-        )
-        .map(|_| ())
-    })
-}
-
-async fn clear(db: &Db) -> Result<(), String> {
-    keychain(|| secure_store::delete(SECRET_NAME)).await?;
-    clear_legacy(db)
+async fn clear() -> Result<(), String> {
+    keychain(|| secure_store::delete(SECRET_NAME)).await
 }
 
 #[tauri::command]
@@ -325,19 +293,16 @@ pub async fn cloud_auth_complete(auth: State<'_, CloudAuth>, url: String) -> Res
 /// A valid access token for the API, refreshed first when it is about to expire. `None` when
 /// signed out or when Auth0 no longer accepts the refresh token.
 #[tauri::command]
-pub async fn cloud_access_token(
-    db: State<'_, Db>,
-    auth: State<'_, CloudAuth>,
-) -> Result<Option<String>, String> {
+pub async fn cloud_access_token(auth: State<'_, CloudAuth>) -> Result<Option<String>, String> {
     let _session = auth.session.lock().await;
-    let Some(tokens) = load(&db).await? else {
+    let Some(tokens) = load().await? else {
         return Ok(None);
     };
     if !needs_refresh(&tokens, now_ms()) {
         return Ok(Some(tokens.access_token));
     }
     let Some(refresh_token) = tokens.refresh_token else {
-        clear(&db).await?;
+        clear().await?;
         return Ok(None);
     };
 
@@ -358,7 +323,7 @@ pub async fn cloud_access_token(
             Ok(Some(refreshed.access_token))
         }
         Err(TokenError::Rejected(code)) if code == "invalid_grant" => {
-            clear(&db).await?;
+            clear().await?;
             Ok(None)
         }
         Err(error) => Err(format!(
@@ -369,10 +334,10 @@ pub async fn cloud_access_token(
 }
 
 #[tauri::command]
-pub async fn cloud_sign_out(db: State<'_, Db>, auth: State<'_, CloudAuth>) -> Result<(), String> {
+pub async fn cloud_sign_out(auth: State<'_, CloudAuth>) -> Result<(), String> {
     *lock(&auth.pending) = None;
     let _session = auth.session.lock().await;
-    clear(&db).await
+    clear().await
 }
 
 #[cfg(test)]
