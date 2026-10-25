@@ -9,8 +9,8 @@ use crate::capture::record::encode_gif::write_frame_rgba;
 use crate::capture::types::Rect;
 use crate::capture::{find_monitor_for_region, list_monitors, CaptureError, MonitorInfo};
 use image::RgbaImage;
-use screencapturekit::cm::CMSampleBufferExt;
 use screencapturekit::cg::CGRect;
+use screencapturekit::cm::CMSampleBufferExt;
 use screencapturekit::cm::CMTime;
 use screencapturekit::cv::CVPixelBufferLockFlags;
 use screencapturekit::prelude::*;
@@ -71,10 +71,7 @@ impl SCStreamOutputTrait for RegionFrameHandler {
         if !matches!(output_type, SCStreamOutputType::Screen) {
             return;
         }
-        if recording_stop_requested()
-            || recording_is_cancelled()
-            || recording_is_paused()
-        {
+        if recording_stop_requested() || recording_is_cancelled() || recording_is_paused() {
             return;
         }
 
@@ -106,12 +103,7 @@ impl SCStreamOutputTrait for RegionFrameHandler {
     }
 }
 
-fn bgra_buffer_to_rgba(
-    buffer: &[u8],
-    width: u32,
-    height: u32,
-    bytes_per_row: usize,
-) -> RgbaImage {
+fn bgra_buffer_to_rgba(buffer: &[u8], width: u32, height: u32, bytes_per_row: usize) -> RgbaImage {
     let mut rgba = RgbaImage::new(width, height);
     let row_bytes = width as usize * 4;
 
@@ -208,9 +200,7 @@ pub fn run_region_recording(
 
     let mut stream = SCStream::new(&filter, &config);
     stream.add_output_handler(handler, SCStreamOutputType::Screen);
-    stream
-        .start_capture()
-        .map_err(map_sck_error)?;
+    stream.start_capture().map_err(map_sck_error)?;
 
     emit_recording_progress(&app, started_at, max_duration_secs);
 

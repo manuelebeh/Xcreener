@@ -29,17 +29,10 @@ fn compress_png(image_data: Vec<u8>) -> Result<Vec<u8>, String> {
     attributes
         .set_quality(60, 90)
         .map_err(|error| error.to_string())?;
-    attributes
-        .set_speed(3)
-        .map_err(|error| error.to_string())?;
+    attributes.set_speed(3).map_err(|error| error.to_string())?;
 
     let mut image = attributes
-        .new_image(
-            &rgba_pixels[..],
-            width as usize,
-            height as usize,
-            0.0,
-        )
+        .new_image(&rgba_pixels[..], width as usize, height as usize, 0.0)
         .map_err(|error| error.to_string())?;
 
     let mut quantization = attributes
@@ -101,8 +94,8 @@ fn compress_webp(image_data: Vec<u8>, quality: u8) -> Result<Vec<u8>, String> {
     let rgba = decoded.to_rgba8();
     let quality = quality.clamp(50, 100) as f32;
 
-    let encoded = webp::Encoder::from_rgba(rgba.as_raw(), rgba.width(), rgba.height())
-        .encode(quality);
+    let encoded =
+        webp::Encoder::from_rgba(rgba.as_raw(), rgba.width(), rgba.height()).encode(quality);
 
     Ok(encoded.to_vec())
 }
@@ -132,6 +125,9 @@ mod tests {
         let compressed = compress_png(original.clone()).expect("compress png");
         assert!(compressed.len() < original.len());
         let reduction = 1.0 - (compressed.len() as f64 / original.len() as f64);
-        assert!(reduction >= 0.30, "expected >= 30% reduction, got {reduction}");
+        assert!(
+            reduction >= 0.30,
+            "expected >= 30% reduction, got {reduction}"
+        );
     }
 }

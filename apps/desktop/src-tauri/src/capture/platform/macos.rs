@@ -63,15 +63,24 @@ pub fn focus_xcap_window(window: &Window) -> Result<(), CaptureError> {
         return Ok(());
     };
 
-    let _ = app.activateWithOptions(objc2_app_kit::NSApplicationActivationOptions::ActivateAllWindows);
+    let _ =
+        app.activateWithOptions(objc2_app_kit::NSApplicationActivationOptions::ActivateAllWindows);
     Ok(())
 }
 
 fn window_event_center(window: &Window) -> Result<CGPoint, CaptureError> {
-    let x = window.x().map_err(|error| CaptureError::Backend(error.to_string()))?;
-    let y = window.y().map_err(|error| CaptureError::Backend(error.to_string()))?;
-    let width = window.width().map_err(|error| CaptureError::Backend(error.to_string()))?;
-    let height = window.height().map_err(|error| CaptureError::Backend(error.to_string()))?;
+    let x = window
+        .x()
+        .map_err(|error| CaptureError::Backend(error.to_string()))?;
+    let y = window
+        .y()
+        .map_err(|error| CaptureError::Backend(error.to_string()))?;
+    let width = window
+        .width()
+        .map_err(|error| CaptureError::Backend(error.to_string()))?;
+    let height = window
+        .height()
+        .map_err(|error| CaptureError::Backend(error.to_string()))?;
 
     let display_height = unsafe { CGDisplayPixelsHigh(CGMainDisplayID()) as f64 };
     Ok(CGPoint {
@@ -80,7 +89,12 @@ fn window_event_center(window: &Window) -> Result<CGPoint, CaptureError> {
     })
 }
 
-fn post_key_at(source: CGEventSourceRef, center: CGPoint, keycode: u16, flags: u64) -> Result<(), CaptureError> {
+fn post_key_at(
+    source: CGEventSourceRef,
+    center: CGPoint,
+    keycode: u16,
+    flags: u64,
+) -> Result<(), CaptureError> {
     unsafe {
         for key_down in [true, false] {
             let event = CGEventCreateKeyboardEvent(source, keycode, key_down);

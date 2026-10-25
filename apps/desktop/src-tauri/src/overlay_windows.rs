@@ -14,12 +14,7 @@ pub fn set_overlay_click_through(window: &WebviewWindow, enabled: bool) -> Resul
         GetWindowLongPtrW, SetWindowLongPtrW, GWL_EXSTYLE, WS_EX_LAYERED, WS_EX_TRANSPARENT,
     };
 
-    let hwnd = HWND(
-        window
-            .hwnd()
-            .map_err(|error| error.to_string())?
-            .0 as _,
-    );
+    let hwnd = HWND(window.hwnd().map_err(|error| error.to_string())?.0 as _);
 
     unsafe {
         let style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE) as u32;
@@ -91,7 +86,9 @@ fn refresh_webview_dpi_offscreen(window: &WebviewWindow) -> Result<(), String> {
     const OFF_SCREEN: f64 = -32_000.0;
 
     window
-        .set_position(Position::Logical(LogicalPosition::new(OFF_SCREEN, OFF_SCREEN)))
+        .set_position(Position::Logical(LogicalPosition::new(
+            OFF_SCREEN, OFF_SCREEN,
+        )))
         .map_err(|error| error.to_string())?;
     window
         .set_size(Size::Logical(LogicalSize::new(1.0, 1.0)))

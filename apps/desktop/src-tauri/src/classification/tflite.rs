@@ -6,7 +6,8 @@ use tract_tflite::prelude::*;
 use crate::classification::preprocess::{self, INPUT_SIZE};
 use crate::classification::types::{ClassificationResult, ContentClass};
 
-type RunnableClassifier = RunnableModel<TypedFact, Box<dyn TypedOp>, Graph<TypedFact, Box<dyn TypedOp>>>;
+type RunnableClassifier =
+    RunnableModel<TypedFact, Box<dyn TypedOp>, Graph<TypedFact, Box<dyn TypedOp>>>;
 
 static MODEL: OnceLock<Option<RunnableClassifier>> = OnceLock::new();
 
@@ -41,7 +42,11 @@ pub fn classify(image: &image::DynamicImage) -> Option<ClassificationResult> {
     let model = get_model()?;
     let start = std::time::Instant::now();
     let input_values = preprocess::to_model_input(image);
-    let input = Tensor::from_shape(&[1, INPUT_SIZE as usize, INPUT_SIZE as usize, 3], &input_values).ok()?;
+    let input = Tensor::from_shape(
+        &[1, INPUT_SIZE as usize, INPUT_SIZE as usize, 3],
+        &input_values,
+    )
+    .ok()?;
     let outputs = model.run(tvec!(input.into())).ok()?;
     let logits = outputs[0].to_array_view::<f32>().ok()?;
     let scores: Vec<f32> = logits.iter().copied().collect();
@@ -50,7 +55,9 @@ pub fn classify(image: &image::DynamicImage) -> Option<ClassificationResult> {
     let (best_index, confidence) = probabilities
         .iter()
         .enumerate()
-        .max_by(|(_, left), (_, right)| left.partial_cmp(right).unwrap_or(std::cmp::Ordering::Equal))
+        .max_by(|(_, left), (_, right)| {
+            left.partial_cmp(right).unwrap_or(std::cmp::Ordering::Equal)
+        })
         .map(|(index, confidence)| (index, *confidence))?;
 
     let label = ContentClass::MODEL_LABELS

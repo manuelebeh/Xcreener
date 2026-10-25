@@ -127,7 +127,10 @@ fn env_file_value(contents: &str, key: &str) -> Option<String> {
 fn link_swift_runtime_rpath() {
     let mut rpaths = vec!["/usr/lib/swift".to_string()];
 
-    if let Ok(output) = std::process::Command::new("xcode-select").arg("-p").output() {
+    if let Ok(output) = std::process::Command::new("xcode-select")
+        .arg("-p")
+        .output()
+    {
         if output.status.success() {
             let xcode_path = String::from_utf8_lossy(&output.stdout).trim().to_string();
             rpaths.push(format!(

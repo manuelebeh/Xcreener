@@ -149,10 +149,15 @@ fn encode_mp4_cfr(
     }
 
     let timestamps: Vec<u32> = if frames.iter().all(|frame| frame.timestamp_ms.is_some()) {
-        frames.iter().map(|frame| frame.timestamp_ms.unwrap()).collect()
+        frames
+            .iter()
+            .map(|frame| frame.timestamp_ms.unwrap())
+            .collect()
     } else {
         let each = total_duration_ms.max(1) as f32 / count as f32;
-        (0..count).map(|index| (index as f32 * each) as u32).collect()
+        (0..count)
+            .map(|index| (index as f32 * each) as u32)
+            .collect()
     };
 
     let span_ms = total_duration_ms
@@ -316,10 +321,17 @@ mod tests {
             let mut img = RgbaImage::from_pixel(160, 120, Rgba([20, 20, 20, 255]));
             for dy in 0..20 {
                 for dx in 0..20 {
-                    img.put_pixel((x + dx).min(159), (40 + dy).min(119), Rgba([240, 80, 40, 255]));
+                    img.put_pixel(
+                        (x + dx).min(159),
+                        (40 + dy).min(119),
+                        Rgba([240, 80, 40, 255]),
+                    );
                 }
             }
-            frames.push(CapturedFrame { image: img, timestamp_ms: Some(t) });
+            frames.push(CapturedFrame {
+                image: img,
+                timestamp_ms: Some(t),
+            });
             t += 50;
             x = (x + 6) % 130;
         }
@@ -335,6 +347,10 @@ mod tests {
         // The 5s gap must be filled by repeated grid frames, not collapsed into one
         // long sample: at the 12fps floor a ~7.2s clip is far more than the ~41 inputs.
         let read = std::fs::read(&path).expect("read mp4");
-        assert!(read.len() > 1000, "mp4 unexpectedly tiny: {} bytes", read.len());
+        assert!(
+            read.len() > 1000,
+            "mp4 unexpectedly tiny: {} bytes",
+            read.len()
+        );
     }
 }

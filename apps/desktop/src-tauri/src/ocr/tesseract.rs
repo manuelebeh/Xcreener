@@ -127,14 +127,9 @@ fn parse_tesseract_tsv(
 
     let mut lines: Vec<TextLine> = line_map.into_iter().map(|(_, line)| line).collect();
     lines.sort_by(|a, b| {
-        a.y
-            .partial_cmp(&b.y)
+        a.y.partial_cmp(&b.y)
             .unwrap_or(std::cmp::Ordering::Equal)
-            .then_with(|| {
-                a.x
-                    .partial_cmp(&b.x)
-                    .unwrap_or(std::cmp::Ordering::Equal)
-            })
+            .then_with(|| a.x.partial_cmp(&b.x).unwrap_or(std::cmp::Ordering::Equal))
     });
 
     if lines.is_empty() {
