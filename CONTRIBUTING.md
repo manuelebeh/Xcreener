@@ -13,7 +13,7 @@ The Xcreener name and logo are not covered by the code licenses: see [TRADEMARKS
 ## Workflow
 
 1. Set up the repo with the steps in the [README](README.md#getting-started), then run `mise run install-hooks`.
-2. Keep pull requests small and focused on one change.
+2. Branch from `main` and open a pull request. Keep it small and focused on one change. Pull requests are squash-merged, so the PR title must follow Conventional Commits. The `js`, `rust` and `security` checks must pass and review threads must be resolved before merging.
 3. Follow [`AGENTS.md`](AGENTS.md) for code style and the architecture rules of the app you touch.
 4. Write commits in [Conventional Commits](https://www.conventionalcommits.org/) format. The commit-msg hook checks it.
 5. Run `mise run lint`, `mise run typecheck` and `mise run test` before opening the pull request.
