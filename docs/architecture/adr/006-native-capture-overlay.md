@@ -85,5 +85,5 @@ Capture preview, monitor/window listing, and the three overlay modes use `xcap` 
 
 - [ADR-003](./003-desktop-ipc-and-events.md)
 - [ADR-004](./004-system-integration-tray-shortcuts.md)
-- [Sprints & Implementations - Sprint 1.1](../../product/sprints.md)
-- [Sprints & Implementations - Sprint 1.2](../../product/sprints.md)
+- Sprints & Implementations - Sprint 1.1 (private, `docs/internal/`)
+- Sprints & Implementations - Sprint 1.2 (private, `docs/internal/`)

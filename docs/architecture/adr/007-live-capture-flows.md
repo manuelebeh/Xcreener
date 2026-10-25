@@ -80,4 +80,4 @@ Two coexisting confirm paths:
 ## References
 
 - [ADR-006](./006-native-capture-overlay.md)
-- [Sprint 2b.3](../../product/sprints.md)
+- Sprint 2b.3 (private, `docs/internal/`)

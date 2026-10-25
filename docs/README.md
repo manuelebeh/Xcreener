@@ -6,7 +6,6 @@ Everything here is tracked in git. Strategy, audits and marketing notes live in 
 |--------|---------------|
 | [`architecture/`](architecture/) | [Desktop stack](architecture/desktop-stack.md) and the [ADRs](architecture/adr/README.md) (one decision per file) |
 | [`guides/`](guides/) | How-tos: [desktop builds](guides/desktop-builds.md), [release signing](guides/release-signing.md), [mobile signing](guides/release-signing-mobile.md), [Auth0 setup](guides/auth0-setup.md) |
-| [`product/`](product/) | [Sprint history](product/sprints.md): what shipped, task by task |
 | [`quality/`](quality/) | [Accessibility audit](quality/accessibility-audit.md) of the design system |
 
 ## Where to put a new doc

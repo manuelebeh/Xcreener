@@ -82,4 +82,4 @@ Fixes QuickTime “freeze at N seconds” when SCK/polling produced sparse frame
 
 - [ADR-007](./007-live-capture-flows.md)
 - FR-011 (product requirements, private)
-- [Sprint 2b.4](../../product/sprints.md)
+- Sprint 2b.4 (private, `docs/internal/`)

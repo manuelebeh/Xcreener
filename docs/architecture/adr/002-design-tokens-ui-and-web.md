@@ -72,4 +72,4 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 - [design.md](../../../design.md) - desktop product design system (Sprint 1.6)
 - [ADR-001](./001-monorepo-and-module-architecture.md)
 - [accessibility-audit.md](../../quality/accessibility-audit.md)
-- [Sprints & Implementations.md](../../product/sprints.md)
+- Sprints & Implementations.md (private, `docs/internal/`)
