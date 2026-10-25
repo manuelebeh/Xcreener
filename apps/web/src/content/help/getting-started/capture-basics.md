@@ -11,7 +11,7 @@ SnapGlow runs from your menu bar or system tray. Captures stay on your device un
 
 ## Global shortcut
 
-Set your shortcut in **Settings → Global capture shortcut** (default `CmdOrControl+Shift+KeyS`).
+Set your shortcut in **Settings → Global capture shortcut** (default `CmdOrControl+Shift+Digit2`).
 
 ## Capture modes
 

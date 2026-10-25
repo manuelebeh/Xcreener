@@ -4,7 +4,7 @@ export type WatermarkPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bott
 export type AppLocale = 'en' | 'fr' | 'de' | 'ja';
 export type LicenseSource = 'direct' | 'setapp' | 'appsumo' | 'partner';
 
-export const DEFAULT_CAPTURE_SHORTCUT = 'CmdOrControl+Shift+KeyS';
+export const DEFAULT_CAPTURE_SHORTCUT = 'CmdOrControl+Shift+Digit2';
 
 export interface WatermarkSettings {
   watermarkEnabled: boolean;
