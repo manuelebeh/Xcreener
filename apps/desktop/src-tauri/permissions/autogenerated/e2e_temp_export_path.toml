@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-e2e-temp-export-path"
+description = "Enables the e2e_temp_export_path command without any pre-configured scope."
+commands.allow = ["e2e_temp_export_path"]
+
+[[permission]]
+identifier = "deny-e2e-temp-export-path"
+description = "Denies the e2e_temp_export_path command without any pre-configured scope."
+commands.deny = ["e2e_temp_export_path"]

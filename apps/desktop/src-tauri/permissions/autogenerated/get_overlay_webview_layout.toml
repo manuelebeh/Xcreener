@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-get-overlay-webview-layout"
+description = "Enables the get_overlay_webview_layout command without any pre-configured scope."
+commands.allow = ["get_overlay_webview_layout"]
+
+[[permission]]
+identifier = "deny-get-overlay-webview-layout"
+description = "Denies the get_overlay_webview_layout command without any pre-configured scope."
+commands.deny = ["get_overlay_webview_layout"]

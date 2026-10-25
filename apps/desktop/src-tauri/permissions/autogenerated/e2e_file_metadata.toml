@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-e2e-file-metadata"
+description = "Enables the e2e_file_metadata command without any pre-configured scope."
+commands.allow = ["e2e_file_metadata"]
+
+[[permission]]
+identifier = "deny-e2e-file-metadata"
+description = "Denies the e2e_file_metadata command without any pre-configured scope."
+commands.deny = ["e2e_file_metadata"]

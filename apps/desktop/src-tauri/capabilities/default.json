@@ -38,6 +38,7 @@
           "path": "$APPDATA/**"
         }
       ]
-    }
+    },
+    "main-window"
   ]
 }

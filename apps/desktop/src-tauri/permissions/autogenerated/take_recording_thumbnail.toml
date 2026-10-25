@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-take-recording-thumbnail"
+description = "Enables the take_recording_thumbnail command without any pre-configured scope."
+commands.allow = ["take_recording_thumbnail"]
+
+[[permission]]
+identifier = "deny-take-recording-thumbnail"
+description = "Denies the take_recording_thumbnail command without any pre-configured scope."
+commands.deny = ["take_recording_thumbnail"]

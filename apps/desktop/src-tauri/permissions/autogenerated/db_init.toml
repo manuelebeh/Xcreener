@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-db-init"
+description = "Enables the db_init command without any pre-configured scope."
+commands.allow = ["db_init"]
+
+[[permission]]
+identifier = "deny-db-init"
+description = "Denies the db_init command without any pre-configured scope."
+commands.deny = ["db_init"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-collections-create"
+description = "Enables the collections_create command without any pre-configured scope."
+commands.allow = ["collections_create"]
+
+[[permission]]
+identifier = "deny-collections-create"
+description = "Denies the collections_create command without any pre-configured scope."
+commands.deny = ["collections_create"]

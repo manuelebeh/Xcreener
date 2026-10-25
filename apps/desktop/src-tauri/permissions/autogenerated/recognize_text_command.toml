@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-recognize-text-command"
+description = "Enables the recognize_text_command command without any pre-configured scope."
+commands.allow = ["recognize_text_command"]
+
+[[permission]]
+identifier = "deny-recognize-text-command"
+description = "Denies the recognize_text_command command without any pre-configured scope."
+commands.deny = ["recognize_text_command"]

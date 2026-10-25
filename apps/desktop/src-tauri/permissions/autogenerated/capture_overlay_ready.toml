@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-capture-overlay-ready"
+description = "Enables the capture_overlay_ready command without any pre-configured scope."
+commands.allow = ["capture_overlay_ready"]
+
+[[permission]]
+identifier = "deny-capture-overlay-ready"
+description = "Denies the capture_overlay_ready command without any pre-configured scope."
+commands.deny = ["capture_overlay_ready"]
