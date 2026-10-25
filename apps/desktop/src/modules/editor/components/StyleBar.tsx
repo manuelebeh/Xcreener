@@ -7,8 +7,8 @@ import type { BackgroundConfig } from '../types';
 
 type BackgroundTab = BackgroundConfig['type'];
 
-/** Swatches shown before "Show all", two rows of the 8-column grid. */
-const GRADIENT_PREVIEW_COUNT = 16;
+/** Swatches shown before "Show all", two rows of the 6-column grid. */
+const GRADIENT_PREVIEW_COUNT = 12;
 
 const BACKGROUND_TABS = [
   { value: 'gradient', label: 'Gradient' },
@@ -89,7 +89,7 @@ export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
         onChange={handleImageUpload}
       />
 
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <span className="text-xs text-foreground">Background</span>
         <Segmented
           ariaLabel="Background type"
@@ -109,7 +109,7 @@ export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
         />
 
         {activeTab === 'gradient' ? (
-          <div className="grid grid-cols-8 gap-1.5 pt-1">
+          <div className="grid grid-cols-6 gap-1.5 pt-1.5">
             {visibleGradients.map((preset) => {
               const isSelected =
                 background.type === 'gradient' && background.presetId === preset.id;
@@ -137,7 +137,7 @@ export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
               <button
                 type="button"
                 aria-expanded={showAllGradients}
-                className="sg-focus-ring col-span-8 mt-0.5 h-6 rounded-md text-xs text-muted hover:text-foreground"
+                className="sg-focus-ring col-span-6 mt-0.5 h-6 rounded-md text-xs text-muted hover:text-foreground"
                 onClick={() => setShowAllGradients((value) => !value)}
               >
                 {showAllGradients ? 'Show fewer' : `Show all ${GRADIENT_PRESETS.length}`}
@@ -147,23 +147,23 @@ export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
         ) : null}
 
         {activeTab === 'solid' ? (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-1.5">
             <input
               type="color"
               aria-label="Background color"
               value={solidColor}
               onChange={(event) => updateBackground({ type: 'solid', color: event.target.value })}
-              className="sg-focus-ring h-7 w-10 cursor-pointer rounded-md border border-border bg-transparent"
+              className="sg-focus-ring h-8 w-12 cursor-pointer rounded-md border border-border bg-transparent"
             />
             <span className="text-xs text-muted tabular-nums">{solidColor}</span>
           </div>
         ) : null}
 
         {activeTab === 'image' ? (
-          <div className="flex items-center gap-2 pt-1">
+          <div className="flex items-center gap-2 pt-1.5">
             <button
               type="button"
-              className="sg-focus-ring h-7 rounded-md border border-border bg-surface px-3 text-xs hover:bg-foreground/[0.05]"
+              className="sg-focus-ring h-8 rounded-md border border-border bg-surface px-3 text-xs hover:bg-foreground/[0.05]"
               onClick={openImagePicker}
             >
               {imageSource ? 'Change image' : 'Upload image'}
@@ -197,7 +197,7 @@ export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
         />
       </div>
 
-      <div className="space-y-4 border-t border-border pt-4">
+      <div className="space-y-4 border-t border-border pt-5">
         <div className="flex items-center justify-between gap-2">
           <span className="text-xs font-semibold text-foreground">Shadow</span>
           <div className="flex items-center gap-2">
@@ -209,7 +209,7 @@ export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
               type="color"
               value={shadow.color}
               onChange={(event) => updateShadow({ color: event.target.value })}
-              className="sg-focus-ring h-6 w-9 cursor-pointer rounded-md border border-border bg-transparent"
+              className="sg-focus-ring h-8 w-12 cursor-pointer rounded-md border border-border bg-transparent"
             />
           </div>
         </div>

@@ -234,7 +234,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
     ) : null;
 
   const content = (
-    <div className="w-full space-y-3" data-testid="export-bar">
+    <div className="w-full space-y-4" data-testid="export-bar">
       {!embedded ? (
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -333,9 +333,9 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {embedded ? null : (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label htmlFor="export-format">Format</Label>
             <Select
               id="export-format"
@@ -353,7 +353,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         )}
 
         {format !== 'png' ? (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label>Quality ({quality}%)</Label>
             <Slider
               min={50}
@@ -367,7 +367,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         ) : null}
 
         {cloudConfigured ? (
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <Label htmlFor="share-expiry">Link expiry</Label>
             <Select
               id="share-expiry"
