@@ -82,4 +82,4 @@ Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `s
 ## References
 
 - [Technical Stack - Desktop.md](../desktop-stack.md)
-- [Sprints & Implementations.md](../../product/sprints.md)
+- Sprints & Implementations.md (private, `docs/internal/`)

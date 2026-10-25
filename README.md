@@ -63,7 +63,6 @@ Start at [`docs/README.md`](docs/README.md).
 
 - Architecture: [desktop stack](docs/architecture/desktop-stack.md), [ADR index](docs/architecture/adr/README.md)
 - Guides: [release signing](docs/guides/release-signing.md), [mobile signing](docs/guides/release-signing-mobile.md), [Auth0 setup](docs/guides/auth0-setup.md)
-- Product: [sprint history](docs/product/sprints.md)
 - Quality: [accessibility audit](docs/quality/accessibility-audit.md)
 - Visual system: [`design.md`](design.md)
 - API: [`apps/api/README.md`](apps/api/README.md)
