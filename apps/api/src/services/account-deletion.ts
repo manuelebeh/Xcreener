@@ -2,6 +2,7 @@ import { and, asc, eq, inArray, isNotNull, ne } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type Stripe from 'stripe';
 import * as schema from '../db/schema';
+import { syncSeatQuantity } from './seat-sync';
 import type { StorageService } from './storage';
 
 type Database = PostgresJsDatabase<typeof schema>;
@@ -230,6 +231,15 @@ export async function deleteUserAccount(
     await tx.delete(schema.invitations).where(eq(schema.invitations.invitedBy, userId));
     await tx.delete(schema.users).where(eq(schema.users.id, userId));
   });
+
+  // The user's seat goes with their membership rows.
+  for (const workspaceId of plan.heirs.keys()) {
+    try {
+      await syncSeatQuantity(db, stripe, workspaceId);
+    } catch (error) {
+      console.error('Stripe seat sync failed after account deletion', workspaceId, error);
+    }
+  }
 
   let orphanedObjects = 0;
   for (const key of storageKeys) {

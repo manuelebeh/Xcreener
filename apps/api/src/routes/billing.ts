@@ -12,18 +12,16 @@ import * as schema from '../db/schema';
 import { env } from '../env';
 import { authenticateRequest } from '../plugins/auth';
 import { requireWorkspaceRole } from '../plugins/workspace-auth';
+import { PAID_STATUSES } from '../services/seat-sync';
 
 interface BillingRouteOptions {
   db: PostgresJsDatabase<typeof schema>;
-  stripe?: Stripe;
+  stripe?: Stripe | null;
 }
 
 type Database = PostgresJsDatabase<typeof schema>;
 type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
 type SubscriptionStatus = (typeof schema.subscriptionStatusEnum.enumValues)[number];
-
-/** Statuses that keep paid features. `past_due` covers Stripe's retry window before unpaid/cancel. */
-const PAID_STATUSES: ReadonlySet<SubscriptionStatus> = new Set(['active', 'trialing', 'past_due']);
 
 function getStripeClient(): Stripe | null {
   if (!env.STRIPE_SECRET_KEY) {
@@ -183,7 +181,7 @@ async function applyStripeEvent(
 }
 
 export async function registerBillingRoutes(app: FastifyInstance, options: BillingRouteOptions) {
-  const stripe = options.stripe ?? getStripeClient();
+  const stripe = options.stripe === undefined ? getStripeClient() : options.stripe;
 
   app.get(
     '/v1/workspaces/:id/billing',

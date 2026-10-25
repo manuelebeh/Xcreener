@@ -4,6 +4,7 @@ import multipart from '@fastify/multipart';
 import sensible from '@fastify/sensible';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import Fastify from 'fastify';
+import type Stripe from 'stripe';
 import type * as schema from './db/schema';
 import { env } from './env';
 import { getAllowedCorsOrigins, isOriginAllowed } from './lib/cors';
@@ -14,7 +15,7 @@ import { registerStripeRawBodyParser } from './plugins/stripe-webhook';
 import { registerAccountRoutes } from './routes/account';
 import { registerAffiliateRoutes } from './routes/affiliates';
 import { registerApiKeyRoutes } from './routes/api-keys';
-import { registerBillingRoutes } from './routes/billing';
+import { getStripeClient, registerBillingRoutes } from './routes/billing';
 import { registerCollabRoutes } from './routes/collab';
 import { registerCollectionRoutes } from './routes/collections';
 import { registerEmbedRoutes } from './routes/embeds';
@@ -33,6 +34,8 @@ import { StorageService } from './services/storage';
 interface BuildAppOptions {
   db: PostgresJsDatabase<typeof schema>;
   storage?: StorageService;
+  /** `null` turns Stripe off; omitted, it comes from `STRIPE_SECRET_KEY`. */
+  stripe?: Stripe | null;
 }
 
 export async function buildApp(options: BuildAppOptions) {
@@ -69,6 +72,7 @@ export async function buildApp(options: BuildAppOptions) {
   registerStripeRawBodyParser(app);
 
   const storage = options.storage ?? new StorageService();
+  const stripe = options.stripe === undefined ? getStripeClient() : options.stripe;
   await storage.ensureBucket();
 
   await registerHealthRoutes(app, { db: options.db });
@@ -78,9 +82,9 @@ export async function buildApp(options: BuildAppOptions) {
   await registerEntitlementRoutes(app, { db: options.db });
   await registerLibraryRoutes(app, { db: options.db, storage });
   await registerCollectionRoutes(app, { db: options.db });
-  await registerWorkspaceRoutes(app, { db: options.db, storage });
+  await registerWorkspaceRoutes(app, { db: options.db, storage, stripe });
   await registerWorkspaceUsageRoutes(app, { db: options.db });
-  await registerBillingRoutes(app, { db: options.db });
+  await registerBillingRoutes(app, { db: options.db, stripe });
   await registerAffiliateRoutes(app);
   await registerCollabRoutes(app, { db: options.db, storage });
   await registerCollabWebSocket(app, { db: options.db });
@@ -88,7 +92,7 @@ export async function buildApp(options: BuildAppOptions) {
   await registerPublicCaptureRoutes(app, { db: options.db, storage });
   await registerTemplateRoutes(app, { db: options.db });
   await registerSyncRoutes(app, { db: options.db, storage });
-  await registerAccountRoutes(app, { db: options.db, storage });
+  await registerAccountRoutes(app, { db: options.db, storage, stripe });
   if (env.NODE_ENV !== 'test') {
     await registerOpenApiDocs(app);
   }

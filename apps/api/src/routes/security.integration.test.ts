@@ -849,6 +849,100 @@ describe.skipIf(!databaseUrl)('API security regressions (Postgres)', () => {
       expect(response.statusCode).toBe(200);
       expect(response.json()).toMatchObject({ seatCount: 5, memberCount: 6, seatMismatch: false });
     });
+
+    /** A Stripe stand-in holding one subscription item, so retrieve sees what update set. */
+    function fakeStripe(quantity: number) {
+      const item = { id: 'si_seat', quantity };
+      const retrieve = vi.fn(async (id: string) => ({ id, items: { data: [item] } }));
+      const update = vi.fn(async (_id: string, params: { items: { quantity: number }[] }) => {
+        item.quantity = params.items[0]?.quantity ?? item.quantity;
+        return {};
+      });
+      return { client: { subscriptions: { retrieve, update } } as never, retrieve, update };
+    }
+
+    async function storedSeatCount(workspaceId: string) {
+      const [row] = await db
+        .select({ seatCount: schema.workspaceSubscriptions.seatCount })
+        .from(schema.workspaceSubscriptions)
+        .where(eq(schema.workspaceSubscriptions.workspaceId, workspaceId));
+      return row?.seatCount;
+    }
+
+    it('resyncs the Stripe quantity with proration when billable members change', async () => {
+      const { workspaceId, owner, editors, viewer } = await fullStarterWorkspace('resync');
+      const subscriptionId = `sub_resync_${run}`;
+      await db.insert(schema.workspaceSubscriptions).values({
+        workspaceId,
+        stripeSubscriptionId: subscriptionId,
+        status: 'active',
+        seatCount: 5,
+      });
+      const stripe = fakeStripe(5);
+      const billed = await buildApp({ db, storage: storage as never, stripe: stripe.client });
+      const headers = { authorization: `Bearer ${alice}` };
+      const seatUpdate = (quantity: number) => [
+        subscriptionId,
+        { items: [{ id: 'si_seat', quantity }], proration_behavior: 'create_prorations' },
+      ];
+
+      try {
+        const removeViewer = await billed.inject({
+          method: 'DELETE',
+          url: `/v1/workspaces/${workspaceId}/members/${viewer.id}`,
+          headers,
+        });
+        expect(removeViewer.statusCode).toBe(204);
+        expect(stripe.retrieve).not.toHaveBeenCalled();
+
+        const demote = await billed.inject({
+          method: 'PATCH',
+          url: `/v1/workspaces/${workspaceId}/members/${editors[0]?.id}`,
+          headers,
+          payload: { role: 'viewer' },
+        });
+        expect(demote.statusCode).toBe(200);
+        expect(stripe.update).toHaveBeenLastCalledWith(...seatUpdate(4));
+
+        const remove = await billed.inject({
+          method: 'DELETE',
+          url: `/v1/workspaces/${workspaceId}/members/${editors[1]?.id}`,
+          headers,
+        });
+        expect(remove.statusCode).toBe(204);
+        expect(stripe.update).toHaveBeenLastCalledWith(...seatUpdate(3));
+        expect(await storedSeatCount(workspaceId)).toBe(3);
+
+        // Stripe down: the member still joins, and the next change catches the quantity up.
+        stripe.update.mockRejectedValueOnce(new Error('Stripe unavailable'));
+        await db.insert(schema.invitations).values({
+          workspaceId,
+          role: 'editor',
+          token: `resync${run}`,
+          invitedBy: owner.id,
+          expiresAt: new Date(Date.now() + 3600_000),
+        });
+        const accept = await billed.inject({
+          method: 'POST',
+          url: `/v1/invitations/resync${run}/accept`,
+          headers: { authorization: `Bearer auth0|resync-joiner-${run}` },
+        });
+        expect(accept.statusCode).toBe(200);
+        expect(await storedSeatCount(workspaceId)).toBe(3);
+
+        const promote = await billed.inject({
+          method: 'PATCH',
+          url: `/v1/workspaces/${workspaceId}/members/${editors[0]?.id}`,
+          headers,
+          payload: { role: 'editor' },
+        });
+        expect(promote.statusCode).toBe(200);
+        expect(stripe.update).toHaveBeenLastCalledWith(...seatUpdate(5));
+        expect(await storedSeatCount(workspaceId)).toBe(5);
+      } finally {
+        await billed.close();
+      }
+    });
   });
 
   describe('Stripe webhook', () => {
@@ -1117,6 +1211,39 @@ describe.skipIf(!databaseUrl)('API security regressions (Postgres)', () => {
       expect(await db.select().from(schema.users).where(eq(schema.users.id, user.id))).toHaveLength(
         1
       );
+    });
+
+    it('lowers the Stripe quantity of the teams a deleted user leaves', async () => {
+      const user = await upsertAuthUser(db, `auth0|leaver-${run}`, null);
+      const heir = await upsertAuthUser(db, `auth0|stayer-${run}`, null);
+      const team = await workspace('leaver', heir.id, [
+        [heir.id, 'admin'],
+        [user.id, 'admin'],
+      ]);
+      await db.insert(schema.workspaceSubscriptions).values({
+        workspaceId: team,
+        stripeSubscriptionId: `sub_leave_${run}`,
+        status: 'active',
+        seatCount: 2,
+      });
+      const retrieve = vi.fn(async (id: string) => ({
+        id,
+        items: { data: [{ id: 'si_seat', quantity: 2 }] },
+      }));
+      const update = vi.fn(async () => ({}));
+
+      const result = await deleteUserAccount(
+        db,
+        storage as never,
+        { subscriptions: { retrieve, update } } as never,
+        user.id
+      );
+
+      expect(result.status).toBe('deleted');
+      expect(update).toHaveBeenCalledWith(`sub_leave_${run}`, {
+        items: [{ id: 'si_seat', quantity: 1 }],
+        proration_behavior: 'create_prorations',
+      });
     });
 
     it('keeps everything when a paid solo workspace cannot be cancelled', async () => {
