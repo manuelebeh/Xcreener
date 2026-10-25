@@ -14,9 +14,48 @@ permissions:
   contents: read
 
 jobs:
-  quality:
-    # 24.04: PipeWire 1.0 headers match libspa 0.9 (xcap). Pinned so the ubuntu-latest move does not break the Rust build.
-    runs-on: ubuntu-24.04
+  # Skipped jobs count as passed, so filtering here (not with `on.paths`) never leaves a check pending.
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      rust: ${{ steps.filter.outputs.rust }}
+      desktop: ${{ steps.filter.outputs.desktop }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'turbo.json'
+              - 'mise.toml'
+              - '.github/workflows/ci.yml'
+            rust:
+              - 'apps/desktop/src-tauri/**'
+              # Embedded with include_str! by src-tauri/src/db/migrations.rs.
+              - 'apps/desktop/src/db/migrations/**'
+              - 'mise.toml'
+              - '.github/workflows/ci.yml'
+            desktop:
+              - *shared
+              - 'apps/desktop/**'
+              - 'packages/**'
+            web:
+              - *shared
+              - 'apps/web/**'
+              - 'packages/**'
+
+  js:
+    needs: changes
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:16-alpine
@@ -41,28 +80,16 @@ jobs:
     env:
       # Enables apps/api/src/routes/security.integration.test.ts against the service above.
       INTEGRATION_DATABASE_URL: postgresql://snapglow:snapglow@localhost:5432/snapglow
-      # The Tauri dependency tree fills the runner disk with debug info: keep symbols out of CI builds.
-      CARGO_PROFILE_DEV_DEBUG: '0'
-      CARGO_PROFILE_TEST_DEBUG: '0'
+      # `turbo --affected` diffs against this commit. When it is missing (new branch), turbo runs everything.
+      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
     steps:
-      - name: Free disk space
-        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
 
       - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
         with:
           install: true
-
-      - name: Install Linux desktop build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-3-dev \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            libpipewire-0.3-dev \
-            libgbm-dev
 
       - name: Install dependencies
         run: mise run install
@@ -71,10 +98,10 @@ jobs:
         run: mise run tokens:build
 
       - name: Lint
-        run: mise run lint
+        run: mise exec -- pnpm turbo lint --affected
 
       - name: Typecheck
-        run: mise run typecheck
+        run: mise exec -- pnpm turbo typecheck --affected
 
       - name: Apply API migrations
         env:
@@ -100,11 +127,53 @@ jobs:
           test -z "$(git status --porcelain -- drizzle)"
 
       - name: Unit and integration tests
-        run: mise run test
+        run: mise exec -- pnpm turbo test --affected
 
       - name: Playwright smoke (web UI)
+        if: needs.changes.outputs.desktop == 'true'
         working-directory: apps/desktop
         run: pnpm exec playwright install chromium && pnpm test:e2e
+
+      - name: Build web
+        if: needs.changes.outputs.web == 'true'
+        run: mise exec -- pnpm --filter @snapglow/web build
+
+  rust:
+    needs: changes
+    if: needs.changes.outputs.rust == 'true'
+    # 24.04: PipeWire 1.0 headers match libspa 0.9 (xcap). Pinned so the ubuntu-latest move does not break the Rust build.
+    runs-on: ubuntu-24.04
+    env:
+      # The Tauri dependency tree fills the runner disk with debug info: keep symbols out of CI builds.
+      CARGO_PROFILE_DEV_DEBUG: '0'
+      CARGO_PROFILE_TEST_DEBUG: '0'
+    steps:
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
+        with:
+          install: true
+
+      - name: Install Linux desktop build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            libpipewire-0.3-dev \
+            libgbm-dev
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: apps/desktop/src-tauri
+
+      # tauri::generate_context! only checks that frontendDist exists; tests do not need the real UI.
+      - name: Stub frontend dist
+        run: mkdir -p apps/desktop/dist
 
       - name: Rust tests
         working-directory: apps/desktop/src-tauri
@@ -115,9 +184,6 @@ jobs:
         run: |
           rustup component add clippy
           cargo clippy --all-targets --locked -- -D warnings
-
-      - name: Build web
-        run: mise exec -- pnpm --filter @snapglow/web build
 
   security:
     runs-on: ubuntu-latest
@@ -141,12 +207,15 @@ jobs:
       - name: Dependency audit (production)
         run: mise exec -- pnpm audit --prod --audit-level high
 
+      # Prebuilt binary: compiling cargo-audit on every run took minutes.
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91 # v2.87.31
+        with:
+          tool: cargo-audit
+
       # Reviewed exceptions live in apps/desktop/src-tauri/.cargo/audit.toml.
       - name: Rust dependency audit
         working-directory: apps/desktop/src-tauri
-        run: |
-          cargo install cargo-audit --locked
-          cargo audit
+        run: cargo audit
 
       - name: Secret scan
         uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
