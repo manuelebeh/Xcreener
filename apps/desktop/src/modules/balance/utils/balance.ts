@@ -37,8 +37,39 @@ export function sourceRect(
   };
 }
 
-export function cropBitmap(source: ImageBitmap, rect: LayoutRect): Promise<ImageBitmap> {
-  const canvas = createExportCanvas(rect.width, rect.height);
+/** Hex color for an RGBA tuple from `ContentAnalysis.background`; alpha is dropped. */
+export function rgbaToHex([red, green, blue]: readonly number[]): string {
+  return `#${[red, green, blue]
+    .map((channel) =>
+      Math.round(channel ?? 0)
+        .toString(16)
+        .padStart(2, '0')
+    )
+    .join('')}`;
+}
+
+/** Color of the capture's top-left pixel, the fallback inset color when detection fails. */
+export async function cornerColor(source: ImageBitmap): Promise<string> {
+  const canvas = createExportCanvas(1, 1);
+  const ctx = canvas.getContext('2d') as
+    | CanvasRenderingContext2D
+    | OffscreenCanvasRenderingContext2D
+    | null;
+  if (!ctx) {
+    throw new Error('Failed to create balance canvas context');
+  }
+  ctx.drawImage(source, 0, 0, 1, 1, 0, 0, 1, 1);
+  return rgbaToHex(Array.from(ctx.getImageData(0, 0, 1, 1).data));
+}
+
+/** Crops `rect` out of the source and surrounds it with an `inset`-wide band of `color`. */
+export function composeBitmap(
+  source: ImageBitmap,
+  rect: LayoutRect,
+  inset: number,
+  color: string
+): Promise<ImageBitmap> {
+  const canvas = createExportCanvas(rect.width + inset * 2, rect.height + inset * 2);
   const ctx = canvas.getContext('2d') as
     | CanvasRenderingContext2D
     | OffscreenCanvasRenderingContext2D
@@ -47,7 +78,21 @@ export function cropBitmap(source: ImageBitmap, rect: LayoutRect): Promise<Image
     throw new Error('Failed to create balance canvas context');
   }
 
-  ctx.drawImage(source, rect.x, rect.y, rect.width, rect.height, 0, 0, rect.width, rect.height);
+  if (inset > 0) {
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  ctx.drawImage(
+    source,
+    rect.x,
+    rect.y,
+    rect.width,
+    rect.height,
+    inset,
+    inset,
+    rect.width,
+    rect.height
+  );
   return createImageBitmap(canvas);
 }
 

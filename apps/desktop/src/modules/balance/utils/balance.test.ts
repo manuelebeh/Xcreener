@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { ContentAnalysis } from '@/shared/types/ipc';
-import { annotationShift, sourceRect } from './balance';
+import { annotationShift, rgbaToHex, sourceRect } from './balance';
 
 // 400x300 capture, content offset to the top-left: margins 40 / 20 / 160 / 180.
 const analysis: ContentAnalysis = {
@@ -60,5 +60,11 @@ describe('annotationShift', () => {
       origin: { x: -100, y: -50 },
     };
     expect(annotationShift(before, after, { x: 200, y: 100 })).toEqual({ x: 0, y: 0 });
+  });
+});
+
+describe('rgbaToHex', () => {
+  it('pads each channel and drops alpha', () => {
+    expect(rgbaToHex([0, 15, 255, 128])).toBe('#000fff');
   });
 });

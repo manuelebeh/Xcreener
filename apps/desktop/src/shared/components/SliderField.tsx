@@ -8,6 +8,7 @@ interface SliderFieldProps {
   min: number;
   max: number;
   step?: number;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }
 
@@ -18,6 +19,7 @@ export function SliderField({
   min,
   max,
   step = 1,
+  disabled,
   onChange,
 }: SliderFieldProps) {
   return (
@@ -34,6 +36,7 @@ export function SliderField({
         min={min}
         max={max}
         step={step}
+        disabled={disabled}
         onValueChange={([next]) => {
           if (next !== undefined) {
             onChange(next);
