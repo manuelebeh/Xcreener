@@ -46,8 +46,8 @@ Permission checks via `can(role, action)` in `team-core`; API enforces with `req
 
 ### Billing (Stripe)
 
-- Plans: `free` (1 member), `team_starter` (max 5), `team_pro` (unlimited seats)
-- Stripe Checkout subscription; quantity = active member count
+- Plans: `free` (1 member), `team_starter` (max 5 editors or admins, unlimited viewers), `team_pro` (unlimited seats)
+- Stripe Checkout subscription; quantity = billable members (editors and admins, never viewers). A join, a removal or a role change updates the quantity with proration (`apps/api/src/services/seat-sync.ts`)
 - Webhooks update `workspace_subscriptions` and `workspaces.plan`
 - Sandbox keys for dev; Customer Portal for self-service
 

@@ -13,19 +13,22 @@ import {
 } from '@snapglow/team-core';
 import { and, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { nanoid } from 'nanoid';
+import type Stripe from 'stripe';
 import * as schema from '../db/schema';
 import { env } from '../env';
 import { allowOrReply } from '../lib/rate-limit';
 import { authenticateRequest, upsertAuthUser } from '../plugins/auth';
 import { requireWorkspaceRole, resolveMembership } from '../plugins/workspace-auth';
 import { createAuth0Organization } from '../services/auth0-management';
+import { countBillableMembers, syncSeatQuantity } from '../services/seat-sync';
 import type { StorageService } from '../services/storage';
 
 interface WorkspaceRouteOptions {
   db: PostgresJsDatabase<typeof schema>;
   storage: StorageService;
+  stripe: Stripe | null;
 }
 
 type Database = PostgresJsDatabase<typeof schema>;
@@ -73,18 +76,6 @@ async function countWorkspaceMembers(
     .from(schema.workspaceMembers)
     .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
   return rows.length;
-}
-
-/** Members on a paid seat: what the plan member limit counts. Viewers are free. */
-async function countBillableMembers(
-  db: Database | Transaction,
-  workspaceId: string
-): Promise<number> {
-  const rows = await db
-    .select()
-    .from(schema.workspaceMembers)
-    .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
-  return rows.filter((row) => isBillableRole(row.role)).length;
 }
 
 /** True when `userId` is the only admin: demoting or removing them would leave nobody to manage billing. */
@@ -164,6 +155,15 @@ export async function registerWorkspaceRoutes(
   app: FastifyInstance,
   options: WorkspaceRouteOptions
 ) {
+  /** The member change is already saved: a Stripe failure is logged and retried by the next change. */
+  async function syncSeats(request: FastifyRequest, workspaceId: string): Promise<void> {
+    try {
+      await syncSeatQuantity(options.db, options.stripe, workspaceId);
+    } catch (error) {
+      request.log.error({ err: error, workspaceId }, 'Stripe seat sync failed');
+    }
+  }
+
   app.decorate('db', options.db);
 
   app.post('/v1/workspaces', { preHandler: authenticateRequest }, async (request, reply) => {
@@ -383,6 +383,7 @@ export async function registerWorkspaceRoutes(
       if (!updated) {
         return reply.code(404).send({ error: 'Member not found' });
       }
+      await syncSeats(request, workspaceId);
 
       const userRows = await options.db
         .select({ email: schema.users.email })
@@ -427,6 +428,7 @@ export async function registerWorkspaceRoutes(
       if (!deleted[0]) {
         return reply.code(404).send({ error: 'Member not found' });
       }
+      await syncSeats(request, workspaceId);
 
       return reply.code(204).send();
     }
@@ -613,6 +615,7 @@ export async function registerWorkspaceRoutes(
       if (result.status !== 200) {
         return reply.code(result.status).send({ error: result.error });
       }
+      await syncSeats(request, invitation.workspaceId);
 
       const response = await toWorkspaceResponse(options.db, result.workspace, invitation.role);
       return reply.send(response);

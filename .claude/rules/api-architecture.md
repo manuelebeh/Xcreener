@@ -15,7 +15,7 @@ Fastify backend for cloud sharing (Sprint 2b.5+), integrations/library (Sprint 2
 - **S3-compatible storage** — MinIO (local), Cloudflare R2 (prod)
 - **Auth0 JWT** — Bearer tokens verified via JWKS; optional `org_id` claim for SSO
 - **API keys** — `sg_live_*` Bearer tokens for `/v1/public/*` (Team Pro workspaces)
-- **Stripe** — Team seat billing (Checkout + webhooks)
+- **Stripe** — Team seat billing (Checkout + webhooks); the seat quantity follows billable members (`services/seat-sync.ts`)
 
 ## Dev
 
