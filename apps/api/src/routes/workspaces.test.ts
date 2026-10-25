@@ -243,7 +243,7 @@ describe('workspace routes', () => {
     await app.close();
   });
 
-  it('blocks invitations when team starter member limit is reached', async () => {
+  function fillStarterWorkspace(memberRole: 'editor' | 'viewer') {
     state.workspaces.push({
       id: '00000000-0000-4000-8000-000000000002',
       name: 'Starter Team',
@@ -259,11 +259,44 @@ describe('workspace routes', () => {
       state.members.push({
         workspaceId: '00000000-0000-4000-8000-000000000002',
         userId: index === 0 ? 'user-admin' : `user-${index}`,
-        role: index === 0 ? 'admin' : 'viewer',
+        role: index === 0 ? 'admin' : memberRole,
         joinedAt: new Date('2026-06-27T12:00:00.000Z'),
       });
     }
+  }
 
+  it('blocks invitations when team starter member limit is reached', async () => {
+    fillStarterWorkspace('editor');
+    const app = await buildTestApp(state, testContext.whereCapture);
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/v1/workspaces/00000000-0000-4000-8000-000000000002/invitations',
+      headers: { authorization: 'Bearer test-token' },
+      payload: { role: 'editor' },
+    });
+
+    expect(response.statusCode).toBe(403);
+    expect(response.json().error).toBe('Member limit reached for workspace plan');
+    await app.close();
+  });
+
+  it('does not count viewers toward the member limit', async () => {
+    fillStarterWorkspace('viewer');
+    const app = await buildTestApp(state, testContext.whereCapture);
+
+    const editorInvite = await app.inject({
+      method: 'POST',
+      url: '/v1/workspaces/00000000-0000-4000-8000-000000000002/invitations',
+      headers: { authorization: 'Bearer test-token' },
+      payload: { role: 'editor' },
+    });
+    expect(editorInvite.statusCode).toBe(201);
+    await app.close();
+  });
+
+  it('lets a full workspace invite more viewers', async () => {
+    fillStarterWorkspace('editor');
     const app = await buildTestApp(state, testContext.whereCapture);
 
     const response = await app.inject({
@@ -273,8 +306,7 @@ describe('workspace routes', () => {
       payload: { role: 'viewer' },
     });
 
-    expect(response.statusCode).toBe(403);
-    expect(response.json().error).toBe('Member limit reached for workspace plan');
+    expect(response.statusCode).toBe(201);
     await app.close();
   });
 });

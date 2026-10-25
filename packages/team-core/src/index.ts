@@ -111,6 +111,11 @@ export function isMemberLimitReached(plan: WorkspacePlan, currentMemberCount: nu
   return !canAddMember(plan, currentMemberCount);
 }
 
+/** Viewers are free: they do not take a paid seat or count toward the plan member limit. */
+export function isBillableRole(role: WorkspaceRole): boolean {
+  return role !== 'viewer';
+}
+
 const ROLE_RANK: Record<WorkspaceRole, number> = {
   viewer: 1,
   editor: 2,
