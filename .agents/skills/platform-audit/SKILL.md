@@ -94,7 +94,7 @@ If a tool is missing (gitleaks, osv-scanner, cargo-audit, cargo-deny, trivy, k6,
 
 ## Procedure
 
-Follow the steps in order. Per-step detail is in [references/checklist.md](references/checklist.md); SnapGlow-specific leads to check first are in [references/snapglow-hotspots.md](references/snapglow-hotspots.md).
+Follow the steps in order. Per-step detail is in [references/checklist.md](references/checklist.md); SnapGlow-specific leads to check first are in `docs/internal/audits/snapglow-hotspots.md` (gitignored, so only on the maintainer's machine; skip this if it is missing).
 
 1. Repository discovery and inventory of actual versions (lockfiles included).
 2. Architecture and data flow mapping (logical DFD), including capture → edit → share/sync/collab.
