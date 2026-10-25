@@ -76,8 +76,8 @@ describe('XcreenerClient', () => {
       Response.json(
         {
           token: 'abc123',
-          shareUrl: 'https://snapglow.app/s/abc123',
-          embedUrl: 'https://snapglow.app/e/abc123',
+          shareUrl: 'https://xcreener.app/s/abc123',
+          embedUrl: 'https://xcreener.app/e/abc123',
           expiresAt: null,
         },
         { status: 201 }

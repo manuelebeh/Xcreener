@@ -20,4 +20,4 @@ Referrals are tracked for **90 days** via browser cookie after the first click.
 
 ## Questions
 
-Contact **affiliates@snapglow.app** for custom partnerships or higher-tier deals.
+Contact **affiliates@xcreener.app** for custom partnerships or higher-tier deals.

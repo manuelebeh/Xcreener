@@ -10,8 +10,8 @@ export const Route = createFileRoute('/blog/$slug')({
           hrefLang: lang,
           href:
             lang === 'en'
-              ? `https://snapglow.app/blog/${slug}`
-              : `https://snapglow.app/blog/${slug}?lang=${lang}`,
+              ? `https://xcreener.app/blog/${slug}`
+              : `https://xcreener.app/blog/${slug}?lang=${lang}`,
         }))
       : [];
 

@@ -59,7 +59,7 @@ Required secrets (future):
 
 - Release Please + CHANGELOG remains deferred to Phase 1.
 - First production signing requires Apple Developer Program + Windows OV/EV cert budget.
-- Custom domain (`releases.snapglow.app`) can replace GitHub endpoint later without client changes if `latest.json` shape is preserved.
+- Custom domain (`releases.xcreener.app`) can replace GitHub endpoint later without client changes if `latest.json` shape is preserved.
 
 ## References
 

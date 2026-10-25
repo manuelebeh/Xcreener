@@ -20,7 +20,7 @@ Capture code from your editor, beautify with Xcreener cloud, and copy the result
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `xcreener.baseUrl` | `https://api.snapglow.app` | Xcreener API base URL |
+| `xcreener.baseUrl` | `https://api.xcreener.app` | Xcreener API base URL |
 
 ## Privacy
 

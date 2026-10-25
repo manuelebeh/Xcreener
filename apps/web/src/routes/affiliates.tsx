@@ -4,7 +4,7 @@ import { captureReferralFromUrl } from '#/lib/affiliates/referral';
 
 const REWARDFUL_PORTAL_URL =
   (import.meta.env.VITE_REWARDFUL_PORTAL_URL as string | undefined) ??
-  'https://snapglow.getrewardful.com/signup';
+  'https://xcreener.getrewardful.com/signup';
 
 export const Route = createFileRoute('/affiliates')({
   head: () => ({

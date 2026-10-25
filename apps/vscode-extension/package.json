@@ -43,7 +43,7 @@
       "properties": {
         "xcreener.baseUrl": {
           "type": "string",
-          "default": "https://api.snapglow.app",
+          "default": "https://api.xcreener.app",
           "description": "Xcreener API base URL"
         }
       }

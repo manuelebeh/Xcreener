@@ -84,7 +84,7 @@ export function WatermarkSection() {
               setWatermarkUrl(event.target.value);
               await setSetting(SETTING_KEYS.watermarkUrl, event.target.value);
             }}
-            placeholder="https://snapglow.app"
+            placeholder="https://xcreener.app"
           />
         </div>
       </SettingsRow>

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { isOriginAllowed } from './cors';
 
 describe('isOriginAllowed', () => {
-  const allowed = ['http://localhost:3000', 'https://snapglow.app'];
+  const allowed = ['http://localhost:3000', 'https://xcreener.app'];
 
   it('allows missing origin (non-browser clients)', () => {
     expect(isOriginAllowed(undefined, allowed)).toBe(true);

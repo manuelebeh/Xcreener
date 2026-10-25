@@ -116,7 +116,7 @@ function LandingPage() {
             <h2 className="text-2xl font-bold">{tm('readyTitle')}</h2>
             <p className="mx-auto mt-3 max-w-md text-muted">{tm('readySubtitle')}</p>
             <div className="mt-8 flex justify-center">
-              <a href="https://snapglow.app/download" className={linkButtonPrimary}>
+              <a href="https://xcreener.app/download" className={linkButtonPrimary}>
                 Download Xcreener
               </a>
             </div>

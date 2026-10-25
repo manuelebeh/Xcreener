@@ -348,7 +348,7 @@ mod tests {
         Config {
             domain: "tenant.eu.auth0.com",
             client_id: "client",
-            audience: "https://api.snapglow.app",
+            audience: "https://api.xcreener.app",
         }
     }
 

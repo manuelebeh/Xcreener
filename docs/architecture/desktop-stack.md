@@ -106,7 +106,7 @@
     "shell": { "open": true },
     "updater": {
       "active": true,
-      "endpoints": ["https://releases.snapglow.app/{{target}}/{{arch}}/{{current_version}}"],
+      "endpoints": ["https://releases.xcreener.app/{{target}}/{{arch}}/{{current_version}}"],
       "dialog": true,
       "pubkey": "..."
     },

@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { getBlogPosts } from '#/lib/blog/loadBlogPosts';
 import { getHelpArticles } from '#/lib/help/loadArticles';
 
-const BASE = 'https://snapglow.app';
+const BASE = 'https://xcreener.app';
 const LOCALES = [
   { hreflang: 'en', lang: '' },
   { hreflang: 'fr', lang: 'fr' },

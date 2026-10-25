@@ -46,7 +46,7 @@ jobs:
           DATABASE_URL: postgresql://xcreener:xcreener@localhost:5432/xcreener
           REDIS_URL: redis://localhost:6379
           AUTH0_DOMAIN: load-test.auth0.com
-          AUTH0_AUDIENCE: https://api.snapglow.app
+          AUTH0_AUDIENCE: https://api.xcreener.app
           WEB_PUBLIC_URL: http://localhost:3000
           S3_ENDPOINT: http://localhost:9000
           S3_BUCKET: xcreener-shares
@@ -62,7 +62,7 @@ jobs:
           DATABASE_URL: postgresql://xcreener:xcreener@localhost:5432/xcreener
           REDIS_URL: redis://localhost:6379
           AUTH0_DOMAIN: load-test.auth0.com
-          AUTH0_AUDIENCE: https://api.snapglow.app
+          AUTH0_AUDIENCE: https://api.xcreener.app
           WEB_PUBLIC_URL: http://localhost:3000
           S3_ENDPOINT: http://localhost:9000
           S3_BUCKET: xcreener-shares
@@ -79,7 +79,7 @@ jobs:
           DATABASE_URL: postgresql://xcreener:xcreener@localhost:5432/xcreener
           REDIS_URL: redis://localhost:6379
           AUTH0_DOMAIN: load-test.auth0.com
-          AUTH0_AUDIENCE: https://api.snapglow.app
+          AUTH0_AUDIENCE: https://api.xcreener.app
           WEB_PUBLIC_URL: http://localhost:3000
           S3_ENDPOINT: http://localhost:9000
           S3_BUCKET: xcreener-shares
