@@ -84,11 +84,7 @@ fn analyze_rgba(rgba: &RgbaImage) -> ImageStats {
 
         let max = r.max(g).max(b);
         let min = r.min(g).min(b);
-        saturation_sum += if max <= 0.001 {
-            0.0
-        } else {
-            (max - min) / max
-        };
+        saturation_sum += if max <= 0.001 { 0.0 } else { (max - min) / max };
 
         r_sum += r;
         g_sum += g;

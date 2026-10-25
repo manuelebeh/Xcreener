@@ -81,7 +81,11 @@ pub fn append_scrolled_frame(
 
     for y in 0..append_height {
         for x in 0..width {
-            canvas.put_pixel(x, previous.height() + y, *next.get_pixel(x, append_start + y));
+            canvas.put_pixel(
+                x,
+                previous.height() + y,
+                *next.get_pixel(x, append_start + y),
+            );
         }
     }
 
@@ -126,10 +130,7 @@ mod tests {
             }
         }
 
-        assert_eq!(
-            find_vertical_overlap(&previous, &next, 40),
-            Some(overlap)
-        );
+        assert_eq!(find_vertical_overlap(&previous, &next, 40), Some(overlap));
     }
 
     #[test]

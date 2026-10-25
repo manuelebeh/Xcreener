@@ -56,12 +56,14 @@ fn execute_native_capture(request: &CaptureNativeRequest) -> Result<Vec<u8>, Cap
             capture_window(window_id)
         }
         "fullscreen" => {
-            let monitor_id = request
-                .monitor_id
-                .ok_or_else(|| CaptureError::Backend("fullscreen capture requires monitorId".into()))?;
+            let monitor_id = request.monitor_id.ok_or_else(|| {
+                CaptureError::Backend("fullscreen capture requires monitorId".into())
+            })?;
             capture_fullscreen(monitor_id)
         }
-        other => Err(CaptureError::Backend(format!("unknown capture kind: {other}"))),
+        other => Err(CaptureError::Backend(format!(
+            "unknown capture kind: {other}"
+        ))),
     }
 }
 

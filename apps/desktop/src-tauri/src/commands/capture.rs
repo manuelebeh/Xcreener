@@ -3,10 +3,9 @@ use crate::capture::{
     capture_native as capture_native_impl, capture_region as capture_region_impl,
     capture_scrolling_window as capture_scrolling_window_impl,
     capture_window as capture_window_impl, get_overlay_bounds, get_window_at_point, list_monitors,
-    list_windows, pause_region_recording, request_scroll_capture_stop,
-    resume_region_recording, start_region_recording, stop_region_recording,
-    CaptureNativeRequest, CaptureOverlayBounds, CaptureRecordStartRequest,
-    CaptureRecordingCompletePayload, MonitorInfo, WindowInfo,
+    list_windows, pause_region_recording, request_scroll_capture_stop, resume_region_recording,
+    start_region_recording, stop_region_recording, CaptureNativeRequest, CaptureOverlayBounds,
+    CaptureRecordStartRequest, CaptureRecordingCompletePayload, MonitorInfo, WindowInfo,
 };
 use crate::overlay;
 use tauri::ipc::Response;

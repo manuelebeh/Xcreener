@@ -152,5 +152,6 @@ pub fn capture_scrolling_window(app: &AppHandle, target: WindowInfo) -> Result<V
         return Err(CaptureError::InvalidDimensions.into_message());
     }
 
-    encode_png(canvas.as_raw(), canvas.width(), canvas.height()).map_err(|error| error.into_message())
+    encode_png(canvas.as_raw(), canvas.width(), canvas.height())
+        .map_err(|error| error.into_message())
 }

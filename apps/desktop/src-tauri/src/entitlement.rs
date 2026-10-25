@@ -140,34 +140,49 @@ mod tests {
     fn rejects_a_token_issued_to_another_user() {
         let keys = key_pair();
         let jwt = token(&keys, "EdDSA", "team_pro", NOW - 10, NOW + 3600);
-        assert_eq!(verify(&jwt, "user-2", keys.public_key().as_ref(), NOW), None);
+        assert_eq!(
+            verify(&jwt, "user-2", keys.public_key().as_ref(), NOW),
+            None
+        );
     }
 
     #[test]
     fn rejects_another_key() {
         let jwt = token(&key_pair(), "EdDSA", "team_pro", NOW - 10, NOW + 3600);
-        assert_eq!(verify(&jwt, "user-1", key_pair().public_key().as_ref(), NOW), None);
+        assert_eq!(
+            verify(&jwt, "user-1", key_pair().public_key().as_ref(), NOW),
+            None
+        );
     }
 
     #[test]
     fn rejects_other_algorithms() {
         let keys = key_pair();
         let jwt = token(&keys, "HS256", "team_pro", NOW - 10, NOW + 3600);
-        assert_eq!(verify(&jwt, "user-1", keys.public_key().as_ref(), NOW), None);
+        assert_eq!(
+            verify(&jwt, "user-1", keys.public_key().as_ref(), NOW),
+            None
+        );
     }
 
     #[test]
     fn rejects_expired_tokens() {
         let keys = key_pair();
         let jwt = token(&keys, "EdDSA", "team_pro", NOW - 7200, NOW - 1);
-        assert_eq!(verify(&jwt, "user-1", keys.public_key().as_ref(), NOW), None);
+        assert_eq!(
+            verify(&jwt, "user-1", keys.public_key().as_ref(), NOW),
+            None
+        );
     }
 
     #[test]
     fn rejects_tokens_issued_in_the_future() {
         let keys = key_pair();
         let jwt = token(&keys, "EdDSA", "team_pro", NOW + 3600, NOW + 7200);
-        assert_eq!(verify(&jwt, "user-1", keys.public_key().as_ref(), NOW), None);
+        assert_eq!(
+            verify(&jwt, "user-1", keys.public_key().as_ref(), NOW),
+            None
+        );
     }
 
     /// Token and key produced by `jose` exactly like apps/api/src/services/entitlement.ts.
@@ -189,7 +204,13 @@ mod tests {
     #[test]
     fn rejects_malformed_tokens() {
         let keys = key_pair();
-        assert_eq!(verify("not-a-token", "user-1", keys.public_key().as_ref(), NOW), None);
-        assert_eq!(verify("a.b.c.d", "user-1", keys.public_key().as_ref(), NOW), None);
+        assert_eq!(
+            verify("not-a-token", "user-1", keys.public_key().as_ref(), NOW),
+            None
+        );
+        assert_eq!(
+            verify("a.b.c.d", "user-1", keys.public_key().as_ref(), NOW),
+            None
+        );
     }
 }
