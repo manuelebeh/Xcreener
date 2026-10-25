@@ -53,6 +53,7 @@ function detectionsToBlurAnnotations(detections: Detection[]): BlurAnnotation[] 
   if (!input) {
     return [];
   }
+  const { mode, color } = useRedactionStore.getState().style;
 
   return detections.map((detection) => {
     const rect = mapRegionToLayout(detection, input);
@@ -63,8 +64,9 @@ function detectionsToBlurAnnotations(detections: Detection[]): BlurAnnotation[] 
       y: rect.y,
       width: rect.width,
       height: rect.height,
-      mode: 'gaussian' as const,
+      mode,
       intensity: 12,
+      ...(mode === 'solid' ? { color } : {}),
     };
   });
 }
@@ -96,7 +98,8 @@ export function useRedactionScan() {
   }, []);
 
   const maskAll = useCallback((auto = false) => {
-    const detections = useRedactionStore.getState().detections;
+    const { detections: found, enabledKinds } = useRedactionStore.getState();
+    const detections = found.filter((detection) => enabledKinds.includes(detection.kind));
     if (detections.length === 0) {
       return;
     }
@@ -113,7 +116,13 @@ export function useRedactionScan() {
       count: detections.length,
     });
 
-    useRedactionStore.getState().clear();
+    // Detections of kinds the user switched off stay listed so they can still be masked one by one.
+    const remaining = found.filter((detection) => !enabledKinds.includes(detection.kind));
+    if (remaining.length === 0) {
+      useRedactionStore.getState().clear();
+    } else {
+      useRedactionStore.getState().setDetections(remaining);
+    }
   }, []);
 
   const maskOne = useCallback((id: string) => {
