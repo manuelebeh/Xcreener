@@ -57,7 +57,7 @@ objc2-foundation = { version = "0.3", default-features = false, features = ["std
 objc2-vision = { version = "0.3", default-features = false, features = ["std", "VNRecognizeTextRequest", "VNRequestHandler", "VNRequest", "VNObservation", "VNTypes", "block2", "objc2-core-foundation"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
-windows = { version = "0.58", features = [
+windows = { version = "0.62", features = [
   "Foundation",
   "Foundation_Collections",
   "Graphics_Imaging",
