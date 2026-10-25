@@ -66,9 +66,9 @@ export function EditorView() {
                 <StyleBar embedded marginControls={<BalanceBar embedded />} />
               </EditorSection>
               <EditorSection title="Text" testId="text-section">
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <TextExtractionBar embedded />
-                  <div className="border-t border-border pt-3">
+                  <div className="border-t border-border pt-5">
                     <RedactionBar embedded />
                   </div>
                 </div>
