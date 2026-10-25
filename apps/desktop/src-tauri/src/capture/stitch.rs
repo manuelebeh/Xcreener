@@ -5,8 +5,10 @@ const MIN_OVERLAP: u32 = 8;
 
 /// Row sum of absolute RGB differences (fast overlap metric).
 fn row_distance(a: &[u8], b: &[u8]) -> u64 {
-    a.chunks_exact(4)
-        .zip(b.chunks_exact(4))
+    a.as_chunks::<4>()
+        .0
+        .iter()
+        .zip(b.as_chunks::<4>().0.iter())
         .map(|(left, right)| {
             (i32::from(left[0]) - i32::from(right[0])).unsigned_abs() as u64
                 + (i32::from(left[1]) - i32::from(right[1])).unsigned_abs() as u64
