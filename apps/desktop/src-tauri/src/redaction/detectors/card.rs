@@ -4,8 +4,7 @@ use std::sync::LazyLock;
 use super::super::types::{SensitiveRegion, TextLine};
 use super::region_for_match;
 
-static CARD_RE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\b(?:\d[ -]*?){13,19}\b").unwrap());
+static CARD_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\b(?:\d[ -]*?){13,19}\b").unwrap());
 
 pub fn detect(line: &TextLine) -> Vec<SensitiveRegion> {
     CARD_RE
@@ -16,7 +15,11 @@ pub fn detect(line: &TextLine) -> Vec<SensitiveRegion> {
 }
 
 fn luhn_valid(value: &str) -> bool {
-    let digits: Vec<u32> = value.chars().filter(|ch| ch.is_ascii_digit()).map(|ch| ch.to_digit(10).unwrap_or(0)).collect();
+    let digits: Vec<u32> = value
+        .chars()
+        .filter(|ch| ch.is_ascii_digit())
+        .map(|ch| ch.to_digit(10).unwrap_or(0))
+        .collect();
 
     if digits.len() < 13 || digits.len() > 19 {
         return false;

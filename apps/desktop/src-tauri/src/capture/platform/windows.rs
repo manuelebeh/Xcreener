@@ -10,7 +10,9 @@ const VK_HOME: u16 = 0x24;
 const VK_NEXT: u16 = 0x22;
 
 pub fn focus_xcap_window(window: &xcap::Window) -> Result<(), CaptureError> {
-    let window_id = window.id().map_err(|error| CaptureError::Backend(error.to_string()))?;
+    let window_id = window
+        .id()
+        .map_err(|error| CaptureError::Backend(error.to_string()))?;
 
     unsafe {
         let hwnd = HWND(window_id as usize as *mut std::ffi::c_void);
@@ -114,7 +116,9 @@ fn gdi_capture_area(x: i32, y: i32, width: i32, height: i32) -> Result<RgbaImage
         if h_bitmap.is_invalid() {
             let _ = DeleteDC(hdc_mem);
             let _ = ReleaseDC(hwnd, hdc_screen);
-            return Err(CaptureError::Backend("CreateCompatibleBitmap failed".into()));
+            return Err(CaptureError::Backend(
+                "CreateCompatibleBitmap failed".into(),
+            ));
         }
 
         let previous_object = SelectObject(hdc_mem, HGDIOBJ::from(h_bitmap));

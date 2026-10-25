@@ -7,14 +7,12 @@ use super::control::{
 use super::control::{
     allocate_frame_index, record_frame_saved, recording_is_cancelled, recording_stop_requested,
 };
-use super::encode_gif::{encode_gif_from_dir, GifQuality};
 #[cfg(not(target_os = "macos"))]
 use super::encode_gif::write_frame_rgba;
+use super::encode_gif::{encode_gif_from_dir, GifQuality};
 use super::encode_mp4::encode_mp4_from_dir;
 use crate::capture::native::{cancel_live_capture, reset_live_capture_cancelled};
-use crate::capture::types::{
-    CaptureRecordStartRequest, CaptureRecordingCompletePayload, Rect,
-};
+use crate::capture::types::{CaptureRecordStartRequest, CaptureRecordingCompletePayload, Rect};
 use crate::capture::{capture_region, list_monitors, validate_region, CaptureError};
 use crate::overlay;
 #[cfg(not(target_os = "macos"))]
@@ -82,8 +80,7 @@ fn capture_loop(
         // encoders reproduce real-time playback rather than assuming a fixed frame rate.
         let timestamp_ms = active_elapsed_ms(started_at);
         let frame_index = allocate_frame_index();
-        let frame_path =
-            frames_dir.join(format!("frame_{frame_index:05}_{timestamp_ms:09}.rgba"));
+        let frame_path = frames_dir.join(format!("frame_{frame_index:05}_{timestamp_ms:09}.rgba"));
         write_frame_rgba(&frame_path, &rgba)?;
         record_frame_saved();
         emit_recording_progress(&app, started_at, max_duration_secs);
@@ -126,7 +123,10 @@ fn cleanup_frames_dir(path: &Path) {
 }
 
 fn recording_staging_path(app: &AppHandle, format: &str) -> Result<PathBuf, String> {
-    let base = app.path().app_data_dir().map_err(|error| error.to_string())?;
+    let base = app
+        .path()
+        .app_data_dir()
+        .map_err(|error| error.to_string())?;
     let staging = base.join("recording-staging");
     std::fs::create_dir_all(&staging).map_err(|error| error.to_string())?;
 
@@ -235,7 +235,11 @@ pub fn start_region_recording(
     };
     // GIFs are meant to be short shareable loops: cap them at 8s (recording auto-stops
     // at the limit). MP4 keeps the full 30s ceiling.
-    let format_cap_secs = if output_format == "gif" { GIF_MAX_DURATION_SECS } else { 30 };
+    let format_cap_secs = if output_format == "gif" {
+        GIF_MAX_DURATION_SECS
+    } else {
+        30
+    };
     let max_duration_secs = request.max_duration_secs.min(format_cap_secs).max(1);
     let gif_quality = GifQuality::from_label(&request.gif_quality);
 

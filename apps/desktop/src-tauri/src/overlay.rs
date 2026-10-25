@@ -374,10 +374,7 @@ pub fn report_capture_failure(app: &AppHandle, message: &str) {
     let message = message.to_string();
     let _ = dispatch_on_main_thread(app, move |app| {
         tray::show_main_window(app);
-        app.emit(
-            "capture-error",
-            CaptureErrorPayload { message },
-        )
-        .map_err(|error| error.to_string())
+        app.emit("capture-error", CaptureErrorPayload { message })
+            .map_err(|error| error.to_string())
     });
 }

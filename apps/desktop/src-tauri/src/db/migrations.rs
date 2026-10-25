@@ -4,9 +4,18 @@ use rusqlite::{Connection, OptionalExtension};
 
 const MIGRATIONS: &[(i64, &str)] = &[
     (1, include_str!("../../../src/db/migrations/001_init.sql")),
-    (2, include_str!("../../../src/db/migrations/002_library_ocr.sql")),
-    (3, include_str!("../../../src/db/migrations/003_capture_uid.sql")),
-    (4, include_str!("../../../src/db/migrations/004_capture_shortcut_default.sql")),
+    (
+        2,
+        include_str!("../../../src/db/migrations/002_library_ocr.sql"),
+    ),
+    (
+        3,
+        include_str!("../../../src/db/migrations/003_capture_uid.sql"),
+    ),
+    (
+        4,
+        include_str!("../../../src/db/migrations/004_capture_shortcut_default.sql"),
+    ),
 ];
 
 /// Splits a migration file into statements. A trigger body holds its own semicolons, so a
@@ -85,7 +94,9 @@ fn table_exists(conn: &Connection, table: &str) -> rusqlite::Result<bool> {
 
 fn applied_version(conn: &Connection) -> rusqlite::Result<i64> {
     let recorded: Option<i64> =
-        conn.query_row("SELECT MAX(version) FROM _schema_migrations", [], |row| row.get(0))?;
+        conn.query_row("SELECT MAX(version) FROM _schema_migrations", [], |row| {
+            row.get(0)
+        })?;
     match recorded {
         Some(version) => Ok(version),
         // Databases created before version tracking already hold the 001 schema.
@@ -138,8 +149,10 @@ mod tests {
     use super::*;
 
     fn latest_version(conn: &Connection) -> i64 {
-        conn.query_row("SELECT MAX(version) FROM _schema_migrations", [], |row| row.get(0))
-            .unwrap()
+        conn.query_row("SELECT MAX(version) FROM _schema_migrations", [], |row| {
+            row.get(0)
+        })
+        .unwrap()
     }
 
     #[test]

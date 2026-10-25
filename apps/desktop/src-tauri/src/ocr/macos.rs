@@ -1,9 +1,9 @@
 use std::sync::Mutex;
 
 use image::GenericImageView;
-use objc2::AnyThread;
 use objc2::rc::Retained;
 use objc2::runtime::AnyObject;
+use objc2::AnyThread;
 use objc2_foundation::{NSArray, NSData, NSDictionary};
 use objc2_vision::{
     VNImageRequestHandler, VNRecognizeTextRequest, VNRequest, VNRequestTextRecognitionLevel,
@@ -53,12 +53,7 @@ impl OcrEngine for MacOcrEngine {
                 continue;
             }
 
-            let bounds = unsafe {
-                observation
-                    .into_super()
-                    .into_super()
-                    .boundingBox()
-            };
+            let bounds = unsafe { observation.into_super().into_super().boundingBox() };
             let width = bounds.size.width * image_width as f64;
             let height = bounds.size.height * image_height as f64;
             let x = bounds.origin.x * image_width as f64;

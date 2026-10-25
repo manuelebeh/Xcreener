@@ -47,8 +47,11 @@ mod tests {
     #[test]
     fn defaults_do_not_overwrite_existing_values() {
         let conn = crate::db::test_connection();
-        conn.execute("INSERT INTO settings (key, value) VALUES ('theme', 'dark')", [])
-            .unwrap();
+        conn.execute(
+            "INSERT INTO settings (key, value) VALUES ('theme', 'dark')",
+            [],
+        )
+        .unwrap();
 
         let defaults = HashMap::from([
             ("theme".to_string(), "system".to_string()),

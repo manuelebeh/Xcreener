@@ -27,4 +27,6 @@ pub(crate) use windows::{
 };
 
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
-pub(crate) use linux::{focus_xcap_window, scroll_xcap_window_page_down, scroll_xcap_window_to_top};
+pub(crate) use linux::{
+    focus_xcap_window, scroll_xcap_window_page_down, scroll_xcap_window_to_top,
+};

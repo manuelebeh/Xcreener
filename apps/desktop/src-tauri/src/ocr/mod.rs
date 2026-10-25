@@ -2,9 +2,9 @@ pub mod types;
 
 #[cfg(target_os = "macos")]
 mod macos;
+mod tesseract;
 #[cfg(target_os = "windows")]
 mod windows;
-mod tesseract;
 
 use types::{RecognizeTextOptions, TextLine};
 

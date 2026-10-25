@@ -130,7 +130,9 @@ mod tests {
             .unwrap();
 
         let links: i64 = conn
-            .query_row("SELECT COUNT(*) FROM capture_collections", [], |row| row.get(0))
+            .query_row("SELECT COUNT(*) FROM capture_collections", [], |row| {
+                row.get(0)
+            })
             .unwrap();
         assert_eq!(links, 0);
     }

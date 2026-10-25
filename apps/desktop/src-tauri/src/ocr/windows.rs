@@ -1,7 +1,7 @@
 use image::{ImageBuffer, Rgba};
 use windows::Graphics::Imaging::{BitmapPixelFormat, SoftwareBitmap};
 use windows::Media::Ocr::OcrEngine as WinOcrEngine;
-use windows::Storage::Streams::{DataWriter, InMemoryRandomAccessStream, IBuffer};
+use windows::Storage::Streams::{DataWriter, IBuffer, InMemoryRandomAccessStream};
 
 use super::OcrEngine;
 use crate::ocr::types::TextLine;
@@ -22,8 +22,8 @@ impl OcrEngine for WindowsOcrEngine {
         )
         .map_err(|error| error.to_string())?;
 
-        let engine = WinOcrEngine::TryCreateFromUserProfileLanguages()
-            .map_err(|error| error.to_string())?;
+        let engine =
+            WinOcrEngine::TryCreateFromUserProfileLanguages().map_err(|error| error.to_string())?;
 
         let result = engine
             .RecognizeAsync(&bitmap)
@@ -46,9 +46,7 @@ impl OcrEngine for WindowsOcrEngine {
                 if let Ok(words) = line.Words() {
                     if let Ok(size) = words.Size() {
                         if size > 0 {
-                            if let (Ok(first), Ok(last)) =
-                                (words.GetAt(0), words.GetAt(size - 1))
-                            {
+                            if let (Ok(first), Ok(last)) = (words.GetAt(0), words.GetAt(size - 1)) {
                                 if let (Ok(first_bbox), Ok(last_bbox)) =
                                     (first.BoundingRect(), last.BoundingRect())
                                 {

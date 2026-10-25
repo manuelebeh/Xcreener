@@ -1,13 +1,9 @@
-use objc2_app_kit::{
-    NSApplication, NSWindow, NSWindowStyleMask, NSWindowTitleVisibility,
-};
+use objc2_app_kit::{NSApplication, NSWindow, NSWindowStyleMask, NSWindowTitleVisibility};
 use objc2_foundation::MainThreadMarker;
 use tauri::WebviewWindow;
 
 fn ns_window(window: &WebviewWindow) -> Result<&NSWindow, String> {
-    let handle = window
-        .ns_window()
-        .map_err(|error| error.to_string())?;
+    let handle = window.ns_window().map_err(|error| error.to_string())?;
     // SAFETY: Tauri returns the live NSWindow for this webview on the main thread.
     Ok(unsafe { &*handle.cast() })
 }

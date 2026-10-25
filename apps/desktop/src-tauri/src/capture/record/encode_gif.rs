@@ -105,10 +105,15 @@ pub fn build_gif_timeline(
     }
 
     let timestamps: Vec<u32> = if frames.iter().all(|frame| frame.timestamp_ms.is_some()) {
-        frames.iter().map(|frame| frame.timestamp_ms.unwrap()).collect()
+        frames
+            .iter()
+            .map(|frame| frame.timestamp_ms.unwrap())
+            .collect()
     } else {
         let each = total_duration_ms.max(1) as f32 / count as f32;
-        (0..count).map(|index| (index as f32 * each) as u32).collect()
+        (0..count)
+            .map(|index| (index as f32 * each) as u32)
+            .collect()
     };
 
     let span_ms = total_duration_ms
@@ -188,7 +193,8 @@ pub fn load_frames_from_dir(frames_dir: &Path) -> Result<Vec<CapturedFrame>, Cap
         .into_iter()
         .map(|path| {
             let timestamp_ms = parse_frame_timestamp_ms(&path);
-            let bytes = std::fs::read(&path).map_err(|error| CaptureError::Backend(error.to_string()))?;
+            let bytes =
+                std::fs::read(&path).map_err(|error| CaptureError::Backend(error.to_string()))?;
             if bytes.len() < 8 {
                 return Err(CaptureError::Backend("invalid frame file".into()));
             }
@@ -203,7 +209,10 @@ pub fn load_frames_from_dir(frames_dir: &Path) -> Result<Vec<CapturedFrame>, Cap
             }
             let image = RgbaImage::from_raw(width, height, bytes[8..].to_vec())
                 .ok_or_else(|| CaptureError::Backend("invalid frame dimensions".into()))?;
-            Ok(CapturedFrame { image, timestamp_ms })
+            Ok(CapturedFrame {
+                image,
+                timestamp_ms,
+            })
         })
         .collect()
 }
@@ -273,7 +282,10 @@ fn write_gif_bytes(
                 .map_err(|error| CaptureError::Backend(error.to_string()))?;
             let mut gif_frame =
                 gif::Frame::from_indexed_pixels(width, height, indexed.clone(), None);
-            gif_frame.delay = delays_cs.get(index).copied().unwrap_or(DEFAULT_FRAME_DELAY_CS);
+            gif_frame.delay = delays_cs
+                .get(index)
+                .copied()
+                .unwrap_or(DEFAULT_FRAME_DELAY_CS);
             encoder
                 .write_frame(&gif_frame)
                 .map_err(|error| CaptureError::Backend(error.to_string()))?;
@@ -454,10 +466,7 @@ mod tests {
     #[test]
     fn gif_timeline_uses_even_grid_and_collapses_static_runs() {
         // Two distinct frames: the first stays on screen ~1s, the second briefly.
-        let frames = vec![
-            frame_with_ts(Some(0)),
-            frame_with_ts(Some(1000)),
-        ];
+        let frames = vec![frame_with_ts(Some(0)), frame_with_ts(Some(1000))];
         let (images, delays) = build_gif_timeline(&frames, 1100);
 
         // One GIF frame per distinct source frame, no duplication blow-up.
@@ -470,7 +479,11 @@ mod tests {
 
     #[test]
     fn gif_timeline_falls_back_to_uniform_without_timestamps() {
-        let frames = vec![frame_with_ts(None), frame_with_ts(None), frame_with_ts(None)];
+        let frames = vec![
+            frame_with_ts(None),
+            frame_with_ts(None),
+            frame_with_ts(None),
+        ];
         let (images, delays) = build_gif_timeline(&frames, 600);
         assert_eq!(images.len(), delays.len());
         assert!(!images.is_empty());

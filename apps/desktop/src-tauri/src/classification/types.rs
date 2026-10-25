@@ -12,7 +12,8 @@ pub enum ContentClass {
 }
 
 impl ContentClass {
-    pub const MODEL_LABELS: [&'static str; 6] = ["code", "ui", "terminal", "photo", "diagram", "text"];
+    pub const MODEL_LABELS: [&'static str; 6] =
+        ["code", "ui", "terminal", "photo", "diagram", "text"];
 
     pub fn as_str(self) -> &'static str {
         match self {

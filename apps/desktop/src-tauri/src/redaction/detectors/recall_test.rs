@@ -18,10 +18,7 @@ fn recall_on_detector_corpus() {
         ("Phone 06 12 34 56 78", vec!["phone"]),
         ("Card 4111 1111 1111 1111", vec!["card"]),
         ("sk_live_abcdefghijklmnopqrstuvwxyz", vec!["api_key"]),
-        (
-            "https://api.example.com?token=secret123",
-            vec!["url"],
-        ),
+        ("https://api.example.com?token=secret123", vec!["url"]),
         ("password: hunter2", vec!["password"]),
         ("Email alice@company.co.uk", vec!["email"]),
         ("secret: my-long-secret-value", vec!["password"]),

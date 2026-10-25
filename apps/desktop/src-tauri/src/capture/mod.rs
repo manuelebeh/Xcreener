@@ -8,17 +8,17 @@ pub mod record;
 pub mod scroll;
 pub mod stitch;
 
-pub use types::{
-    CaptureErrorPayload, CaptureNativeRequest, CaptureOverlayBounds, CaptureOverlayInitPayload,
-    CaptureProgressPayload, CaptureRecordStartRequest, CaptureRecordingCompletePayload,
-    MonitorInfo, OverlayWebviewLayout, Rect, WindowInfo,
-};
 pub use native::{cancel_live_capture, capture_native};
 pub use record::{
     cancel_region_recording, pause_region_recording, resume_region_recording,
     start_region_recording, stop_region_recording,
 };
 pub use scroll::{capture_scrolling_window, request_scroll_capture_stop};
+pub use types::{
+    CaptureErrorPayload, CaptureNativeRequest, CaptureOverlayBounds, CaptureOverlayInitPayload,
+    CaptureProgressPayload, CaptureRecordStartRequest, CaptureRecordingCompletePayload,
+    MonitorInfo, OverlayWebviewLayout, Rect, WindowInfo,
+};
 pub use validate::{validate_monitor_id, validate_region, validate_window_id};
 
 use image::codecs::png::PngEncoder;
@@ -347,14 +347,17 @@ pub fn capture_window(window_id: u64) -> Result<Vec<u8>, CaptureError> {
     validate_window_id(window_id, &windows)?;
 
     let xcap_windows = Window::all().map_err(map_xcap_error)?;
-    let window = xcap_windows.into_iter().find(|window| {
-        window
-            .id()
-            .ok()
-            .map(u64::from)
-            .map(|id| id == window_id)
-            .unwrap_or(false)
-    }).ok_or(CaptureError::WindowNotFound(window_id))?;
+    let window = xcap_windows
+        .into_iter()
+        .find(|window| {
+            window
+                .id()
+                .ok()
+                .map(u64::from)
+                .map(|id| id == window_id)
+                .unwrap_or(false)
+        })
+        .ok_or(CaptureError::WindowNotFound(window_id))?;
 
     #[cfg_attr(not(target_os = "macos"), allow(unused_mut))]
     let mut image = window.capture_image().map_err(map_xcap_error)?;
@@ -451,20 +454,12 @@ pub fn capture_fullscreen(display_id: u32) -> Result<Vec<u8>, CaptureError> {
 }
 
 #[allow(dead_code)]
-pub fn local_to_screen(
-    local_x: i32,
-    local_y: i32,
-    bounds: &CaptureOverlayBounds,
-) -> (i32, i32) {
+pub fn local_to_screen(local_x: i32, local_y: i32, bounds: &CaptureOverlayBounds) -> (i32, i32) {
     (local_x + bounds.x, local_y + bounds.y)
 }
 
 #[allow(dead_code)]
-pub fn screen_to_local(
-    screen_x: i32,
-    screen_y: i32,
-    bounds: &CaptureOverlayBounds,
-) -> (i32, i32) {
+pub fn screen_to_local(screen_x: i32, screen_y: i32, bounds: &CaptureOverlayBounds) -> (i32, i32) {
     (screen_x - bounds.x, screen_y - bounds.y)
 }
 

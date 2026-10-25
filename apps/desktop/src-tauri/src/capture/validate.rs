@@ -39,7 +39,10 @@ pub fn validate_monitor_id(display_id: u32, monitors: &[MonitorInfo]) -> Result<
     }
 }
 
-pub fn validate_window_id(window_id: u64, windows: &[super::types::WindowInfo]) -> Result<(), CaptureError> {
+pub fn validate_window_id(
+    window_id: u64,
+    windows: &[super::types::WindowInfo],
+) -> Result<(), CaptureError> {
     if windows.iter().any(|window| window.id == window_id) {
         Ok(())
     } else {

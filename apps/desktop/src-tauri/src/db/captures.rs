@@ -240,9 +240,11 @@ pub async fn captures_get(db: State<'_, Db>, id: i64) -> Result<Option<CaptureRo
 #[tauri::command]
 pub async fn captures_uid_exists(db: State<'_, Db>, uid: String) -> Result<bool, String> {
     with_conn(&db, |conn| {
-        conn.query_row("SELECT 1 FROM captures WHERE uid = ?1 LIMIT 1", [uid], |_| {
-            Ok(())
-        })
+        conn.query_row(
+            "SELECT 1 FROM captures WHERE uid = ?1 LIMIT 1",
+            [uid],
+            |_| Ok(()),
+        )
         .optional()
         .map(|row| row.is_some())
     })
@@ -299,7 +301,11 @@ mod tests {
         let found = search(&conn, "invoice", 30).unwrap();
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].id, id);
-        assert!(found[0].snippet.as_deref().unwrap_or("").contains("invoice"));
+        assert!(found[0]
+            .snippet
+            .as_deref()
+            .unwrap_or("")
+            .contains("invoice"));
     }
 
     #[test]
@@ -324,10 +330,13 @@ mod tests {
         )
         .unwrap();
 
-        conn.execute("DELETE FROM captures WHERE id = ?1", [id]).unwrap();
+        conn.execute("DELETE FROM captures WHERE id = ?1", [id])
+            .unwrap();
 
         let links: i64 = conn
-            .query_row("SELECT COUNT(*) FROM capture_collections", [], |row| row.get(0))
+            .query_row("SELECT COUNT(*) FROM capture_collections", [], |row| {
+                row.get(0)
+            })
             .unwrap();
         assert_eq!(links, 0);
     }
