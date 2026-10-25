@@ -10,7 +10,7 @@ order: 4
 | Plan | Highlights |
 |------|------------|
 | **Free** | 1 member, personal cloud |
-| **Team Starter** | Up to 5 members, brand kit, collaboration |
+| **Team Starter** | 5 editors or admins, unlimited viewers, brand kit, collaboration |
 | **Team Pro** | Unlimited seats, API keys, SSO |
 
 ## Upgrade
@@ -19,7 +19,11 @@ Admins click **Upgrade to Team Starter** or **Team Pro** in Settings. Checkout o
 
 ## Manage subscription
 
-After subscribing, use **Manage subscription** to open the Stripe Customer Portal — update seats, payment method, or cancel.
+After subscribing, use **Manage subscription** to open the Stripe Customer Portal to update the payment method or cancel.
+
+## Seats
+
+You pay one seat per editor or admin. Viewers are free. Seats follow the members list: inviting an editor, removing one, or changing a role updates the subscription, prorated by Stripe.
 
 ## SSO (Team Pro)
 

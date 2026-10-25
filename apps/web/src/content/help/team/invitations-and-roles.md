@@ -19,8 +19,8 @@ Invitees sign in with Auth0 if needed, then join the workspace automatically.
 
 ## Changing roles
 
-Admins can update or remove members from the members list. Seat billing updates when Stripe is configured.
+Admins can update or remove members from the members list. On a paid plan, adding, removing, or promoting an editor or admin updates the seat count, prorated. Viewers are free.
 
 ## Limits
 
-Free workspaces allow one member. **Team Starter** supports up to five members; **Team Pro** is unlimited.
+Free workspaces allow one member. **Team Starter** supports five editors or admins and any number of viewers; **Team Pro** is unlimited.
