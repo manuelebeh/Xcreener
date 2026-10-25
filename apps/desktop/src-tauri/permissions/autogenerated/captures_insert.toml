@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-captures-insert"
+description = "Enables the captures_insert command without any pre-configured scope."
+commands.allow = ["captures_insert"]
+
+[[permission]]
+identifier = "deny-captures-insert"
+description = "Denies the captures_insert command without any pre-configured scope."
+commands.deny = ["captures_insert"]

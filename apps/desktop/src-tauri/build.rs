@@ -2,8 +2,91 @@ fn main() {
     #[cfg(target_os = "macos")]
     link_swift_runtime_rpath();
     embed_auth0_config();
-    tauri_build::build()
+    tauri_build::try_build(
+        tauri_build::Attributes::new()
+            .app_manifest(tauri_build::AppManifest::new().commands(COMMANDS)),
+    )
+    .expect("failed to run tauri-build");
 }
+
+/// Every command in `generate_handler!` (`src/lib.rs`). Declaring them makes Tauri check each
+/// call against the window's capability, so the capture overlay cannot reach cloud or database
+/// commands. A command missing here or from a capability is refused at runtime.
+const COMMANDS: &[&str] = &[
+    "capture_region",
+    "capture_window",
+    "capture_fullscreen",
+    "capture_native_command",
+    "capture_scrolling_window_command",
+    "cancel_live_capture_command",
+    "stop_scrolling_capture_command",
+    "start_region_recording_command",
+    "pause_region_recording_command",
+    "resume_region_recording_command",
+    "stop_region_recording_command",
+    "cancel_region_recording_command",
+    "open_path_command",
+    "show_live_capture_overlay",
+    "list_monitors_command",
+    "list_windows_command",
+    "get_window_at_point_command",
+    "get_capture_overlay_bounds",
+    "get_overlay_webview_layout",
+    "show_capture_overlay",
+    "start_capture_command",
+    "capture_overlay_ready",
+    "hide_capture_overlay",
+    "cancel_capture_overlay",
+    "detect_sensitive_data",
+    "recognize_text_command",
+    "analyze_content_command",
+    "compress_export_bytes_command",
+    "classify_content_command",
+    "stash_capture_image",
+    "take_capture_image",
+    "take_overlay_preview",
+    "take_recording_thumbnail",
+    "verify_entitlement",
+    "update_capture_shortcut",
+    "secure_store_get",
+    "secure_store_set",
+    "secure_store_delete",
+    "cloud_auth_start",
+    "cloud_auth_complete",
+    "cloud_access_token",
+    "cloud_sign_out",
+    "db_init",
+    "settings_get",
+    "settings_set",
+    "captures_insert",
+    "captures_update_ocr_text",
+    "captures_update_tags",
+    "captures_list",
+    "captures_search",
+    "captures_list_by_tag",
+    "captures_list_by_collection",
+    "captures_get",
+    "captures_uid_exists",
+    "captures_delete",
+    "collections_list",
+    "collections_create",
+    "collections_rename",
+    "collections_delete",
+    "collections_add_capture",
+    "collections_remove_capture",
+    "collections_for_capture",
+    "presets_list",
+    "presets_create",
+    "presets_delete",
+    "e2e_show_main_window",
+    "e2e_emit_capture_triggered",
+    "e2e_inject_screenshot",
+    "e2e_temp_export_path",
+    "e2e_file_metadata",
+    "e2e_hide_main_window",
+    "e2e_is_main_window_visible",
+    "e2e_is_capture_overlay_visible",
+];
 
 /// `cloud_auth.rs` needs the same Auth0 tenant as the WebView. Values come from the process
 /// environment first, then `apps/desktop/.env.local`, then `.env` (Vite's precedence).

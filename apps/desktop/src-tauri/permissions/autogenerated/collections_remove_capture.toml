@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-collections-remove-capture"
+description = "Enables the collections_remove_capture command without any pre-configured scope."
+commands.allow = ["collections_remove_capture"]
+
+[[permission]]
+identifier = "deny-collections-remove-capture"
+description = "Denies the collections_remove_capture command without any pre-configured scope."
+commands.deny = ["collections_remove_capture"]

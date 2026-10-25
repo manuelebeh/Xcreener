@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-captures-uid-exists"
+description = "Enables the captures_uid_exists command without any pre-configured scope."
+commands.allow = ["captures_uid_exists"]
+
+[[permission]]
+identifier = "deny-captures-uid-exists"
+description = "Denies the captures_uid_exists command without any pre-configured scope."
+commands.deny = ["captures_uid_exists"]

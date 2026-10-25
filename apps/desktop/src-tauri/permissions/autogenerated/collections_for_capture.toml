@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-collections-for-capture"
+description = "Enables the collections_for_capture command without any pre-configured scope."
+commands.allow = ["collections_for_capture"]
+
+[[permission]]
+identifier = "deny-collections-for-capture"
+description = "Denies the collections_for_capture command without any pre-configured scope."
+commands.deny = ["collections_for_capture"]

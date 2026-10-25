@@ -13,6 +13,22 @@
     "core:window:allow-set-focus",
     "core:window:allow-set-position",
     "core:window:allow-set-size",
-    "core:window:allow-is-visible"
+    "core:window:allow-is-visible",
+    "allow-cancel-capture-overlay",
+    "allow-cancel-live-capture-command",
+    "allow-cancel-region-recording-command",
+    "allow-capture-native-command",
+    "allow-capture-overlay-ready",
+    "allow-capture-scrolling-window-command",
+    "allow-get-window-at-point-command",
+    "allow-hide-capture-overlay",
+    "allow-list-windows-command",
+    "allow-pause-region-recording-command",
+    "allow-resume-region-recording-command",
+    "allow-start-region-recording-command",
+    "allow-stash-capture-image",
+    "allow-stop-region-recording-command",
+    "allow-stop-scrolling-capture-command",
+    "allow-take-overlay-preview"
   ]
 }

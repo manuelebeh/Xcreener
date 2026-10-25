@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-stop-scrolling-capture-command"
+description = "Enables the stop_scrolling_capture_command command without any pre-configured scope."
+commands.allow = ["stop_scrolling_capture_command"]
+
+[[permission]]
+identifier = "deny-stop-scrolling-capture-command"
+description = "Denies the stop_scrolling_capture_command command without any pre-configured scope."
+commands.deny = ["stop_scrolling_capture_command"]
