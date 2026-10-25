@@ -70,6 +70,8 @@ interface EditorState {
   shadow: ShadowConfig;
   selectedPresetId: string | null;
   transform: ScreenshotTransform;
+  /** On-screen zoom of the preview as a fraction of export size; null fits the stage. */
+  viewZoom: number | null;
   customPresets: FramePreset[];
   activeTool: EditorTool;
   annotations: Annotation[];
@@ -89,6 +91,7 @@ interface EditorState {
   setPreset: (presetId: string | null) => void;
   setTransform: (transform: Partial<ScreenshotTransform>) => void;
   resetTransform: () => void;
+  setViewZoom: (viewZoom: number | null) => void;
   setCustomPresets: (presets: FramePreset[]) => void;
   addCustomPreset: (preset: FramePreset) => void;
   removeCustomPreset: (id: string) => void;
@@ -123,6 +126,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   shadow: DEFAULT_SHADOW,
   selectedPresetId: null,
   transform: DEFAULT_TRANSFORM,
+  viewZoom: null,
   customPresets: [],
   activeTool: 'select',
   annotations: [],
@@ -149,6 +153,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         paddingTouched: false,
         selectedPresetId: null,
         transform: DEFAULT_TRANSFORM,
+        viewZoom: null,
         annotations: [],
         selectedAnnotationId: null,
         history: emptyHistory(),
@@ -167,6 +172,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       paddingTouched: false,
       selectedPresetId: null,
       transform: DEFAULT_TRANSFORM,
+      viewZoom: null,
       annotations: [],
       selectedAnnotationId: null,
       history: emptyHistory(),
@@ -297,6 +303,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     );
     set({ transform });
   },
+
+  setViewZoom: (viewZoom) => set({ viewZoom }),
 
   setCustomPresets: (presets) => set({ customPresets: presets }),
 
