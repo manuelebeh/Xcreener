@@ -759,6 +759,96 @@ describe.skipIf(!databaseUrl)('API security regressions (Postgres)', () => {
         .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
       expect(members).toHaveLength(2);
     });
+
+    /** Team Starter at its limit of 5 paid seats (alice + 4 editors), plus one free viewer. */
+    async function fullStarterWorkspace(slug: string) {
+      const owner = await upsertAuthUser(db, alice, null);
+      const [workspace] = await db
+        .insert(schema.workspaces)
+        .values({ name: slug, slug: `${slug}-${run}`, plan: 'team_starter', createdBy: owner.id })
+        .returning();
+      const workspaceId = workspace?.id ?? '';
+      const editors = await Promise.all(
+        Array.from({ length: 4 }, (_, index) =>
+          upsertAuthUser(db, `auth0|${slug}-editor-${index}-${run}`, null)
+        )
+      );
+      const viewer = await upsertAuthUser(db, `auth0|${slug}-viewer-${run}`, null);
+      await db
+        .insert(schema.workspaceMembers)
+        .values([
+          { workspaceId, userId: owner.id, role: 'admin' as const },
+          ...editors.map((editor) => ({ workspaceId, userId: editor.id, role: 'editor' as const })),
+          { workspaceId, userId: viewer.id, role: 'viewer' as const },
+        ]);
+      return { workspaceId, owner, editors, viewer };
+    }
+
+    it('refuses to promote a viewer past the paid seat limit', async () => {
+      const { workspaceId, editors, viewer } = await fullStarterWorkspace('promote');
+
+      const promote = await app.inject({
+        method: 'PATCH',
+        url: `/v1/workspaces/${workspaceId}/members/${viewer.id}`,
+        headers: { authorization: `Bearer ${alice}` },
+        payload: { role: 'editor' },
+      });
+      expect(promote.statusCode).toBe(403);
+
+      const demote = await app.inject({
+        method: 'PATCH',
+        url: `/v1/workspaces/${workspaceId}/members/${editors[0]?.id}`,
+        headers: { authorization: `Bearer ${alice}` },
+        payload: { role: 'viewer' },
+      });
+      expect(demote.statusCode).toBe(200);
+
+      const retry = await app.inject({
+        method: 'PATCH',
+        url: `/v1/workspaces/${workspaceId}/members/${viewer.id}`,
+        headers: { authorization: `Bearer ${alice}` },
+        payload: { role: 'editor' },
+      });
+      expect(retry.statusCode).toBe(200);
+    });
+
+    it('lets viewers join a full workspace but not editors', async () => {
+      const { workspaceId, owner } = await fullStarterWorkspace('accept');
+      const expiresAt = new Date(Date.now() + 3600_000);
+      await db.insert(schema.invitations).values([
+        { workspaceId, role: 'viewer', token: `v${run}`, invitedBy: owner.id, expiresAt },
+        { workspaceId, role: 'editor', token: `e${run}`, invitedBy: owner.id, expiresAt },
+      ]);
+
+      const asViewer = await app.inject({
+        method: 'POST',
+        url: `/v1/invitations/v${run}/accept`,
+        headers: { authorization: `Bearer auth0|accept-v-${run}` },
+      });
+      expect(asViewer.statusCode).toBe(200);
+
+      const asEditor = await app.inject({
+        method: 'POST',
+        url: `/v1/invitations/e${run}/accept`,
+        headers: { authorization: `Bearer auth0|accept-e-${run}` },
+      });
+      expect(asEditor.statusCode).toBe(403);
+    });
+
+    it('bills seats for editors and admins only', async () => {
+      const { workspaceId } = await fullStarterWorkspace('seats');
+      await db
+        .insert(schema.workspaceSubscriptions)
+        .values({ workspaceId, status: 'active', seatCount: 5 });
+
+      const response = await app.inject({
+        method: 'GET',
+        url: `/v1/workspaces/${workspaceId}/billing`,
+        headers: { authorization: `Bearer ${alice}` },
+      });
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toMatchObject({ seatCount: 5, memberCount: 6, seatMismatch: false });
+    });
   });
 
   describe('Stripe webhook', () => {
