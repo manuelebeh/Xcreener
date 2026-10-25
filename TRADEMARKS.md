@@ -22,4 +22,4 @@ The code licenses ([AGPL-3.0](LICENSE) and MIT in the directories that carry the
 
 ## Questions
 
-For any use not listed here, open an issue on this repository before shipping it.
+For any use not listed here, write to hello@emmanuelebeh.dev before shipping it.
