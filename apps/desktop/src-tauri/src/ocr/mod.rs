@@ -65,6 +65,7 @@ fn resolve_tessdata_dir() -> Option<String> {
     None
 }
 
+#[cfg(any(target_os = "macos", target_os = "windows"))]
 fn needs_tesseract_for_languages(languages: &[String]) -> bool {
     languages.iter().any(|language| {
         let code = language.to_lowercase();
