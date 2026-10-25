@@ -62,6 +62,7 @@ Radius: 6px controls, 10px panels. Hairlines 1px. One accent (blue) for selectio
 - **Height** · 32px for buttons (`sm`), selects and text inputs; the primary Export button shares that row height
 - **Selects** · native element, `appearance: none` with a drawn chevron (theme.css)
 - **Segmented** · `@/shared/components/Segmented` for mutually exclusive modes
+- **Inspector rhythm** · label to its control 6px (`space-y-1.5`), controls inside a group 16px (`space-y-4`), groups and their hairline 20px on both sides (`space-y-5`, `pt-5`), a note under its control 4 to 8px. Color inputs are 32 x 48px, like buttons and selects
 - **Slider rows** · `@/shared/components/SliderField`: label left, live value right, slider below
 - **Primary** · `bg-primary text-primary-foreground`; Secondary · `bg-surface border-border`; Ghost · transparent
 - **Destructive** · deferred delete with undo toast, never `window.confirm`

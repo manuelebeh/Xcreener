@@ -36,7 +36,14 @@ export function TextExtractionBar({ embedded = false }: { embedded?: boolean }) 
         </div>
       ) : null}
 
-      {actions}
+      {embedded ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-foreground">Text extraction</span>
+          {actions}
+        </div>
+      ) : (
+        actions
+      )}
 
       {status === 'scanning' ? (
         <p className="text-xs text-muted" role="status">

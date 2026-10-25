@@ -22,8 +22,8 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
 
   if (annotation.type === 'text') {
     return (
-      <div className="flex flex-wrap items-end gap-3">
-        <label className="space-y-1 text-xs">
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="space-y-1.5 text-xs">
           <span className="text-muted">Font size</span>
           <input
             type="number"
@@ -37,7 +37,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
             className="sg-focus-ring block h-8 w-20 rounded-md border border-border bg-background px-2 text-sm"
           />
         </label>
-        <label className="space-y-1 text-xs">
+        <label className="space-y-1.5 text-xs">
           <span className="text-muted">Color</span>
           <input
             type="color"
@@ -50,7 +50,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
             className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
           />
         </label>
-        <label className="space-y-1 text-xs">
+        <label className="space-y-1.5 text-xs">
           <span className="text-muted">Background</span>
           <input
             type="color"
@@ -69,8 +69,8 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
 
   if (annotation.type === 'highlight') {
     return (
-      <div className="flex flex-wrap items-end gap-3">
-        <label className="space-y-1 text-xs">
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="space-y-1.5 text-xs">
           <span className="text-muted">Color</span>
           <input
             type="color"
@@ -83,7 +83,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
             className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
           />
         </label>
-        <div className="min-w-[160px] flex-1 space-y-1" onPointerDown={pushHistory}>
+        <div className="min-w-[160px] flex-1 space-y-1.5" onPointerDown={pushHistory}>
           <Label>Opacity</Label>
           <Slider
             min={0.1}
@@ -99,7 +99,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
 
   if (annotation.type === 'blur') {
     return (
-      <div className="flex flex-wrap items-end gap-3">
+      <div className="flex flex-wrap items-end gap-4">
         <div className="flex gap-1">
           {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
             <Button
@@ -116,7 +116,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
             </Button>
           ))}
         </div>
-        <div className="min-w-[160px] flex-1 space-y-1" onPointerDown={pushHistory}>
+        <div className="min-w-[160px] flex-1 space-y-1.5" onPointerDown={pushHistory}>
           <Label>Intensity</Label>
           <Slider
             min={2}
@@ -139,8 +139,8 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
     annotation.type === 'line'
   ) {
     return (
-      <div className="flex flex-wrap items-end gap-3">
-        <label className="space-y-1 text-xs">
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="space-y-1.5 text-xs">
           <span className="text-muted">Stroke</span>
           <input
             type="color"
@@ -153,7 +153,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
             className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
           />
         </label>
-        <div className="min-w-[160px] flex-1 space-y-1" onPointerDown={pushHistory}>
+        <div className="min-w-[160px] flex-1 space-y-1.5" onPointerDown={pushHistory}>
           <Label>Width</Label>
           <Slider
             min={1}
@@ -286,9 +286,9 @@ export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) 
   }
 
   const toolbar = (
-    <div className="w-full space-y-3" data-testid="annotation-options">
+    <div className="w-full space-y-4" data-testid="annotation-options">
       {showBlurDefaults ? (
-        <div className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-wrap items-end gap-4">
           <div className="flex gap-1">
             {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
               <Button
@@ -301,7 +301,7 @@ export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) 
               </Button>
             ))}
           </div>
-          <div className="min-w-[160px] flex-1 space-y-1">
+          <div className="min-w-[160px] flex-1 space-y-1.5">
             <Label>Intensity</Label>
             <Slider
               min={2}
