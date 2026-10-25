@@ -15,6 +15,13 @@ const TOOLS: { id: EditorTool; label: string }[] = [
   { id: 'blur', label: 'Blur' },
 ];
 
+const BLUR_MODES: BlurMode[] = ['gaussian', 'pixelate', 'solid'];
+const BLUR_MODE_LABELS: Record<BlurMode, string> = {
+  gaussian: 'Gaussian',
+  pixelate: 'Pixelate',
+  solid: 'Solid',
+};
+
 function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
   const updateAnnotation = useEditorStore((s) => s.updateAnnotation);
   const updateToolDefaults = useEditorStore((s) => s.updateToolDefaults);
@@ -101,7 +108,7 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
     return (
       <div className="flex flex-wrap items-end gap-4">
         <div className="flex gap-1">
-          {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
+          {BLUR_MODES.map((mode) => (
             <Button
               key={mode}
               size="sm"
@@ -112,22 +119,35 @@ function SelectedAnnotationPanel({ annotation }: { annotation: Annotation }) {
                 updateToolDefaults({ blurMode: mode });
               }}
             >
-              {mode === 'gaussian' ? 'Gaussian' : 'Pixelate'}
+              {BLUR_MODE_LABELS[mode]}
             </Button>
           ))}
         </div>
-        <div className="min-w-[160px] flex-1 space-y-1.5" onPointerDown={pushHistory}>
-          <Label>Intensity</Label>
-          <Slider
-            min={2}
-            max={40}
-            step={1}
-            value={[annotation.intensity]}
-            onValueChange={(value) =>
-              updateAnnotation(annotation.id, { intensity: value[0] ?? annotation.intensity })
-            }
-          />
-        </div>
+        {annotation.mode === 'solid' ? (
+          <label className="space-y-1.5 text-xs">
+            <span className="text-muted">Color</span>
+            <input
+              type="color"
+              value={annotation.color ?? '#000000'}
+              onPointerDown={pushHistory}
+              onChange={(event) => updateAnnotation(annotation.id, { color: event.target.value })}
+              className="sg-focus-ring block h-8 w-12 cursor-pointer rounded-md border border-border"
+            />
+          </label>
+        ) : (
+          <div className="min-w-[160px] flex-1 space-y-1.5" onPointerDown={pushHistory}>
+            <Label>Intensity</Label>
+            <Slider
+              min={2}
+              max={40}
+              step={1}
+              value={[annotation.intensity]}
+              onValueChange={(value) =>
+                updateAnnotation(annotation.id, { intensity: value[0] ?? annotation.intensity })
+              }
+            />
+          </div>
+        )}
       </div>
     );
   }
@@ -290,14 +310,14 @@ export function AnnotationToolbar({ embedded = false }: { embedded?: boolean }) 
       {showBlurDefaults ? (
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex gap-1">
-            {(['gaussian', 'pixelate'] as BlurMode[]).map((mode) => (
+            {BLUR_MODES.map((mode) => (
               <Button
                 key={mode}
                 size="sm"
                 variant={toolDefaults.blurMode === mode ? 'primary' : 'secondary'}
                 onClick={() => updateToolDefaults({ blurMode: mode })}
               >
-                {mode === 'gaussian' ? 'Gaussian' : 'Pixelate'}
+                {BLUR_MODE_LABELS[mode]}
               </Button>
             ))}
           </div>
