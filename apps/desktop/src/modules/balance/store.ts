@@ -2,12 +2,17 @@ import { create } from 'zustand';
 import type { ContentAnalysis } from '@/shared/types/ipc';
 import type { Point } from './utils/balance';
 
+const DEFAULT_INSET_COLOR = '#ffffff';
+
 export type BalanceStatus = 'idle' | 'analyzing' | 'ready' | 'error';
 
-interface BalanceState {
+export interface BalanceState {
   status: BalanceStatus;
   error: string | null;
   balance: boolean;
+  /** Width of the band of `insetColor` around the content, in capture pixels. */
+  inset: number;
+  insetColor: string;
   /** Untouched copy of the capture; every adjustment is redrawn from it. */
   source: ImageBitmap | null;
   analysis: ContentAnalysis | null;
@@ -22,6 +27,8 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
   status: 'idle',
   error: null,
   balance: false,
+  inset: 0,
+  insetColor: DEFAULT_INSET_COLOR,
   source: null,
   analysis: null,
   output: null,
@@ -32,6 +39,8 @@ export const useBalanceStore = create<BalanceState>((set, get) => ({
       status: 'idle',
       error: null,
       balance: false,
+      inset: 0,
+      insetColor: DEFAULT_INSET_COLOR,
       source: null,
       analysis: null,
       output,
