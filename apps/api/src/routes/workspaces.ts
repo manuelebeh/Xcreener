@@ -2,6 +2,7 @@ import {
   type BrandKitConfig,
   computeInvitationExpiresAt,
   type InvitationResponse,
+  isBillableRole,
   isInvitationExpired,
   isMemberLimitReached,
   isWorkspaceRole,
@@ -72,6 +73,18 @@ async function countWorkspaceMembers(
     .from(schema.workspaceMembers)
     .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
   return rows.length;
+}
+
+/** Members on a paid seat: what the plan member limit counts. Viewers are free. */
+async function countBillableMembers(
+  db: Database | Transaction,
+  workspaceId: string
+): Promise<number> {
+  const rows = await db
+    .select()
+    .from(schema.workspaceMembers)
+    .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
+  return rows.filter((row) => isBillableRole(row.role)).length;
 }
 
 /** True when `userId` is the only admin: demoting or removing them would leave nobody to manage billing. */
@@ -321,17 +334,52 @@ export async function registerWorkspaceRoutes(
         return reply.code(409).send({ error: 'A workspace needs at least one admin' });
       }
 
-      const [updated] = await options.db
-        .update(schema.workspaceMembers)
-        .set({ role: body.role })
-        .where(
-          and(
-            eq(schema.workspaceMembers.workspaceId, workspaceId),
-            eq(schema.workspaceMembers.userId, userId)
-          )
-        )
-        .returning();
+      const role = body.role;
+      // Promoting a viewer takes a paid seat. The workspace row lock serializes it with accepts.
+      const updated = await options.db.transaction(async (tx) => {
+        if (isBillableRole(role)) {
+          const [workspace] = await tx
+            .select()
+            .from(schema.workspaces)
+            .where(eq(schema.workspaces.id, workspaceId))
+            .limit(1)
+            .for('update');
+          const [current] = await tx
+            .select()
+            .from(schema.workspaceMembers)
+            .where(
+              and(
+                eq(schema.workspaceMembers.workspaceId, workspaceId),
+                eq(schema.workspaceMembers.userId, userId)
+              )
+            )
+            .limit(1);
+          if (
+            workspace &&
+            current &&
+            !isBillableRole(current.role) &&
+            isMemberLimitReached(workspace.plan, await countBillableMembers(tx, workspaceId))
+          ) {
+            return 'limit' as const;
+          }
+        }
 
+        const [row] = await tx
+          .update(schema.workspaceMembers)
+          .set({ role })
+          .where(
+            and(
+              eq(schema.workspaceMembers.workspaceId, workspaceId),
+              eq(schema.workspaceMembers.userId, userId)
+            )
+          )
+          .returning();
+        return row;
+      });
+
+      if (updated === 'limit') {
+        return reply.code(403).send({ error: 'Member limit reached for workspace plan' });
+      }
       if (!updated) {
         return reply.code(404).send({ error: 'Member not found' });
       }
@@ -412,8 +460,10 @@ export async function registerWorkspaceRoutes(
         return reply.code(404).send({ error: 'Workspace not found' });
       }
 
-      const memberCount = await countWorkspaceMembers(options.db, workspaceId);
-      if (isMemberLimitReached(workspace.plan, memberCount)) {
+      if (
+        isBillableRole(role) &&
+        isMemberLimitReached(workspace.plan, await countBillableMembers(options.db, workspaceId))
+      ) {
         return reply.code(403).send({ error: 'Member limit reached for workspace plan' });
       }
 
@@ -531,8 +581,13 @@ export async function registerWorkspaceRoutes(
           return { status: 404 as const, error: 'Workspace not found' };
         }
 
-        const memberCount = await countWorkspaceMembers(tx, invitation.workspaceId);
-        if (isMemberLimitReached(workspace.plan, memberCount)) {
+        if (
+          isBillableRole(invitation.role) &&
+          isMemberLimitReached(
+            workspace.plan,
+            await countBillableMembers(tx, invitation.workspaceId)
+          )
+        ) {
           return { status: 403 as const, error: 'Member limit reached for workspace plan' };
         }
 

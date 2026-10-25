@@ -1,7 +1,8 @@
-import type {
-  BillingStatusResponse,
-  CheckoutSessionResponse,
-  WorkspacePlan,
+import {
+  type BillingStatusResponse,
+  type CheckoutSessionResponse,
+  isBillableRole,
+  type WorkspacePlan,
 } from '@snapglow/team-core';
 import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
@@ -31,22 +32,23 @@ function getStripeClient(): Stripe | null {
   return new Stripe(env.STRIPE_SECRET_KEY);
 }
 
+/** `billable` excludes viewers: it is the seat quantity billed in Stripe. */
 async function countWorkspaceMembers(
   db: PostgresJsDatabase<typeof schema>,
   workspaceId: string
-): Promise<number> {
+): Promise<{ total: number; billable: number }> {
   const rows = await db
     .select()
     .from(schema.workspaceMembers)
     .where(eq(schema.workspaceMembers.workspaceId, workspaceId));
-  return rows.length;
+  return { total: rows.length, billable: rows.filter((row) => isBillableRole(row.role)).length };
 }
 
 async function toBillingStatus(
   db: PostgresJsDatabase<typeof schema>,
   workspace: schema.Workspace
 ): Promise<BillingStatusResponse> {
-  const memberCount = await countWorkspaceMembers(db, workspace.id);
+  const members = await countWorkspaceMembers(db, workspace.id);
   const subRows = await db
     .select()
     .from(schema.workspaceSubscriptions)
@@ -54,13 +56,13 @@ async function toBillingStatus(
     .limit(1);
   const sub = subRows[0];
 
-  const seatCount = sub?.seatCount ?? memberCount;
+  const seatCount = sub?.seatCount ?? members.billable;
   return {
     plan: workspace.plan,
     status: sub?.status ?? null,
     seatCount,
-    memberCount,
-    seatMismatch: sub?.status === 'active' && seatCount < memberCount,
+    memberCount: members.total,
+    seatMismatch: sub?.status === 'active' && seatCount < members.billable,
     currentPeriodEnd: sub?.currentPeriodEnd?.toISOString() ?? null,
     stripeCustomerId: sub?.stripeCustomerId ?? null,
   };
@@ -241,7 +243,7 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
         return reply.code(404).send({ error: 'Workspace not found' });
       }
 
-      const memberCount = await countWorkspaceMembers(options.db, workspaceId);
+      const members = await countWorkspaceMembers(options.db, workspaceId);
       const subRows = await options.db
         .select()
         .from(schema.workspaceSubscriptions)
@@ -263,7 +265,7 @@ export async function registerBillingRoutes(app: FastifyInstance, options: Billi
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         customer: customerId,
-        line_items: [{ price: priceId, quantity: Math.max(1, memberCount) }],
+        line_items: [{ price: priceId, quantity: Math.max(1, members.billable) }],
         success_url: `${env.WEB_PUBLIC_URL}/settings?billing=success`,
         cancel_url: `${env.WEB_PUBLIC_URL}/settings?billing=cancel`,
         client_reference_id: referral || undefined,
