@@ -9,7 +9,7 @@ export type EditorTool =
   | 'highlight'
   | 'blur';
 
-export type BlurMode = 'gaussian' | 'pixelate';
+export type BlurMode = 'gaussian' | 'pixelate' | 'solid';
 
 export type ResizeHandleId = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'start' | 'end';
 
@@ -105,6 +105,8 @@ export interface BlurAnnotation {
   height: number;
   mode: BlurMode;
   intensity: number;
+  /** Fill of the `solid` mode; black when unset. */
+  color?: string;
 }
 
 export type Annotation =
