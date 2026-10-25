@@ -130,12 +130,18 @@ export function Canvas() {
       return { width: 0, height: 0 };
     }
 
-    return fitPreviewSize(
+    const fitted = fitPreviewSize(
       layout.canvasWidth,
       layout.canvasHeight,
       containerSize.width,
       containerSize.height
     );
+    // Never zoom past actual size, so a canvas that grows (padding, inset) keeps the same
+    // zoom while it still fits the stage instead of shrinking the content.
+    if (fitted.width > layout.canvasWidth) {
+      return { width: Math.round(layout.canvasWidth), height: Math.round(layout.canvasHeight) };
+    }
+    return fitted;
   }, [layout, containerSize]);
 
   const displayScale = useMemo(() => {
