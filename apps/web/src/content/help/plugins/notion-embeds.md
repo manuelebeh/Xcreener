@@ -23,4 +23,4 @@ Embeds show the beautified capture with Open Graph metadata for link previews. T
 
 ## Desktop
 
-Upload from SnapGlow desktop, then publish via API key automation or the Notion tool.
+Upload from Xcreener desktop, then publish via API key automation or the Notion tool.

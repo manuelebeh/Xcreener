@@ -1,11 +1,11 @@
 ---
 title: Affiliate program
 category: Marketing
-description: Earn 30% commission on first sales by referring SnapGlow customers.
+description: Earn 30% commission on first sales by referring Xcreener customers.
 order: 1
 ---
 
-Share SnapGlow with your audience and earn **30% commission** on each referred customer's first purchase.
+Share Xcreener with your audience and earn **30% commission** on each referred customer's first purchase.
 
 ## How it works
 

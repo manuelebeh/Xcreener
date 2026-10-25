@@ -27,7 +27,7 @@ Phase 0 requires installable desktop builds and a test update channel before MVP
 - **Signature:** Ed25519 key pair (`tauri signer generate`). Public key in `tauri.conf.json`; private key in the `release` environment secret `TAURI_SIGNING_PRIVATE_KEY`.
 - **Endpoint (test channel):** GitHub Releases latest manifest:
   ```
-  https://github.com/manuelebeh/ScreenCut/releases/latest/download/latest.json
+  https://github.com/manuelebeh/Xcreener/releases/latest/download/latest.json
   ```
 - **UX:** silent check on startup; manual "Check for updates" in Settings.
 - **CSP:** `connect-src` includes `https://github.com` and `https://api.github.com`.

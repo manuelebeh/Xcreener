@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isPaidPlan } from '@snapglow/team-core';
-import { type VerifiedEntitlement, verifyEntitlementToken } from '@snapglow/team-core/entitlement';
+import { isPaidPlan } from '@xcreener/team-core';
+import { type VerifiedEntitlement, verifyEntitlementToken } from '@xcreener/team-core/entitlement';
 import { create } from 'zustand';
 
 import * as auth from './auth';
 import { getApiUrl, getEntitlementPublicKey } from './config';
 
-const ENTITLEMENT_TOKEN_KEY = 'snapglow:entitlementToken';
+const ENTITLEMENT_TOKEN_KEY = 'xcreener:entitlementToken';
 /** Internal user id the API returned with the token; the token's `sub` must match it. */
-const ENTITLEMENT_USER_KEY = 'snapglow:entitlementUserId';
+const ENTITLEMENT_USER_KEY = 'xcreener:entitlementUserId';
 
 interface AccountState {
   signedIn: boolean;

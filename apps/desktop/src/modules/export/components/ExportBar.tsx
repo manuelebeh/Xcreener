@@ -1,9 +1,9 @@
-import { SHARE_EXPIRY_LABELS, SHARE_EXPIRY_OPTIONS, type ShareExpiry } from '@snapglow/cloud-core';
-import type { IntegrationProvider } from '@snapglow/integrations-core';
-import { INTEGRATION_LABELS, isEnterpriseIntegrationProvider } from '@snapglow/integrations-core';
-import { Button, Label, Select, Slider } from '@snapglow/ui';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
 import { ask } from '@tauri-apps/plugin-dialog';
+import { SHARE_EXPIRY_LABELS, SHARE_EXPIRY_OPTIONS, type ShareExpiry } from '@xcreener/cloud-core';
+import type { IntegrationProvider } from '@xcreener/integrations-core';
+import { INTEGRATION_LABELS, isEnterpriseIntegrationProvider } from '@xcreener/integrations-core';
+import { Button, Label, Select, Slider } from '@xcreener/ui';
 import { useCallback, useRef, useState } from 'react';
 import { captureExportCompleted } from '@/integrations/posthog/events';
 import { isCloudConfigured } from '@/modules/cloud/config';
@@ -96,12 +96,12 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
 
         if (action === 'share') {
           if (!isAuthenticated) {
-            setLastMessage('Sign in to SnapGlow cloud in Settings before sharing');
+            setLastMessage('Sign in to Xcreener cloud in Settings before sharing');
             return;
           }
 
           const confirmed = await ask(
-            'Upload this capture to SnapGlow cloud and create a shareable link?',
+            'Upload this capture to Xcreener cloud and create a shareable link?',
             {
               title: 'Share to cloud',
               kind: 'info',
@@ -115,7 +115,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
             return;
           }
 
-          const share = await uploadShare(result.blob, shareExpiry, `snapglow-export.${format}`);
+          const share = await uploadShare(result.blob, shareExpiry, `xcreener-export.${format}`);
           await writeText(share.url);
           setLastShareToken(share.token);
           setLastMessage(`Share link copied · ${share.url}${compressionMessage}`);
@@ -179,7 +179,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         return;
       }
 
-      const file = new File([dragBlobRef.current], `snapglow-export.${format}`, {
+      const file = new File([dragBlobRef.current], `xcreener-export.${format}`, {
         type: dragBlobRef.current.type,
       });
       event.dataTransfer.setData('text/uri-list', URL.createObjectURL(file));
@@ -427,7 +427,7 @@ export function ExportBar({ embedded = false }: { embedded?: boolean }) {
         <SendToIntegrationDialog
           provider={sendProvider}
           exportBlob={pendingSendBlob}
-          filename={`snapglow-export.${pendingSendFormat}`}
+          filename={`xcreener-export.${pendingSendFormat}`}
           mimeType={pendingSendBlob.type || 'image/png'}
           onClose={() => {
             setSendProvider(null);

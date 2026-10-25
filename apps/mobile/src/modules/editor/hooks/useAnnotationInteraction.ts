@@ -12,7 +12,7 @@ import {
   moveAnnotation,
   type ResizeHandleId,
   resizeAnnotation,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 import { useCallback, useRef } from 'react';
 import { type GestureResponderEvent, PanResponder } from 'react-native';
 

@@ -1,5 +1,5 @@
-import { buildDesignCaptureState } from '@snapglow/plugin-core';
-import { SnapGlowClient } from '@snapglow/sdk';
+import { buildDesignCaptureState } from '@xcreener/plugin-core';
+import { XcreenerClient } from '@xcreener/sdk';
 
 const apiKeyInput = document.getElementById('apiKey') as HTMLInputElement;
 const baseUrlInput = document.getElementById('baseUrl') as HTMLInputElement;
@@ -29,13 +29,13 @@ function getConfig(): StoredConfig {
   };
 }
 
-function createClient(): SnapGlowClient | null {
+function createClient(): XcreenerClient | null {
   const config = getConfig();
   if (!config.apiKey) {
-    setStatus('Enter your SnapGlow API key first.');
+    setStatus('Enter your Xcreener API key first.');
     return null;
   }
-  return new SnapGlowClient(config);
+  return new XcreenerClient(config);
 }
 
 function postToPlugin(message: unknown) {
@@ -98,7 +98,7 @@ async function importSelection(bytes: Uint8Array, name: string) {
     return;
   }
 
-  await run('Uploading to SnapGlow…', async () => {
+  await run('Uploading to Xcreener…', async () => {
     const blob = new Blob([Uint8Array.from(bytes)], { type: 'image/png' });
     const uploaded = await client.captures.upload(blob, { title: name, tags: ['figma'] });
 

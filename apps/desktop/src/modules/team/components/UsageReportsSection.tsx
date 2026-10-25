@@ -1,5 +1,5 @@
-import type { UsagePeriod, WorkspaceUsageResponse } from '@snapglow/team-core';
-import { Button } from '@snapglow/ui';
+import type { UsagePeriod, WorkspaceUsageResponse } from '@xcreener/team-core';
+import { Button } from '@xcreener/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { getWorkspaceUsage } from '../api';
 import { useTeamStore } from '../store';

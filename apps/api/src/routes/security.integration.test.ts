@@ -3,8 +3,8 @@
  *
  * Skipped unless INTEGRATION_DATABASE_URL points to a migrated, disposable database:
  *   mise run api:infra
- *   createdb + DATABASE_URL=<url> pnpm --filter @snapglow/api db:migrate
- *   INTEGRATION_DATABASE_URL=<url> pnpm --filter @snapglow/api test
+ *   createdb + DATABASE_URL=<url> pnpm --filter @xcreener/api db:migrate
+ *   INTEGRATION_DATABASE_URL=<url> pnpm --filter @xcreener/api test
  */
 import { createHmac } from 'node:crypto';
 import type { AddressInfo } from 'node:net';
@@ -49,9 +49,9 @@ vi.mock('../plugins/auth', async (importOriginal) => {
   };
 });
 
-import { apiKeyDisplayPrefix, buildApiKeyPlaintext } from '@snapglow/api-core';
-import { generateApiKeySecret, hashApiKey } from '@snapglow/api-core/api-keys';
-import { defaultCollabDocumentState } from '@snapglow/collab-core';
+import { apiKeyDisplayPrefix, buildApiKeyPlaintext } from '@xcreener/api-core';
+import { generateApiKeySecret, hashApiKey } from '@xcreener/api-core/api-keys';
+import { defaultCollabDocumentState } from '@xcreener/collab-core';
 import { buildApp } from '../app';
 import { createDb } from '../db/migrate';
 import * as schema from '../db/schema';
@@ -81,7 +81,7 @@ function nextMessage(socket: WebSocket): Promise<Record<string, unknown>> {
 }
 
 function multipartBody(fields: Record<string, string>, file: Buffer, mimeType: string) {
-  const boundary = '----snapglowtest';
+  const boundary = '----xcreenertest';
   const parts: Buffer[] = [];
   for (const [name, value] of Object.entries(fields)) {
     parts.push(

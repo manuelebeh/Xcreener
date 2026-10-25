@@ -1,5 +1,5 @@
-import type { IntegrationProvider } from '@snapglow/integrations-core';
-import { INTEGRATION_LABELS } from '@snapglow/integrations-core';
+import type { IntegrationProvider } from '@xcreener/integrations-core';
+import { INTEGRATION_LABELS } from '@xcreener/integrations-core';
 import {
   listConfluencePages as fetchConfluencePages,
   sendToConfluencePage,

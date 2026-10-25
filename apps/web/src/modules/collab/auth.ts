@@ -1,7 +1,7 @@
 // Tokens live only in memory, out of reach of a script reading localStorage. A reload
 // signs in again silently through the Auth0 session (prompt=none).
-const LEGACY_STORAGE_KEY = 'snapglow_web_auth_tokens';
-const SILENT_TRIED_KEY = 'snapglow_silent_auth_tried';
+const LEGACY_STORAGE_KEY = 'xcreener_web_auth_tokens';
+const SILENT_TRIED_KEY = 'xcreener_silent_auth_tried';
 
 if (typeof window !== 'undefined') {
   localStorage.removeItem(LEGACY_STORAGE_KEY);
@@ -85,9 +85,9 @@ export async function startWebAuthLogin(
     .replace(/\//g, '_')
     .replace(/=+$/, '');
   const state = crypto.randomUUID();
-  sessionStorage.setItem('snapglow_pkce_verifier', verifier);
-  sessionStorage.setItem('snapglow_auth_state', state);
-  sessionStorage.setItem('snapglow_auth_return_to', returnTo);
+  sessionStorage.setItem('xcreener_pkce_verifier', verifier);
+  sessionStorage.setItem('xcreener_auth_state', state);
+  sessionStorage.setItem('xcreener_auth_return_to', returnTo);
 
   const params = new URLSearchParams({
     response_type: 'code',
@@ -104,8 +104,8 @@ export async function startWebAuthLogin(
 }
 
 export async function handleWebAuthCallback(code: string, state: string): Promise<void> {
-  const expectedState = sessionStorage.getItem('snapglow_auth_state');
-  const verifier = sessionStorage.getItem('snapglow_pkce_verifier');
+  const expectedState = sessionStorage.getItem('xcreener_auth_state');
+  const verifier = sessionStorage.getItem('xcreener_pkce_verifier');
   if (!expectedState || expectedState !== state || !verifier) {
     throw new Error('Invalid Auth0 callback');
   }
@@ -140,16 +140,16 @@ export async function handleWebAuthCallback(code: string, state: string): Promis
   };
 
   sessionStorage.removeItem(SILENT_TRIED_KEY);
-  sessionStorage.removeItem('snapglow_pkce_verifier');
-  sessionStorage.removeItem('snapglow_auth_state');
+  sessionStorage.removeItem('xcreener_pkce_verifier');
+  sessionStorage.removeItem('xcreener_auth_state');
 }
 
 export function getAuthReturnTo(): string {
-  return sessionStorage.getItem('snapglow_auth_return_to') ?? '/';
+  return sessionStorage.getItem('xcreener_auth_return_to') ?? '/';
 }
 
 export function clearAuthReturnTo(): void {
-  sessionStorage.removeItem('snapglow_auth_return_to');
+  sessionStorage.removeItem('xcreener_auth_return_to');
 }
 
 /**

@@ -1,5 +1,5 @@
 {
-  "name": "@snapglow/notion-embed",
+  "name": "@xcreener/notion-embed",
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
@@ -14,11 +14,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@snapglow/sdk": "workspace:*"
+    "@xcreener/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "@types/node": "^22.10.2",
     "esbuild": "^0.25.0",
     "tsx": "^4.20.3",

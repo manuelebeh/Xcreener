@@ -108,7 +108,7 @@ fn embed_auth0_config() {
             .filter(|value| !value.is_empty())
             .or_else(|| files.iter().find_map(|file| env_file_value(file, &key)));
         if let Some(value) = value {
-            println!("cargo:rustc-env=SNAPGLOW_AUTH0_{name}={value}");
+            println!("cargo:rustc-env=XCREENER_AUTH0_{name}={value}");
         }
     }
 }
@@ -144,10 +144,10 @@ fn link_swift_runtime_rpath() {
 
     for rpath in rpaths {
         let flag = format!("-Wl,-rpath,{rpath}");
-        println!("cargo:rustc-link-arg-bin=snapglow-desktop={flag}");
+        println!("cargo:rustc-link-arg-bin=xcreener-desktop={flag}");
         println!("cargo:rustc-link-arg={flag}");
     }
 
-    println!("cargo:rustc-link-arg-bin=snapglow-desktop=-Wl,-weak_framework,ScreenCaptureKit");
+    println!("cargo:rustc-link-arg-bin=xcreener-desktop=-Wl,-weak_framework,ScreenCaptureKit");
     println!("cargo:rustc-link-arg=-Wl,-weak_framework,ScreenCaptureKit");
 }

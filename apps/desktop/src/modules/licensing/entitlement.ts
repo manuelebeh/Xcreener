@@ -1,4 +1,4 @@
-import { isPaidPlan } from '@snapglow/team-core';
+import { isPaidPlan } from '@xcreener/team-core';
 import { create } from 'zustand';
 import { getSetting, setSetting } from '@/db';
 import { getValidAccessToken } from '@/modules/cloud/auth';

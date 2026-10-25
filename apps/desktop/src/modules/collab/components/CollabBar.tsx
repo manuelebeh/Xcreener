@@ -1,7 +1,7 @@
-import type { CollabDocumentState } from '@snapglow/collab-core';
-import { isPaidPlan } from '@snapglow/team-core';
-import { Button } from '@snapglow/ui';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import type { CollabDocumentState } from '@xcreener/collab-core';
+import { isPaidPlan } from '@xcreener/team-core';
+import { Button } from '@xcreener/ui';
 import { useCallback, useState } from 'react';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { useCloudAuthStore } from '@/modules/cloud/store';

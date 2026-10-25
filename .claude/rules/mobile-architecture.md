@@ -11,7 +11,7 @@ paths:
 - **Expo docs (SDK 56):** [docs.expo.dev/versions/v56.0.0](https://docs.expo.dev/versions/v56.0.0/) — use this versioned reference for native modules, config plugins, and prebuild (not the unversioned “latest” docs)
 - **Development builds only** — Share Extension / Share Intent require native code (`expo-dev-client`, not Expo Go)
 - **State:** Zustand per module (`src/modules/`)
-- **Design system:** `@snapglow/ui-native` + `@snapglow/design-tokens/tokens.native`
+- **Design system:** `@xcreener/ui-native` + `@xcreener/design-tokens/tokens.native`
 - **Lint / format:** Biome (same as desktop/web)
 
 ## Dev commands
@@ -22,7 +22,7 @@ mise run dev:mobile:ios      # Build & run iOS simulator (first run runs prebuil
 mise run dev:mobile:android  # Build & run Android emulator
 ```
 
-First native run requires Xcode (iOS) or Android Studio (Android). After plugin or native module changes (e.g. `expo-share-intent`, `expo-media-library`, `snapglow-ocr`), rebuild with `mise run dev:mobile:ios` / `dev:mobile:android` (Metro alone does not link native modules).
+First native run requires Xcode (iOS) or Android Studio (Android). After plugin or native module changes (e.g. `expo-share-intent`, `expo-media-library`, `xcreener-ocr`), rebuild with `mise run dev:mobile:ios` / `dev:mobile:android` (Metro alone does not link native modules).
 
 When adding or upgrading Expo packages, prefer `npx expo install <pkg>` in `apps/mobile/` so versions stay aligned with SDK 56 (see [SDK 56 docs](https://docs.expo.dev/versions/v56.0.0/)).
 
@@ -34,7 +34,7 @@ apps/mobile/
 ├── app.config.ts        # Expo config + share-intent plugin
 ├── eas.json             # EAS Build profiles (development / preview / production)
 ├── metro.config.js      # Monorepo workspace resolution
-├── modules/snapglow-ocr/  # Local Expo module — Vision (iOS) + ML Kit (Android)
+├── modules/xcreener-ocr/  # Local Expo module — Vision (iOS) + ML Kit (Android)
 └── src/modules/
     ├── account/         # Auth0 sign-in (PKCE) + API-signed plan; free plans get the watermark
     ├── capture/         # Share import + image state (Sprint 1b.1)
@@ -48,12 +48,12 @@ apps/mobile/
 
 | Package | Role |
 |---------|------|
-| `@snapglow/design-tokens` | SSOT — import `tokens.native` for RN theme |
-| `@snapglow/editor-core` | Shared layout, presets, annotations (desktop + mobile) |
-| `@snapglow/redaction-core` | On-device sensitive-data detectors + coordinate mapping |
-| `@snapglow/ui-native` | RN components (Button, ThemeProvider) — sibling of web `@snapglow/ui` |
+| `@xcreener/design-tokens` | SSOT — import `tokens.native` for RN theme |
+| `@xcreener/editor-core` | Shared layout, presets, annotations (desktop + mobile) |
+| `@xcreener/redaction-core` | On-device sensitive-data detectors + coordinate mapping |
+| `@xcreener/ui-native` | RN components (Button, ThemeProvider) — sibling of web `@xcreener/ui` |
 
-Do **not** import `@snapglow/ui` (web/Radix/Tailwind) in mobile code.
+Do **not** import `@xcreener/ui` (web/Radix/Tailwind) in mobile code.
 
 ## Share import flow
 

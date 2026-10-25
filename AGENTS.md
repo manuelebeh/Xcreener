@@ -1,4 +1,4 @@
-# SnapGlow agent instructions
+# Xcreener agent instructions
 
 Privacy-first screenshot app: capture, beautify, share. Local-first; optional cloud links. Monorepo: pnpm + Turborepo + mise (Node, Rust).
 
@@ -104,8 +104,8 @@ Write like a clear human. Direct, specific, varied rhythm. For deep rewrites, us
 
 - TypeScript / JS: Biome only (no ESLint/Prettier).
 - Desktop: module-first under `apps/desktop/src/modules/`; invoke Rust via `src/tauri/commands.ts`; prefer `@/db` for SQLite settings.
-- Web: TanStack Start; tokens from `@snapglow/design-tokens`; components from `@snapglow/ui`.
-- Mobile: Expo 56; `@snapglow/ui-native` + `tokens.native`; shared logic in `editor-core` / `redaction-core`.
+- Web: TanStack Start; tokens from `@xcreener/design-tokens`; components from `@xcreener/ui`.
+- Mobile: Expo 56; `@xcreener/ui-native` + `tokens.native`; shared logic in `editor-core` / `redaction-core`.
 - API: Fastify; see `.cursor/rules/api-architecture.mdc`.
 - Commits: Conventional Commits; mise hooks (lint-staged + commitlint).
 

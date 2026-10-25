@@ -1,4 +1,4 @@
-import { Button, Input, Select } from '@snapglow/ui';
+import { Button, Input, Select } from '@xcreener/ui';
 import { useCallback, useMemo } from 'react';
 import type { StoredCapture } from '@/db/captures';
 import { updateCaptureTags } from '@/db/captures';

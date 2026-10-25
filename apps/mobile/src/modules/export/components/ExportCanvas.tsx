@@ -1,5 +1,5 @@
 import type { SkImage } from '@shopify/react-native-skia';
-import { computeLayout, fitGpuTextureSize } from '@snapglow/editor-core';
+import { computeLayout, fitGpuTextureSize } from '@xcreener/editor-core';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { PixelRatio, View } from 'react-native';
 import {

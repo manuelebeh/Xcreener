@@ -1,6 +1,6 @@
-import { buildApiKeyPlaintext, isApiKeyPlaintext } from '@snapglow/api-core';
-import { generateApiKeySecret, hashApiKey, verifyApiKey } from '@snapglow/api-core/api-keys';
-import { hasApiAccess } from '@snapglow/team-core';
+import { buildApiKeyPlaintext, isApiKeyPlaintext } from '@xcreener/api-core';
+import { generateApiKeySecret, hashApiKey, verifyApiKey } from '@xcreener/api-core/api-keys';
+import { hasApiAccess } from '@xcreener/team-core';
 import { describe, expect, it } from 'vitest';
 
 describe('public API auth helpers', () => {

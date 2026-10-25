@@ -28,7 +28,7 @@ Phase 4 requires a 30% first-sale affiliate program with tracking and payouts. S
 
 ### Desktop
 
-- Deep link `snapglow://ref/:code` stores referral in settings (optional sync to web cookie pattern)
+- Deep link `xcreener://ref/:code` stores referral in settings (optional sync to web cookie pattern)
 
 ## Consequences
 

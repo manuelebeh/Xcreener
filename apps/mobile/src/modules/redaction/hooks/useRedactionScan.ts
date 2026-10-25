@@ -1,7 +1,7 @@
-import type { BlurAnnotation } from '@snapglow/editor-core';
-import { detectInLines, mapRegionToLayout, type TextLine } from '@snapglow/redaction-core';
+import type { BlurAnnotation } from '@xcreener/editor-core';
+import { detectInLines, mapRegionToLayout, type TextLine } from '@xcreener/redaction-core';
 import { useCallback } from 'react';
-import { recognizeText } from 'snapglow-ocr';
+import { recognizeText } from 'xcreener-ocr';
 
 import { useEditorStore } from '@/modules/editor/store';
 

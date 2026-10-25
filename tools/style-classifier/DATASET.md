@@ -1,8 +1,8 @@
-# SnapGlow style-classifier dataset
+# Xcreener style-classifier dataset
 
 How the dataset for **AI-001** (Sprint 2b.1 — Suggestion de style IA) is constituted.
 
-Six classes drive the style-suggestion mapping (`@snapglow/style-suggestion-core`):
+Six classes drive the style-suggestion mapping (`@xcreener/style-suggestion-core`):
 `code`, `ui`, `terminal`, `photo`, `diagram`, `text`.
 
 The dataset is **constituted reproducibly from researched public sources**, not

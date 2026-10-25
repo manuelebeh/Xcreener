@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { deepLinkRoute } from './deepLink';
 
 describe('deepLinkRoute', () => {
-  it('reads the route from a snapglow URL', () => {
-    expect(deepLinkRoute(new URL('snapglow://auth/callback?code=1'))).toBe('auth/callback');
-    expect(deepLinkRoute(new URL('snapglow://integrations/callback/'))).toBe(
+  it('reads the route from a xcreener URL', () => {
+    expect(deepLinkRoute(new URL('xcreener://auth/callback?code=1'))).toBe('auth/callback');
+    expect(deepLinkRoute(new URL('xcreener://integrations/callback/'))).toBe(
       'integrations/callback'
     );
   });

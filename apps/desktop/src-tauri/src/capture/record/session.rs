@@ -136,7 +136,7 @@ fn recording_staging_path(app: &AppHandle, format: &str) -> Result<PathBuf, Stri
         .unwrap_or_default()
         .as_millis();
 
-    Ok(staging.join(format!("snapglow-recording-{stamp}.{ext}")))
+    Ok(staging.join(format!("xcreener-recording-{stamp}.{ext}")))
 }
 
 fn finalize_region_recording(

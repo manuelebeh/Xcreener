@@ -5,6 +5,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? 'postgresql://snapglow:snapglow@localhost:5432/snapglow',
+    url: process.env.DATABASE_URL ?? 'postgresql://xcreener:xcreener@localhost:5432/xcreener',
   },
 });

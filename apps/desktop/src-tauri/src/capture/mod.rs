@@ -41,7 +41,7 @@ pub enum CaptureError {
     DisplayNotFound(u32),
     #[error("window {0} not found")]
     WindowNotFound(u64),
-    #[error("screen recording permission denied - enable Screen Recording for SnapGlow in System Settings")]
+    #[error("screen recording permission denied - enable Screen Recording for Xcreener in System Settings")]
     PermissionDenied,
     #[error("capture failed: {0}")]
     Backend(String),
@@ -78,19 +78,19 @@ fn monitor_scale_factor(monitor: &Monitor) -> f64 {
     monitor.scale_factor().unwrap_or(1.0) as f64
 }
 
-fn is_snapglow_window(window: &Window) -> bool {
+fn is_xcreener_window(window: &Window) -> bool {
     if window.pid().ok() == Some(std::process::id()) {
         return true;
     }
 
     if let Ok(app_name) = window.app_name() {
-        if app_name.eq_ignore_ascii_case("SnapGlow") {
+        if app_name.eq_ignore_ascii_case("Xcreener") {
             return true;
         }
     }
 
     if let Ok(title) = window.title() {
-        if title.eq_ignore_ascii_case("SnapGlow Capture") {
+        if title.eq_ignore_ascii_case("Xcreener Capture") {
             return true;
         }
     }
@@ -129,14 +129,14 @@ pub(crate) fn resolve_window(target: &WindowInfo) -> Result<Window, CaptureError
     let windows = Window::all().map_err(map_xcap_error)?;
 
     if let Some(window) = windows.iter().find(|window| {
-        window.id().ok().map(u64::from) == Some(target.id) && !is_snapglow_window(window)
+        window.id().ok().map(u64::from) == Some(target.id) && !is_xcreener_window(window)
     }) {
         return Ok(window.clone());
     }
 
     windows
         .into_iter()
-        .filter(|window| !is_snapglow_window(window))
+        .filter(|window| !is_xcreener_window(window))
         .find(|window| window_info_matches(window, target))
         .ok_or(CaptureError::WindowNotFound(target.id))
 }
@@ -170,7 +170,7 @@ pub fn list_windows() -> Result<Vec<WindowInfo>, CaptureError> {
     Window::all()
         .map_err(map_xcap_error)?
         .into_iter()
-        .filter(|window| !is_snapglow_window(window))
+        .filter(|window| !is_xcreener_window(window))
         .filter_map(|window| {
             let title = window.title().ok()?;
             if title.is_empty() {

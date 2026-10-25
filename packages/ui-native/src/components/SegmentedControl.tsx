@@ -1,4 +1,4 @@
-import { radius, spacing } from '@snapglow/design-tokens/tokens.native';
+import { radius, spacing } from '@xcreener/design-tokens/tokens.native';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
 

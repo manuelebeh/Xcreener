@@ -1,6 +1,6 @@
-import { type CollabDocumentState, defaultCollabDocumentState } from '@snapglow/collab-core';
+import { type CollabDocumentState, defaultCollabDocumentState } from '@xcreener/collab-core';
 
-export type { CollabDocumentState } from '@snapglow/collab-core';
+export type { CollabDocumentState } from '@xcreener/collab-core';
 
 /** Dark gradient preset for code editor captures (VS Code). */
 export function buildCodeCaptureState(

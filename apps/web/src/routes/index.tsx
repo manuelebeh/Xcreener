@@ -1,6 +1,6 @@
-import { useTranslation } from '@snapglow/i18n';
-import { Button } from '@snapglow/ui';
 import { createFileRoute } from '@tanstack/react-router';
+import { useTranslation } from '@xcreener/i18n';
+import { Button } from '@xcreener/ui';
 import { useEffect } from 'react';
 import { captureReferralFromUrl } from '#/lib/affiliates/referral';
 import { useLandingCtaExperiment, usePricingExperiment } from '#/lib/experiments/useExperiment';
@@ -14,7 +14,7 @@ const linkButtonSecondary =
 export const Route = createFileRoute('/')({
   head: () => ({
     meta: [
-      { title: 'SnapGlow - Screenshots that shine' },
+      { title: 'Xcreener - Screenshots that shine' },
       {
         name: 'description',
         content:
@@ -117,7 +117,7 @@ function LandingPage() {
             <p className="mx-auto mt-3 max-w-md text-muted">{tm('readySubtitle')}</p>
             <div className="mt-8 flex justify-center">
               <a href="https://snapglow.app/download" className={linkButtonPrimary}>
-                Download SnapGlow
+                Download Xcreener
               </a>
             </div>
             <div className="mt-6">
@@ -130,7 +130,7 @@ function LandingPage() {
       </main>
 
       <footer className="border-t border-border py-8 text-center text-sm text-muted">
-        SnapGlow - screenshots that shine.
+        Xcreener - screenshots that shine.
       </footer>
     </div>
   );

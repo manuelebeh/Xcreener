@@ -1,1 +1,1 @@
-export { type RenderResult, renderFrame } from '@snapglow/render-core';
+export { type RenderResult, renderFrame } from '@xcreener/render-core';

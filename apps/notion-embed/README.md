@@ -1,12 +1,12 @@
-# SnapGlow Notion Embed
+# Xcreener Notion Embed
 
-Insert enriched SnapGlow embed blocks into Notion pages using the public API and Notion OAuth.
+Insert enriched Xcreener embed blocks into Notion pages using the public API and Notion OAuth.
 
 ## Setup
 
-1. Configure Notion OAuth app (same credentials as SnapGlow API `NOTION_CLIENT_ID` / `NOTION_CLIENT_SECRET`).
+1. Configure Notion OAuth app (same credentials as Xcreener API `NOTION_CLIENT_ID` / `NOTION_CLIENT_SECRET`).
 2. Set redirect URI to `http://localhost:3456/oauth/callback` in Notion integration settings.
-3. Create a Team Pro API key in SnapGlow desktop.
+3. Create a Team Pro API key in Xcreener desktop.
 
 ## Run locally
 
@@ -14,8 +14,8 @@ Insert enriched SnapGlow embed blocks into Notion pages using the public API and
 export NOTION_CLIENT_ID=...
 export NOTION_CLIENT_SECRET=...
 export WEB_PUBLIC_URL=http://localhost:3000
-export SNAPGLOW_API_URL=http://localhost:8787   # the only API the server talks to
-pnpm --filter @snapglow/notion-embed dev
+export XCREENER_API_URL=http://localhost:8787   # the only API the server talks to
+pnpm --filter @xcreener/notion-embed dev
 ```
 
 Open http://localhost:3456

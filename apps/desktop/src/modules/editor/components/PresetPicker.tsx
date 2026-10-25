@@ -1,4 +1,4 @@
-import { Button, Input, Label, Select } from '@snapglow/ui';
+import { Button, Input, Label, Select } from '@xcreener/ui';
 import { useCallback, useState } from 'react';
 import {
   createCustomPreset,
@@ -50,7 +50,7 @@ export function PresetPicker() {
       try {
         await deleteCustomPreset(dbId);
       } catch (error) {
-        console.error('[SnapGlow] Failed to delete custom preset', error);
+        console.error('[Xcreener] Failed to delete custom preset', error);
       }
     }
   }, []);
@@ -95,7 +95,7 @@ export function PresetPicker() {
       setName('');
       setOpen(false);
     } catch (error) {
-      console.error('[SnapGlow] Failed to save custom preset', error);
+      console.error('[Xcreener] Failed to save custom preset', error);
     } finally {
       setSaving(false);
     }

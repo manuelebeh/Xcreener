@@ -1,5 +1,5 @@
-import type { TemplateListingResponse } from '@snapglow/marketplace-core';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import type { TemplateListingResponse } from '@xcreener/marketplace-core';
 import { fetchTemplateBySlug } from '#/lib/marketplace/fetchTemplates';
 
 export const Route = createFileRoute('/marketplace/$slug')({
@@ -7,10 +7,10 @@ export const Route = createFileRoute('/marketplace/$slug')({
     const template = loaderData as TemplateListingResponse | undefined;
     return {
       meta: [
-        { title: `${template?.title ?? 'Template'} — SnapGlow Marketplace` },
+        { title: `${template?.title ?? 'Template'} — Xcreener Marketplace` },
         {
           name: 'description',
-          content: template?.description ?? 'Community beautification template for SnapGlow.',
+          content: template?.description ?? 'Community beautification template for Xcreener.',
         },
         ...(template?.previewUrl ? [{ property: 'og:image', content: template.previewUrl }] : []),
       ],
@@ -72,7 +72,7 @@ function MarketplaceDetailPage() {
         </dl>
 
         <p className="mt-8 rounded-lg border border-border bg-surface p-4 text-sm text-muted">
-          Open SnapGlow desktop → Settings → Marketplace → search &quot;{template.title}&quot; →
+          Open Xcreener desktop → Settings → Marketplace → search &quot;{template.title}&quot; →
           Install.
         </p>
       </main>

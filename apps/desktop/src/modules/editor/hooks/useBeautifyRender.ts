@@ -31,7 +31,7 @@ export function useBeautifyRender(
       const pixelRatio = (displayWidth * (window.devicePixelRatio || 1)) / layout.canvasWidth;
 
       if (import.meta.env.DEV) {
-        performance.mark('snapglow-render-start');
+        performance.mark('xcreener-render-start');
       }
 
       canvas.width = Math.round(layout.canvasWidth * pixelRatio);
@@ -43,8 +43,8 @@ export function useBeautifyRender(
       renderFrame(context, input, pixelRatio, canvas);
 
       if (import.meta.env.DEV) {
-        performance.mark('snapglow-render-end');
-        performance.measure('snapglow-render', 'snapglow-render-start', 'snapglow-render-end');
+        performance.mark('xcreener-render-end');
+        performance.measure('xcreener-render', 'xcreener-render-start', 'xcreener-render-end');
       }
     };
 

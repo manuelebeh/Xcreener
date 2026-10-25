@@ -8,7 +8,7 @@ import { getApiUrl } from './config';
 export async function deleteCloudAccount(): Promise<void> {
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
-    throw new Error('Sign in to SnapGlow cloud first');
+    throw new Error('Sign in to Xcreener cloud first');
   }
 
   const response = await fetch(`${getApiUrl()}/v1/users/me`, {

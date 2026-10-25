@@ -81,7 +81,7 @@ export function useCaptureSession() {
         const savedPath = await saveRecordingFile(
           payload.filePath,
           payload.format,
-          `snapglow-recording.${payload.format}`
+          `xcreener-recording.${payload.format}`
         );
         await persistRecording({
           sourcePath: payload.filePath,

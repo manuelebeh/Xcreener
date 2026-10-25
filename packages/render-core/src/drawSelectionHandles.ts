@@ -1,5 +1,5 @@
-import type { Annotation } from '@snapglow/editor-core';
-import { getAnnotationBounds, getResizeHandles } from '@snapglow/editor-core';
+import type { Annotation } from '@xcreener/editor-core';
+import { getAnnotationBounds, getResizeHandles } from '@xcreener/editor-core';
 
 const HANDLE_SIZE = 8;
 

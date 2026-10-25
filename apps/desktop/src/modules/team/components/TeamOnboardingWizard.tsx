@@ -1,6 +1,6 @@
-import { isPaidPlan } from '@snapglow/team-core';
-import { Button, Input } from '@snapglow/ui';
 import { openUrl } from '@tauri-apps/plugin-opener';
+import { isPaidPlan } from '@xcreener/team-core';
+import { Button, Input } from '@xcreener/ui';
 import { useCallback, useEffect, useState } from 'react';
 import {
   captureExperimentExposure,
@@ -145,7 +145,7 @@ export function TeamOnboardingWizard({
 
           {step === 'cloud-auth' ? (
             <div className="space-y-3">
-              <h2 className="font-display text-lg font-semibold">Sign in to SnapGlow cloud</h2>
+              <h2 className="font-display text-lg font-semibold">Sign in to Xcreener cloud</h2>
               <p className="text-sm text-muted">
                 Team features require cloud auth. Your captures stay local until you choose to
                 upload.

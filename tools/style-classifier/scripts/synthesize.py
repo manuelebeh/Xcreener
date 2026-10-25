@@ -3,7 +3,7 @@
 
 These three classes are generated rather than scraped: synthesis gives unlimited,
 balanced, copyright-clean variety (themes, fonts, layouts) that closely matches
-what SnapGlow users actually capture.
+what Xcreener users actually capture.
 
 - code     : Pygments renders source snippets across many color themes + fonts.
 - terminal : shell sessions + log lines rendered with dark terminal themes and a
@@ -13,7 +13,7 @@ what SnapGlow users actually capture.
 
 Code source text:
   --code-source-dir  walk a directory of real source files (defaults to the
-                     SnapGlow repo so snippets look authentic). Falls back to a
+                     Xcreener repo so snippets look authentic). Falls back to a
                      small bundled set of synthetic snippets if nothing is found.
 
 Examples
@@ -77,7 +77,7 @@ LOG_LINES = [
     "  VITE v5.4.2  ready in 412 ms",
     "  ➜  Local:   http://localhost:1420/",
     "$ cargo check",
-    "    Checking snapglow-desktop v0.1.0",
+    "    Checking xcreener-desktop v0.1.0",
     "    Finished dev [unoptimized + debuginfo] target(s) in 3.21s",
     "$ git status",
     "On branch main",
@@ -186,7 +186,7 @@ def render_terminal(dest: Path, count: int) -> int:
             png = highlight(body, lexer, formatter)
         except Exception:
             continue
-        png = _add_window_chrome(png, title=random.choice(["bash", "zsh — 80×24", "powershell", "node", "~/snapglow"]))
+        png = _add_window_chrome(png, title=random.choice(["bash", "zsh — 80×24", "powershell", "node", "~/xcreener"]))
         (dest / f"terminal_{style}_{i:05d}.png").write_bytes(png)
         written += 1
     return written

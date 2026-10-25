@@ -3,7 +3,7 @@ import type {
   BrandKitConfig,
   MemberResponse,
   WorkspaceResponse,
-} from '@snapglow/team-core';
+} from '@xcreener/team-core';
 import { create } from 'zustand';
 import { setSetting } from '@/db';
 import { refreshEntitlement } from '@/modules/licensing/entitlement';

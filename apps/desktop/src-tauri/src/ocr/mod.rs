@@ -56,7 +56,7 @@ fn resolve_tessdata_dir() -> Option<String> {
         }
     }
 
-    if let Ok(resource_dir) = std::env::var("SNAPGLOW_TESSDATA_DIR") {
+    if let Ok(resource_dir) = std::env::var("XCREENER_TESSDATA_DIR") {
         if !resource_dir.is_empty() {
             return Some(resource_dir);
         }

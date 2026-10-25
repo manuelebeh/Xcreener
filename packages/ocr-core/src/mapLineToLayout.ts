@@ -1,4 +1,4 @@
-import type { ComputedLayout, LayoutRect } from '@snapglow/editor-core';
+import type { ComputedLayout, LayoutRect } from '@xcreener/editor-core';
 import type { TextLine } from './types';
 
 export function mapLineToLayout(

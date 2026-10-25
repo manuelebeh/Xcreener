@@ -54,7 +54,7 @@ vi.mock('../plugins/auth', () => ({
   upsertAuthUser: async () => testContext.currentAuthUser,
 }));
 
-import type { WorkspacePlan } from '@snapglow/team-core';
+import type { WorkspacePlan } from '@xcreener/team-core';
 import { buildTestApp, type MemoryState, resetMemoryState } from './workspaces.test-helpers';
 
 const AUTH = { authorization: 'Bearer test-token' };

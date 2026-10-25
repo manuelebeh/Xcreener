@@ -23,7 +23,7 @@ export function useTrayNavigation() {
       'open-latest-capture': () => {
         listCaptures(1)
           .then(([latest]) => (latest ? openCapture(latest.id) : navigate('/history')))
-          .catch((error) => console.error('[SnapGlow] Failed to reopen last capture', error));
+          .catch((error) => console.error('[Xcreener] Failed to reopen last capture', error));
       },
     };
 

@@ -1,5 +1,5 @@
 {
-  "name": "@snapglow/i18n",
+  "name": "@xcreener/i18n",
   "version": "0.1.0",
   "license": "AGPL-3.0-only",
   "private": true,
@@ -23,8 +23,8 @@
     "react": ">=18"
   },
   "devDependencies": {
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "@types/node": "^22.10.2",
     "@types/react": "^19.1.13",
     "react": "^19.1.1",

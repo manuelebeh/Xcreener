@@ -1,13 +1,13 @@
 [package]
-name = "snapglow-desktop"
+name = "xcreener-desktop"
 version = "0.1.0"
-description = "SnapGlow desktop application"
-authors = ["SnapGlow"]
+description = "Xcreener desktop application"
+authors = ["Xcreener"]
 license = "AGPL-3.0-only"
 edition = "2021"
 
 [lib]
-name = "snapglow_desktop_lib"
+name = "xcreener_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

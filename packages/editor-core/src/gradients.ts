@@ -1,12 +1,12 @@
 import type { GradientPreset } from './types';
 
-export const DEFAULT_GRADIENT_PRESET_ID = 'snapglow-brand';
+export const DEFAULT_GRADIENT_PRESET_ID = 'xcreener-brand';
 
 export const DEFAULT_SOLID_COLOR = '#ede8e0';
 
 const FALLBACK_PRESET: GradientPreset = {
   id: DEFAULT_GRADIENT_PRESET_ID,
-  name: 'SnapGlow',
+  name: 'Xcreener',
   angle: 160,
   stops: [
     { offset: 0, color: '#f2ece4' },

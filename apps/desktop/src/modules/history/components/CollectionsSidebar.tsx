@@ -1,4 +1,4 @@
-import { Button, Input } from '@snapglow/ui';
+import { Button, Input } from '@xcreener/ui';
 import { useState } from 'react';
 import type { StoredCollection } from '@/db/collections';
 

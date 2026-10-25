@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in SnapGlow (desktop, tooling, or docs)
+description: Report a bug in Xcreener (desktop, tooling, or docs)
 title: "[Bug] "
 labels: ["bug", "triage"]
 body:
@@ -87,7 +87,7 @@ body:
     attributes:
       label: Environment
       description: OS version and toolchain (from `mise --version`, `node -v`, `rustc -V`).
-      placeholder: "macOS 15.x, mise 2026.x, Node 24.x, pnpm 9.x, Rust stable, SnapGlow 0.1.0"
+      placeholder: "macOS 15.x, mise 2026.x, Node 24.x, pnpm 9.x, Rust stable, Xcreener 0.1.0"
 
   - type: checkboxes
     id: checks

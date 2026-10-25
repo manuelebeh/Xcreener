@@ -36,7 +36,7 @@ export async function encodeSnapshotToFile(
   }
 
   const extension = format === 'jpg' ? 'jpg' : 'png';
-  const fileUri = `${documentDirectory}snapglow-export-${Date.now()}.${extension}`;
+  const fileUri = `${documentDirectory}xcreener-export-${Date.now()}.${extension}`;
 
   await writeAsStringAsync(fileUri, base64, {
     encoding: EncodingType.Base64,

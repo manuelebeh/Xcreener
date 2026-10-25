@@ -1,4 +1,4 @@
-import { Button } from '@snapglow/ui';
+import { Button } from '@xcreener/ui';
 import type { StoredCapture } from '@/db/captures';
 
 interface DeleteUndoToastProps {

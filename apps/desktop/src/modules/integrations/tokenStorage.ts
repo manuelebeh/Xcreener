@@ -1,4 +1,4 @@
-import type { IntegrationProvider } from '@snapglow/integrations-core';
+import type { IntegrationProvider } from '@xcreener/integrations-core';
 import { readSecret, writeSecret } from '@/shared/lib/secureStorage';
 
 export interface StoredIntegrationToken {

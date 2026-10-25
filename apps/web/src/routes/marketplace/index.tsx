@@ -4,10 +4,10 @@ import { fetchTemplateList } from '#/lib/marketplace/fetchTemplates';
 export const Route = createFileRoute('/marketplace/')({
   head: () => ({
     meta: [
-      { title: 'Template marketplace — SnapGlow' },
+      { title: 'Template marketplace — Xcreener' },
       {
         name: 'description',
-        content: 'Community beautification templates for SnapGlow screenshots.',
+        content: 'Community beautification templates for Xcreener screenshots.',
       },
     ],
   }),
@@ -22,7 +22,7 @@ function MarketplaceIndexPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
         <Link to="/" className="text-lg font-semibold tracking-tight no-underline text-foreground">
-          SnapGlow
+          Xcreener
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link to="/help" className="font-medium text-muted no-underline hover:text-foreground">
@@ -37,7 +37,7 @@ function MarketplaceIndexPage() {
       <main className="mx-auto max-w-5xl px-6 pb-16">
         <h1 className="font-display text-3xl font-bold tracking-tight">Template marketplace</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Community beautification presets — install in SnapGlow desktop from Settings →
+          Community beautification presets — install in Xcreener desktop from Settings →
           Marketplace.
         </p>
         <p className="mt-1 text-sm text-muted">{total} templates</p>

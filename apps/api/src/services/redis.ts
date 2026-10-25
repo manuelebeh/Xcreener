@@ -1,4 +1,4 @@
-import { API_RATE_LIMITS } from '@snapglow/api-core';
+import { API_RATE_LIMITS } from '@xcreener/api-core';
 import Redis from 'ioredis';
 import { env } from '../env';
 

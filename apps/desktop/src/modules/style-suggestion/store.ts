@@ -1,4 +1,4 @@
-import type { ContentClass, StyleSuggestion } from '@snapglow/style-suggestion-core';
+import type { ContentClass, StyleSuggestion } from '@xcreener/style-suggestion-core';
 import { create } from 'zustand';
 
 export type StyleSuggestionStatus = 'idle' | 'classifying' | 'ready' | 'error' | 'dismissed';

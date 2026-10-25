@@ -1,1 +1,1 @@
-export { fitPreviewSize } from '@snapglow/editor-core';
+export { fitPreviewSize } from '@xcreener/editor-core';

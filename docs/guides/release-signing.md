@@ -1,6 +1,6 @@
 # Release signing & updater keys
 
-Operational guide for signed SnapGlow desktop releases. **Phase 0 (Sprint 0.4):** updater Ed25519 keys are configured; macOS Developer ID and Windows Authenticode certificates are **not yet provisioned**.
+Operational guide for signed Xcreener desktop releases. **Phase 0 (Sprint 0.4):** updater Ed25519 keys are configured; macOS Developer ID and Windows Authenticode certificates are **not yet provisioned**.
 
 ## 1. Tauri updater (Ed25519)
 
@@ -9,7 +9,7 @@ Distinct from platform code signing - signs `latest.json` and update bundles.
 ### Generate key pair (once per team)
 
 ```bash
-pnpm --filter @snapglow/desktop tauri signer generate -w ~/.tauri/snapglow.key
+pnpm --filter @xcreener/desktop tauri signer generate -w ~/.tauri/xcreener.key
 ```
 
 - **Public key:** committed in `apps/desktop/src-tauri/tauri.conf.json` → `plugins.updater.pubkey`
@@ -67,15 +67,15 @@ Until Apple Developer ID and Windows Authenticode certificates are provisioned, 
 ### macOS (`.dmg`)
 
 1. Download the `.dmg` from the draft GitHub Release (tag `v0.1.0-beta.*` or later).
-2. Open the DMG and drag SnapGlow to Applications.
-3. On first launch, Gatekeeper may block the app. Right-click SnapGlow → **Open** → confirm **Open** again.
+2. Open the DMG and drag Xcreener to Applications.
+3. On first launch, Gatekeeper may block the app. Right-click Xcreener → **Open** → confirm **Open** again.
 4. Alternatively: **System Settings → Privacy & Security → Open Anyway** after the first blocked launch.
 
 ### Windows (`.msi` / `.exe`)
 
 1. Download the installer from the draft release.
 2. If SmartScreen shows “Windows protected your PC”, click **More info** → **Run anyway**.
-3. Complete the installer; launch SnapGlow from the Start menu.
+3. Complete the installer; launch Xcreener from the Start menu.
 
 ### Updater secrets checklist (GitHub → Settings → Secrets)
 
@@ -105,9 +105,9 @@ CI runs `.github/workflows/release.yml` → draft release with macOS (aarch64 + 
 Same two steps as CI (build without the key, then bundle with it):
 
 ```bash
-pnpm --filter @snapglow/desktop tauri build --no-bundle --target aarch64-apple-darwin
-export TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/snapglow.key)"
-pnpm --filter @snapglow/desktop tauri bundle --target aarch64-apple-darwin \
+pnpm --filter @xcreener/desktop tauri build --no-bundle --target aarch64-apple-darwin
+export TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/xcreener.key)"
+pnpm --filter @xcreener/desktop tauri bundle --target aarch64-apple-darwin \
   --config '{"bundle":{"createUpdaterArtifacts":true}}'
 ```
 
@@ -116,13 +116,13 @@ pnpm --filter @snapglow/desktop tauri bundle --target aarch64-apple-darwin \
 The desktop app only trusts a paid plan signed by the API (`GET /v1/me/entitlement`) and checks the signature in Rust (`src-tauri/src/entitlement.rs`). This key pair is separate from the updater key.
 
 ```bash
-pnpm --filter @snapglow/api exec tsx scripts/generate-entitlement-keys.ts
+pnpm --filter @xcreener/api exec tsx scripts/generate-entitlement-keys.ts
 ```
 
 | Value | Where | Secret? |
 |-------|-------|---------|
 | `ENTITLEMENT_PRIVATE_KEY` | API environment (prod host, `apps/api/.env.local` in dev) | Yes |
-| `SNAPGLOW_ENTITLEMENT_PUBLIC_KEY` | GitHub → Settings → Variables (Actions), read by `release.yml` / `build.yml`; your shell for local builds | No |
+| `XCREENER_ENTITLEMENT_PUBLIC_KEY` | GitHub → Settings → Variables (Actions), read by `release.yml` / `build.yml`; your shell for local builds | No |
 
 `release.yml` fails when the variable is missing: a build without it treats every paying account as free. Rotating the pair logs every desktop out of its paid plan until it reaches the API again.
 

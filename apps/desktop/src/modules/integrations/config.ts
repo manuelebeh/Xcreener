@@ -3,5 +3,5 @@ export function isIntegrationsConfigured(): boolean {
 }
 
 export function getIntegrationsRedirectUri(): string {
-  return 'snapglow://integrations/callback';
+  return 'xcreener://integrations/callback';
 }

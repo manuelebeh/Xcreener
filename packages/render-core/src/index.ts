@@ -1,5 +1,5 @@
-import type { CollabDocumentState } from '@snapglow/collab-core';
-import type { WatermarkConfig } from '@snapglow/editor-core';
+import type { CollabDocumentState } from '@xcreener/collab-core';
+import type { WatermarkConfig } from '@xcreener/editor-core';
 import type { RenderInput, RenderScreenshotSource } from './types';
 
 export function documentStateToRenderInput(

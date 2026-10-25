@@ -1,4 +1,4 @@
-import type { SyncLibraryItem } from '@snapglow/sync-core';
+import type { SyncLibraryItem } from '@xcreener/sync-core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { importSyncedLibraryItem } from './syncPull';
 

@@ -5,7 +5,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 export const Route = createFileRoute('/redeem')({
   head: () => ({
     meta: [
-      { title: 'Redeem partner code — SnapGlow' },
+      { title: 'Redeem partner code — Xcreener' },
       { name: 'description', content: 'Redeem AppSumo, Setapp, or partner bundle codes.' },
     ],
   }),
@@ -17,7 +17,7 @@ function RedeemPage() {
     <div className="min-h-screen bg-background px-6 py-16 text-foreground">
       <div className="mx-auto max-w-md">
         <Link to="/" className="text-sm text-muted no-underline hover:text-foreground">
-          ← SnapGlow
+          ← Xcreener
         </Link>
         <h1 className="mt-4 font-display text-2xl font-bold">Redeem partner code</h1>
         <p className="mt-2 text-sm text-muted">

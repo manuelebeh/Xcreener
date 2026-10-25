@@ -4,9 +4,9 @@ import { computeWatermarkBox, watermarkLabel } from './watermark';
 
 describe('watermark geometry', () => {
   it('joins name and url', () => {
-    expect(watermarkLabel(DEFAULT_WATERMARK)).toBe('SnapGlow');
+    expect(watermarkLabel(DEFAULT_WATERMARK)).toBe('Xcreener');
     expect(watermarkLabel({ ...DEFAULT_WATERMARK, url: 'snapglow.app' })).toBe(
-      'SnapGlow · snapglow.app'
+      'Xcreener · snapglow.app'
     );
   });
 

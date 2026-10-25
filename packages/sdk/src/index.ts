@@ -4,8 +4,8 @@ import type {
   ExportCaptureResponse,
   ExportFormat,
   PublishCaptureResponse,
-} from '@snapglow/api-core';
-import type { CollabDocumentState } from '@snapglow/collab-core';
+} from '@xcreener/api-core';
+import type { CollabDocumentState } from '@xcreener/collab-core';
 
 export class ApiError extends Error {
   constructor(
@@ -29,7 +29,7 @@ export class RateLimitError extends ApiError {
   }
 }
 
-export interface SnapGlowClientOptions {
+export interface XcreenerClientOptions {
   apiKey: string;
   baseUrl?: string;
   fetchImpl?: typeof fetch;
@@ -65,12 +65,12 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
   return JSON.parse(text) as T;
 }
 
-export class SnapGlowClient {
+export class XcreenerClient {
   private readonly apiKey: string;
   private readonly baseUrl: string;
   private readonly fetchImpl: typeof fetch;
 
-  constructor(options: SnapGlowClientOptions) {
+  constructor(options: XcreenerClientOptions) {
     this.apiKey = options.apiKey;
     this.baseUrl = (options.baseUrl ?? 'http://localhost:8787').replace(/\/$/, '');
     this.fetchImpl = options.fetchImpl ?? fetch;

@@ -1,12 +1,12 @@
-import { I18nProvider, initI18n, resolveLocale, type SupportedLocale } from '@snapglow/i18n';
+import { I18nProvider, initI18n, resolveLocale, type SupportedLocale } from '@xcreener/i18n';
 import { type ReactNode, useEffect } from 'react';
 
-interface SnapGlowI18nProviderProps {
+interface XcreenerI18nProviderProps {
   children: ReactNode;
   locale?: SupportedLocale | string | null;
 }
 
-export function SnapGlowI18nProvider({ children, locale }: SnapGlowI18nProviderProps) {
+export function XcreenerI18nProvider({ children, locale }: XcreenerI18nProviderProps) {
   const resolved = resolveLocale(locale ?? null);
   const i18n = initI18n(resolved);
 

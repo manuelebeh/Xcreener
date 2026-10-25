@@ -1,4 +1,4 @@
-//! Local SQLite library (`snapglow.db`). Rust owns the connection and exposes one typed
+//! Local SQLite library (`xcreener.db`). Rust owns the connection and exposes one typed
 //! command per query, so a script in the WebView cannot run arbitrary SQL.
 
 mod captures;
@@ -26,8 +26,8 @@ pub use collections::{
 pub use presets::{presets_create, presets_delete, presets_list};
 pub use settings::{settings_get, settings_set};
 
-/// Same file tauri-plugin-sql opened for `sqlite:snapglow.db`, so existing libraries carry over.
-const DB_FILENAME: &str = "snapglow.db";
+/// Same file tauri-plugin-sql opened for `sqlite:xcreener.db`, so existing libraries carry over.
+const DB_FILENAME: &str = "xcreener.db";
 
 #[derive(Default)]
 pub struct Db(Mutex<Option<Connection>>);

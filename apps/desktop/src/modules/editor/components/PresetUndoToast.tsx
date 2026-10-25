@@ -1,4 +1,4 @@
-import { Button } from '@snapglow/ui';
+import { Button } from '@xcreener/ui';
 import type { FramePreset } from '../types';
 
 interface PresetUndoToastProps {

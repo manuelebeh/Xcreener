@@ -2,8 +2,8 @@ import {
   INTEGRATION_LABELS,
   INTEGRATION_PROVIDERS,
   isEnterpriseIntegrationProvider,
-} from '@snapglow/integrations-core';
-import { Button } from '@snapglow/ui';
+} from '@xcreener/integrations-core';
+import { Button } from '@xcreener/ui';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { hasEnterpriseIntegrationsAccess } from '@/modules/licensing/premiumAccess';
 import { SettingsGroup, SettingsRow } from '@/shared/components/SettingsGroup';
@@ -36,7 +36,7 @@ export function IntegrationsSection() {
       description={
         isAuthenticated
           ? 'Send exports straight to third-party apps. Tokens stay on this device. Jira, Confluence, and Teams require Team Pro.'
-          : 'Sign in to SnapGlow cloud above before connecting.'
+          : 'Sign in to Xcreener cloud above before connecting.'
       }
     >
       {INTEGRATION_PROVIDERS.map((provider) => {

@@ -10,6 +10,6 @@ Path-specific architecture (when editing matching files):
 
 - `apps/api/**` → Fastify cloud API; see `.cursor/rules/api-architecture.mdc`
 - `apps/desktop/**` → Tauri + React modules (`modules/` + IPC)
-- `apps/web/**` → TanStack Start landing + share viewer; `@snapglow/ui` / design-tokens
-- `apps/mobile/**` → Expo SDK 56; `@snapglow/ui-native`
-- `packages/**` → design-tokens owns tokens; `*-core` shared domain; `@snapglow/sdk` client-only
+- `apps/web/**` → TanStack Start landing + share viewer; `@xcreener/ui` / design-tokens
+- `apps/mobile/**` → Expo SDK 56; `@xcreener/ui-native`
+- `packages/**` → design-tokens owns tokens; `*-core` shared domain; `@xcreener/sdk` client-only

@@ -1,4 +1,4 @@
-import { DEFAULT_WATERMARK, getPresetById, type WatermarkConfig } from '@snapglow/editor-core';
+import { DEFAULT_WATERMARK, getPresetById, type WatermarkConfig } from '@xcreener/editor-core';
 import { useMemo } from 'react';
 
 import { usePremiumAccess } from '@/modules/account';
@@ -15,7 +15,7 @@ export interface MobileRenderInput {
   transform: ReturnType<typeof useEditorStore.getState>['transform'];
   annotations: ReturnType<typeof useEditorStore.getState>['annotations'];
   selectedAnnotationId: string | null;
-  /** Set on free plans: the SnapGlow badge on the preview and every export. */
+  /** Set on free plans: the Xcreener badge on the preview and every export. */
   watermark?: WatermarkConfig;
 }
 

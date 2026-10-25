@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { ApiError, RateLimitError, SnapGlowClient } from './index';
+import { ApiError, RateLimitError, XcreenerClient } from './index';
 
-describe('SnapGlowClient', () => {
+describe('XcreenerClient', () => {
   it('uploads a capture with multipart form data', async () => {
     const fetchImpl = vi.fn(async () =>
       Response.json(
@@ -22,7 +22,7 @@ describe('SnapGlowClient', () => {
       )
     );
 
-    const client = new SnapGlowClient({
+    const client = new XcreenerClient({
       apiKey: 'sg_live_testsecret',
       baseUrl: 'https://api.test',
       fetchImpl,
@@ -50,7 +50,7 @@ describe('SnapGlowClient', () => {
         })
     );
 
-    const client = new SnapGlowClient({
+    const client = new XcreenerClient({
       apiKey: 'sg_live_testsecret',
       fetchImpl,
     });
@@ -63,7 +63,7 @@ describe('SnapGlowClient', () => {
       Response.json({ error: 'Capture not found' }, { status: 404 })
     );
 
-    const client = new SnapGlowClient({
+    const client = new XcreenerClient({
       apiKey: 'sg_live_testsecret',
       fetchImpl,
     });
@@ -84,7 +84,7 @@ describe('SnapGlowClient', () => {
       )
     );
 
-    const client = new SnapGlowClient({
+    const client = new XcreenerClient({
       apiKey: 'sg_live_testsecret',
       fetchImpl,
     });
@@ -103,7 +103,7 @@ describe('SnapGlowClient', () => {
         new Response(new Uint8Array([1, 2, 3]), { headers: { 'Content-Type': 'image/png' } })
     );
 
-    const client = new SnapGlowClient({
+    const client = new XcreenerClient({
       apiKey: 'sg_live_testsecret',
       fetchImpl: fetchImpl as unknown as typeof fetch,
     });

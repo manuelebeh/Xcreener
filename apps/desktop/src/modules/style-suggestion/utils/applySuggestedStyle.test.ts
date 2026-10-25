@@ -1,4 +1,4 @@
-import { mapContentClassToStyle, SHADOW_STRONG } from '@snapglow/style-suggestion-core';
+import { mapContentClassToStyle, SHADOW_STRONG } from '@xcreener/style-suggestion-core';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useEditorStore } from '@/modules/editor/store';
 import { applySuggestedStyle } from '@/modules/style-suggestion/utils/applySuggestedStyle';

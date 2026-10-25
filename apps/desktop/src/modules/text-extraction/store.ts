@@ -1,4 +1,4 @@
-import type { TextLine } from '@snapglow/ocr-core';
+import type { TextLine } from '@xcreener/ocr-core';
 import { create } from 'zustand';
 
 export type TextExtractionStatus = 'idle' | 'scanning' | 'ready' | 'error';

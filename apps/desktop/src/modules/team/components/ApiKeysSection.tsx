@@ -1,6 +1,6 @@
-import type { ApiKeyResponse, CreateApiKeyResponse } from '@snapglow/api-core';
-import { hasApiAccess } from '@snapglow/team-core';
-import { Button, Input } from '@snapglow/ui';
+import type { ApiKeyResponse, CreateApiKeyResponse } from '@xcreener/api-core';
+import { hasApiAccess } from '@xcreener/team-core';
+import { Button, Input } from '@xcreener/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { createApiKey, listApiKeys, revokeApiKey } from '../api-keys';
 import { useTeamStore } from '../store';

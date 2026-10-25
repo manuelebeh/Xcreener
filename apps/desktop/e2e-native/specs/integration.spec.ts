@@ -1,7 +1,7 @@
 import { $, expect } from '@wdio/globals';
 import { tauriInvoke } from '../helpers/tauri';
 
-describe('SnapGlow native integration', () => {
+describe('Xcreener native integration', () => {
   before(async () => {
     await tauriInvoke('e2e_show_main_window');
   });

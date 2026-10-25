@@ -20,7 +20,7 @@ export function useCustomPresetsLoader(): void {
         }
       })
       .catch((error) => {
-        console.error('[SnapGlow] Failed to load custom presets', error);
+        console.error('[Xcreener] Failed to load custom presets', error);
       });
 
     return () => {

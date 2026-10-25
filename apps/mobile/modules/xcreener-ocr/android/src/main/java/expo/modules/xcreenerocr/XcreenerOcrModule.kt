@@ -1,4 +1,4 @@
-package expo.modules.snapglowocr
+package expo.modules.xcreenerocr
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,11 +12,11 @@ import expo.modules.kotlin.modules.ModuleDefinition
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class SnapglowOcrModule : Module() {
+class XcreenerOcrModule : Module() {
   private val maxOcrDimension = 2048
 
   override fun definition() = ModuleDefinition {
-    Name("SnapglowOcr")
+    Name("XcreenerOcr")
 
     AsyncFunction("recognizeText") { imageUri: String, promise: Promise ->
       recognizeText(imageUri, promise)

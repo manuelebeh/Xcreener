@@ -1,5 +1,5 @@
-import type { PublicEmbedResponse } from '@snapglow/cloud-core';
 import { createFileRoute, notFound } from '@tanstack/react-router';
+import type { PublicEmbedResponse } from '@xcreener/cloud-core';
 
 const API_URL = process.env.API_URL ?? process.env.VITE_API_URL ?? 'http://localhost:8787';
 
@@ -34,12 +34,12 @@ export const Route = createFileRoute('/e/$token')({
   loader: async ({ params }) => fetchEmbed(params.token),
   head: ({ loaderData }) => ({
     meta: [
-      { title: loaderData?.title ? `${loaderData.title} — SnapGlow` : 'SnapGlow embed' },
+      { title: loaderData?.title ? `${loaderData.title} — Xcreener` : 'Xcreener embed' },
       { name: 'robots', content: 'noindex' },
       ...(loaderData?.assetUrl
         ? [
             { property: 'og:image', content: loaderData.assetUrl },
-            { property: 'og:title', content: loaderData.title ?? 'SnapGlow capture' },
+            { property: 'og:title', content: loaderData.title ?? 'Xcreener capture' },
           ]
         : []),
     ],
@@ -69,7 +69,7 @@ function EmbedViewerPage() {
         ) : (
           <img
             src={embed.assetUrl}
-            alt={embed.title ?? 'SnapGlow capture'}
+            alt={embed.title ?? 'Xcreener capture'}
             className="max-h-[95vh] max-w-full rounded-lg object-contain"
             data-testid="embed-viewer-image"
           />

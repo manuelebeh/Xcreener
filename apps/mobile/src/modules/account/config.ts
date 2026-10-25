@@ -1,5 +1,5 @@
 /** Same Auth0 native application and callback as the desktop app. */
-export const AUTH_REDIRECT_URI = 'snapglow://auth/callback';
+export const AUTH_REDIRECT_URI = 'xcreener://auth/callback';
 
 export function getAuth0Config() {
   return {

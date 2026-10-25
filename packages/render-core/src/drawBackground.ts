@@ -1,4 +1,4 @@
-import { getGradientPreset } from '@snapglow/editor-core';
+import { getGradientPreset } from '@xcreener/editor-core';
 import type { RenderBackgroundConfig } from './types';
 
 function drawCoverImage(

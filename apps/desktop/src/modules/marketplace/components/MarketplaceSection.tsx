@@ -1,5 +1,5 @@
-import { templateStyleToCustomPresetInput } from '@snapglow/marketplace-core';
-import { Button } from '@snapglow/ui';
+import { templateStyleToCustomPresetInput } from '@xcreener/marketplace-core';
+import { Button } from '@xcreener/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { createCustomPreset } from '@/db/presets';
 import { SettingsGroup, SettingsRow } from '@/shared/components/SettingsGroup';

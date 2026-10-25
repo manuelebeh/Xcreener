@@ -11,11 +11,11 @@ function resolveDebugAppPath() {
   }
 
   if (os.platform() === 'darwin') {
-    return path.join(desktopDir, 'src-tauri', 'target', 'debug', 'bundle', 'macos', 'SnapGlow.app');
+    return path.join(desktopDir, 'src-tauri', 'target', 'debug', 'bundle', 'macos', 'Xcreener.app');
   }
 
   const ext = os.platform() === 'win32' ? '.exe' : '';
-  return path.join(desktopDir, 'src-tauri', 'target', 'debug', `snapglow-desktop${ext}`);
+  return path.join(desktopDir, 'src-tauri', 'target', 'debug', `xcreener-desktop${ext}`);
 }
 
 function resolveTauriOptions() {
@@ -29,7 +29,7 @@ function resolveTauriOptions() {
   // WebView2 on Windows CI needs a writable user-data folder or msedgedriver
   // fails with "DevToolsActivePort file doesn't exist" during session create.
   if (os.platform() === 'win32') {
-    const userDataFolder = path.join(os.tmpdir(), `snapglow-e2e-webview-${process.pid}`);
+    const userDataFolder = path.join(os.tmpdir(), `xcreener-e2e-webview-${process.pid}`);
     mkdirSync(userDataFolder, { recursive: true });
     options.webviewOptions = { userDataFolder };
   }

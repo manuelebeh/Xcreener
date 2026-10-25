@@ -1,4 +1,4 @@
-import { Button } from '@snapglow/ui';
+import { Button } from '@xcreener/ui';
 import { useEditorStore } from '@/modules/editor/store';
 import { useCopyExtractedText } from '../hooks/useCopyExtractedText';
 import { useTextExtractionStore } from '../store';

@@ -1,4 +1,4 @@
-import { DEFAULT_WATERMARK } from '@snapglow/editor-core';
+import { DEFAULT_WATERMARK } from '@xcreener/editor-core';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@tauri-apps/api/core', () => ({ convertFileSrc: (path: string) => path }));
@@ -16,7 +16,7 @@ const customized = {
 };
 
 describe('watermarkFromSettings', () => {
-  it('forces the SnapGlow badge on free plans, keeping only the corner', () => {
+  it('forces the Xcreener badge on free plans, keeping only the corner', () => {
     expect(watermarkFromSettings(customized, false)).toEqual({
       ...DEFAULT_WATERMARK,
       position: 'top-left',

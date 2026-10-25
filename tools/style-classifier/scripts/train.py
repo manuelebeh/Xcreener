@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fine-tune MobileNetV3-Small for SnapGlow screenshot content classification."""
+"""Fine-tune MobileNetV3-Small for Xcreener screenshot content classification."""
 
 from __future__ import annotations
 

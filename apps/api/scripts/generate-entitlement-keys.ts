@@ -2,9 +2,9 @@
  * Generates the Ed25519 key pair for desktop entitlements.
  *
  * - ENTITLEMENT_PRIVATE_KEY (API env, secret): signs entitlement tokens.
- * - SNAPGLOW_ENTITLEMENT_PUBLIC_KEY (desktop build env, public): verifies them in Rust.
+ * - XCREENER_ENTITLEMENT_PUBLIC_KEY (desktop build env, public): verifies them in Rust.
  *
- * Usage: pnpm --filter @snapglow/api exec tsx scripts/generate-entitlement-keys.ts
+ * Usage: pnpm --filter @xcreener/api exec tsx scripts/generate-entitlement-keys.ts
  */
 import { exportJWK, exportPKCS8, generateKeyPair } from 'jose';
 
@@ -15,4 +15,4 @@ const { x } = await exportJWK(publicKey);
 console.log('# apps/api/.env.local (keep secret)');
 console.log(`ENTITLEMENT_PRIVATE_KEY="${privatePem.trim().replaceAll('\n', '\\n')}"`);
 console.log('\n# Desktop build environment (public, raw key, base64url)');
-console.log(`SNAPGLOW_ENTITLEMENT_PUBLIC_KEY=${x}`);
+console.log(`XCREENER_ENTITLEMENT_PUBLIC_KEY=${x}`);

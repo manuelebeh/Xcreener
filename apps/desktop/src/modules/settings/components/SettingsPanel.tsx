@@ -1,5 +1,5 @@
-import { LOCALE_LABELS, SUPPORTED_LOCALES, useTranslation } from '@snapglow/i18n';
-import { Button, Input, Select } from '@snapglow/ui';
+import { LOCALE_LABELS, SUPPORTED_LOCALES, useTranslation } from '@xcreener/i18n';
+import { Button, Input, Select } from '@xcreener/ui';
 import { useState } from 'react';
 import { setSetting } from '@/db';
 import { isAnalyticsActive, setObservabilityEnabled } from '@/integrations/observability';

@@ -21,7 +21,7 @@ Sprint 3.5–3.6 delivered the public REST API (ADR-013). Sprint 3.7–3.8 adds 
 Plugins capture **locally** (editor render, Figma export) then:
 
 1. `POST /v1/public/captures` — upload PNG
-2. `PATCH /v1/public/captures/:id` — apply beautify preset from `@snapglow/plugin-core`
+2. `PATCH /v1/public/captures/:id` — apply beautify preset from `@xcreener/plugin-core`
 3. `POST /v1/public/captures/:id/export` — server WYSIWYG render
 4. Optional: `POST /v1/public/captures/:id/publish` — permanent embed share
 
@@ -31,8 +31,8 @@ No OS-native capture via API (desktop app remains the capture surface for screen
 
 | Package | Preset | Use case |
 |---------|--------|----------|
-| `@snapglow/plugin-core` | `buildCodeCaptureState` | VS Code code screenshots |
-| `@snapglow/plugin-core` | `buildDesignCaptureState` | Figma frame import |
+| `@xcreener/plugin-core` | `buildCodeCaptureState` | VS Code code screenshots |
+| `@xcreener/plugin-core` | `buildDesignCaptureState` | Figma frame import |
 
 ### Notion embeds
 
@@ -55,9 +55,9 @@ No OS-native capture via API (desktop app remains the capture surface for screen
 
 ## Consequences
 
-- `@snapglow/sdk` gains `captures.publish()` method
+- `@xcreener/sdk` gains `captures.publish()` method
 - `shares` table gains optional `title` for embed OG metadata
-- `usage:read` permission added to `@snapglow/team-core` (admin only)
+- `usage:read` permission added to `@xcreener/team-core` (admin only)
 
 ## Alternatives considered
 

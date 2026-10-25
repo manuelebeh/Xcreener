@@ -1,4 +1,4 @@
-import { useTranslation } from '@snapglow/i18n';
+import { useTranslation } from '@xcreener/i18n';
 import posthog from 'posthog-js';
 import { useEffect, useState } from 'react';
 

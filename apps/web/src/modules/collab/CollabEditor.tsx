@@ -1,11 +1,11 @@
-import { participantColor } from '@snapglow/collab-core';
+import { participantColor } from '@xcreener/collab-core';
 import {
   type Annotation,
   computeLayout,
   createAnnotationFromDrag,
   DEFAULT_TOOL_DEFAULTS,
   type EditorTool,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createComment, fetchCollabDocument, fetchComments, fetchNotifications } from './api';
 import {
@@ -218,7 +218,7 @@ export function CollabEditor({ documentId }: { documentId: string }) {
       <section className="space-y-3">
         <header className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-wide text-muted">SnapGlow collaboration</p>
+            <p className="text-xs uppercase tracking-wide text-muted">Xcreener collaboration</p>
             <h1 className="font-display text-2xl font-semibold">
               {document.title ?? 'Shared capture'}
             </h1>

@@ -1,6 +1,6 @@
 # Technical Stack - Desktop (macOS & Windows)
 
-> Architecture technique détaillée pour les applications desktop SnapGlow
+> Architecture technique détaillée pour les applications desktop Xcreener
 > **Version :** 1.0 | **Date :** Juin 2026 | **Statut :** Brouillon
 
 ← Cahier des Charges | → Sprints & Implementations
@@ -23,7 +23,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        SnapGlow Desktop                      │
+│                        Xcreener Desktop                      │
 │                                                              │
 │  ┌─────────────────────────────────────────────────────┐    │
 │  │                   Frontend (WebView)                  │    │
@@ -79,9 +79,9 @@
 
 ```json
 {
-  "productName": "SnapGlow",
+  "productName": "Xcreener",
   "version": "1.0.0",
-  "identifier": "app.snapglow.desktop",
+  "identifier": "app.xcreener.desktop",
   "build": {
     "frontendDist": "../dist"
   },
@@ -89,7 +89,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "SnapGlow",
+        "title": "Xcreener",
         "width": 480,
         "height": 640,
         "resizable": true,
@@ -113,7 +113,7 @@
     "global-shortcut": {},
     "clipboard-manager": {},
     "notification": {},
-    "sql": { "preload": { "main": "sqlite:snapglow.db" } }
+    "sql": { "preload": { "main": "sqlite:xcreener.db" } }
   }
 }
 ```
@@ -390,7 +390,7 @@ async fn open_path_command(path: String) -> Result<(), String> { ... }
 
 ## 5. Moteur de Rendu (Canvas)
 
-> **État Sprint 2b.2 :** moteur `renderFrame` dans `modules/editor/engine/` - layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem - le canvas est monté conditionnellement après `displaySize`). **Shell UI** : `AppTopNav` (N1b) + routes ; **éditeur** Feature Stack (`EditorView` - canvas sticky + `EditorToolsPanel` scrollable, ordre Format → Auto-crop → Style suggestion → Style → Annotations → Text extraction → Sensitive data → Export). **Design system** : `design.md` (verrouillé) + `@snapglow/design-tokens` + `@snapglow/ui`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`) + compression Rust optionnelle (`smartCompression` setting). Clipboard image : `Image.fromBytes` ; clipboard texte OCR : `writeText`.
+> **État Sprint 2b.2 :** moteur `renderFrame` dans `modules/editor/engine/` - layers 1–5 (fond, ombre, capture, flou manuel/auto, annotations). Rendu via `useBeautifyRender` (rAF, gated on `canvasMounted`). Interactions annotations via `useAnnotationInteraction` (idem - le canvas est monté conditionnellement après `displaySize`). **Shell UI** : `AppTopNav` (N1b) + routes ; **éditeur** Feature Stack (`EditorView` - canvas sticky + `EditorToolsPanel` scrollable, ordre Format → Auto-crop → Style suggestion → Style → Annotations → Text extraction → Sensitive data → Export). **Design system** : `design.md` (verrouillé) + `@xcreener/design-tokens` + `@xcreener/ui`. Undo/redo (20 niveaux). Export WYSIWYG via `renderToExportCanvas` (offscreen, `selectedAnnotationId: null`, `pixelRatio: 1`) + compression Rust optionnelle (`smartCompression` setting). Clipboard image : `Image.fromBytes` ; clipboard texte OCR : `writeText`.
 
 ### 5.1 Architecture du moteur
 
@@ -500,8 +500,8 @@ CREATE INDEX idx_captures_tags ON captures(tags);
 > **Historique (Sprint 1.6) :** persistance via `@tauri-apps/plugin-fs` (`fs:scope-appdata-recursive`). Miniatures servies via asset protocol (`convertFileSrc`).
 
 ```
-~/Library/Application Support/SnapGlow/    (macOS)
-%APPDATA%/SnapGlow/                        (Windows)
+~/Library/Application Support/Xcreener/    (macOS)
+%APPDATA%/Xcreener/                        (Windows)
 ├── captures/                               # Images capturées (originaux)
 │   ├── 2026-06/
 │   │   ├── capture_20260615_143022.png
@@ -510,7 +510,7 @@ CREATE INDEX idx_captures_tags ON captures(tags);
 │   ├── thumb_20260615_143022.webp
 │   └── ...
 ├── presets/                                # Fonds personnalisés (images)
-├── snapglow.db                            # Base SQLite
+├── xcreener.db                            # Base SQLite
 └── config.json                            # Config rapide (raccourcis, thème)
 ```
 
@@ -558,7 +558,7 @@ UI : highlight (`RedactionOverlay`) puis masquage → `BlurAnnotation` (layer 4,
 
 ## 8. IA On-device (Phase 2)
 
-> **Statut implémentation (2026-06-20)** : pipeline desktop livré (Sprint 2b.1). Mapping style dans `@snapglow/style-suggestion-core`, UI `StyleSuggestionBar`, commande Tauri `classify_content_command`. **Modèle MobileNetV3 non entraîné** — pas de dataset ; fallback heuristique on-device en attendant `tools/style-classifier/` + export vers `src-tauri/resources/models/`.
+> **Statut implémentation (2026-06-20)** : pipeline desktop livré (Sprint 2b.1). Mapping style dans `@xcreener/style-suggestion-core`, UI `StyleSuggestionBar`, commande Tauri `classify_content_command`. **Modèle MobileNetV3 non entraîné** — pas de dataset ; fallback heuristique on-device en attendant `tools/style-classifier/` + export vers `src-tauri/resources/models/`.
 
 ### 8.1 Modèle de suggestion de style
 
@@ -595,7 +595,7 @@ UI : highlight (`RedactionOverlay`) puis masquage → `BlurAnnotation` (layer 4,
 
 ### 8.3 OCR copy-text, auto-crop, compression export (Sprint 2b.2)
 
-> **Statut implémentation (2026-06-20)** : desktop livré. Package `@snapglow/ocr-core`, UI `TextExtractionBar` + overlay sélection, `AutoCropBar`, setting **Smart export compression**.
+> **Statut implémentation (2026-06-20)** : desktop livré. Package `@xcreener/ocr-core`, UI `TextExtractionBar` + overlay sélection, `AutoCropBar`, setting **Smart export compression**.
 
 | Feature | Backend | Frontend | IPC |
 |---|---|---|---|
@@ -770,9 +770,9 @@ jobs:
 | `@tauri-apps/api` | API Tauri côté frontend |
 | `@tauri-apps/plugin-*` | Plugins Tauri (voir section 2.3) |
 | `@phosphor-icons/react` | Icônes cohérentes |
-| `@snapglow/style-suggestion-core` | Mapping classification → style (desktop, Sprint 2b.1) |
-| `@snapglow/ocr-core` | Types OCR + helpers copy-text (desktop, Sprint 2b.2) |
-| `@snapglow/redaction-core` | Détecteurs regex + mapRegionToLayout (desktop + mobile) |
+| `@xcreener/style-suggestion-core` | Mapping classification → style (desktop, Sprint 2b.1) |
+| `@xcreener/ocr-core` | Types OCR + helpers copy-text (desktop, Sprint 2b.2) |
+| `@xcreener/redaction-core` | Détecteurs regex + mapRegionToLayout (desktop + mobile) |
 | `date-fns` | Manipulation de dates (historique) |
 | `zod` | Validation de schémas (settings, presets) |
 

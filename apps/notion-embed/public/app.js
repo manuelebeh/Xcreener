@@ -49,7 +49,7 @@ async function loadPages() {
 loadCapturesButton.onclick = async () => {
   const apiKey = apiKeyInput.value.trim();
   if (!apiKey) {
-    setStatus('Enter your SnapGlow API key.');
+    setStatus('Enter your Xcreener API key.');
     return;
   }
 

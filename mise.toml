@@ -8,26 +8,26 @@ install = "pnpm install"
 lint = "pnpm turbo lint"
 typecheck = "pnpm turbo typecheck"
 format = "pnpm turbo format"
-"dev:desktop" = "pnpm --filter @snapglow/desktop tauri dev"
-"dev:web" = "pnpm --filter @snapglow/web dev"
-"dev:mobile" = "pnpm --filter @snapglow/mobile dev"
-"dev:mobile:ios" = "pnpm --filter @snapglow/mobile ios"
-"dev:mobile:android" = "pnpm --filter @snapglow/mobile android"
+"dev:desktop" = "pnpm --filter @xcreener/desktop tauri dev"
+"dev:web" = "pnpm --filter @xcreener/web dev"
+"dev:mobile" = "pnpm --filter @xcreener/mobile dev"
+"dev:mobile:ios" = "pnpm --filter @xcreener/mobile ios"
+"dev:mobile:android" = "pnpm --filter @xcreener/mobile android"
 "api:infra" = "docker compose -f apps/api/docker-compose.yml up -d"
-"dev:api" = { depends = ["api:infra"], run = "pnpm --filter @snapglow/api dev" }
-"build:mobile:preview" = "pnpm --filter @snapglow/mobile exec eas build --profile preview --platform all"
-"build:mobile:production" = "pnpm --filter @snapglow/mobile exec eas build --profile production --platform all"
-"tokens:build" = "pnpm --filter @snapglow/design-tokens build"
-"storybook" = "pnpm --filter @snapglow/ui storybook"
+"dev:api" = { depends = ["api:infra"], run = "pnpm --filter @xcreener/api dev" }
+"build:mobile:preview" = "pnpm --filter @xcreener/mobile exec eas build --profile preview --platform all"
+"build:mobile:production" = "pnpm --filter @xcreener/mobile exec eas build --profile production --platform all"
+"tokens:build" = "pnpm --filter @xcreener/design-tokens build"
+"storybook" = "pnpm --filter @xcreener/ui storybook"
 test = "pnpm turbo test"
-"i18n:check" = "pnpm --filter @snapglow/i18n check:missing-keys"
+"i18n:check" = "pnpm --filter @xcreener/i18n check:missing-keys"
 "blog:validate" = "node apps/web/scripts/validate-blog-posts.mjs"
-"dev:affiliates" = "pnpm --filter @snapglow/web dev"
-"test:e2e:native" = "pnpm --filter @snapglow/desktop test:e2e:native:ci"
+"dev:affiliates" = "pnpm --filter @xcreener/web dev"
+"test:e2e:native" = "pnpm --filter @xcreener/desktop test:e2e:native:ci"
 "load:api" = { depends = ["api:infra"], run = '''
 cd apps/api && \
-  dotenv -e .env.local -- tsx scripts/seed-load-fixture.ts > /tmp/snapglow-load-env.txt && \
-  export $(grep '^LOAD_TEST_' /tmp/snapglow-load-env.txt | xargs) && \
+  dotenv -e .env.local -- tsx scripts/seed-load-fixture.ts > /tmp/xcreener-load-env.txt && \
+  export $(grep '^LOAD_TEST_' /tmp/xcreener-load-env.txt | xargs) && \
   k6 run -e BASE_URL="${LOAD_TEST_BASE_URL:-http://localhost:8787}" \
     -e API_KEY="$LOAD_TEST_API_KEY" \
     -e CAPTURE_ID="$LOAD_TEST_CAPTURE_ID" \
@@ -42,15 +42,15 @@ pre-push = { env = { TURBO_SCM_BASE = "origin/main" }, run = "pnpm turbo typeche
 
 [tasks."build:desktop:arm64"]
 depends = ["tokens:build", "build:desktop:prep:mac"]
-run = "pnpm --filter @snapglow/desktop tauri build --target aarch64-apple-darwin"
+run = "pnpm --filter @xcreener/desktop tauri build --target aarch64-apple-darwin"
 
 [tasks."build:desktop:intel"]
 depends = ["tokens:build", "build:desktop:prep:mac"]
-run = "pnpm --filter @snapglow/desktop tauri build --target x86_64-apple-darwin"
+run = "pnpm --filter @xcreener/desktop tauri build --target x86_64-apple-darwin"
 
 [tasks."build:desktop:windows"]
 depends = ["tokens:build", "build:desktop:prep:windows"]
-run = "pnpm --filter @snapglow/desktop tauri build --target x86_64-pc-windows-msvc"
+run = "pnpm --filter @xcreener/desktop tauri build --target x86_64-pc-windows-msvc"
 
 [tasks."build:desktop:mac"]
 depends = ["build:desktop:arm64", "build:desktop:intel"]

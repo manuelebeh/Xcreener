@@ -61,12 +61,12 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: snapglow
-          POSTGRES_PASSWORD: snapglow
-          POSTGRES_DB: snapglow
+          POSTGRES_USER: xcreener
+          POSTGRES_PASSWORD: xcreener
+          POSTGRES_DB: xcreener
         ports: ['5432:5432']
         options: >-
-          --health-cmd "pg_isready -U snapglow -d snapglow"
+          --health-cmd "pg_isready -U xcreener -d xcreener"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -80,7 +80,7 @@ jobs:
           --health-retries 10
     env:
       # Enables apps/api/src/routes/security.integration.test.ts against the service above.
-      INTEGRATION_DATABASE_URL: postgresql://snapglow:snapglow@localhost:5432/snapglow
+      INTEGRATION_DATABASE_URL: postgresql://xcreener:xcreener@localhost:5432/xcreener
       # `turbo --affected` diffs against this commit. When it is missing (new branch), turbo runs everything.
       TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
     steps:
@@ -106,16 +106,16 @@ jobs:
 
       - name: Apply API migrations
         env:
-          DATABASE_URL: postgresql://snapglow:snapglow@localhost:5432/snapglow
+          DATABASE_URL: postgresql://xcreener:xcreener@localhost:5432/xcreener
           REDIS_URL: redis://localhost:6379
           AUTH0_DOMAIN: example.auth0.com
           AUTH0_AUDIENCE: https://api.example.com
           WEB_PUBLIC_URL: http://localhost:3000
           S3_ENDPOINT: http://localhost:9000
-          S3_BUCKET: snapglow-shares
+          S3_BUCKET: xcreener-shares
           S3_ACCESS_KEY: minioadmin
           S3_SECRET_KEY: minioadmin
-        run: mise exec -- pnpm --filter @snapglow/api db:migrate
+        run: mise exec -- pnpm --filter @xcreener/api db:migrate
 
       # schema.ts, the SQL migrations and drizzle/meta must agree: a schema change without its
       # generated migration (or a stale snapshot) fails here instead of on the next db:generate.
@@ -137,7 +137,7 @@ jobs:
 
       - name: Build web
         if: needs.changes.outputs.web == 'true'
-        run: mise exec -- pnpm --filter @snapglow/web build
+        run: mise exec -- pnpm --filter @xcreener/web build
 
   rust:
     needs: changes

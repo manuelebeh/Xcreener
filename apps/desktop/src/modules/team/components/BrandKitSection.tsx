@@ -1,5 +1,5 @@
-import { isPaidPlan } from '@snapglow/team-core';
-import { Button, Input } from '@snapglow/ui';
+import { isPaidPlan } from '@xcreener/team-core';
+import { Button, Input } from '@xcreener/ui';
 import { setSetting } from '@/db';
 import { useSettingsStore } from '@/modules/settings/store';
 import { SETTING_KEYS } from '@/shared/types/settings';

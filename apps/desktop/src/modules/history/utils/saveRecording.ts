@@ -10,7 +10,7 @@ const FILTERS: Record<CaptureRecordOutputFormat, { name: string; extensions: str
 export async function saveRecordingFile(
   sourcePath: string,
   format: CaptureRecordOutputFormat,
-  suggestedName = `snapglow-recording.${format}`
+  suggestedName = `xcreener-recording.${format}`
 ): Promise<string | null> {
   const path = await save({
     defaultPath: suggestedName,

@@ -1,4 +1,4 @@
-import { radius, spacing } from '@snapglow/design-tokens/tokens.native';
+import { radius, spacing } from '@xcreener/design-tokens/tokens.native';
 import { forwardRef, useMemo } from 'react';
 import {
   Pressable,

@@ -1,4 +1,4 @@
-import { buildCodeCaptureState, buildDesignCaptureState } from '@snapglow/plugin-core';
+import { buildCodeCaptureState, buildDesignCaptureState } from '@xcreener/plugin-core';
 import { describe, expect, it } from 'vitest';
 
 describe('plugin-core presets', () => {

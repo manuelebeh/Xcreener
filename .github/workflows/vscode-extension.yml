@@ -28,10 +28,10 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm --filter snapglow-vscode test
-      - run: pnpm --filter snapglow-vscode typecheck
-      - run: pnpm --filter snapglow-vscode lint
-      - run: pnpm --filter snapglow-vscode package
+      - run: pnpm --filter xcreener-vscode test
+      - run: pnpm --filter xcreener-vscode typecheck
+      - run: pnpm --filter xcreener-vscode lint
+      - run: pnpm --filter xcreener-vscode package
 
       - name: Publish to Marketplace
         if: startsWith(github.ref, 'refs/tags/vscode-v')

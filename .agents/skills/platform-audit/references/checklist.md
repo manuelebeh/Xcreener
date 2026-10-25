@@ -60,12 +60,12 @@ Check: which windows can call it (`main` uses `default.json`, `capture-overlay` 
 - **IPC**: Rust-side validation of paths, sizes, formats, IDs; errors leaking paths.
 - **CSP**: every directive; `'unsafe-inline'` styles, `connect-src` third parties in production builds and the dev-only `devCsp`, asset protocol scope.
 - **Remote content**: share previews, marketplace templates, collab documents, integration responses rendered in a WebView with IPC access.
-- **Navigation and deep links**: `snapglow://` handlers (cloud auth, integrations callback, referral). Any app can register or call the scheme: state/PKCE checks, replayed callbacks, attacker-crafted links triggering actions.
+- **Navigation and deep links**: `xcreener://` handlers (cloud auth, integrations callback, referral). Any app can register or call the scheme: state/PKCE checks, replayed callbacks, attacker-crafted links triggering actions.
 - **Screen capture privacy**: macOS screen-recording entitlement, private APIs (`macOSPrivateApi`), overlay windows on all workspaces, captures of other apps' content (passwords, notifications), redaction before upload or share.
 - **Command execution**: `Command::new("tesseract")` (PATH resolution, arguments, temp files). Any other process spawn.
 - **Filesystem**: export paths, temp files, overwrite, traversal, symlinks, permissions of captures on disk, cleanup.
 - **Local secrets**: Auth0 tokens and integration tokens in SQLite settings, clipboard, logs; keychain not used?
-- **Updates**: Tauri updater minisign pubkey, endpoint (`github.com/.../releases/latest/download/latest.json`), private key storage in CI, downgrade, repo name mismatch (ScreenCut vs SnapGlow).
+- **Updates**: Tauri updater minisign pubkey, endpoint (`github.com/.../releases/latest/download/latest.json`), private key storage in CI, downgrade, repo name mismatch (ScreenCut vs Xcreener).
 - **Code signing**: macOS (Developer ID, notarization, entitlements, Hardened Runtime; Apple secrets commented out in `release.yml`), Windows (Authenticode), Linux.
 
 ## 5. React / TypeScript (desktop, web, mobile)
@@ -98,7 +98,7 @@ API1 BOLA, API2 Broken Authentication, API3 Broken Object Property Level Authori
 
 ## 7. Database
 
-Postgres (Drizzle `apps/api/drizzle/`, `src/db/schema.ts`) and desktop SQLite (`apps/desktop/src/db/`, `tauri-plugin-sql` preload `snapglow.db`). Schema (FKs, uniqueness, constraints, nullability, types, IDs, timestamps), indexes (`EXPLAIN ANALYZE` on library listing, share lookup by token, sync pull by cursor, collab ops), queries (N+1, `SELECT *`, offset pagination), transactions (atomicity, idempotency, concurrency for collab ops and sync), migrations (reversibility, destructive steps, zero-downtime, how desktop SQLite migrations run). DB security: runtime user privileges, TLS, network exposure, backups.
+Postgres (Drizzle `apps/api/drizzle/`, `src/db/schema.ts`) and desktop SQLite (`apps/desktop/src/db/`, `tauri-plugin-sql` preload `xcreener.db`). Schema (FKs, uniqueness, constraints, nullability, types, IDs, timestamps), indexes (`EXPLAIN ANALYZE` on library listing, share lookup by token, sync pull by cursor, collab ops), queries (N+1, `SELECT *`, offset pagination), transactions (atomicity, idempotency, concurrency for collab ops and sync), migrations (reversibility, destructive steps, zero-downtime, how desktop SQLite migrations run). DB security: runtime user privileges, TLS, network exposure, backups.
 
 ## 8. Rust quality and security
 
@@ -120,11 +120,11 @@ CI: actions pinned by SHA, per-job `permissions`, secrets (`TAURI_SIGNING_PRIVAT
 
 ## 11. Secrets
 
-Search for `API_KEY`, `SECRET`, `PASSWORD`, `TOKEN`, `PRIVATE_KEY`, `CLIENT_SECRET`, `DATABASE_URL`, `AWS_`, `S3_`, `STRIPE`, `sk_`, `pk_`, `ghp_`, `AKIA`, `whsec_` in tracked files, fixtures, `.env.example`, logs, and git history (`gitleaks` if available). Weak defaults (`snapglow/snapglow`, `minioadmin`) are acceptable locally only if deployed config rejects them. Public keys (updater pubkey, Auth0 client IDs, PostHog keys) are not secrets: say so.
+Search for `API_KEY`, `SECRET`, `PASSWORD`, `TOKEN`, `PRIVATE_KEY`, `CLIENT_SECRET`, `DATABASE_URL`, `AWS_`, `S3_`, `STRIPE`, `sk_`, `pk_`, `ghp_`, `AKIA`, `whsec_` in tracked files, fixtures, `.env.example`, logs, and git history (`gitleaks` if available). Weak defaults (`xcreener/xcreener`, `minioadmin`) are acceptable locally only if deployed config rejects them. Public keys (updater pubkey, Auth0 client IDs, PostHog keys) are not secrets: say so.
 
 ## 12. Personal data and privacy
 
-SnapGlow claims "privacy-first: no telemetry, no cloud upload without explicit user action". Verify the claim in code: analytics opt-in default (`isAnalyticsActive`), Sentry before consent, what PostHog events carry, OCR text and window titles stored or sent, auto-sync without explicit action, share links indexed or guessable, redaction applied before upload, data in crash reports. Inventory: which data, where stored, encrypted, retention, shared (PostHog, Sentry, Stripe, Auth0, Rewardful, integrations), deletable (account deletion, share revocation, S3 objects). Legal compliance: "to be verified legally depending on country and context", never concluded automatically.
+Xcreener claims "privacy-first: no telemetry, no cloud upload without explicit user action". Verify the claim in code: analytics opt-in default (`isAnalyticsActive`), Sentry before consent, what PostHog events carry, OCR text and window titles stored or sent, auto-sync without explicit action, share links indexed or guessable, redaction applied before upload, data in crash reports. Inventory: which data, where stored, encrypted, retention, shared (PostHog, Sentry, Stripe, Auth0, Rewardful, integrations), deletable (account deletion, share revocation, S3 objects). Legal compliance: "to be verified legally depending on country and context", never concluded automatically.
 
 ## 13. Cryptography and randomness
 
@@ -168,7 +168,7 @@ WCAG 2.2 on critical paths with the keyboard only: capture overlay (keyboard-onl
 
 - Contracts: `openapi/public.yaml`, `packages/sdk`, `api-core` Zod schemas vs real responses. Cases where TypeScript says A and the API returns B.
 - Dates: share expiry, sync cursors, UTC vs local.
-- i18n: `@snapglow/i18n` missing keys (`mise run i18n:check`), fallback, plurals, formats.
+- i18n: `@xcreener/i18n` missing keys (`mise run i18n:check`), fallback, plurals, formats.
 - Configuration: dev/test/prod, separated secrets, dangerous defaults, hardcoded URLs/ports, permissive CORS, devtools in production.
 
 ## 21. Build, release, deployment, backups
@@ -192,7 +192,7 @@ For each important feature (capture, share with expiry, embeds, workspaces/invit
 ## 25. Cross-layer attack chains to reason about
 
 - malicious marketplace template or collab document → editor render in the desktop WebView → `window.__TAURI__` → SQL/FS/clipboard/opener;
-- crafted `snapglow://` link from a web page or another app → deep-link handler → login CSRF, integration token swap, referral fraud;
+- crafted `xcreener://` link from a web page or another app → deep-link handler → login CSRF, integration token swap, referral fraud;
 - leaked or guessed share token → public viewer → screenshot containing secrets;
 - API key of workspace A → public API → objects of workspace B;
 - compromised dependency in a shared `*-core` package → desktop, mobile, web, API, and extensions at once;

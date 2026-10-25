@@ -64,7 +64,7 @@ export async function sendToNotionPage(input: {
           object: 'block',
           type: 'paragraph',
           paragraph: {
-            rich_text: [{ type: 'text', text: { content: input.caption ?? 'SnapGlow export' } }],
+            rich_text: [{ type: 'text', text: { content: input.caption ?? 'Xcreener export' } }],
           },
         },
         {

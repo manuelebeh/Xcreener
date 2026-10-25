@@ -49,7 +49,7 @@ export async function sendToTeamsChannel(input: {
   filename: string;
   message?: string;
 }): Promise<string> {
-  const content = input.message ?? `SnapGlow export: ${input.filename}`;
+  const content = input.message ?? `Xcreener export: ${input.filename}`;
 
   const response = await fetch(
     `https://graph.microsoft.com/v1.0/teams/${input.teamId}/channels/${input.channelId}/messages`,

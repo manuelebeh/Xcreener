@@ -1,5 +1,5 @@
 {
-  "name": "@snapglow/api-core",
+  "name": "@xcreener/api-core",
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
@@ -16,12 +16,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@snapglow/collab-core": "workspace:*",
+    "@xcreener/collab-core": "workspace:*",
     "zod": "^4.6.6"
   },
   "devDependencies": {
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "@types/node": "^22.10.2",
     "typescript": "^6.0.2",
     "vitest": "^3.2.4"

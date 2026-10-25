@@ -1,4 +1,4 @@
-# SnapGlow API load tests (T-019)
+# Xcreener API load tests (T-019)
 
 [k6](https://k6.io/) scenarios targeting **1000+ requests/min** (~17 rps sustained).
 

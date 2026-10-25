@@ -1,4 +1,4 @@
-import type { ApiKeyResponse, CreateApiKeyResponse } from '@snapglow/api-core';
+import type { ApiKeyResponse, CreateApiKeyResponse } from '@xcreener/api-core';
 import { teamFetch } from './api';
 
 export async function listApiKeys(workspaceId: string): Promise<ApiKeyResponse[]> {

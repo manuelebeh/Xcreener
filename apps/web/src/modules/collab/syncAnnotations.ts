@@ -1,5 +1,5 @@
-import type { AnnotationOp } from '@snapglow/collab-core';
-import type { Annotation } from '@snapglow/editor-core';
+import type { AnnotationOp } from '@xcreener/collab-core';
+import type { Annotation } from '@xcreener/editor-core';
 import { collabClient } from './client';
 import { useCollabStore } from './store';
 

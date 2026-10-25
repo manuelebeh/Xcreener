@@ -20,7 +20,7 @@ export function AppTopNav() {
   return (
     <header className="grid h-11 shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-border bg-background px-4">
       <p className="min-w-0 truncate text-[13px] font-semibold tracking-tight text-foreground">
-        SnapGlow
+        Xcreener
       </p>
 
       <nav

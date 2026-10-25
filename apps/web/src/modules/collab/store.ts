@@ -3,8 +3,8 @@ import type {
   CommentResponse,
   NotificationResponse,
   ParticipantPresence,
-} from '@snapglow/collab-core';
-import type { Annotation } from '@snapglow/editor-core';
+} from '@xcreener/collab-core';
+import type { Annotation } from '@xcreener/editor-core';
 import { create } from 'zustand';
 
 interface CollabState {

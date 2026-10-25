@@ -1,5 +1,5 @@
 {
-  "extends": "@snapglow/typescript-config/react-native.json",
+  "extends": "@xcreener/typescript-config/react-native.json",
   "compilerOptions": {
     "rootDir": "src"
   },

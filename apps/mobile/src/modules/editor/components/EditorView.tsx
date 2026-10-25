@@ -1,5 +1,5 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
-import { useTheme } from '@snapglow/ui-native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
+import { useTheme } from '@xcreener/ui-native';
 import { useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';

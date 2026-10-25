@@ -1,10 +1,10 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
 import {
   DEFAULT_GRADIENT_PRESET_ID,
   DEFAULT_SOLID_COLOR,
   GRADIENT_PRESETS,
-} from '@snapglow/editor-core';
-import { SegmentedControl, Slider, useTheme } from '@snapglow/ui-native';
+} from '@xcreener/editor-core';
+import { SegmentedControl, Slider, useTheme } from '@xcreener/ui-native';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 

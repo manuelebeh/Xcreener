@@ -1,5 +1,5 @@
-import type { Annotation, BlurAnnotation } from '@snapglow/editor-core';
-import { clampBlurRect, gaussianBlurImageData, pixelateImageData } from '@snapglow/editor-core';
+import type { Annotation, BlurAnnotation } from '@xcreener/editor-core';
+import { clampBlurRect, gaussianBlurImageData, pixelateImageData } from '@xcreener/editor-core';
 
 function getBlurDeviceRect(
   rect: { x: number; y: number; width: number; height: number },
@@ -88,4 +88,4 @@ export function drawBlurMasks(
   }
 }
 
-export { gaussianBlurImageData, pixelateImageData } from '@snapglow/editor-core';
+export { gaussianBlurImageData, pixelateImageData } from '@xcreener/editor-core';

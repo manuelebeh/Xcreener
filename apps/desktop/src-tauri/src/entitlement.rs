@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Raw Ed25519 public key (base64url), baked in at build time. Without it every token is rejected.
-const PUBLIC_KEY: Option<&str> = option_env!("SNAPGLOW_ENTITLEMENT_PUBLIC_KEY");
+const PUBLIC_KEY: Option<&str> = option_env!("XCREENER_ENTITLEMENT_PUBLIC_KEY");
 
 /// Tolerated drift between the API clock and this machine.
 const CLOCK_SKEW_SECONDS: u64 = 300;

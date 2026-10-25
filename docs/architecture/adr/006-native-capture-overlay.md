@@ -14,7 +14,7 @@ Sprint 0 delivered tray + global shortcut → `capture-triggered` with stub UI. 
 
 ### Snapshot-before-overlay (Rust)
 
-1. On shortcut / `show_capture_overlay`, Rust calls `capture_desktop_preview()` **before** showing SnapGlow windows.
+1. On shortcut / `show_capture_overlay`, Rust calls `capture_desktop_preview()` **before** showing Xcreener windows.
 2. Preview is a PNG compositing all monitors into overlay bounds (`get_overlay_bounds`).
 3. Rust positions the `capture-overlay` webview and emits `capture-overlay-init` with `{ bounds, monitors, previewPng }`.
 

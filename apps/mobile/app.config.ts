@@ -3,23 +3,23 @@ import type { ExpoConfig } from 'expo/config';
 const isProduction = process.env.APP_VARIANT === 'production';
 
 const config: ExpoConfig = {
-  name: 'SnapGlow',
-  slug: 'snapglow',
+  name: 'Xcreener',
+  slug: 'xcreener',
   version: '0.1.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
-  scheme: 'snapglow',
+  scheme: 'xcreener',
   userInterfaceStyle: 'automatic',
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.snapglow.app',
+    bundleIdentifier: 'com.xcreener.app',
     buildNumber: '1',
     infoPlist: {
-      NSPhotoLibraryAddUsageDescription: 'SnapGlow saves edited screenshots to your photo library.',
+      NSPhotoLibraryAddUsageDescription: 'Xcreener saves edited screenshots to your photo library.',
     },
   },
   android: {
-    package: 'com.snapglow.app',
+    package: 'com.xcreener.app',
     versionCode: 1,
     adaptiveIcon: {
       backgroundColor: '#E6F4FE',
@@ -46,7 +46,7 @@ const config: ExpoConfig = {
       {
         // Save-only (saveToPhotos asks for write access): false keeps the read key out of Info.plist.
         photosPermission: false,
-        savePhotosPermission: 'Allow SnapGlow to save edited screenshots to your photo library.',
+        savePhotosPermission: 'Allow Xcreener to save edited screenshots to your photo library.',
       },
     ],
     [

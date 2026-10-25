@@ -1,5 +1,5 @@
 /**
- * Validates Tauri global shortcut strings (subset used by SnapGlow).
+ * Validates Tauri global shortcut strings (subset used by Xcreener).
  * Examples: CmdOrControl+Shift+KeyS, Alt+KeyA
  */
 const SHORTCUT_PATTERN =

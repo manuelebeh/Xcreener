@@ -12,7 +12,7 @@ export const Route = createFileRoute('/help/$slug')({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.title ?? 'Help'} — SnapGlow` },
+      { title: `${loaderData?.title ?? 'Help'} — Xcreener` },
       { name: 'description', content: loaderData?.description ?? '' },
     ],
   }),

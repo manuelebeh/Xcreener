@@ -1,4 +1,4 @@
-import { isShareExpired, type PublicEmbedResponse, type ShareMimeType } from '@snapglow/cloud-core';
+import { isShareExpired, type PublicEmbedResponse, type ShareMimeType } from '@xcreener/cloud-core';
 import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

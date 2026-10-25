@@ -1,5 +1,5 @@
 import { createCanvas } from '@napi-rs/canvas';
-import { defaultCollabDocumentState } from '@snapglow/collab-core';
+import { defaultCollabDocumentState } from '@xcreener/collab-core';
 import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 import { RenderTooLargeError, renderCaptureExport } from './render';

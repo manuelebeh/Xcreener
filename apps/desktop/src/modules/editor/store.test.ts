@@ -21,7 +21,7 @@ describe('useEditorStore', () => {
 
     expect(useEditorStore.getState()).toMatchObject({
       screenshot,
-      background: { type: 'gradient', presetId: 'snapglow-brand' },
+      background: { type: 'gradient', presetId: 'xcreener-brand' },
       borderRadius: DEFAULT_BORDER_RADIUS,
       shadow: DEFAULT_SHADOW,
       padding: autoPadding(screenshot),

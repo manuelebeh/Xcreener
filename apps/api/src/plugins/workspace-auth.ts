@@ -1,4 +1,4 @@
-import { can, hasMinRole, type WorkspaceRole } from '@snapglow/team-core';
+import { can, hasMinRole, type WorkspaceRole } from '@xcreener/team-core';
 import { and, eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyReply, FastifyRequest } from 'fastify';

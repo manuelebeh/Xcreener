@@ -4,7 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 import { AUTH_REDIRECT_URI, getAuth0Config } from './config';
 
-const TOKENS_KEY = 'snapglow.auth.tokens';
+const TOKENS_KEY = 'xcreener.auth.tokens';
 const VERIFIER_CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
 
 interface StoredAuthTokens {

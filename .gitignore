@@ -17,7 +17,7 @@ src-tauri/WixTools/
 
 # SQLite / local data
 *.db
-snapglow.db
+xcreener.db
 
 # Environment
 .env

@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Basic security scan for SnapGlow API (T-020). Non-blocking; documents findings in security-audit report.
+# Basic security scan for Xcreener API (T-020). Non-blocking; documents findings in security-audit report.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
-echo "== SnapGlow API security scan =="
+echo "== Xcreener API security scan =="
 echo "Date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 echo ""
 
 echo "-- pnpm audit (api workspace) --"
-pnpm --filter @snapglow/api audit --audit-level=moderate 2>&1 || true
+pnpm --filter @xcreener/api audit --audit-level=moderate 2>&1 || true
 echo ""
 
 echo "-- Dependency review: @fastify/helmet present --"

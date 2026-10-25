@@ -1,4 +1,4 @@
-import { computeLayout } from '@snapglow/editor-core';
+import { computeLayout } from '@xcreener/editor-core';
 import { useMemo } from 'react';
 
 import type { MobileRenderInput } from './useMobileRenderInput';

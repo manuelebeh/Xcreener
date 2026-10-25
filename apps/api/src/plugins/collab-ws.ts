@@ -5,8 +5,8 @@ import {
   isCollabClientMessage,
   type ParticipantPresence,
   participantColor,
-} from '@snapglow/collab-core';
-import { can } from '@snapglow/team-core';
+} from '@xcreener/collab-core';
+import { can } from '@xcreener/team-core';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';
 import { createRemoteJWKSet, jwtVerify } from 'jose';

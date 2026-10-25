@@ -44,7 +44,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Optional here: without it, smoke builds treat every account as free.
-          SNAPGLOW_ENTITLEMENT_PUBLIC_KEY: ${{ vars.SNAPGLOW_ENTITLEMENT_PUBLIC_KEY }}
+          XCREENER_ENTITLEMENT_PUBLIC_KEY: ${{ vars.XCREENER_ENTITLEMENT_PUBLIC_KEY }}
         with:
           projectPath: apps/desktop
           args: ${{ matrix.args }}
@@ -52,7 +52,7 @@ jobs:
       - name: Upload unsigned artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: snapglow-${{ matrix.platform }}-${{ matrix.args || 'default' }}
+          name: xcreener-${{ matrix.platform }}-${{ matrix.args || 'default' }}
           # `--target` builds land in target/<triple>/release, default builds in target/release.
           path: |
             apps/desktop/src-tauri/target/**/release/bundle/dmg/*.dmg

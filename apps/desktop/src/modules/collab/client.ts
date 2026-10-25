@@ -1,5 +1,5 @@
-import type { CollabServerMessage, ParticipantPresence } from '@snapglow/collab-core';
-import { COLLAB_PRESENCE_THROTTLE_MS } from '@snapglow/collab-core';
+import type { CollabServerMessage, ParticipantPresence } from '@xcreener/collab-core';
+import { COLLAB_PRESENCE_THROTTLE_MS } from '@xcreener/collab-core';
 import { getCollabWsUrl } from './api';
 
 type MessageHandler = (message: CollabServerMessage) => void;

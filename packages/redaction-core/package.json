@@ -1,5 +1,5 @@
 {
-  "name": "@snapglow/redaction-core",
+  "name": "@xcreener/redaction-core",
   "version": "0.1.0",
   "license": "AGPL-3.0-only",
   "private": true,
@@ -15,11 +15,11 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@snapglow/editor-core": "workspace:*"
+    "@xcreener/editor-core": "workspace:*"
   },
   "devDependencies": {
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "typescript": "^6.0.2",
     "vitest": "^3.2.4"
   }

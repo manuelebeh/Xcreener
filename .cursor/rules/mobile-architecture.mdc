@@ -8,7 +8,7 @@ alwaysApply: false
 # apps/mobile
 
 - Expo SDK 56 + Expo Router. Development builds only (share intent / OCR need native code; not Expo Go).
-- Design: `@snapglow/ui-native` + `@snapglow/design-tokens` `tokens.native`. Shared edit/redaction via `editor-core` / `redaction-core`.
+- Design: `@xcreener/ui-native` + `@xcreener/design-tokens` `tokens.native`. Shared edit/redaction via `editor-core` / `redaction-core`.
 - Domain modules under `src/modules/` (account, capture, editor, export, redaction). Zustand per module. `account/` holds Auth0 sign-in and the API-signed plan that decides the free-plan watermark.
 - Prefer `npx expo install <pkg>` inside `apps/mobile/` to stay on SDK 56.
 - Dev: `mise run dev:mobile` / `dev:mobile:ios` / `dev:mobile:android`. Rebuild after native module changes.

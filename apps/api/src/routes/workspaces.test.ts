@@ -136,7 +136,7 @@ describe('workspace routes', () => {
 
     expect(inviteResponse.statusCode).toBe(201);
     const invitation = inviteResponse.json();
-    expect(invitation.inviteUrl).toContain('snapglow://team/invite?token=');
+    expect(invitation.inviteUrl).toContain('xcreener://team/invite?token=');
     expect(state.invitations).toHaveLength(1);
 
     testContext.currentAuthUser = {

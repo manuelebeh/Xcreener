@@ -6,7 +6,7 @@ Complete before submission (Sprint 1b.4). Upload blocked until developer account
 
 | Field | iOS (App Store Connect) | Android (Play Console) | Draft value |
 |-------|-------------------------|------------------------|-------------|
-| App name | ✓ | ✓ | SnapGlow |
+| App name | ✓ | ✓ | Xcreener |
 | Subtitle / short description | ✓ | ✓ | Beautify screenshots instantly |
 | Full description | ✓ | ✓ | TBD |
 | Category | Photo & Video | Photography | |

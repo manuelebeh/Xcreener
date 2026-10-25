@@ -1,9 +1,9 @@
-import { buildCodeCaptureState } from '@snapglow/plugin-core';
-import { SnapGlowClient } from '@snapglow/sdk';
+import { buildCodeCaptureState } from '@xcreener/plugin-core';
+import { XcreenerClient } from '@xcreener/sdk';
 import * as vscode from 'vscode';
 import { getEditorLines, renderCodeToPng } from './codeRenderer';
 
-const API_KEY_SECRET = 'snapglow.apiKey';
+const API_KEY_SECRET = 'xcreener.apiKey';
 
 /** Electron clipboard buffer write is available at runtime but missing from @types/vscode. */
 async function writeClipboardPng(png: Uint8Array): Promise<void> {
@@ -20,7 +20,7 @@ export async function getApiKey(context: vscode.ExtensionContext): Promise<strin
 export async function setApiKey(context: vscode.ExtensionContext): Promise<void> {
   const current = await context.secrets.get(API_KEY_SECRET);
   const value = await vscode.window.showInputBox({
-    title: 'SnapGlow API Key',
+    title: 'Xcreener API Key',
     prompt: 'Enter your Team Pro workspace API key (sg_live_...)',
     password: true,
     value: current ?? '',
@@ -34,7 +34,7 @@ export async function setApiKey(context: vscode.ExtensionContext): Promise<void>
   const trimmed = value.trim();
   if (!trimmed) {
     await context.secrets.delete(API_KEY_SECRET);
-    vscode.window.showInformationMessage('SnapGlow API key cleared.');
+    vscode.window.showInformationMessage('Xcreener API key cleared.');
     return;
   }
 
@@ -44,21 +44,21 @@ export async function setApiKey(context: vscode.ExtensionContext): Promise<void>
   }
 
   await context.secrets.store(API_KEY_SECRET, trimmed);
-  vscode.window.showInformationMessage('SnapGlow API key saved.');
+  vscode.window.showInformationMessage('Xcreener API key saved.');
 }
 
 function getBaseUrl(): string {
   return (
-    vscode.workspace.getConfiguration('snapglow').get<string>('baseUrl') ?? 'http://localhost:8787'
+    vscode.workspace.getConfiguration('xcreener').get<string>('baseUrl') ?? 'http://localhost:8787'
   );
 }
 
-async function createClient(context: vscode.ExtensionContext): Promise<SnapGlowClient | null> {
+async function createClient(context: vscode.ExtensionContext): Promise<XcreenerClient | null> {
   const apiKey = await getApiKey(context);
   if (!apiKey) {
     const configure = 'Configure API Key';
     const choice = await vscode.window.showWarningMessage(
-      'SnapGlow API key not configured.',
+      'Xcreener API key not configured.',
       configure
     );
     if (choice === configure) {
@@ -67,7 +67,7 @@ async function createClient(context: vscode.ExtensionContext): Promise<SnapGlowC
     return null;
   }
 
-  return new SnapGlowClient({ apiKey, baseUrl: getBaseUrl() });
+  return new XcreenerClient({ apiKey, baseUrl: getBaseUrl() });
 }
 
 export async function captureEditor(): Promise<Buffer | null> {
@@ -111,7 +111,7 @@ export async function captureAndBeautify(context: vscode.ExtensionContext): Prom
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: 'SnapGlow: beautifying capture…',
+      title: 'Xcreener: beautifying capture…',
       cancellable: false,
     },
     async () => {
@@ -140,7 +140,7 @@ export async function captureAndBeautify(context: vscode.ExtensionContext): Prom
       await writeClipboardPng(imageBuffer);
 
       vscode.window.showInformationMessage(
-        `SnapGlow: beautified capture copied to clipboard (${exported.width}×${exported.height}).`
+        `Xcreener: beautified capture copied to clipboard (${exported.width}×${exported.height}).`
       );
     }
   );
@@ -153,14 +153,14 @@ export async function captureEditorToClipboard(): Promise<void> {
   }
 
   await writeClipboardPng(png);
-  vscode.window.showInformationMessage('SnapGlow: editor capture copied to clipboard.');
+  vscode.window.showInformationMessage('Xcreener: editor capture copied to clipboard.');
 }
 
 export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
-    vscode.commands.registerCommand('snapglow.configureApiKey', () => setApiKey(context)),
-    vscode.commands.registerCommand('snapglow.captureEditor', () => captureEditorToClipboard()),
-    vscode.commands.registerCommand('snapglow.captureAndBeautify', () =>
+    vscode.commands.registerCommand('xcreener.configureApiKey', () => setApiKey(context)),
+    vscode.commands.registerCommand('xcreener.captureEditor', () => captureEditorToClipboard()),
+    vscode.commands.registerCommand('xcreener.captureAndBeautify', () =>
       captureAndBeautify(context)
     )
   );

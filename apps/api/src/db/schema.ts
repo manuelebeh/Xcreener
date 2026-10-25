@@ -1,6 +1,6 @@
-import type { CollabDocumentState } from '@snapglow/collab-core';
-import type { TemplateStyle } from '@snapglow/marketplace-core';
-import type { BrandKitColors, BrandKitFonts, BrandKitWatermark } from '@snapglow/team-core';
+import type { CollabDocumentState } from '@xcreener/collab-core';
+import type { TemplateStyle } from '@xcreener/marketplace-core';
+import type { BrandKitColors, BrandKitFonts, BrandKitWatermark } from '@xcreener/team-core';
 import { sql } from 'drizzle-orm';
 import {
   type AnyPgColumn,

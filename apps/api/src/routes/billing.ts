@@ -3,7 +3,7 @@ import {
   type CheckoutSessionResponse,
   isBillableRole,
   type WorkspacePlan,
-} from '@snapglow/team-core';
+} from '@xcreener/team-core';
 import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

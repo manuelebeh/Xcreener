@@ -1,4 +1,4 @@
-import type { CollabDocumentState } from '@snapglow/collab-core';
+import type { CollabDocumentState } from '@xcreener/collab-core';
 import { z } from 'zod';
 
 export const API_KEY_PREFIX = 'sg_live_';

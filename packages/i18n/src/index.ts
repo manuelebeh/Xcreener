@@ -64,7 +64,7 @@ export function initI18n(locale?: SupportedLocale): typeof i18n {
 }
 
 export { I18nextProvider as I18nProvider, useTranslation } from 'react-i18next';
-export { SnapGlowI18nProvider } from './provider';
+export { XcreenerI18nProvider } from './provider';
 export { i18n };
 
 export function getEnglishResourceKeys(): string[] {

@@ -3,7 +3,7 @@ import type {
   CommentResponse,
   NotificationResponse,
   ParticipantPresence,
-} from '@snapglow/collab-core';
+} from '@xcreener/collab-core';
 import { create } from 'zustand';
 
 interface CollabState {

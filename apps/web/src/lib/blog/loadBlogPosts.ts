@@ -51,7 +51,7 @@ function loadAllPosts(): BlogPost[] {
       title: meta.title ?? 'Untitled',
       description: meta.description ?? '',
       publishedAt: meta.publishedAt ?? '2026-01-01',
-      author: meta.author ?? 'SnapGlow Team',
+      author: meta.author ?? 'Xcreener Team',
       body,
     };
   });

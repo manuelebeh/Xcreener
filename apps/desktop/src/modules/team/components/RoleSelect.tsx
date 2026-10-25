@@ -1,5 +1,5 @@
-import type { WorkspaceRole } from '@snapglow/team-core';
-import { Select } from '@snapglow/ui';
+import type { WorkspaceRole } from '@xcreener/team-core';
+import { Select } from '@xcreener/ui';
 
 const ROLE_LABELS: Record<WorkspaceRole, string> = {
   admin: 'Admin',

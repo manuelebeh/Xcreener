@@ -1,4 +1,4 @@
-import type { TemplateListingResponse, TemplateListResponse } from '@snapglow/marketplace-core';
+import type { TemplateListingResponse, TemplateListResponse } from '@xcreener/marketplace-core';
 
 function getApiUrl(): string {
   if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {

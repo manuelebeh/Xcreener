@@ -1,4 +1,4 @@
-import { fitPreviewSize } from '@snapglow/editor-core';
+import { fitPreviewSize } from '@xcreener/editor-core';
 import { useMemo, useRef, useState } from 'react';
 import { View } from 'react-native';
 

@@ -1,5 +1,5 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
-import { Button, useTheme } from '@snapglow/ui-native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
+import { Button, useTheme } from '@xcreener/ui-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';

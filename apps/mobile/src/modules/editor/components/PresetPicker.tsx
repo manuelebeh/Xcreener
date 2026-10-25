@@ -1,12 +1,12 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
 import {
   BUILT_IN_PRESETS,
   FREE_PRESET_ID,
   getNetworkPresets,
   SOCIAL_NETWORKS,
   STANDARD_PRESETS,
-} from '@snapglow/editor-core';
-import { Button, useTheme } from '@snapglow/ui-native';
+} from '@xcreener/editor-core';
+import { Button, useTheme } from '@xcreener/ui-native';
 import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useEditorStore } from '../store';

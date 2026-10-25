@@ -48,7 +48,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   ocrEngine: 'auto',
   ocrLanguages: 'eng',
   watermarkEnabled: true,
-  watermarkDisplayName: 'SnapGlow',
+  watermarkDisplayName: 'Xcreener',
   watermarkUrl: '',
   watermarkLogoPath: '',
   watermarkPosition: 'bottom-right',

@@ -7,7 +7,7 @@ import { useTeamStore } from './store';
 
 export function parseTeamInviteUrl(url: string): string | null {
   const parsed = new URL(url);
-  if (parsed.protocol !== 'snapglow:' || !parsed.pathname.includes('team/invite')) {
+  if (parsed.protocol !== 'xcreener:' || !parsed.pathname.includes('team/invite')) {
     return null;
   }
   return parsed.searchParams.get('token');

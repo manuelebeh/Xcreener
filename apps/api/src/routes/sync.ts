@@ -1,5 +1,5 @@
-import type { SettingsPatch, SyncLibraryResponse, UserSettingsResponse } from '@snapglow/sync-core';
-import { SYNCABLE_SETTING_KEYS } from '@snapglow/sync-core';
+import type { SettingsPatch, SyncLibraryResponse, UserSettingsResponse } from '@xcreener/sync-core';
+import { SYNCABLE_SETTING_KEYS } from '@xcreener/sync-core';
 import { and, desc, eq, gt, or } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

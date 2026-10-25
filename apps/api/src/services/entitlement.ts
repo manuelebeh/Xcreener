@@ -1,4 +1,4 @@
-import type { WorkspacePlan } from '@snapglow/team-core';
+import type { WorkspacePlan } from '@xcreener/team-core';
 import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { importPKCS8, SignJWT } from 'jose';

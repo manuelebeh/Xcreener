@@ -1,4 +1,4 @@
-# Accessibility audit - SnapGlow design system (WCAG 2.1 AA)
+# Accessibility audit - Xcreener design system (WCAG 2.1 AA)
 
 **Date:** 2026-06-16  
 **Sprint:** 0.4 (P0-020)  
@@ -9,7 +9,7 @@
 | Tool | Status |
 |------|--------|
 | `@storybook/addon-a11y` | Enabled in Storybook (`mise run storybook`) |
-| Biome a11y rules | Enabled via `@snapglow/biome-config` |
+| Biome a11y rules | Enabled via `@xcreener/biome-config` |
 | Automated contrast validation | Manual review (OKLCH pairs documented below) |
 
 ## Component audit

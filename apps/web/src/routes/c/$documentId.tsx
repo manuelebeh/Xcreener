@@ -4,7 +4,7 @@ import { CollabEditor } from '#/modules/collab/CollabEditor';
 export const Route = createFileRoute('/c/$documentId')({
   component: CollabPage,
   head: () => ({
-    meta: [{ title: 'Collaboration — SnapGlow' }, { name: 'robots', content: 'noindex' }],
+    meta: [{ title: 'Collaboration — Xcreener' }, { name: 'robots', content: 'noindex' }],
   }),
 });
 

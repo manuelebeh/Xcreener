@@ -1,5 +1,5 @@
 {
-  "name": "@snapglow/figma-plugin",
+  "name": "@xcreener/figma-plugin",
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
@@ -11,13 +11,13 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@snapglow/plugin-core": "workspace:*",
-    "@snapglow/sdk": "workspace:*"
+    "@xcreener/plugin-core": "workspace:*",
+    "@xcreener/sdk": "workspace:*"
   },
   "devDependencies": {
     "@figma/plugin-typings": "^1.119.0",
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "esbuild": "^0.25.0",
     "typescript": "^6.0.2",
     "vitest": "^3.2.4"

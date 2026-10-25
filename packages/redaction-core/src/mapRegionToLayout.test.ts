@@ -1,4 +1,4 @@
-import { DEFAULT_BACKGROUND, DEFAULT_SHADOW, type RenderInput } from '@snapglow/editor-core';
+import { DEFAULT_BACKGROUND, DEFAULT_SHADOW, type RenderInput } from '@xcreener/editor-core';
 import { describe, expect, it } from 'vitest';
 
 import { mapRegionToLayout } from './mapRegionToLayout';

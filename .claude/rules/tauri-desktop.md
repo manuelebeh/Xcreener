@@ -7,9 +7,9 @@ paths:
 
 ## App identity
 
-- Identifier: `app.snapglow.desktop`
-- Product: SnapGlow
-- Crate: `snapglow-desktop` in `apps/desktop/src-tauri/`
+- Identifier: `app.xcreener.desktop`
+- Product: Xcreener
+- Crate: `xcreener-desktop` in `apps/desktop/src-tauri/`
 
 ## Windows
 
@@ -43,11 +43,11 @@ Register new commands in `lib.rs` and mirror types in `src/shared/types/ipc.ts` 
 - `modules/text-extraction/` - TextExtractionBar, selection overlay, `writeText` clipboard
 - `modules/balance/` - BalanceBar: equal margins, redrawn from a kept copy of the capture
 
-Shared packages: `@snapglow/style-suggestion-core`, `@snapglow/ocr-core`.
+Shared packages: `@xcreener/style-suggestion-core`, `@xcreener/ocr-core`.
 
 ## SQLite
 
-- Rust owns `snapglow.db` (`app_config_dir`, rusqlite) in `src-tauri/src/db/`: one typed command per query (`settings_*`, `captures_*`, `collections_*`, `presets_*`). The WebView has no raw SQL; add a command for a new query
+- Rust owns `xcreener.db` (`app_config_dir`, rusqlite) in `src-tauri/src/db/`: one typed command per query (`settings_*`, `captures_*`, `collections_*`, `presets_*`). The WebView has no raw SQL; add a command for a new query
 - Migrations: `src/db/migrations/*.sql`, embedded and applied by `src-tauri/src/db/migrations.rs` through `db_init` (`ensureMigrationsApplied` in `migrate.ts`)
 - Capture history: `src/db/captures.ts` (retention 30)
 - Settings keys (2b.2): `ocrEngine`, `ocrLanguages`, `smartCompression`
@@ -67,4 +67,4 @@ CSP in `tauri.conf.json` - keep `'unsafe-inline'` for styles only as needed; no 
 ## OCR dev notes (Tesseract fallback)
 
 - macOS/Windows: native OCR used in `auto` mode without extra install
-- Tesseract CLI fallback: `brew install tesseract` (+ language packs); optional `TESSDATA_PREFIX` or `SNAPGLOW_TESSDATA_DIR`
+- Tesseract CLI fallback: `brew install tesseract` (+ language packs); optional `TESSDATA_PREFIX` or `XCREENER_TESSDATA_DIR`

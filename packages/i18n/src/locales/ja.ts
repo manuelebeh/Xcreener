@@ -1,5 +1,5 @@
 export const commonJa = {
-  appName: 'SnapGlow',
+  appName: 'Xcreener',
   loading: '読み込み中…',
   save: '保存',
   cancel: 'キャンセル',

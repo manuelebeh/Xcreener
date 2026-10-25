@@ -6,13 +6,13 @@ import {
   exportCaptureSchema,
   MAX_RENDER_PIXELS,
   type PublishCaptureResponse,
-} from '@snapglow/api-core';
+} from '@xcreener/api-core';
 import {
   ALLOWED_SHARE_MIME_TYPES,
   MAX_LIBRARY_ITEM_BYTES,
   type ShareMimeType,
-} from '@snapglow/cloud-core';
-import { type CollabDocumentState, defaultCollabDocumentState } from '@snapglow/collab-core';
+} from '@xcreener/cloud-core';
+import { type CollabDocumentState, defaultCollabDocumentState } from '@xcreener/collab-core';
 import { and, desc, eq, ilike, lt, or, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

@@ -1,5 +1,5 @@
-import { Button } from '@snapglow/ui';
 import { ask } from '@tauri-apps/plugin-dialog';
+import { Button } from '@xcreener/ui';
 import { useEffect, useState } from 'react';
 import { setSetting } from '@/db';
 import { useSettingsStore } from '@/modules/settings/store';
@@ -32,7 +32,7 @@ export function CloudAuthSection() {
 
   async function handleDeleteAccount() {
     const confirmed = await ask(
-      'This permanently deletes your SnapGlow cloud account, your cloud library, share links and any workspace where you are the only member. Captures saved on this device are kept.',
+      'This permanently deletes your Xcreener cloud account, your cloud library, share links and any workspace where you are the only member. Captures saved on this device are kept.',
       {
         title: 'Delete cloud account',
         kind: 'warning',
@@ -95,7 +95,7 @@ export function CloudAuthSection() {
     return (
       <SettingsGroup title="Cloud sharing">
         <SettingsRow
-          label="SnapGlow cloud"
+          label="Xcreener cloud"
           hint="Sign in to create share links. Nothing is uploaded unless you share a capture or turn on library backup."
           footer={error || librarySyncError ? errors : null}
         >
@@ -143,7 +143,7 @@ export function CloudAuthSection() {
       />
       <SettingsRow
         label="Delete cloud account"
-        hint="Erases your account and everything stored in SnapGlow cloud. Local captures stay."
+        hint="Erases your account and everything stored in Xcreener cloud. Local captures stay."
         footer={
           deleteError ? (
             <p className="text-xs text-destructive" role="alert">

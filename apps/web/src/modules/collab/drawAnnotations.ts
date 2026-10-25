@@ -1,4 +1,4 @@
-import type { Annotation } from '@snapglow/editor-core';
+import type { Annotation } from '@xcreener/editor-core';
 
 function drawArrowHead(
   ctx: CanvasRenderingContext2D,

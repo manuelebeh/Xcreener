@@ -1,5 +1,5 @@
 {
-  "name": "snapglow",
+  "name": "xcreener",
   "private": true,
   "license": "AGPL-3.0-only",
   "scripts": {
@@ -8,7 +8,7 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "format": "turbo format",
-    "postinstall": "pnpm --filter @snapglow/design-tokens build"
+    "postinstall": "pnpm --filter @xcreener/design-tokens build"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.6",

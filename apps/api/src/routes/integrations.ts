@@ -8,8 +8,8 @@ import {
   isEnterpriseIntegrationProvider,
   isIntegrationProvider,
   type RefreshIntegrationTokenResponse,
-} from '@snapglow/integrations-core';
-import { hasEnterpriseIntegrationsAccess } from '@snapglow/team-core';
+} from '@xcreener/integrations-core';
+import { hasEnterpriseIntegrationsAccess } from '@xcreener/team-core';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { customAlphabet } from 'nanoid';
@@ -425,7 +425,7 @@ export async function registerIntegrationRoutes(
       const user = await upsertAuthUser(options.db, authUser.auth0Sub, authUser.email);
 
       // The state is checked here on exchange, not only by the desktop: a code intercepted
-      // through the custom scheme cannot be redeemed by another SnapGlow account.
+      // through the custom scheme cannot be redeemed by another Xcreener account.
       const state = createState();
       const codeVerifier = randomBytes(32).toString('base64url');
       await savePendingIntegrationOAuth(state, {

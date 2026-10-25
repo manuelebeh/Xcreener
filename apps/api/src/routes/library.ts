@@ -5,7 +5,7 @@ import {
   type LibrarySearchResponse,
   MAX_LIBRARY_ITEM_BYTES,
   type ShareMimeType,
-} from '@snapglow/cloud-core';
+} from '@xcreener/cloud-core';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

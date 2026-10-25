@@ -2,14 +2,14 @@
  * Seeds Team Pro workspace + API key + capture for k6 load tests.
  * Usage: dotenv -e .env.local -- tsx scripts/seed-load-fixture.ts
  */
-import { buildApiKeyPlaintext } from '@snapglow/api-core';
-import { generateApiKeySecret, hashApiKey } from '@snapglow/api-core/api-keys';
+import { buildApiKeyPlaintext } from '@xcreener/api-core';
+import { generateApiKeySecret, hashApiKey } from '@xcreener/api-core/api-keys';
 import { eq } from 'drizzle-orm';
 import { createDb } from '../src/db/migrate';
 import * as schema from '../src/db/schema';
 import { StorageService } from '../src/services/storage';
 
-const LOAD_FIXTURE_SUB = 'load-test|snapglow';
+const LOAD_FIXTURE_SUB = 'load-test|xcreener';
 const LOAD_FIXTURE_SLUG = 'load-test-workspace';
 
 const MINIMAL_PNG = Buffer.from(
@@ -29,7 +29,7 @@ async function main() {
   if (!user) {
     const inserted = await db
       .insert(schema.users)
-      .values({ auth0Sub: LOAD_FIXTURE_SUB, email: 'load-test@snapglow.local' })
+      .values({ auth0Sub: LOAD_FIXTURE_SUB, email: 'load-test@xcreener.local' })
       .returning();
     const row = inserted[0];
     if (!row) {

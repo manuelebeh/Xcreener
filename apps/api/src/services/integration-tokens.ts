@@ -4,7 +4,7 @@ import { env } from '../env';
 /**
  * Provider refresh tokens never reach clients in usable form. The API hands out a sealed
  * `refreshHandle` (AES-256-GCM, bound to the user and provider through the associated data)
- * and keeps nothing server side. A stolen handle is useless without the same SnapGlow account,
+ * and keeps nothing server side. A stolen handle is useless without the same Xcreener account,
  * and cannot be redeemed directly at the provider.
  */
 

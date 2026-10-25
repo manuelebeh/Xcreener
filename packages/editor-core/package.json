@@ -1,5 +1,5 @@
 {
-  "name": "@snapglow/editor-core",
+  "name": "@xcreener/editor-core",
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
@@ -15,8 +15,8 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "typescript": "^6.0.2",
     "vitest": "^3.2.4"
   }

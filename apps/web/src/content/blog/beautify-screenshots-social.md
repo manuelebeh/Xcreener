@@ -2,10 +2,10 @@
 title: How to beautify screenshots for social media
 description: Step-by-step guide to padding, backgrounds, and export presets for Twitter, LinkedIn, and Instagram.
 publishedAt: 2026-06-22
-author: SnapGlow Team
+author: Xcreener Team
 ---
 
-Social screenshots need consistent padding and backgrounds. Here's a fast workflow with SnapGlow.
+Social screenshots need consistent padding and backgrounds. Here's a fast workflow with Xcreener.
 
 ## 1. Capture the region
 

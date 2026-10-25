@@ -85,10 +85,10 @@ pub fn run() {
             if let Err(error) =
                 register_capture_shortcut(app.handle(), shortcuts::DEFAULT_CAPTURE_SHORTCUT)
             {
-                eprintln!("[SnapGlow] could not register the capture shortcut: {error}");
+                eprintln!("[Xcreener] could not register the capture shortcut: {error}");
             }
             if let Err(error) = tray::setup_tray(app.handle()) {
-                eprintln!("[SnapGlow] could not create the tray icon: {error}");
+                eprintln!("[Xcreener] could not create the tray icon: {error}");
             }
             overlay::setup_overlay_window(app.handle())?;
 

@@ -1,4 +1,4 @@
-export type { PresetStyleDefaults } from '@snapglow/editor-core';
+export type { PresetStyleDefaults } from '@xcreener/editor-core';
 export {
   BUILT_IN_PRESETS,
   FREE_PRESET_ID,
@@ -13,4 +13,4 @@ export {
   SOCIAL_NETWORKS,
   SOCIAL_PRESETS,
   STANDARD_PRESETS,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';

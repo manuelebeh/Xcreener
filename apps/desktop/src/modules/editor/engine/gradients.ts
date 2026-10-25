@@ -3,4 +3,4 @@ export {
   DEFAULT_SOLID_COLOR,
   GRADIENT_PRESETS,
   getGradientPreset,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';

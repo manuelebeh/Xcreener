@@ -1,4 +1,4 @@
-import type { LayoutRect } from '@snapglow/editor-core';
+import type { LayoutRect } from '@xcreener/editor-core';
 import type { RenderScreenshotSource } from './types';
 
 function roundRectPath(ctx: CanvasRenderingContext2D, rect: LayoutRect, radius: number): void {

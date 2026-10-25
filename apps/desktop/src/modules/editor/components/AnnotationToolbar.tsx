@@ -1,4 +1,4 @@
-import { Button, Label, Slider, Tooltip, TooltipProvider } from '@snapglow/ui';
+import { Button, Label, Slider, Tooltip, TooltipProvider } from '@xcreener/ui';
 import type { Annotation, BlurMode, EditorTool } from '../annotations/types';
 import { useEditorStore } from '../store';
 import { ToolIcon } from './ToolIcons';

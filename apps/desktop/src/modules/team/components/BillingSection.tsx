@@ -1,5 +1,5 @@
-import { isPaidPlan } from '@snapglow/team-core';
-import { Button } from '@snapglow/ui';
+import { isPaidPlan } from '@xcreener/team-core';
+import { Button } from '@xcreener/ui';
 import { useState } from 'react';
 import { useTeamStore } from '../store';
 

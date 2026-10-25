@@ -17,7 +17,7 @@ const FILTERS: Record<ExportFormat, { name: string; extensions: string[] }[]> = 
 export async function saveExportBlob(
   blob: Blob,
   format: ExportFormat,
-  suggestedName = `snapglow-export.${EXTENSIONS[format]}`
+  suggestedName = `xcreener-export.${EXTENSIONS[format]}`
 ): Promise<string | null> {
   const path = await save({
     defaultPath: suggestedName,

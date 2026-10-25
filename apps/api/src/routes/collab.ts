@@ -1,9 +1,9 @@
-import { collabDocumentStateSchema } from '@snapglow/api-core';
+import { collabDocumentStateSchema } from '@xcreener/api-core';
 import {
   ALLOWED_SHARE_MIME_TYPES,
   maxBytesForMime,
   type ShareMimeType,
-} from '@snapglow/cloud-core';
+} from '@xcreener/cloud-core';
 import {
   buildCollabUrl,
   type CollabDocumentResponse,
@@ -13,8 +13,8 @@ import {
   defaultCollabDocumentState,
   type NotificationResponse,
   parseMentionEmails,
-} from '@snapglow/collab-core';
-import { can, isPaidPlan, type WorkspaceRole } from '@snapglow/team-core';
+} from '@xcreener/collab-core';
+import { can, isPaidPlan, type WorkspaceRole } from '@xcreener/team-core';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

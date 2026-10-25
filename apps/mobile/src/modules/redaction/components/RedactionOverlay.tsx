@@ -1,5 +1,5 @@
-import { computeLayout, fitPreviewSize } from '@snapglow/editor-core';
-import { mapRegionToLayout } from '@snapglow/redaction-core';
+import { computeLayout, fitPreviewSize } from '@xcreener/editor-core';
+import { mapRegionToLayout } from '@xcreener/redaction-core';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useMobileRenderInput } from '@/modules/editor/hooks/useMobileRenderInput';

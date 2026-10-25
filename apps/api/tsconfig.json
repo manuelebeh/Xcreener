@@ -1,5 +1,5 @@
 {
-  "extends": "@snapglow/typescript-config/base.json",
+  "extends": "@xcreener/typescript-config/base.json",
   "include": ["src", "drizzle.config.ts"],
   "compilerOptions": {
     "lib": ["ES2022", "DOM"],

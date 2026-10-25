@@ -1,4 +1,4 @@
-# SnapGlow API (`@snapglow/api`)
+# Xcreener API (`@xcreener/api`)
 
 Fastify backend for optional cloud sharing (Sprint 2b.5).
 
@@ -26,7 +26,7 @@ Health check: `GET http://localhost:8787/health`
 | POST | `/v1/shares` | Bearer JWT | Multipart upload → share link |
 | GET | `/v1/shares/:token` | No | Public metadata + presigned asset URL |
 
-Shared types: `@snapglow/cloud-core`.
+Shared types: `@xcreener/cloud-core`.
 
 ## Docs
 

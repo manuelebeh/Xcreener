@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { build } from 'esbuild';
 
 const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
-const external = Object.keys(pkg.dependencies).filter((name) => !name.startsWith('@snapglow/'));
+const external = Object.keys(pkg.dependencies).filter((name) => !name.startsWith('@xcreener/'));
 
 await build({
   // The render worker is its own entry: piscina loads it by path (render-pool.ts).

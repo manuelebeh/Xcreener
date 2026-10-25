@@ -4,7 +4,7 @@ import type {
   CommentResponse,
   CreateCollabDocumentResponse,
   NotificationResponse,
-} from '@snapglow/collab-core';
+} from '@xcreener/collab-core';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { getApiUrl } from '@/modules/cloud/config';
 import { getWorkspaceHeaders } from '@/modules/team/headers';

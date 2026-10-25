@@ -1,5 +1,5 @@
-import type { LibraryItemResponse } from '@snapglow/cloud-core';
 import { readFile } from '@tauri-apps/plugin-fs';
+import type { LibraryItemResponse } from '@xcreener/cloud-core';
 import { useSettingsStore } from '@/modules/settings/store';
 import { getValidAccessToken } from './auth';
 import { getApiUrl } from './config';

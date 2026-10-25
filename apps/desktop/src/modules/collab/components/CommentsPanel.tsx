@@ -1,4 +1,4 @@
-import { Button } from '@snapglow/ui';
+import { Button } from '@xcreener/ui';
 import { useState } from 'react';
 import { createComment } from '../api';
 import { useCollabStore } from '../store';

@@ -1,4 +1,4 @@
-import type { ShadowConfig } from '@snapglow/editor-core';
+import type { ShadowConfig } from '@xcreener/editor-core';
 
 export const CONTENT_CLASSES = ['code', 'ui', 'terminal', 'photo', 'diagram', 'text'] as const;
 

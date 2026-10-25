@@ -30,14 +30,14 @@ export async function e2eExportToPath(
   };
 }
 
-export interface SnapGlowE2EBridge {
+export interface XcreenerE2EBridge {
   e2eEditorHasScreenshot: typeof e2eEditorHasScreenshot;
   e2eExportToPath: typeof e2eExportToPath;
 }
 
 declare global {
   interface Window {
-    __snapglowE2E?: SnapGlowE2EBridge;
+    __xcreenerE2E?: XcreenerE2EBridge;
   }
 }
 
@@ -46,7 +46,7 @@ export function registerE2EBridge(): void {
     return;
   }
 
-  window.__snapglowE2E = {
+  window.__xcreenerE2E = {
     e2eEditorHasScreenshot,
     e2eExportToPath,
   };

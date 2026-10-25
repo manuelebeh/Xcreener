@@ -1,4 +1,4 @@
-# SnapGlow docs
+# Xcreener docs
 
 Everything here is tracked in git. Strategy, audits and marketing notes live in `docs/internal/`, which is gitignored and stays on your machine.
 

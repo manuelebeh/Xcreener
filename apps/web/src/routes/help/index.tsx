@@ -5,7 +5,7 @@ import { getHelpArticles } from '#/lib/help/loadArticles';
 export const Route = createFileRoute('/help/')({
   head: () => ({
     meta: [
-      { title: 'Help center — SnapGlow' },
+      { title: 'Help center — Xcreener' },
       { name: 'description', content: 'Guides for capture, cloud sharing, teams, and plugins.' },
     ],
   }),
@@ -19,7 +19,7 @@ function HelpIndexPage() {
     <HelpLayout>
       <h1 className="font-display text-3xl font-bold tracking-tight">Help center</h1>
       <p className="mt-2 text-muted">
-        Privacy-first guides for SnapGlow desktop, cloud sharing, and team features.
+        Privacy-first guides for Xcreener desktop, cloud sharing, and team features.
       </p>
 
       <div className="mt-8 space-y-6">

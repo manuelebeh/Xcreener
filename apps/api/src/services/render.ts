@@ -4,12 +4,12 @@ import {
   type ExportFormat,
   MAX_RENDER_PIXELS,
   mimeTypeForExportFormat,
-} from '@snapglow/api-core';
-import type { CollabDocumentState } from '@snapglow/collab-core';
-import { DEFAULT_WATERMARK, type WatermarkConfig } from '@snapglow/editor-core';
-import type { RenderScreenshotSource } from '@snapglow/render-core';
-import { computeLayout, documentStateToRenderInput, renderFrame } from '@snapglow/render-core';
-import type { BrandKitWatermark } from '@snapglow/team-core';
+} from '@xcreener/api-core';
+import type { CollabDocumentState } from '@xcreener/collab-core';
+import { DEFAULT_WATERMARK, type WatermarkConfig } from '@xcreener/editor-core';
+import type { RenderScreenshotSource } from '@xcreener/render-core';
+import { computeLayout, documentStateToRenderInput, renderFrame } from '@xcreener/render-core';
+import type { BrandKitWatermark } from '@xcreener/team-core';
 import type { StorageService } from './storage';
 
 export interface RenderExportOptions {

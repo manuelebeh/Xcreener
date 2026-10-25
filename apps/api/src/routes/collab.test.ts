@@ -1,4 +1,4 @@
-import { can } from '@snapglow/team-core';
+import { can } from '@xcreener/team-core';
 import { describe, expect, it } from 'vitest';
 
 describe('collab permissions', () => {

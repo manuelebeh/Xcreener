@@ -6,7 +6,7 @@
 
 ## Context
 
-Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus a landing page. Figma deliverables run in parallel; code starts from a provisional SnapGlow palette.
+Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus a landing page. Figma deliverables run in parallel; code starts from a provisional Xcreener palette.
 
 ## Decision
 
@@ -32,17 +32,17 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 ### Web landing (`apps/web`)
 
 - **TanStack Start** + Nitro + Vite 8
-- Package: `@snapglow/web`
-- Consumes `@snapglow/design-tokens` and `@snapglow/ui`
+- Package: `@xcreener/web`
+- Consumes `@xcreener/design-tokens` and `@xcreener/ui`
 - Local dev: `mise run dev:web` (port 3000)
-- VPS deploy deferred; CI smoke-builds via `pnpm --filter @snapglow/web build`
+- VPS deploy deferred; CI smoke-builds via `pnpm --filter @xcreener/web build`
 
 ### Mobile app (`apps/mobile`, Sprint 1b.1)
 
 - **Expo SDK 56** + Expo Router + development builds (`expo-dev-client`, not Expo Go)
-- Package: `@snapglow/mobile`
-- **`packages/ui-native`** — sibling of `@snapglow/ui` (Pressable + StyleSheet, no Radix/Tailwind on RN)
-- Consumes `@snapglow/design-tokens/tokens.native` and `@snapglow/ui-native`
+- Package: `@xcreener/mobile`
+- **`packages/ui-native`** — sibling of `@xcreener/ui` (Pressable + StyleSheet, no Radix/Tailwind on RN)
+- Consumes `@xcreener/design-tokens/tokens.native` and `@xcreener/ui-native`
 - Share import: `expo-share-intent` (iOS Share Extension + Android Intent)
 - Local dev: `mise run dev:mobile` ; native run: `dev:mobile:ios` / `dev:mobile:android`
 - Generated `ios/` / `android/` folders are gitignored; regen via `expo prebuild`
@@ -53,7 +53,7 @@ Sprint 0.2 needs a shared visual foundation for desktop and marketing web, plus 
 - **`packages/editor-core`** — shared layout, presets, gradients, annotations, blur algos (desktop + mobile) ; Vitest in-package
 - **`apps/mobile`** renderer : `@shopify/react-native-skia` ; state Zustand per module
 - Export : snapshot async, `expo-file-system/legacy` for file write, `expo-media-library` + native share sheet
-- Desktop imports `@snapglow/editor-core` via thin re-exports in `apps/desktop/src/modules/editor/engine/`
+- Desktop imports `@xcreener/editor-core` via thin re-exports in `apps/desktop/src/modules/editor/engine/`
 
 ### Git hooks
 

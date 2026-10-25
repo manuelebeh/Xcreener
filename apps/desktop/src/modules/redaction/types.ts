@@ -1,4 +1,4 @@
-import type { DetectionKind, SensitiveRegion } from '@snapglow/redaction-core';
+import type { DetectionKind, SensitiveRegion } from '@xcreener/redaction-core';
 import type { BlurMode } from '@/modules/editor/annotations/types';
 
 export type RedactionStatus = 'idle' | 'scanning' | 'ready' | 'error';

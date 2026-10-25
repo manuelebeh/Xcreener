@@ -1,31 +1,31 @@
 ---
 title: Send captures to Jira
 category: Integrations
-description: Connect Jira Cloud and attach beautified screenshots to issues from SnapGlow desktop.
+description: Connect Jira Cloud and attach beautified screenshots to issues from Xcreener desktop.
 order: 1
 ---
 
-Attach SnapGlow exports directly to **Jira Cloud** issues without leaving the editor.
+Attach Xcreener exports directly to **Jira Cloud** issues without leaving the editor.
 
 ## Requirements
 
-- SnapGlow desktop signed in to cloud
+- Xcreener desktop signed in to cloud
 - **Team Pro** workspace (enterprise integration)
-- Jira Cloud site with OAuth app configured on the SnapGlow API
+- Jira Cloud site with OAuth app configured on the Xcreener API
 
 ## Connect Jira
 
 1. Open **Settings → Integrations**.
 2. Click **Connect** next to Jira.
 3. Complete Atlassian OAuth in your browser.
-4. Return to SnapGlow — the connection shows your site name.
+4. Return to Xcreener — the connection shows your site name.
 
 ## Send an export
 
 1. Beautify your capture in the editor.
 2. In the export bar, choose **Send to → Jira**.
 3. Pick an issue and optional comment.
-4. SnapGlow uploads the image as an attachment and adds a comment with a link when supported.
+4. Xcreener uploads the image as an attachment and adds a comment with a link when supported.
 
 ## Troubleshooting
 

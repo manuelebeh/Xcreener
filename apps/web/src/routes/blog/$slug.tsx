@@ -17,7 +17,7 @@ export const Route = createFileRoute('/blog/$slug')({
 
     return {
       meta: [
-        { title: `${post?.title ?? 'Article'} — SnapGlow Blog` },
+        { title: `${post?.title ?? 'Article'} — Xcreener Blog` },
         { name: 'description', content: post?.description ?? '' },
         ...alternates.map((alt) => ({
           tag: 'link',

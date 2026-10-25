@@ -1,4 +1,4 @@
-import type { BrandKitConfig } from '@snapglow/team-core';
+import type { BrandKitConfig } from '@xcreener/team-core';
 import { getSetting, setSetting } from '@/db';
 import { SETTING_KEYS } from '@/shared/types/settings';
 

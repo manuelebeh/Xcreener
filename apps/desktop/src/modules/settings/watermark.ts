@@ -1,7 +1,7 @@
-import { DEFAULT_WATERMARK, type WatermarkConfig } from '@snapglow/editor-core';
-import type { BrandKitConfig } from '@snapglow/team-core';
-import { isPaidPlan } from '@snapglow/team-core';
 import { convertFileSrc } from '@tauri-apps/api/core';
+import { DEFAULT_WATERMARK, type WatermarkConfig } from '@xcreener/editor-core';
+import type { BrandKitConfig } from '@xcreener/team-core';
+import { isPaidPlan } from '@xcreener/team-core';
 import { hasPremiumAccess } from '@/modules/licensing/premiumAccess';
 import { useSettingsStore } from '@/modules/settings/store';
 import { useTeamStore } from '@/modules/team/store';
@@ -21,7 +21,7 @@ export function watermarkFromSettings(
   premium = hasPremiumAccess()
 ): WatermarkConfig {
   // Every export goes through here, so this is where the free plan is enforced: the
-  // SnapGlow badge whatever the saved settings say. Only the corner is the user's choice.
+  // Xcreener badge whatever the saved settings say. Only the corner is the user's choice.
   if (!premium) {
     return { ...DEFAULT_WATERMARK, position: settings.watermarkPosition };
   }

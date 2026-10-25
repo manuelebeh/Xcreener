@@ -18,11 +18,11 @@ use crate::secure_store;
 
 // Same values as the WebView's VITE_AUTH0_*, baked in by build.rs so the WebView cannot
 // point the token requests at another host.
-const DOMAIN: Option<&str> = option_env!("SNAPGLOW_AUTH0_DOMAIN");
-const CLIENT_ID: Option<&str> = option_env!("SNAPGLOW_AUTH0_CLIENT_ID");
-const AUDIENCE: Option<&str> = option_env!("SNAPGLOW_AUTH0_AUDIENCE");
+const DOMAIN: Option<&str> = option_env!("XCREENER_AUTH0_DOMAIN");
+const CLIENT_ID: Option<&str> = option_env!("XCREENER_AUTH0_CLIENT_ID");
+const AUDIENCE: Option<&str> = option_env!("XCREENER_AUTH0_AUDIENCE");
 
-const REDIRECT_URI: &str = "snapglow://auth/callback";
+const REDIRECT_URI: &str = "xcreener://auth/callback";
 const SECRET_NAME: &str = "cloud.tokens";
 /// Refresh this long before expiry so the token is still valid when the WebView uses it.
 const REFRESH_MARGIN_MS: i64 = 30_000;
@@ -391,21 +391,21 @@ mod tests {
 
     #[test]
     fn callback_requires_the_pending_state() {
-        let url = "snapglow://auth/callback?code=abc&state=s1";
+        let url = "xcreener://auth/callback?code=abc&state=s1";
         assert_eq!(callback_code(url, Some(&pending("s1"))).unwrap(), "abc");
         assert!(callback_code(url, Some(&pending("other"))).is_err());
         assert!(callback_code(url, None).is_err());
-        assert!(callback_code("snapglow://auth/callback?state=s1", Some(&pending("s1"))).is_err());
+        assert!(callback_code("xcreener://auth/callback?state=s1", Some(&pending("s1"))).is_err());
     }
 
     #[test]
     fn callback_surfaces_the_auth0_error() {
-        let url = "snapglow://auth/callback?error=access_denied&error_description=Nope";
+        let url = "xcreener://auth/callback?error=access_denied&error_description=Nope";
         assert_eq!(
             callback_code(url, Some(&pending("s1"))).unwrap_err(),
             "Nope"
         );
-        let bare = "snapglow://auth/callback?error=access_denied";
+        let bare = "xcreener://auth/callback?error=access_denied";
         assert_eq!(callback_code(bare, None).unwrap_err(), "access_denied");
     }
 

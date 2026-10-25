@@ -5,5 +5,5 @@ const config = configFromEnv();
 const host = process.env.NOTION_EMBED_HOST ?? '127.0.0.1';
 
 createNotionEmbedServer(config).listen(config.port, host, () => {
-  console.log(`SnapGlow Notion embed tool: http://${host}:${config.port}`);
+  console.log(`Xcreener Notion embed tool: http://${host}:${config.port}`);
 });

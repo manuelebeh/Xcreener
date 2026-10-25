@@ -1,4 +1,4 @@
-import type { CollectionResponse, CreateCollectionResponse } from '@snapglow/cloud-core';
+import type { CollectionResponse, CreateCollectionResponse } from '@xcreener/cloud-core';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

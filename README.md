@@ -1,4 +1,4 @@
-# SnapGlow
+# Xcreener
 
 Privacy-first screenshot app: capture, beautify, share. Everything runs on your machine. Cloud links exist, but only when you ask for one.
 
@@ -78,4 +78,4 @@ Code meant to be embedded in other projects is [MIT](packages/sdk/LICENSE). Each
 - `apps/vscode-extension`, `apps/figma-plugin`, `apps/notion-embed`
 - `packages/biome-config`, `packages/typescript-config`
 
-The SnapGlow name and logo are not covered by these licenses: see [TRADEMARKS.md](TRADEMARKS.md). Contributions require the [CLA](CLA.md), see [CONTRIBUTING.md](CONTRIBUTING.md).
+The Xcreener name and logo are not covered by these licenses: see [TRADEMARKS.md](TRADEMARKS.md). Contributions require the [CLA](CLA.md), see [CONTRIBUTING.md](CONTRIBUTING.md).

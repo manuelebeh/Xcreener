@@ -1,5 +1,5 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
-import { useTheme } from '@snapglow/ui-native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
+import { useTheme } from '@xcreener/ui-native';
 import { useEffect, useState } from 'react';
 import { Modal, StyleSheet, Text, TextInput, View } from 'react-native';
 

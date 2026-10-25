@@ -2,13 +2,13 @@
 
 Adapted from the Apache Software Foundation Individual Contributor License Agreement v2.2.
 
-This agreement is between you and Emmanuel Ebeh, the maintainer of SnapGlow ("the Maintainer"). It applies to every Contribution you submit to the SnapGlow repository. You keep the copyright on your Contributions; this agreement only grants the licenses below.
+This agreement is between you and Emmanuel Ebeh, the maintainer of Xcreener ("the Maintainer"). It applies to every Contribution you submit to the Xcreener repository. You keep the copyright on your Contributions; this agreement only grants the licenses below.
 
 ## 1. Definitions
 
 "You" means the copyright owner, or the legal entity authorized by the copyright owner, that signs this agreement.
 
-"Contribution" means any original work of authorship, including modifications or additions to existing work, that you intentionally submit to the Maintainer for inclusion in SnapGlow, through a pull request, an issue, a patch or any other channel.
+"Contribution" means any original work of authorship, including modifications or additions to existing work, that you intentionally submit to the Maintainer for inclusion in Xcreener, through a pull request, an issue, a patch or any other channel.
 
 ## 2. Copyright license
 

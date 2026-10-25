@@ -1,4 +1,4 @@
-import { participantColor } from '@snapglow/collab-core';
+import { participantColor } from '@xcreener/collab-core';
 import { useCollabStore } from '../store';
 
 interface RemoteCursorsOverlayProps {

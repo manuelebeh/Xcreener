@@ -1,6 +1,6 @@
-import { isApiKeyPlaintext } from '@snapglow/api-core';
-import { hashApiKey } from '@snapglow/api-core/api-keys';
-import { hasApiAccess } from '@snapglow/team-core';
+import { isApiKeyPlaintext } from '@xcreener/api-core';
+import { hashApiKey } from '@xcreener/api-core/api-keys';
+import { hasApiAccess } from '@xcreener/team-core';
 import { and, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyReply, FastifyRequest } from 'fastify';

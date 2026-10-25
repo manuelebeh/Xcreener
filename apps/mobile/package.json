@@ -1,5 +1,5 @@
 {
-  "name": "@snapglow/mobile",
+  "name": "@xcreener/mobile",
   "main": "expo-router/entry",
   "version": "0.1.0",
   "license": "AGPL-3.0-only",
@@ -16,12 +16,12 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.2.0",
     "@shopify/react-native-skia": "2.6.2",
-    "@snapglow/design-tokens": "workspace:*",
-    "@snapglow/editor-core": "workspace:*",
-    "@snapglow/i18n": "workspace:*",
-    "@snapglow/redaction-core": "workspace:*",
-    "@snapglow/team-core": "workspace:*",
-    "@snapglow/ui-native": "workspace:*",
+    "@xcreener/design-tokens": "workspace:*",
+    "@xcreener/editor-core": "workspace:*",
+    "@xcreener/i18n": "workspace:*",
+    "@xcreener/redaction-core": "workspace:*",
+    "@xcreener/team-core": "workspace:*",
+    "@xcreener/ui-native": "workspace:*",
     "expo": "~56.0.12",
     "expo-constants": "~56.0.18",
     "expo-crypto": "~56.0.5",
@@ -44,12 +44,12 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
     "react-native-worklets": "0.8.3",
-    "snapglow-ocr": "file:./modules/snapglow-ocr",
+    "xcreener-ocr": "file:./modules/xcreener-ocr",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "@types/react": "~19.2.2",
     "typescript": "~6.0.3"
   }

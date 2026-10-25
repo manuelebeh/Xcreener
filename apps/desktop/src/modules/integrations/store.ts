@@ -1,5 +1,5 @@
-import type { IntegrationProvider } from '@snapglow/integrations-core';
-import { INTEGRATION_LABELS, INTEGRATION_PROVIDERS } from '@snapglow/integrations-core';
+import type { IntegrationProvider } from '@xcreener/integrations-core';
+import { INTEGRATION_LABELS, INTEGRATION_PROVIDERS } from '@xcreener/integrations-core';
 import { create } from 'zustand';
 import { isCloudConfigured } from '@/modules/cloud/config';
 import { handleIntegrationCallback, refreshIntegrationToken, startIntegrationLogin } from './auth';

@@ -1,4 +1,3 @@
-import { resolveLocale, SnapGlowI18nProvider } from '@snapglow/i18n';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
 import {
@@ -8,6 +7,7 @@ import {
   useSearch,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { resolveLocale, XcreenerI18nProvider } from '@xcreener/i18n';
 import { ConsentBanner } from '../integrations/posthog/ConsentBanner';
 import PostHogProvider from '../integrations/posthog/provider';
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
@@ -28,7 +28,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'SnapGlow - Screenshots that shine',
+        title: 'Xcreener - Screenshots that shine',
       },
     ],
     links: [
@@ -51,7 +51,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <SnapGlowI18nProvider locale={locale}>
+        <XcreenerI18nProvider locale={locale}>
           <PostHogProvider>
             {children}
             <ConsentBanner />
@@ -70,7 +70,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               />
             ) : null}
           </PostHogProvider>
-        </SnapGlowI18nProvider>
+        </XcreenerI18nProvider>
         <Scripts />
       </body>
     </html>

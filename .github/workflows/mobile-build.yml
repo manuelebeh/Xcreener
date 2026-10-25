@@ -44,7 +44,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build design tokens
-        run: pnpm --filter @snapglow/design-tokens build
+        run: pnpm --filter @xcreener/design-tokens build
 
       - name: EAS Build
         working-directory: apps/mobile

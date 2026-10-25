@@ -2,7 +2,7 @@
 # Each entry needs a reason and is revisited when the upstream crate ships a fix.
 [advisories]
 ignore = [
-  # openh264-sys2 0.6: heap overflow in the H.264 *decoder*. SnapGlow only encodes. Fixed in 0.8 (major bump of `openh264`).
+  # openh264-sys2 0.6: heap overflow in the H.264 *decoder*. Xcreener only encodes. Fixed in 0.8 (major bump of `openh264`).
   "RUSTSEC-2025-0008",
   # quick-xml 0.39 via plist <- tauri: parses the app's own Info.plist, not untrusted XML. Waiting on tauri/plist.
   # quick-xml 0.30 is not in the macOS/Windows normal dependency tree.

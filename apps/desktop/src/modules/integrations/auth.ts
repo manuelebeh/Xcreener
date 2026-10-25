@@ -1,9 +1,9 @@
+import { openUrl } from '@tauri-apps/plugin-opener';
 import {
   INTEGRATION_LABELS,
   type IntegrationProvider,
   type RefreshIntegrationTokenResponse,
-} from '@snapglow/integrations-core';
-import { openUrl } from '@tauri-apps/plugin-opener';
+} from '@xcreener/integrations-core';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { getApiUrl } from '@/modules/cloud/config';
 import { deepLinkRoute } from '@/shared/lib/deepLink';
@@ -28,7 +28,7 @@ export async function startIntegrationLogin(provider: IntegrationProvider): Prom
 
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
-    throw new Error('Sign in to SnapGlow cloud before connecting integrations');
+    throw new Error('Sign in to Xcreener cloud before connecting integrations');
   }
 
   const response = await fetch(`${getApiUrl()}/v1/integrations/${provider}/authorize`, {
@@ -78,7 +78,7 @@ export async function handleIntegrationCallback(
 
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
-    throw new Error('Sign in to SnapGlow cloud before connecting integrations');
+    throw new Error('Sign in to Xcreener cloud before connecting integrations');
   }
 
   const response = await fetch(`${getApiUrl()}/v1/integrations/${provider}/token`, {

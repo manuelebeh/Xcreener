@@ -11,7 +11,7 @@ Collaboration requires a **paid team workspace** (Team Starter or Team Pro).
 
 ## Start a session
 
-From the editor, open **Collaboration → Start collaboration**. SnapGlow uploads the current capture and opens a WebSocket session.
+From the editor, open **Collaboration → Start collaboration**. Xcreener uploads the current capture and opens a WebSocket session.
 
 ## Web link
 

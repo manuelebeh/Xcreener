@@ -1,5 +1,5 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
-import { Button, useTheme } from '@snapglow/ui-native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
+import { Button, useTheme } from '@xcreener/ui-native';
 import { useCallback, useRef, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
@@ -87,7 +87,7 @@ export function ExportBar({ canvasRef }: ExportBarProps) {
       </View>
       {status ? <Text style={{ color: colors.muted, fontSize: 13 }}>{status}</Text> : null}
       {exportInput?.watermark ? (
-        <Text style={{ color: colors.muted, fontSize: 13 }}>Free plan: SnapGlow watermark</Text>
+        <Text style={{ color: colors.muted, fontSize: 13 }}>Free plan: Xcreener watermark</Text>
       ) : null}
     </View>
   );

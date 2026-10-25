@@ -29,7 +29,7 @@ Authorization: Bearer sg_live_...
 
 ## SDK
 
-Install `@snapglow/sdk` for TypeScript clients. OpenAPI docs live at `/docs` on the API host.
+Install `@xcreener/sdk` for TypeScript clients. OpenAPI docs live at `/docs` on the API host.
 
 ## Revoke
 

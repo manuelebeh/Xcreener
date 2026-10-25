@@ -1,5 +1,5 @@
 name: Feature Request
-description: Propose a new feature or improvement for SnapGlow
+description: Propose a new feature or improvement for Xcreener
 title: "[Feature] "
 labels: ["enhancement", "triage"]
 body:
@@ -43,7 +43,7 @@ body:
     id: architecture
     attributes:
       label: Architecture Alignment
-      description: Confirm where this fits in the current SnapGlow monorepo.
+      description: Confirm where this fits in the current Xcreener monorepo.
       options:
         - label: Desktop changes will live under `apps/desktop/src/modules/<name>/` (or `shared/`, `db/`, `tauri/`).
         - label: New Rust logic will go in `src-tauri/src/commands/` with TS wrappers in `src/tauri/commands.ts`.

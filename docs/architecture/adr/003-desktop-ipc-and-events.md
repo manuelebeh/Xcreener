@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). **Sprint 1.6** adds capture history (frontend `db/captures.ts` + filesystem, no Rust IPC) and debug-only E2E hooks in `test_support.rs`. **Sprint 2b.1** adds `classify_content_command`. **Sprint 2b.2** adds OCR copy-text, auto-crop, and smart export compression IPC. **Sprint 2b.3** adds live capture flows (delay, menu, scroll) — see [ADR-007](./007-live-capture-flows.md). See also [ADR-006](./006-native-capture-overlay.md).
+Xcreener desktop splits UI (React) from platform integration (Rust/Tauri). Phase 0 scaffolds capture/export commands as stubs while real settings persistence lives in the frontend SQL layer. **Sprint 1.1** implements native capture (overlay, preview snapshot, editor handoff). **Sprint 1.2** implements beautification in the editor module (Canvas 2D engine, no new IPC). **Sprint 1.5** adds `detect_sensitive_data` (OCR + regex redaction) and frontend-only file export (dialog + fs + clipboard). **Sprint 1.6** adds capture history (frontend `db/captures.ts` + filesystem, no Rust IPC) and debug-only E2E hooks in `test_support.rs`. **Sprint 2b.1** adds `classify_content_command`. **Sprint 2b.2** adds OCR copy-text, auto-crop, and smart export compression IPC. **Sprint 2b.3** adds live capture flows (delay, menu, scroll) — see [ADR-007](./007-live-capture-flows.md). See also [ADR-006](./006-native-capture-overlay.md).
 
 ## Decision
 
@@ -74,7 +74,7 @@ Listeners use `apps/desktop/src/tauri/events.ts` → `onAppEvent`.
 
 **Phase 0:** SQLite via `@tauri-apps/plugin-sql` in `apps/desktop/src/db/`. Migrations in `migrations/001_init.sql`; `migrate.ts` applies statements one-by-one (`sql:allow-execute`). Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is required (e.g. autostart read at boot without webview).
 
-**2026-10 (audit FINDING-011):** the SQL plugin is gone. Rust opens `snapglow.db` with rusqlite (`src-tauri/src/db/`), applies the same `migrations/*.sql` in `db_init`, and exposes one typed command per query. `src/db/*.ts` keep their API and call those commands, so the WebView can no longer run arbitrary SQL.
+**2026-10 (audit FINDING-011):** the SQL plugin is gone. Rust opens `xcreener.db` with rusqlite (`src-tauri/src/db/`), applies the same `migrations/*.sql` in `db_init`, and exposes one typed command per query. `src/db/*.ts` keep their API and call those commands, so the WebView can no longer run arbitrary SQL.
 
 ### Capture history (Sprint 1.6)
 

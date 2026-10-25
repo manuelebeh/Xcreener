@@ -23,7 +23,7 @@ import {
   type ScreenshotTransform,
   type ShadowConfig,
   type ToolDefaults,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 import { create } from 'zustand';
 
 export interface EditorScreenshot {

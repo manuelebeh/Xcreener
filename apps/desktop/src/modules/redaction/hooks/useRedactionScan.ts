@@ -1,4 +1,4 @@
-import type { DetectionKind } from '@snapglow/redaction-core';
+import type { DetectionKind } from '@xcreener/redaction-core';
 import { useCallback } from 'react';
 import { captureRedactionTriggered } from '@/integrations/posthog/events';
 import type { BlurAnnotation } from '@/modules/editor/annotations/types';

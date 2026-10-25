@@ -58,7 +58,7 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
     )?;
     let reopen_item = MenuItem::with_id(app, "reopen", "Reopen Last Capture", true, None::<&str>)?;
     let history_item = MenuItem::with_id(app, "history", "History", true, None::<&str>)?;
-    let open_item = MenuItem::with_id(app, "open", "Open SnapGlow", true, None::<&str>)?;
+    let open_item = MenuItem::with_id(app, "open", "Open Xcreener", true, None::<&str>)?;
     let settings_item = MenuItem::with_id(
         app,
         "settings",
@@ -66,7 +66,7 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
         true,
         Some("CmdOrControl+Comma"),
     )?;
-    let quit_item = MenuItem::with_id(app, "quit", "Quit SnapGlow", true, Some("CmdOrControl+Q"))?;
+    let quit_item = MenuItem::with_id(app, "quit", "Quit Xcreener", true, Some("CmdOrControl+Q"))?;
     let menu = Menu::with_items(
         app,
         &[
@@ -95,7 +95,7 @@ pub fn setup_tray(app: &AppHandle) -> tauri::Result<()> {
                 let app = app.clone();
                 std::thread::spawn(move || {
                     if let Err(error) = overlay::open_capture_overlay(&app) {
-                        eprintln!("[SnapGlow] failed to open capture overlay: {error}");
+                        eprintln!("[Xcreener] failed to open capture overlay: {error}");
                     }
                 });
             }

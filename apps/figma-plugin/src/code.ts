@@ -1,7 +1,7 @@
 // Main thread: Figma document access only. Network calls live in the UI iframe,
 // because this sandbox has no Blob, FormData, Headers or URLSearchParams.
 
-const CONFIG_KEY = 'snapglow-config';
+const CONFIG_KEY = 'xcreener-config';
 
 figma.showUI(__html__, { width: 360, height: 520, themeColors: true });
 
@@ -55,7 +55,7 @@ function placeImage(payload: { bytes: Uint8Array; width: number; height: number 
   const node = figma.createRectangle();
   node.resize(payload.width, payload.height);
   node.fills = [{ type: 'IMAGE', scaleMode: 'FIT', imageHash: image.hash }];
-  node.name = 'SnapGlow capture';
+  node.name = 'Xcreener capture';
   figma.currentPage.appendChild(node);
   figma.viewport.scrollAndZoomIntoView([node]);
   figma.ui.postMessage({ type: 'image-placed' });

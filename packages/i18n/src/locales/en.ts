@@ -1,5 +1,5 @@
 export const commonEn = {
-  appName: 'SnapGlow',
+  appName: 'Xcreener',
   loading: 'Loading…',
   save: 'Save',
   cancel: 'Cancel',

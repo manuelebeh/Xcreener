@@ -1,6 +1,6 @@
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 
-const SCRYPT_SALT = 'snapglow-api-key-v1';
+const SCRYPT_SALT = 'xcreener-api-key-v1';
 
 export function hashApiKey(plaintext: string): string {
   return scryptSync(plaintext, SCRYPT_SALT, 64).toString('hex');

@@ -1,5 +1,5 @@
 export const commonDe = {
-  appName: 'SnapGlow',
+  appName: 'Xcreener',
   loading: 'Wird geladen…',
   save: 'Speichern',
   cancel: 'Abbrechen',

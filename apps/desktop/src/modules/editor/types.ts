@@ -1,7 +1,7 @@
 import type {
   BackgroundConfig as CoreBackgroundConfig,
   RenderInput as CoreRenderInput,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 
 export type {
   Annotation,
@@ -27,7 +27,7 @@ export type {
   ShadowConfig,
   TextAnnotation,
   ToolDefaults,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 
 export {
   DEFAULT_BORDER_RADIUS,
@@ -35,7 +35,7 @@ export {
   DEFAULT_TOOL_DEFAULTS,
   DEFAULT_TRANSFORM,
   HISTORY_MAX,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 
 /** Desktop background may hold an ImageBitmap for custom image uploads. */
 export type BackgroundConfig =
@@ -44,7 +44,7 @@ export type BackgroundConfig =
 
 export const DEFAULT_BACKGROUND: BackgroundConfig = {
   type: 'gradient',
-  presetId: 'snapglow-brand',
+  presetId: 'xcreener-brand',
 };
 
 export interface RenderInput extends Omit<CoreRenderInput, 'background' | 'screenshot'> {

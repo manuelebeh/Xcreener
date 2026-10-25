@@ -1,4 +1,4 @@
-import { Button } from '@snapglow/ui';
+import { Button } from '@xcreener/ui';
 import { useEffect, useState } from 'react';
 import { fetchNotifications, markAllNotificationsRead, markNotificationRead } from '../api';
 import { unreadNotificationCount, useCollabStore } from '../store';

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AUTO_REDACTION_KEY = 'snapglow:autoRedaction';
+const AUTO_REDACTION_KEY = 'xcreener:autoRedaction';
 
 export async function getAutoRedactionEnabled(): Promise<boolean> {
   const value = await AsyncStorage.getItem(AUTO_REDACTION_KEY);

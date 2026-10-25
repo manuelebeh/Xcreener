@@ -4,9 +4,9 @@ import UIKit
 
 private let maxOcrDimension: CGFloat = 2048
 
-public class SnapglowOcrModule: Module {
+public class XcreenerOcrModule: Module {
   public func definition() -> ModuleDefinition {
-    Name("SnapglowOcr")
+    Name("XcreenerOcr")
 
     AsyncFunction("recognizeText") { (imageUri: String) -> [[String: Any]] in
       try self.recognize(imageUri: imageUri)

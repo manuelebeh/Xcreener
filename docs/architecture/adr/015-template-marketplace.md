@@ -12,7 +12,7 @@ Phase 4 requires a community marketplace for beautification templates. Users sho
 
 ### Shared types
 
-- **`@snapglow/marketplace-core`** — `TemplateStyle` (subset of `CollabDocumentState`), Zod validation, DTOs
+- **`@xcreener/marketplace-core`** — `TemplateStyle` (subset of `CollabDocumentState`), Zod validation, DTOs
 - Install flow converts `TemplateStyle` → desktop SQLite `custom_presets`
 
 ### API
@@ -20,7 +20,7 @@ Phase 4 requires a community marketplace for beautification templates. Users sho
 - Postgres `template_listings` table (single table; status field for moderation)
 - Public read: `GET /v1/templates`, `GET /v1/templates/:slug`
 - Auth submit: `POST /v1/templates`
-- Admin moderate: `PATCH /v1/templates/:id/moderate` (workspace admin on SnapGlow internal workspace or env `MARKETPLACE_MODERATOR_SUBS`)
+- Admin moderate: `PATCH /v1/templates/:id/moderate` (workspace admin on Xcreener internal workspace or env `MARKETPLACE_MODERATOR_SUBS`)
 
 ### Web & desktop
 

@@ -1,4 +1,4 @@
-import { getTheme, type NativeTheme } from '@snapglow/design-tokens/tokens.native';
+import { getTheme, type NativeTheme } from '@xcreener/design-tokens/tokens.native';
 import { createContext, type ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 import { useColorScheme as useSystemColorScheme } from 'react-native';
 

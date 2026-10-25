@@ -9,7 +9,7 @@ vi.mock('@/modules/cloud/auth', () => ({ getValidAccessToken: async () => 'cloud
 vi.mock('@/modules/cloud/config', () => ({ getApiUrl: () => 'https://api.test' }));
 vi.mock('./config', () => ({
   isIntegrationsConfigured: () => true,
-  getIntegrationsRedirectUri: () => 'snapglow://integrations/callback',
+  getIntegrationsRedirectUri: () => 'xcreener://integrations/callback',
 }));
 vi.mock('./tokenStorage', () => ({ saveIntegrationToken, clearIntegrationToken }));
 
@@ -53,7 +53,7 @@ describe('integration OAuth flow', () => {
     expect(openUrl).toHaveBeenCalledOnce();
 
     const stored = await handleIntegrationCallback(
-      `snapglow://integrations/callback?code=abc&state=${SERVER_STATE}`
+      `xcreener://integrations/callback?code=abc&state=${SERVER_STATE}`
     );
 
     expect(stored?.accessToken).toBe('slack-token');
@@ -65,7 +65,7 @@ describe('integration OAuth flow', () => {
     await startIntegrationLogin('slack');
 
     await expect(
-      handleIntegrationCallback('snapglow://integrations/callback?code=abc&state=attacker')
+      handleIntegrationCallback('xcreener://integrations/callback?code=abc&state=attacker')
     ).rejects.toThrow('Invalid integration callback');
     expect(saveIntegrationToken).not.toHaveBeenCalled();
   });

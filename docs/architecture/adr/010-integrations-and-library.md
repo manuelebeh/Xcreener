@@ -6,16 +6,16 @@
 
 ## Context
 
-Sprint 2b.5 delivered Auth0 cloud sharing. Sprint 2b.6 adds third-party send targets (Slack, Notion, Linear, GitHub), a searchable local/cloud library, tags/collections, and export watermarks — while keeping SnapGlow privacy-first and local-first.
+Sprint 2b.5 delivered Auth0 cloud sharing. Sprint 2b.6 adds third-party send targets (Slack, Notion, Linear, GitHub), a searchable local/cloud library, tags/collections, and export watermarks — while keeping Xcreener privacy-first and local-first.
 
 ## Decision
 
 ### Integrations framework
 
-- **`@snapglow/integrations-core`** — provider ids, scopes, shared send types
+- **`@xcreener/integrations-core`** — provider ids, scopes, shared send types
 - **API OAuth proxy** — `GET/POST /v1/integrations/:provider/*` exchanges codes using server secrets; desktop stores tokens in SQLite (`integrationTokens`)
 - **Desktop `modules/integrations/`** — Settings connect/disconnect, ExportBar **Send to…** with consent dialog, direct provider API calls with local tokens
-- Deep link: `snapglow://integrations/callback`
+- Deep link: `xcreener://integrations/callback`
 
 ### Hybrid library (CL-012)
 
@@ -30,7 +30,7 @@ Sprint 2b.5 delivered Auth0 cloud sharing. Sprint 2b.6 adds third-party send tar
 
 ### Watermark (CL-011)
 
-- `WatermarkConfig` in `@snapglow/editor-core`, rendered last in `renderFrame` via `drawWatermark.ts`
+- `WatermarkConfig` in `@xcreener/editor-core`, rendered last in `renderFrame` via `drawWatermark.ts`
 - Settings persistence in SQLite; included in export, share upload, and integration sends
 - Billing gating stubbed (`watermarkEnabled` toggle only)
 

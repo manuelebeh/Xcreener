@@ -1,5 +1,5 @@
-# Production image for the SnapGlow API. Build from the repository root:
-#   docker build -f apps/api/Dockerfile -t snapglow-api .
+# Production image for the Xcreener API. Build from the repository root:
+#   docker build -f apps/api/Dockerfile -t xcreener-api .
 # Configuration comes from the environment (see apps/api/.env.example); migrations run at boot.
 
 FROM node:24-slim AS build
@@ -7,9 +7,9 @@ RUN npm install -g pnpm@9.15.9
 WORKDIR /repo
 COPY . .
 # Scripts are skipped: the root postinstall builds design tokens, which the API does not use.
-RUN pnpm install --frozen-lockfile --ignore-scripts --filter @snapglow/api...
-RUN pnpm --filter @snapglow/api build
-RUN pnpm --filter @snapglow/api deploy --prod --ignore-scripts /out
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter @xcreener/api...
+RUN pnpm --filter @xcreener/api build
+RUN pnpm --filter @xcreener/api deploy --prod --ignore-scripts /out
 
 # glibc (slim, not alpine) for the @napi-rs/canvas prebuilt binary.
 FROM node:24-slim

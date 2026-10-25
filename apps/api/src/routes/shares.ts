@@ -7,7 +7,7 @@ import {
   maxBytesForMime,
   type PublicShareResponse,
   type ShareMimeType,
-} from '@snapglow/cloud-core';
+} from '@xcreener/cloud-core';
 import { and, eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

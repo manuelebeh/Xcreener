@@ -1,4 +1,4 @@
--- SnapGlow local schema (Technical Stack §6.1)
+-- Xcreener local schema (Technical Stack §6.1)
 
 CREATE TABLE IF NOT EXISTS captures (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,

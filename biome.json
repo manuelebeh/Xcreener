@@ -1,5 +1,5 @@
 {
-  "extends": ["@snapglow/biome-config/biome.json"],
+  "extends": ["@xcreener/biome-config/biome.json"],
   "files": {
     "includes": [
       "**/*.ts",

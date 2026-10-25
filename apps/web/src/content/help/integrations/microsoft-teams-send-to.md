@@ -1,7 +1,7 @@
 ---
 title: Send captures to Microsoft Teams
 category: Integrations
-description: Post beautified screenshots to Teams channels from SnapGlow desktop.
+description: Post beautified screenshots to Teams channels from Xcreener desktop.
 order: 3
 ---
 
@@ -9,7 +9,7 @@ Share exports to **Microsoft Teams** channels for async design reviews and suppo
 
 ## Requirements
 
-- SnapGlow desktop + cloud sign-in
+- Xcreener desktop + cloud sign-in
 - **Team Pro** workspace
 - Microsoft Entra app with `ChannelMessage.Send` and `Channel.ReadBasic.All` scopes
 
@@ -24,9 +24,9 @@ Share exports to **Microsoft Teams** channels for async design reviews and suppo
 1. Export or beautify your capture.
 2. Choose **Send to → Microsoft Teams**.
 3. Pick a channel and optional message.
-4. SnapGlow posts the image to the channel feed.
+4. Xcreener posts the image to the channel feed.
 
 ## Troubleshooting
 
 - **No channels** — the signed-in user must be a member of the team.
-- **403 on send** — verify admin consent for the SnapGlow Entra application.
+- **403 on send** — verify admin consent for the Xcreener Entra application.

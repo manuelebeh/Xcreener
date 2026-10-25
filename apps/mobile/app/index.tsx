@@ -1,5 +1,5 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
-import { Button, useTheme } from '@snapglow/ui-native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
+import { Button, useTheme } from '@xcreener/ui-native';
 import { StatusBar } from 'expo-status-bar';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,7 +21,7 @@ export default function HomeScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       <StatusBar style={resolvedTheme === 'dark' ? 'light' : 'dark'} />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.title, { color: colors.foreground }]}>SnapGlow</Text>
+        <Text style={[styles.title, { color: colors.foreground }]}>Xcreener</Text>
         <Text style={[styles.subtitle, { color: colors.muted }]}>
           Share a screenshot from Photos or any app to import it here.
         </Text>

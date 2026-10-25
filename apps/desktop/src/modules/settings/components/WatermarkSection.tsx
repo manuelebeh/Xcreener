@@ -1,5 +1,5 @@
-import { Button, Input, Select, Slider } from '@snapglow/ui';
 import { open } from '@tauri-apps/plugin-dialog';
+import { Button, Input, Select, Slider } from '@xcreener/ui';
 import { setSetting } from '@/db';
 import { usePremiumAccess } from '@/modules/licensing/premiumAccess';
 import { SettingsGroup, SettingsRow, SettingsToggle } from '@/shared/components/SettingsGroup';
@@ -19,7 +19,7 @@ export function WatermarkSection() {
   const setWatermarkLogoPath = useSettingsStore((s) => s.setWatermarkLogoPath);
   const setWatermarkPosition = useSettingsStore((s) => s.setWatermarkPosition);
   const setWatermarkOpacity = useSettingsStore((s) => s.setWatermarkOpacity);
-  // Free plans export the SnapGlow badge whatever is saved here (watermarkFromSettings);
+  // Free plans export the Xcreener badge whatever is saved here (watermarkFromSettings);
   // the controls are locked so the UI says the same thing.
   const premium = usePremiumAccess();
   const locked = !premium;
@@ -48,7 +48,7 @@ export function WatermarkSection() {
         label="Show watermark on exports"
         hint={
           locked
-            ? 'Free plans always show the SnapGlow watermark; you can pick its corner. Team Starter or Pro unlocks removal and customization (Team → Billing).'
+            ? 'Free plans always show the Xcreener watermark; you can pick its corner. Team Starter or Pro unlocks removal and customization (Team → Billing).'
             : undefined
         }
         checked={locked || watermarkEnabled}

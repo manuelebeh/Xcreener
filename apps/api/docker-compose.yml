@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: snapglow
-      POSTGRES_PASSWORD: snapglow
-      POSTGRES_DB: snapglow
+      POSTGRES_USER: xcreener
+      POSTGRES_PASSWORD: xcreener
+      POSTGRES_DB: xcreener
     ports:
       - '127.0.0.1:5432:5432'
     volumes:
-      - snapglow_pg:/var/lib/postgresql/data
+      - xcreener_pg:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U snapglow -d snapglow']
+      test: ['CMD-SHELL', 'pg_isready -U xcreener -d xcreener']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -35,7 +35,7 @@ services:
       - '127.0.0.1:9000:9000'
       - '127.0.0.1:9001:9001'
     volumes:
-      - snapglow_minio:/bitnami/minio/data
+      - xcreener_minio:/bitnami/minio/data
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
       interval: 5s
@@ -43,5 +43,5 @@ services:
       retries: 10
 
 volumes:
-  snapglow_pg:
-  snapglow_minio:
+  xcreener_pg:
+  xcreener_minio:

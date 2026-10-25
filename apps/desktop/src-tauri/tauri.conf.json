@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "SnapGlow",
+  "productName": "Xcreener",
   "version": "0.1.0",
-  "identifier": "app.snapglow.desktop",
+  "identifier": "app.xcreener.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -15,7 +15,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "SnapGlow",
+        "title": "Xcreener",
         "width": 1120,
         "height": 740,
         "minWidth": 900,
@@ -27,7 +27,7 @@
       },
       {
         "label": "capture-overlay",
-        "title": "SnapGlow Capture",
+        "title": "Xcreener Capture",
         "width": 800,
         "height": 600,
         "decorations": false,
@@ -62,7 +62,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/manuelebeh/ScreenCut/releases/latest/download/latest.json"
+        "https://github.com/manuelebeh/Xcreener/releases/latest/download/latest.json"
       ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IENCMjIzNUMwQjJBRUVDRjYKUldUMjdLNnl3RFVpeTZvc3lFRWo4ZXpRL080ZUlMZVFpaHgrTkcvWVlONXRWWUhvY2tpU1d3QTUK"
@@ -70,7 +70,7 @@
     "deep-link": {
       "desktop": {
         "schemes": [
-          "snapglow"
+          "xcreener"
         ]
       }
     }

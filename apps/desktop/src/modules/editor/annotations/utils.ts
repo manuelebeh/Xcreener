@@ -5,4 +5,4 @@ export {
   isAnnotationTooSmall,
   isDrawTool,
   normalizeRect,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';

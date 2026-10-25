@@ -9,20 +9,20 @@ import {
 
 describe('presetSchemas', () => {
   it('parses valid gradient background JSON', () => {
-    expect(parseStoredBackground('{"type":"gradient","presetId":"snapglow-brand"}')).toEqual({
+    expect(parseStoredBackground('{"type":"gradient","presetId":"xcreener-brand"}')).toEqual({
       type: 'gradient',
-      presetId: 'snapglow-brand',
+      presetId: 'xcreener-brand',
     });
   });
 
   it('falls back for invalid background JSON', () => {
     expect(parseStoredBackground('{"type":"image"}')).toEqual({
       type: 'gradient',
-      presetId: 'snapglow-brand',
+      presetId: 'xcreener-brand',
     });
     expect(parseStoredBackground('not-json')).toEqual({
       type: 'gradient',
-      presetId: 'snapglow-brand',
+      presetId: 'xcreener-brand',
     });
   });
 
@@ -67,7 +67,7 @@ describe('presetSchemas', () => {
       height: 1080,
       aspectRatio: '16:9',
       style: {
-        background: { type: 'gradient', presetId: 'snapglow-brand' },
+        background: { type: 'gradient', presetId: 'xcreener-brand' },
         padding: 40,
         borderRadius: 12,
         shadow: {

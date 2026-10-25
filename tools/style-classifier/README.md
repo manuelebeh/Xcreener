@@ -1,4 +1,4 @@
-# SnapGlow style classifier training
+# Xcreener style classifier training
 
 Offline tooling to fine-tune MobileNetV3-Small for screenshot content classification.
 

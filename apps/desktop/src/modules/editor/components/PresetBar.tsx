@@ -1,4 +1,4 @@
-import { Dropdown, Tooltip, TooltipProvider } from '@snapglow/ui';
+import { Dropdown, Tooltip, TooltipProvider } from '@xcreener/ui';
 import { clsx } from 'clsx';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import {

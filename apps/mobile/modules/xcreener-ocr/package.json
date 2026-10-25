@@ -1,11 +1,11 @@
 {
-  "name": "snapglow-ocr",
+  "name": "xcreener-ocr",
   "version": "0.1.0",
-  "description": "On-device OCR for SnapGlow redaction (Vision iOS, ML Kit Android)",
+  "description": "On-device OCR for Xcreener redaction (Vision iOS, ML Kit Android)",
   "main": "index.ts",
-  "author": "SnapGlow",
+  "author": "Xcreener",
   "license": "UNLICENSED",
-  "homepage": "https://github.com/snapglow/snapglow",
+  "homepage": "https://github.com/manuelebeh/Xcreener",
   "peerDependencies": {
     "expo": "*",
     "react": "*",

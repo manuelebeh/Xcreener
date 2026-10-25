@@ -1,5 +1,5 @@
-import { linesToPlainText } from '@snapglow/ocr-core';
 import { writeText } from '@tauri-apps/plugin-clipboard-manager';
+import { linesToPlainText } from '@xcreener/ocr-core';
 import { useCallback } from 'react';
 import { useTextExtractionStore } from '../store';
 

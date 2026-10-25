@@ -9,10 +9,10 @@ const REWARDFUL_PORTAL_URL =
 export const Route = createFileRoute('/affiliates')({
   head: () => ({
     meta: [
-      { title: 'Affiliate program — SnapGlow' },
+      { title: 'Affiliate program — Xcreener' },
       {
         name: 'description',
-        content: 'Earn 30% commission on first sales with the SnapGlow affiliate program.',
+        content: 'Earn 30% commission on first sales with the Xcreener affiliate program.',
       },
     ],
   }),
@@ -28,7 +28,7 @@ function AffiliatesPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex max-w-3xl items-center justify-between px-6 py-5">
         <Link to="/" className="text-lg font-semibold tracking-tight no-underline text-foreground">
-          SnapGlow
+          Xcreener
         </Link>
       </header>
 

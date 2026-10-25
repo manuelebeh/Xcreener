@@ -2,13 +2,13 @@
 
 ## Licensing
 
-SnapGlow uses two licenses. See [License](README.md#license) for which directories use which.
+Xcreener uses two licenses. See [License](README.md#license) for which directories use which.
 
-Before your first pull request is merged, you must sign the [Contributor License Agreement](CLA.md). It lets the maintainer keep publishing SnapGlow on app stores, whose terms conflict with the AGPL, and offer commercial licenses next to the AGPL. You keep the copyright on your work. To sign, comment on your pull request:
+Before your first pull request is merged, you must sign the [Contributor License Agreement](CLA.md). It lets the maintainer keep publishing Xcreener on app stores, whose terms conflict with the AGPL, and offer commercial licenses next to the AGPL. You keep the copyright on your work. To sign, comment on your pull request:
 
 > I have read the CLA Document and I hereby sign the CLA
 
-The SnapGlow name and logo are not covered by the code licenses: see [TRADEMARKS.md](TRADEMARKS.md).
+The Xcreener name and logo are not covered by the code licenses: see [TRADEMARKS.md](TRADEMARKS.md).
 
 ## Workflow
 

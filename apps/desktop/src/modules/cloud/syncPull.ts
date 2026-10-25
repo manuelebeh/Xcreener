@@ -5,7 +5,7 @@ import {
   type SyncLibraryItem,
   type SyncLibraryResponse,
   type UserSettingsResponse,
-} from '@snapglow/sync-core';
+} from '@xcreener/sync-core';
 import { setSetting } from '@/db';
 import { captureUidExists, getCapture, insertCapture, pruneCaptures } from '@/db/captures';
 import { writeCaptureFiles } from '@/modules/history/utils/captureFiles';

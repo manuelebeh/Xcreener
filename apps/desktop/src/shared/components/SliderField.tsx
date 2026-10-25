@@ -1,4 +1,4 @@
-import { Slider } from '@snapglow/ui';
+import { Slider } from '@xcreener/ui';
 
 interface SliderFieldProps {
   label: string;

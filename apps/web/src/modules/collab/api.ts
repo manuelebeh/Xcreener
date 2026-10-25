@@ -2,7 +2,7 @@ import type {
   CollabDocumentResponse,
   CommentResponse,
   NotificationResponse,
-} from '@snapglow/collab-core';
+} from '@xcreener/collab-core';
 import { getValidAccessToken } from './auth';
 
 function getApiUrl(): string {

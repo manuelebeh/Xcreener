@@ -65,7 +65,7 @@ pub fn e2e_temp_export_path(app: AppHandle) -> Result<String, String> {
         .path()
         .app_data_dir()
         .map_err(|error| error.to_string())?
-        .join(format!("snapglow-e2e-export-{}.png", std::process::id()));
+        .join(format!("xcreener-e2e-export-{}.png", std::process::id()));
     Ok(path.to_string_lossy().into_owned())
 }
 

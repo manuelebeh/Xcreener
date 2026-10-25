@@ -24,7 +24,7 @@ const DEFAULT_SETTING_ENTRIES: Record<string, string> = {
 let initPromise: Promise<void> | null = null;
 
 /**
- * Rust opens `snapglow.db`, applies `migrations/*.sql` and inserts missing default settings
+ * Rust opens `xcreener.db`, applies `migrations/*.sql` and inserts missing default settings
  * (`src-tauri/src/db`). Safe to call before every query.
  */
 export function ensureMigrationsApplied(): Promise<void> {

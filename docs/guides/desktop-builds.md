@@ -31,7 +31,7 @@ Pushing a `v*` tag creates a draft GitHub Release with macOS (arm64 and x86_64) 
 
 ## Tests
 
-- Web smoke: `pnpm --filter @snapglow/desktop test:e2e`
+- Web smoke: `pnpm --filter @xcreener/desktop test:e2e`
 - Native integration: `mise run test:e2e:native` (WebDriver on Linux and Windows, Rust tests on macOS)
 - Rust unit tests: `cd apps/desktop/src-tauri && cargo test`
 

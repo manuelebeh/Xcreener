@@ -39,7 +39,7 @@ Two coexisting confirm paths:
 ### Scrolling capture (AC-001 / AC-002)
 
 - Toolbar mode **Scroll**: window selection only; overlay passes full `WindowInfo` to Rust
-- `capture_scrolling_window_command` resolves target via `resolve_window` (id + title/bounds; excludes SnapGlow windows)
+- `capture_scrolling_window_command` resolves target via `resolve_window` (id + title/bounds; excludes Xcreener windows)
 - **Algorithm** (viewport chunks, same pattern as browser scroll-capture extensions):
   1. Focus target window
   2. Scroll to top (`Home` × 5 + `Cmd+Up` on macOS; `VK_HOME` on Windows)

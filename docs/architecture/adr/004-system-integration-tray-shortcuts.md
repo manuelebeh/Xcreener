@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow runs as a menu-bar / system-tray utility. Users expect show/hide from the tray, a global capture shortcut, and optional launch-at-login. Sprint 0.3 implemented these; Sprint 0.4 documents the architecture and test strategy.
+Xcreener runs as a menu-bar / system-tray utility. Users expect show/hide from the tray, a global capture shortcut, and optional launch-at-login. Sprint 0.3 implemented these; Sprint 0.4 documents the architecture and test strategy.
 
 ## Decision
 

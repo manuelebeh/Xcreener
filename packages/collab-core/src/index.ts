@@ -4,7 +4,7 @@ import type {
   FramePreset,
   ScreenshotTransform,
   ShadowConfig,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 
 export const COLLAB_WS_PATH = '/v1/collab/ws';
 export const COLLAB_PRESENCE_TTL_SECONDS = 30;
@@ -164,7 +164,7 @@ export function defaultCollabDocumentState(
   return {
     screenshotWidth,
     screenshotHeight,
-    background: { type: 'gradient', presetId: 'snapglow-brand' },
+    background: { type: 'gradient', presetId: 'xcreener-brand' },
     padding: 40,
     borderRadius: 12,
     shadow: {

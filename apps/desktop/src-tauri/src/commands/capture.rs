@@ -58,7 +58,7 @@ pub async fn show_capture_overlay(app: AppHandle) -> Result<CaptureOverlayBounds
 }
 
 /// Starts a capture from the main window's button. The preview screenshot must not contain
-/// SnapGlow itself, so the window is hidden and given a moment to leave the screen first.
+/// Xcreener itself, so the window is hidden and given a moment to leave the screen first.
 /// The overlay then opens from its own thread, exactly like the global shortcut does.
 #[tauri::command]
 pub fn start_capture_command(app: AppHandle) -> Result<(), String> {
@@ -69,7 +69,7 @@ pub fn start_capture_command(app: AppHandle) -> Result<(), String> {
     std::thread::spawn(move || {
         std::thread::sleep(std::time::Duration::from_millis(250));
         if let Err(error) = overlay::open_capture_overlay(&app) {
-            eprintln!("[SnapGlow] failed to open capture overlay: {error}");
+            eprintln!("[Xcreener] failed to open capture overlay: {error}");
         }
     });
 

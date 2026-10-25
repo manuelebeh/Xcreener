@@ -12,7 +12,7 @@ Sprint 2b delivered Auth0 cloud sharing (ADR-009) and hybrid library (ADR-010). 
 
 ### Shared package
 
-- **`@snapglow/team-core`** — workspace roles, plan limits, permission matrix (`can()`), response types, brand kit config
+- **`@xcreener/team-core`** — workspace roles, plan limits, permission matrix (`can()`), response types, brand kit config
 
 ### Tenancy model
 
@@ -34,12 +34,12 @@ Permission checks via `can(role, action)` in `team-core`; API enforces with `req
 ### Invitations (v1)
 
 - Signed link: nanoid token, 7-day expiry; transactional email optional (Resend, Sprint 3.3–3.4 — see ADR-012)
-- Deep link: `snapglow://team/invite?token=…`
+- Deep link: `xcreener://team/invite?token=…`
 - Accept: `POST /v1/invitations/:token/accept` (authenticated; email match when invitation email set)
 
 ### Brand kit
 
-- Extends `WatermarkConfig` from `@snapglow/editor-core`
+- Extends `WatermarkConfig` from `@xcreener/editor-core`
 - Logo in S3: `brand-kits/{workspaceId}/logo`
 - Colors/fonts JSONB on `brand_kits` table
 - Desktop caches kit locally; export merges team kit over personal watermark when active paid workspace + toggle ON

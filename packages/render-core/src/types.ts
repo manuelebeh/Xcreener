@@ -4,7 +4,7 @@ import type {
   BackgroundConfig as CoreBackgroundConfig,
   RenderInput as CoreRenderInput,
   WatermarkConfig,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 
 export type RenderBackgroundConfig =
   | Extract<CoreBackgroundConfig, { type: 'gradient' } | { type: 'solid' }>

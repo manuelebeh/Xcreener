@@ -10,7 +10,7 @@ import {
   type SsoStatusResponse,
   type WorkspaceResponse,
   type WorkspaceRole,
-} from '@snapglow/team-core';
+} from '@xcreener/team-core';
 import { and, eq, isNull } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
@@ -112,7 +112,7 @@ async function toWorkspaceResponse(
 }
 
 function inviteDeepLink(token: string): string {
-  return `snapglow://team/invite?token=${token}`;
+  return `xcreener://team/invite?token=${token}`;
 }
 
 function toInvitationResponse(invitation: schema.Invitation): InvitationResponse {

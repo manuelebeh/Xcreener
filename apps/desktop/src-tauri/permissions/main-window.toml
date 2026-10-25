@@ -2,7 +2,7 @@
 # in capabilities/overlay.json.
 [[set]]
 identifier = "main-window"
-description = "All SnapGlow Rust commands, for the main window."
+description = "All Xcreener Rust commands, for the main window."
 permissions = [
   "allow-capture-region",
   "allow-capture-window",

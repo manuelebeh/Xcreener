@@ -1,4 +1,4 @@
-import type { ComputedLayout } from '@snapglow/editor-core';
+import type { ComputedLayout } from '@xcreener/editor-core';
 import { computeLayout } from './computeLayout';
 import { drawAnnotations } from './drawAnnotations';
 import { drawBackground } from './drawBackground';

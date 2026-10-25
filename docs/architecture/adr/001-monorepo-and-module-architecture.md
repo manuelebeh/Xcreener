@@ -6,14 +6,14 @@
 
 ## Context
 
-SnapGlow evolves from a desktop menu-bar app (Tauri) toward a multi-surface product: web landing (TanStack Start, VPS), mobile (Expo), and API (Fastify). Sprint 0.1 establishes the monorepo skeleton, shared tooling, and a modular desktop frontend without implementing capture/editor features yet.
+Xcreener evolves from a desktop menu-bar app (Tauri) toward a multi-surface product: web landing (TanStack Start, VPS), mobile (Expo), and API (Fastify). Sprint 0.1 establishes the monorepo skeleton, shared tooling, and a modular desktop frontend without implementing capture/editor features yet.
 
 ## Decision
 
 ### Monorepo layout
 
 ```
-screen-cut/
+xcreener/
 ├── apps/desktop/     # Tauri v2 + React (Sprint 0.1)
 ├── apps/web/         # TanStack Start landing, VPS (Sprint 0.2)
 ├── apps/mobile/      # Expo (Phase 1b)
@@ -57,7 +57,7 @@ Modules expose a public API through `index.ts`; internal files stay colocated (`
 
 ### Rust command surface
 
-Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`, `redaction`, `classification`, `ocr`, `image_processing`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot - ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only - no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Sprint 1.5** adds on-device redaction (`src-tauri/src/redaction/`, IPC `detect_sensitive_data`; OCR engine in `src-tauri/src/ocr/`) and frontend export (`modules/export/` via offscreen canvas + Tauri dialog/fs/clipboard). **Sprint 1.6** adds capture history (`modules/history/`, `db/captures.ts`, filesystem under `$APPDATA/captures/` + `$APPDATA/thumbnails/` - frontend-only, no Rust IPC). **Sprint 2b.1** adds `classify_content_command` and `modules/style-suggestion/`. **Sprint 2b.2** adds `recognize_text_command`, `detect_content_bounds_command`, `crop_image_command`, `compress_export_bytes_command`, shared packages `@snapglow/ocr-core`, modules `text-extraction/` and `auto-crop/`. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/` (`migrate.ts` splits multi-statement SQL); Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
+Tauri commands are grouped in `src-tauri/src/commands/` (`capture`, `export`, `storage`, `redaction`, `classification`, `ocr`, `image_processing`). **Sprint 1.1** implements native capture (`src-tauri/src/capture/`, overlay window, preview snapshot - ADR-006). **Sprint 1.2** implements the beautification engine in `modules/editor/engine/` (Canvas 2D, frontend-only - no new Rust commands). **Sprint 1.4** adds annotation layers 4–5 and editor interaction (frontend-only). **Sprint 1.5** adds on-device redaction (`src-tauri/src/redaction/`, IPC `detect_sensitive_data`; OCR engine in `src-tauri/src/ocr/`) and frontend export (`modules/export/` via offscreen canvas + Tauri dialog/fs/clipboard). **Sprint 1.6** adds capture history (`modules/history/`, `db/captures.ts`, filesystem under `$APPDATA/captures/` + `$APPDATA/thumbnails/` - frontend-only, no Rust IPC). **Sprint 2b.1** adds `classify_content_command` and `modules/style-suggestion/`. **Sprint 2b.2** adds `recognize_text_command`, `detect_content_bounds_command`, `crop_image_command`, `compress_export_bytes_command`, shared packages `@xcreener/ocr-core`, modules `text-extraction/` and `auto-crop/`. **Sprint 0.3** adds system integration in `src-tauri/src/tray.rs` and `shortcuts.rs` (tray icon, global shortcut → overlay, autostart plugin). Settings persistence uses the **frontend SQL plugin** via `src/db/` (`migrate.ts` splits multi-statement SQL); Rust `get_setting` / `set_setting` remain placeholders until a shared Rust-side store is needed.
 
 ### Code intelligence
 

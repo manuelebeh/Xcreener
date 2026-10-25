@@ -6,7 +6,7 @@
 
 ## Context
 
-SnapGlow is privacy-first and local-first. Phase 2b adds **optional cloud sharing** (FR-012): authenticated upload, short public links, configurable expiry, and a web viewer. Phase 3 will extend the same backend for multi-tenant workspaces and a public REST API.
+Xcreener is privacy-first and local-first. Phase 2b adds **optional cloud sharing** (FR-012): authenticated upload, short public links, configurable expiry, and a web viewer. Phase 3 will extend the same backend for multi-tenant workspaces and a public REST API.
 
 ## Decision
 
@@ -28,13 +28,13 @@ SnapGlow is privacy-first and local-first. Phase 2b adds **optional cloud sharin
 
 ### Clients
 
-- **Desktop (MVP):** PKCE Auth0 flow via system browser + `snapglow://auth/callback` deep link; explicit consent dialog before upload; Share link in ExportBar
+- **Desktop (MVP):** PKCE Auth0 flow via system browser + `xcreener://auth/callback` deep link; explicit consent dialog before upload; Share link in ExportBar
 - **Web:** TanStack Start SSR viewer at `/s/:token` (no auth)
 - **Mobile:** API-ready; UI deferred
 
 ### Shared package
 
-- `@snapglow/cloud-core` — expiry helpers, MIME allowlist, response types
+- `@xcreener/cloud-core` — expiry helpers, MIME allowlist, response types
 
 ## Consequences
 

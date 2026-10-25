@@ -51,7 +51,7 @@ pub fn build_global_shortcut_plugin() -> impl tauri::plugin::Plugin<tauri::Wry> 
                 let app = app.clone();
                 std::thread::spawn(move || {
                     if let Err(error) = overlay::open_capture_overlay(&app) {
-                        eprintln!("[SnapGlow] failed to open capture overlay: {error}");
+                        eprintln!("[Xcreener] failed to open capture overlay: {error}");
                     }
                 });
             }

@@ -13,7 +13,7 @@ Admins create invite links from **Settings → Team → Invite member**.
 
 1. Optionally restrict the invite to an email address
 2. Choose a role (admin, editor, viewer)
-3. Copy the link — it opens `snapglow://team/invite?token=…` in SnapGlow
+3. Copy the link — it opens `xcreener://team/invite?token=…` in Xcreener
 
 Invitees sign in with Auth0 if needed, then join the workspace automatically.
 

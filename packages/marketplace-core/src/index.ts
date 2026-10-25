@@ -1,4 +1,4 @@
-import type { BackgroundConfig, FramePreset, ShadowConfig } from '@snapglow/editor-core';
+import type { BackgroundConfig, FramePreset, ShadowConfig } from '@xcreener/editor-core';
 import { z } from 'zod';
 
 export type TemplateStatus = 'pending' | 'approved' | 'rejected';

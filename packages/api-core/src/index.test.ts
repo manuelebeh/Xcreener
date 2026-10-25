@@ -1,4 +1,4 @@
-import { defaultCollabDocumentState } from '@snapglow/collab-core';
+import { defaultCollabDocumentState } from '@xcreener/collab-core';
 import { describe, expect, it } from 'vitest';
 import { collabDocumentStateSchema, MAX_COLLAB_ANNOTATIONS } from './index';
 

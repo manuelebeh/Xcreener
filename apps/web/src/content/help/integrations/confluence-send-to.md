@@ -1,7 +1,7 @@
 ---
 title: Send captures to Confluence
 category: Integrations
-description: Publish screenshot exports to Confluence pages from SnapGlow desktop.
+description: Publish screenshot exports to Confluence pages from Xcreener desktop.
 order: 2
 ---
 
@@ -9,7 +9,7 @@ Embed polished screenshots on **Confluence Cloud** pages in one step.
 
 ## Requirements
 
-- SnapGlow desktop + cloud sign-in
+- Xcreener desktop + cloud sign-in
 - **Team Pro** workspace
 - Confluence Cloud site linked to the same Atlassian OAuth app as Jira
 
@@ -24,7 +24,7 @@ Embed polished screenshots on **Confluence Cloud** pages in one step.
 1. Finish editing your capture.
 2. Choose **Send to → Confluence** in the export bar.
 3. Select a page and optional message.
-4. SnapGlow uploads the image and appends it to the page body.
+4. Xcreener uploads the image and appends it to the page body.
 
 ## Tips
 

@@ -1,4 +1,4 @@
-import { Dropdown } from '@snapglow/ui';
+import { Dropdown } from '@xcreener/ui';
 import { stepViewZoom } from '../engine/viewZoom';
 import { useEditorStore } from '../store';
 

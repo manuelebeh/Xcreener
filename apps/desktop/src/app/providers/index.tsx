@@ -1,5 +1,5 @@
-import { SnapGlowI18nProvider } from '@snapglow/i18n';
-import { ThemeProvider } from '@snapglow/ui';
+import { XcreenerI18nProvider } from '@xcreener/i18n';
+import { ThemeProvider } from '@xcreener/ui';
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { initDatabase, loadAppSettings, setSetting } from '@/db';
 import { initObservability } from '@/integrations/observability';
@@ -46,24 +46,24 @@ export function AppProviders({ children }: AppProvidersProps) {
           await hydrateTeamFromSettings(settings.activeWorkspaceId || null);
           await loadStoredEntitlement();
           refreshEntitlement().catch((error) => {
-            console.debug('[SnapGlow] Entitlement refresh skipped', error);
+            console.debug('[Xcreener] Entitlement refresh skipped', error);
           });
         }
 
         try {
           await updateCaptureShortcut(settings.captureShortcut);
         } catch (error) {
-          console.error('[SnapGlow] Failed to register capture shortcut', error);
+          console.error('[Xcreener] Failed to register capture shortcut', error);
         }
 
         try {
           await syncAutostart(settings.launchAtLogin);
         } catch (error) {
-          console.error('[SnapGlow] Failed to sync autostart', error);
+          console.error('[Xcreener] Failed to sync autostart', error);
         }
 
         checkForAppUpdate({ silent: true }).catch((error) => {
-          console.debug('[SnapGlow] Startup update check skipped', error);
+          console.debug('[Xcreener] Startup update check skipped', error);
         });
       }
 
@@ -73,7 +73,7 @@ export function AppProviders({ children }: AppProvidersProps) {
     }
 
     bootstrap().catch((error) => {
-      console.error('[SnapGlow] Failed to initialize app', error);
+      console.error('[Xcreener] Failed to initialize app', error);
       if (!cancelled) {
         setReady(true);
       }
@@ -102,19 +102,19 @@ export function AppProviders({ children }: AppProvidersProps) {
   if (!ready) {
     return (
       <div className="min-h-screen bg-background p-6 font-sans text-foreground">
-        Loading SnapGlow…
+        Loading Xcreener…
       </div>
     );
   }
 
   return (
-    <SnapGlowI18nProvider locale={locale}>
+    <XcreenerI18nProvider locale={locale}>
       <PostHogProvider>
         <ThemeProvider theme={theme} onThemeChange={handleThemeChange}>
           <TeamOnboardingHost />
           {children}
         </ThemeProvider>
       </PostHogProvider>
-    </SnapGlowI18nProvider>
+    </XcreenerI18nProvider>
   );
 }

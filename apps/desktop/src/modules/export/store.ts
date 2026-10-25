@@ -1,4 +1,4 @@
-import type { ShareExpiry } from '@snapglow/cloud-core';
+import type { ShareExpiry } from '@xcreener/cloud-core';
 import { create } from 'zustand';
 import type { ExportFormat } from './utils/formats';
 

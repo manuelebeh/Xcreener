@@ -43,7 +43,7 @@ export const INTEGRATION_SCOPES: Record<IntegrationProvider, string> = {
   msteams: 'ChannelMessage.Send Channel.ReadBasic.All offline_access',
 };
 
-export const INTEGRATION_REDIRECT_URI = 'snapglow://integrations/callback';
+export const INTEGRATION_REDIRECT_URI = 'xcreener://integrations/callback';
 
 export interface IntegrationConnection {
   provider: IntegrationProvider;

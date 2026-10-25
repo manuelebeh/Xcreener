@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
-group = 'expo.modules.snapglowocr'
+group = 'expo.modules.xcreenerocr'
 version = '0.1.0'
 
 def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
@@ -12,7 +12,7 @@ if (expoModulesCorePlugin.exists()) {
 }
 
 android {
-  namespace "expo.modules.snapglowocr"
+  namespace "expo.modules.xcreenerocr"
   compileSdkVersion safeExtGet("compileSdkVersion", 35)
 
   defaultConfig {

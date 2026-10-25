@@ -7,7 +7,7 @@ order: 1
 
 # Capture basics
 
-SnapGlow runs from your menu bar or system tray. Captures stay on your device until you export or upload.
+Xcreener runs from your menu bar or system tray. Captures stay on your device until you export or upload.
 
 ## Global shortcut
 

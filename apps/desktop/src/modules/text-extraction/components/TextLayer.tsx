@@ -1,4 +1,4 @@
-import { mapLineToLayout } from '@snapglow/ocr-core';
+import { mapLineToLayout } from '@xcreener/ocr-core';
 import { computeLayout } from '@/modules/editor/engine/computeLayout';
 import { getPresetById } from '@/modules/editor/engine/presets';
 import { useEditorStore } from '@/modules/editor/store';

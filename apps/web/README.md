@@ -1,6 +1,6 @@
 Welcome to your new TanStack Start app! 
 
-# SnapGlow Web (`@snapglow/web`)
+# Xcreener Web (`@xcreener/web`)
 
 Marketing landing (TanStack Start + Nitro) and **public share viewer** for cloud links (Sprint 2b.5).
 

@@ -1,4 +1,4 @@
-import type { StyleSuggestion } from '@snapglow/style-suggestion-core';
+import type { StyleSuggestion } from '@xcreener/style-suggestion-core';
 import { useEditorStore } from '@/modules/editor/store';
 import type { BackgroundConfig } from '@/modules/editor/types';
 import { createBlurredScreenshotBackground } from './blurredScreenshotBackground';

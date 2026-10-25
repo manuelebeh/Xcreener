@@ -1,4 +1,4 @@
-import { computeLayout, type LayoutRect, type RenderInput } from '@snapglow/editor-core';
+import { computeLayout, type LayoutRect, type RenderInput } from '@xcreener/editor-core';
 
 import type { SensitiveRegion } from './types';
 

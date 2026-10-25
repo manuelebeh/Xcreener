@@ -1,4 +1,4 @@
-import { Button, Input } from '@snapglow/ui';
+import { Button, Input } from '@xcreener/ui';
 import { useEffect, useState } from 'react';
 import { useCloudAuthStore } from '@/modules/cloud/store';
 import { SettingsGroup, SettingsRow } from '@/shared/components/SettingsGroup';

@@ -1,6 +1,6 @@
 # Mobile release & signing (Sprint 1b.3)
 
-Operational guide for SnapGlow iOS + Android builds via [EAS Build](https://docs.expo.dev/build/introduction/).
+Operational guide for Xcreener iOS + Android builds via [EAS Build](https://docs.expo.dev/build/introduction/).
 
 ## Prerequisites
 
@@ -48,13 +48,13 @@ eas credentials
 ### iOS
 
 - Distribution certificate + provisioning profile (EAS or manual upload)
-- App ID: `com.snapglow.app`
+- App ID: `com.xcreener.app`
 - Capabilities: Photos (write), Share Extension (via `expo-share-intent`)
 
 ### Android
 
 - Keystore: EAS-generated or upload existing
-- Package: `com.snapglow.app`
+- Package: `com.xcreener.app`
 - Play App Signing recommended when Play Console is active
 
 ## Store upload (after accounts active)
@@ -86,7 +86,7 @@ Privacy policy URL: **TBD** before public submission (required by both stores).
 
 ## Account & paid plan
 
-The mobile app reuses the desktop's Auth0 native application (callback `snapglow://auth/callback`) and checks the plan token from `GET /v1/me/entitlement` with `@snapglow/team-core/entitlement`. Free plans (or a missing public key) get the SnapGlow watermark on the preview and every export.
+The mobile app reuses the desktop's Auth0 native application (callback `xcreener://auth/callback`) and checks the plan token from `GET /v1/me/entitlement` with `@xcreener/team-core/entitlement`. Free plans (or a missing public key) get the Xcreener watermark on the preview and every export.
 
 EAS builds run on Expo's servers, so GitHub Actions variables do not reach them. Set these per environment as plain-text EAS variables (they are public and ship in the bundle):
 
@@ -98,7 +98,7 @@ for name in EXPO_PUBLIC_API_URL EXPO_PUBLIC_AUTH0_DOMAIN EXPO_PUBLIC_AUTH0_CLIEN
 done
 ```
 
-`EXPO_PUBLIC_ENTITLEMENT_PUBLIC_KEY` is the same value as the desktop's `SNAPGLOW_ENTITLEMENT_PUBLIC_KEY` (see [release-signing.md § 7](./release-signing.md#7-paid-plan-entitlements-ed25519)). Local dev: copy `apps/mobile/.env.example` to `.env.local`.
+`EXPO_PUBLIC_ENTITLEMENT_PUBLIC_KEY` is the same value as the desktop's `XCREENER_ENTITLEMENT_PUBLIC_KEY` (see [release-signing.md § 7](./release-signing.md#7-paid-plan-entitlements-ed25519)). Local dev: copy `apps/mobile/.env.example` to `.env.local`.
 
 ## Related
 

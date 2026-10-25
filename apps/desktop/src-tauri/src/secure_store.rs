@@ -6,7 +6,7 @@
 
 use keyring::Entry;
 
-const SERVICE: &str = "app.snapglow.desktop";
+const SERVICE: &str = "app.xcreener.desktop";
 const CHUNK_BYTES: usize = 1000;
 const MAX_CHUNKS: usize = 64;
 
@@ -163,7 +163,7 @@ mod tests {
     #[test]
     #[ignore]
     fn keychain_roundtrip() {
-        let name = "snapglow-test.roundtrip";
+        let name = "xcreener-test.roundtrip";
         let value = "t".repeat(CHUNK_BYTES * 3 + 17);
 
         set(name, &value).unwrap();

@@ -1,0 +1,15 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["XcreenerOcrModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.xcreenerocr.XcreenerOcrModule"],
+    "publication": {
+      "groupId": "com.xcreener.app",
+      "artifactId": "xcreener-ocr",
+      "version": "0.1.0",
+      "repository": "local-maven-repo"
+    }
+  }
+}

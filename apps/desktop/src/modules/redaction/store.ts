@@ -1,4 +1,4 @@
-import type { DetectionKind } from '@snapglow/redaction-core';
+import type { DetectionKind } from '@xcreener/redaction-core';
 import { create } from 'zustand';
 import type { Detection, RedactionStatus, RedactionStyle } from './types';
 import { DEFAULT_REDACTION_STYLE, REDACTION_CATEGORIES } from './types';

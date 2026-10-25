@@ -8,7 +8,7 @@ const fixtureDir = join(dirname(fileURLToPath(import.meta.url)), '../fixtures');
 const sampleCapture = readFileSync(join(fixtureDir, 'sample-capture.png'));
 const sampleBytes = Array.from(sampleCapture);
 
-describe('SnapGlow capture → beautify → export', () => {
+describe('Xcreener capture → beautify → export', () => {
   before(async () => {
     await tauriInvoke('e2e_show_main_window');
   });
@@ -19,7 +19,7 @@ describe('SnapGlow capture → beautify → export', () => {
     await browser.waitUntil(
       async () => {
         const hasScreenshot = await browser.execute(async () => {
-          return window.__snapglowE2E?.e2eEditorHasScreenshot() ?? false;
+          return window.__xcreenerE2E?.e2eEditorHasScreenshot() ?? false;
         });
         return hasScreenshot === true;
       },
@@ -46,10 +46,10 @@ describe('SnapGlow capture → beautify → export', () => {
 
     const exportPath = await tauriInvoke<string>('e2e_temp_export_path');
     await browser.execute(async (path) => {
-      if (!window.__snapglowE2E) {
+      if (!window.__xcreenerE2E) {
         throw new Error('E2E bridge is not registered');
       }
-      await window.__snapglowE2E.e2eExportToPath(path, 'png', 95);
+      await window.__xcreenerE2E.e2eExportToPath(path, 'png', 95);
     }, exportPath);
 
     const [exists, size] = await tauriInvoke<[boolean, number]>('e2e_file_metadata', {

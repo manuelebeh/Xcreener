@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
   <key>NSScreenCaptureUsageDescription</key>
-  <string>SnapGlow needs screen recording permission to capture screenshots.</string>
+  <string>Xcreener needs screen recording permission to capture screenshots.</string>
   <key>LSUIElement</key>
   <true/>
 </dict>

@@ -1,4 +1,4 @@
-# Design - SnapGlow
+# Design - Xcreener
 
 Desktop redesign locked 2026-10-13: the category standard, executed with care.
 Agents and design skills (impeccable / taste) read this file first; pages defer
@@ -70,7 +70,7 @@ Radius: 6px controls, 10px panels. Hairlines 1px. One accent (blue) for selectio
 
 ## Interaction
 
-- **Focus** · `.sg-focus-ring` utility and `@snapglow/ui` `focusRingClasses`
+- **Focus** · `.sg-focus-ring` utility and `@xcreener/ui` `focusRingClasses`
 - **Tooltips** · 800ms hover delay; silent success preferred over celebratory toasts
 - **Motion** · `transition-colors` / `transition-opacity` only, no layout animation; reduced motion handled globally
 - **Capture HUD** · `.capture-hud` classes, semantic tokens through `color-mix`, cool neutral scale from theme.css
@@ -116,7 +116,7 @@ See `packages/design-tokens/dist/tokens.css`. Key semantic block:
 ### 2 · Tailwind v4 `@theme`
 
 See `packages/design-tokens/dist/tailwind-theme.css`. Consumed by desktop via
-`@snapglow/ui/styles.css`. Utilities: `bg-primary`, `text-muted`, `font-display`, `font-mono`, etc.
+`@xcreener/ui/styles.css`. Utilities: `bg-primary`, `text-muted`, `font-display`, `font-mono`, etc.
 
 ### 3 · DTCG `tokens.json`
 

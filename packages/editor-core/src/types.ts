@@ -98,7 +98,7 @@ export interface WatermarkConfig {
 export const DEFAULT_WATERMARK: WatermarkConfig = {
   enabled: true,
   logoPath: null,
-  displayName: 'SnapGlow',
+  displayName: 'Xcreener',
   url: null,
   position: 'bottom-right',
   /** Percent (0-100), like the desktop setting; drawWatermark divides by 100. */
@@ -130,5 +130,5 @@ export const DEFAULT_SHADOW: ShadowConfig = {
 
 export const DEFAULT_BACKGROUND: BackgroundConfig = {
   type: 'gradient',
-  presetId: 'snapglow-brand',
+  presetId: 'xcreener-brand',
 };

@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SnapGlowClient } from '@snapglow/sdk';
+import { XcreenerClient } from '@xcreener/sdk';
 
 const publicDir = join(fileURLToPath(new URL('.', import.meta.url)), '../public');
 
@@ -16,8 +16,8 @@ export interface NotionEmbedConfig {
   notionClientId: string;
   notionClientSecret: string;
   redirectUri: string;
-  /** SnapGlow API every proxied call goes to. Never taken from the request (2026-10-24 audit, FINDING-005). */
-  snapglowApiUrl: string;
+  /** Xcreener API every proxied call goes to. Never taken from the request (2026-10-24 audit, FINDING-005). */
+  xcreenerApiUrl: string;
 }
 
 export function configFromEnv(): NotionEmbedConfig {
@@ -27,7 +27,7 @@ export function configFromEnv(): NotionEmbedConfig {
     notionClientId: process.env.NOTION_CLIENT_ID ?? '',
     notionClientSecret: process.env.NOTION_CLIENT_SECRET ?? '',
     redirectUri: process.env.NOTION_EMBED_REDIRECT_URI ?? `http://localhost:${port}/oauth/callback`,
-    snapglowApiUrl: process.env.SNAPGLOW_API_URL ?? 'http://localhost:8787',
+    xcreenerApiUrl: process.env.XCREENER_API_URL ?? 'http://localhost:8787',
   };
 }
 
@@ -129,8 +129,8 @@ export function createNotionEmbedServer(config: NotionEmbedConfig = configFromEn
     return session;
   }
 
-  function snapglowClient(apiKey: string) {
-    return new SnapGlowClient({ apiKey, baseUrl: config.snapglowApiUrl });
+  function xcreenerClient(apiKey: string) {
+    return new XcreenerClient({ apiKey, baseUrl: config.xcreenerApiUrl });
   }
 
   async function exchangeNotionCode(code: string) {
@@ -310,9 +310,9 @@ export function createNotionEmbedServer(config: NotionEmbedConfig = configFromEn
       const apiKey = requireString(body, 'apiKey');
       const pageId = requireString(body, 'pageId');
       const captureId = requireString(body, 'captureId');
-      const title = typeof body.title === 'string' && body.title ? body.title : 'SnapGlow capture';
+      const title = typeof body.title === 'string' && body.title ? body.title : 'Xcreener capture';
 
-      const published = await snapglowClient(apiKey).captures.publish(captureId);
+      const published = await xcreenerClient(apiKey).captures.publish(captureId);
       await insertEmbedBlock(session.notionToken, pageId, published.embedUrl, title);
 
       return jsonResponse(res, 200, {
@@ -324,7 +324,7 @@ export function createNotionEmbedServer(config: NotionEmbedConfig = configFromEn
     // POST so the API key travels in the body, not in a logged query string.
     if (url.pathname === '/api/captures' && req.method === 'POST') {
       const body = await readJsonBody(req);
-      const list = await snapglowClient(requireString(body, 'apiKey')).captures.list({
+      const list = await xcreenerClient(requireString(body, 'apiKey')).captures.list({
         limit: 20,
       });
       return jsonResponse(res, 200, { items: list.items });

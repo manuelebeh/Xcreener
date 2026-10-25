@@ -34,7 +34,7 @@ describe('notion embed server', () => {
       notionClientId: '',
       notionClientSecret: '',
       redirectUri: 'http://localhost/oauth/callback',
-      snapglowApiUrl: apiUrl,
+      xcreenerApiUrl: apiUrl,
     });
     baseUrl = await listen(server);
   });
@@ -53,7 +53,7 @@ describe('notion embed server', () => {
     expect(next.status).toBe(400);
   });
 
-  it('only talks to the configured SnapGlow API, whatever the request says', async () => {
+  it('only talks to the configured Xcreener API, whatever the request says', async () => {
     const response = await fetch(
       `${baseUrl}/api/captures?baseUrl=${encodeURIComponent(otherUrl)}`,
       {

@@ -1,13 +1,13 @@
 {
-  "name": "snapglow-vscode",
-  "displayName": "SnapGlow",
-  "description": "Capture code from the editor, beautify with SnapGlow, and export to clipboard.",
+  "name": "xcreener-vscode",
+  "displayName": "Xcreener",
+  "description": "Capture code from the editor, beautify with Xcreener, and export to clipboard.",
   "version": "0.1.0",
-  "publisher": "snapglow",
+  "publisher": "xcreener",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/snapglow/screen-cut",
+    "url": "https://github.com/manuelebeh/Xcreener",
     "directory": "apps/vscode-extension"
   },
   "engines": {
@@ -18,33 +18,33 @@
     "Snippets"
   ],
   "activationEvents": [
-    "onCommand:snapglow.configureApiKey",
-    "onCommand:snapglow.captureEditor",
-    "onCommand:snapglow.captureAndBeautify"
+    "onCommand:xcreener.configureApiKey",
+    "onCommand:xcreener.captureEditor",
+    "onCommand:xcreener.captureAndBeautify"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "snapglow.configureApiKey",
-        "title": "SnapGlow: Configure API Key"
+        "command": "xcreener.configureApiKey",
+        "title": "Xcreener: Configure API Key"
       },
       {
-        "command": "snapglow.captureEditor",
-        "title": "SnapGlow: Capture Editor"
+        "command": "xcreener.captureEditor",
+        "title": "Xcreener: Capture Editor"
       },
       {
-        "command": "snapglow.captureAndBeautify",
-        "title": "SnapGlow: Capture & Beautify"
+        "command": "xcreener.captureAndBeautify",
+        "title": "Xcreener: Capture & Beautify"
       }
     ],
     "configuration": {
-      "title": "SnapGlow",
+      "title": "Xcreener",
       "properties": {
-        "snapglow.baseUrl": {
+        "xcreener.baseUrl": {
           "type": "string",
           "default": "https://api.snapglow.app",
-          "description": "SnapGlow API base URL"
+          "description": "Xcreener API base URL"
         }
       }
     }
@@ -61,12 +61,12 @@
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.80",
-    "@snapglow/plugin-core": "workspace:*",
-    "@snapglow/sdk": "workspace:*"
+    "@xcreener/plugin-core": "workspace:*",
+    "@xcreener/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@snapglow/biome-config": "workspace:*",
-    "@snapglow/typescript-config": "workspace:*",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "@types/node": "^22.10.2",
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^3.6.0",

@@ -18,7 +18,7 @@ paths:
 ## Desktop (`apps/desktop`)
 
 - React 19 + Vite + Tailwind v4 + TypeScript; path alias `@/` → `src/`
-- Imports `@snapglow/ui` and design tokens
+- Imports `@xcreener/ui` and design tokens
 - Feature modules: `src/modules/{balance,capture,cloud,collab,editor,export,history,integrations,licensing,marketplace,redaction,settings,style-suggestion,team,text-extraction}/`
 - Public module API via `index.ts`; use Zustand stores per module
 - Routes in `src/app/routes.tsx`; providers in `src/app/providers/`
@@ -26,13 +26,13 @@ paths:
 
 ## Web (`apps/web`)
 
-- TanStack Start + Nitro + Tailwind v4 - `@snapglow/web`
+- TanStack Start + Nitro + Tailwind v4 - `@xcreener/web`
 - Landing page at `/`; dev on port 3000 via `mise run dev:web`
-- VPS deploy deferred; local build: `pnpm --filter @snapglow/web build`
+- VPS deploy deferred; local build: `pnpm --filter @xcreener/web build`
 
 ## Lint / format
 
-Biome only - root `biome.json` extends `@snapglow/biome-config`. No ESLint or Prettier.
+Biome only - root `biome.json` extends `@xcreener/biome-config`. No ESLint or Prettier.
 
 ## UI polish
 

@@ -4,7 +4,7 @@ import { getBlogPosts } from '#/lib/blog/loadBlogPosts';
 export const Route = createFileRoute('/blog/')({
   head: () => ({
     meta: [
-      { title: 'Blog — SnapGlow' },
+      { title: 'Blog — Xcreener' },
       { name: 'description', content: 'Tips, comparisons, and guides for screenshot workflows.' },
     ],
   }),
@@ -18,7 +18,7 @@ function BlogIndexPage() {
     <div className="min-h-screen bg-background px-6 py-12 text-foreground">
       <div className="mx-auto max-w-3xl">
         <Link to="/" className="text-sm text-muted no-underline hover:text-foreground">
-          ← SnapGlow
+          ← Xcreener
         </Link>
         <h1 className="mt-4 font-display text-3xl font-bold">Blog</h1>
         <p className="mt-2 text-muted">Guides and comparisons for screenshot workflows.</p>

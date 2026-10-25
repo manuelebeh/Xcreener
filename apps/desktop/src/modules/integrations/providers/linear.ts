@@ -125,7 +125,7 @@ export async function sendToLinearIssue(input: {
 }): Promise<string> {
   const buffer = await input.blob.arrayBuffer();
   const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-  const body = `${input.message ?? 'SnapGlow export'}\n\n![${input.filename}](data:${input.blob.type};base64,${base64})`;
+  const body = `${input.message ?? 'Xcreener export'}\n\n![${input.filename}](data:${input.blob.type};base64,${base64})`;
 
   const response = await fetch('https://api.linear.app/graphql', {
     method: 'POST',

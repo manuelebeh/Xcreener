@@ -1,5 +1,5 @@
-import { spacing } from '@snapglow/design-tokens/tokens.native';
-import { Button, useTheme } from '@snapglow/ui-native';
+import { spacing } from '@xcreener/design-tokens/tokens.native';
+import { Button, useTheme } from '@xcreener/ui-native';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { isAccountConfigured } from '../config';
@@ -10,7 +10,7 @@ const PLAN_LABELS = { free: 'Free', team_starter: 'Team Starter', team_pro: 'Tea
 function confirmDeleteAccount() {
   Alert.alert(
     'Delete cloud account',
-    'This permanently deletes your SnapGlow cloud account and the data stored with it. Edits saved on this phone are kept.',
+    'This permanently deletes your Xcreener cloud account and the data stored with it. Edits saved on this phone are kept.',
     [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Delete account', style: 'destructive', onPress: () => void deleteAccount() },
@@ -40,7 +40,7 @@ export function AccountSection() {
       ) : null}
       {premium ? null : (
         <Text style={[styles.note, { color: colors.muted }]}>
-          Exports include the SnapGlow watermark. Upgrade from the desktop app: Settings → Team →
+          Exports include the Xcreener watermark. Upgrade from the desktop app: Settings → Team →
           Billing.
         </Text>
       )}

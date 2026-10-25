@@ -1,6 +1,6 @@
 # Mobile app
 
-Expo companion app (`@snapglow/mobile`, **SDK 56**).
+Expo companion app (`@xcreener/mobile`, **SDK 56**).
 
 - Repo guide: [`AGENTS.md`](../../AGENTS.md)
 - Agent rules: [`.cursor/rules/mobile-architecture.mdc`](../../.cursor/rules/mobile-architecture.mdc)

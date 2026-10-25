@@ -1,6 +1,6 @@
 {
-  "name": "SnapGlow",
-  "id": "snapglow-import-export",
+  "name": "Xcreener",
+  "id": "xcreener-import-export",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",

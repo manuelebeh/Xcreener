@@ -4,7 +4,7 @@
 
 ## Product overview
 
-**One-liner:** SnapGlow is a privacy-first screenshot app: capture, beautify, and share. Local-first; optional cloud links.
+**One-liner:** Xcreener is a privacy-first screenshot app: capture, beautify, and share. Local-first; optional cloud links.
 
 **What it does:** Capture screens (zone / window / display), beautify with presets and annotations, redact sensitive content on-device, and export or share. Desktop (Tauri) is the primary surface; companion mobile (Expo), landing + public share viewer (TanStack Start), and optional Fastify cloud API for links and teams.
 

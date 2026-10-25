@@ -29,7 +29,7 @@ import {
   WATERMARK_FONT_SIZE,
   type WatermarkConfig,
   watermarkLabel,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
 import { forwardRef, useImperativeHandle, useMemo } from 'react';
 import { PixelRatio, View } from 'react-native';
 

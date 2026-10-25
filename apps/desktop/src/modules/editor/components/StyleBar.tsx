@@ -98,7 +98,7 @@ export function StyleBar({ embedded = false, marginControls }: StyleBarProps) {
           onChange={(tab) => {
             if (tab === 'gradient') {
               setActiveTab('gradient');
-              updateBackground({ type: 'gradient', presetId: 'snapglow-brand' });
+              updateBackground({ type: 'gradient', presetId: 'xcreener-brand' });
             } else if (tab === 'solid') {
               setActiveTab('solid');
               updateBackground({ type: 'solid', color: solidColor });

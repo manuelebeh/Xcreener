@@ -16,11 +16,11 @@ The internal `/v1/*` API uses Auth0 JWT for desktop/web clients. Third-party aut
 
 | Package | Role |
 |---------|------|
-| `@snapglow/api-core` | Public API DTOs, Zod schemas, API key format, rate-limit constants |
-| `@snapglow/render-core` | Canvas render engine (extracted from desktop) — browser + Node |
-| `@snapglow/sdk` | Publishable HTTP client (`@snapglow/sdk`, npm beta) |
+| `@xcreener/api-core` | Public API DTOs, Zod schemas, API key format, rate-limit constants |
+| `@xcreener/render-core` | Canvas render engine (extracted from desktop) — browser + Node |
+| `@xcreener/sdk` | Publishable HTTP client (`@xcreener/sdk`, npm beta) |
 
-Beautify config reuses `CollabDocumentState` from `@snapglow/collab-core`.
+Beautify config reuses `CollabDocumentState` from `@xcreener/collab-core`.
 
 ### Namespace and auth
 
@@ -41,7 +41,7 @@ Separate from `library_items` to avoid polluting desktop cloud sync and to simpl
 ### Server render
 
 - `@napi-rs/canvas` in `apps/api` for headless export
-- `@snapglow/render-core` shared with desktop for WYSIWYG parity
+- `@xcreener/render-core` shared with desktop for WYSIWYG parity
 - Export formats: PNG, JPG, WebP; brand kit watermark merged when workspace has brand kit
 
 ### Rate limiting (Redis)
@@ -61,7 +61,7 @@ Per API key id; `429` + `Retry-After`.
 
 ## Consequences
 
-- Desktop render engine moves to `@snapglow/render-core`; desktop imports shared package
+- Desktop render engine moves to `@xcreener/render-core`; desktop imports shared package
 - CI tests mock render service when native canvas unavailable
 - API key UI in desktop Settings deferred; admin creates keys via JWT routes
 - Capture automation = **upload screenshot + beautify + export**, not OS-native capture

@@ -5,7 +5,7 @@ globs:
 alwaysApply: false
 ---
 
-# SnapGlow API (`apps/api`)
+# Xcreener API (`apps/api`)
 
 Fastify backend for cloud sharing (Sprint 2b.5+), integrations/library (Sprint 2b.6+), team workspaces (Sprint 3.1–3.2+), and public developer API (Sprint 3.5–3.6+).
 
@@ -24,7 +24,7 @@ Fastify backend for cloud sharing (Sprint 2b.5+), integrations/library (Sprint 2
 ```bash
 mise run dev:api   # docker compose (Postgres, Redis, MinIO) + Fastify on :8787
 cp apps/api/.env.example apps/api/.env.local
-pnpm --filter @snapglow/api db:migrate
+pnpm --filter @xcreener/api db:migrate
 ```
 
 ## Routes
@@ -101,13 +101,13 @@ Optional header `X-Workspace-Id` scopes library/share uploads and collab documen
 ## Conventions
 
 - Env validated with `@t3-oss/env-core` + Zod (`src/env.ts`)
-- Shared types in `@snapglow/cloud-core`, `@snapglow/integrations-core`, `@snapglow/team-core`, `@snapglow/collab-core`, `@snapglow/api-core`
-- Server render via `@snapglow/render-core` + `@napi-rs/canvas` for public API export
+- Shared types in `@xcreener/cloud-core`, `@xcreener/integrations-core`, `@xcreener/team-core`, `@xcreener/collab-core`, `@xcreener/api-core`
+- Server render via `@xcreener/render-core` + `@napi-rs/canvas` for public API export
 - Export renders run in a piscina worker pool (`services/render-pool.ts`, `RENDER_WORKERS`, `RENDER_TIMEOUT_MS`; busy or timed out → 503); upload size checks read the image header (`services/image-dimensions.ts`), never decode
-- Workspace authz via `requireWorkspaceRole` / `can()` from `@snapglow/team-core`
+- Workspace authz via `requireWorkspaceRole` / `can()` from `@xcreener/team-core`
 - Privacy: uploads only from authenticated clients; explicit consent in desktop UI
 - Integration OAuth secrets live in API env only; access tokens stored on desktop
-- Paid features: Jira / Confluence / Teams OAuth require Team Pro (checked in `/v1/integrations/*`); desktop plan comes only from `/v1/me/entitlement`, signed with `ENTITLEMENT_PRIVATE_KEY` and verified in Rust with `SNAPGLOW_ENTITLEMENT_PUBLIC_KEY`
+- Paid features: Jira / Confluence / Teams OAuth require Team Pro (checked in `/v1/integrations/*`); desktop plan comes only from `/v1/me/entitlement`, signed with `ENTITLEMENT_PRIVATE_KEY` and verified in Rust with `XCREENER_ENTITLEMENT_PUBLIC_KEY`
 - Link expiry: `1h`, `24h`, `7d`, `permanent` (see `packages/cloud-core`)
 
 ## Related
@@ -123,5 +123,5 @@ Optional header `X-Workspace-Id` scopes library/share uploads and collab documen
 - Figma plugin: `apps/figma-plugin/`
 - Notion embed tool: `apps/notion-embed/`
 - ADR: `009-cloud-api-and-sharing.md`, `010-integrations-and-library.md`, `011-workspaces-team-and-billing.md`, `012-realtime-collaboration.md`, `013-public-api.md`, `014-plugins-and-embeds.md`, `015-template-marketplace.md`, `016-affiliate-program.md`, `018-cross-device-sync.md`
-- SDK: `packages/sdk` (`@snapglow/sdk`)
-- Plugin presets: `packages/plugin-core` (`@snapglow/plugin-core`)
+- SDK: `packages/sdk` (`@xcreener/sdk`)
+- Plugin presets: `packages/plugin-core` (`@xcreener/plugin-core`)

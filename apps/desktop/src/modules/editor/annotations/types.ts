@@ -14,5 +14,5 @@ export type {
   ResizeHandleId,
   TextAnnotation,
   ToolDefaults,
-} from '@snapglow/editor-core';
-export { DEFAULT_TOOL_DEFAULTS, HISTORY_MAX } from '@snapglow/editor-core';
+} from '@xcreener/editor-core';
+export { DEFAULT_TOOL_DEFAULTS, HISTORY_MAX } from '@xcreener/editor-core';

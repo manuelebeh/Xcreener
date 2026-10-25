@@ -1,5 +1,5 @@
-import { can } from '@snapglow/team-core';
-import { Button } from '@snapglow/ui';
+import { can } from '@xcreener/team-core';
+import { Button } from '@xcreener/ui';
 import { useTeamStore } from '../store';
 import { RoleSelect } from './RoleSelect';
 

@@ -1,15 +1,15 @@
 ---
 name: platform-audit
-description: Full, evidence-based technical audit of the SnapGlow platform (Tauri 2 + React desktop app with Rust capture/OCR, TanStack Start web app and public share viewer, Fastify API with Auth0, Postgres, Redis, S3, Stripe, collab WebSocket, Expo mobile app, VS Code / Figma / Notion plugins, shared packages, CI). Covers security, performance, architecture, reliability, testing, observability, privacy. Use when the user asks for an audit, a whole-platform security review, a production-readiness check, a threat model, or a "full audit". Accepts an optional scope argument (desktop, rust, web, api, mobile, plugins, packages, ci, all).
+description: Full, evidence-based technical audit of the Xcreener platform (Tauri 2 + React desktop app with Rust capture/OCR, TanStack Start web app and public share viewer, Fastify API with Auth0, Postgres, Redis, S3, Stripe, collab WebSocket, Expo mobile app, VS Code / Figma / Notion plugins, shared packages, CI). Covers security, performance, architecture, reliability, testing, observability, privacy. Use when the user asks for an audit, a whole-platform security review, a production-readiness check, a threat model, or a "full audit". Accepts an optional scope argument (desktop, rust, web, api, mobile, plugins, packages, ci, all).
 ---
 
-# SnapGlow platform audit
+# Xcreener platform audit
 
 Act as a Senior Software Architect, Application Security Engineer, DevSecOps Engineer, Performance Engineer, and TypeScript / React / Tauri / Rust / Fastify / React Native engineer.
 
 Goal: a **real audit of this repository**, not a best-practices essay. For each area, determine what is well designed, what works but can improve, bad practices, likely bugs or regressions, security issues, performance problems, technical debt, scaling risks, what is missing for serious production use, and in what order to fix things.
 
-SnapGlow captures **whatever is on the user's screen** (passwords, private messages, customer data), sells itself as **privacy-first**, and turns captures into **public links**. Weigh findings with that in mind, and check the privacy claims in code.
+Xcreener captures **whatever is on the user's screen** (passwords, private messages, customer data), sells itself as **privacy-first**, and turns captures into **public links**. Weigh findings with that in mind, and check the privacy claims in code.
 
 ## Scope (argument)
 
@@ -27,15 +27,15 @@ A partial scope uses the same report format, limited to the relevant sections, a
 
 ## Actual system (verified in the repo; re-check at audit time)
 
-Never assume: re-read manifests, `AGENTS.md`, `README.md`, `design.md`, ADRs in `docs/architecture/adr/`, and `docs/architecture/desktop-stack.md` at the start of every audit; versions move. The repo folder is `screen-cut`, the GitHub repo `ScreenCut`, the product **SnapGlow**: same project.
+Never assume: re-read manifests, `AGENTS.md`, `README.md`, `design.md`, ADRs in `docs/architecture/adr/`, and `docs/architecture/desktop-stack.md` at the start of every audit; versions move. The repo folder is `screen-cut`, the GitHub repo `ScreenCut`, the product **Xcreener**: same project.
 
 | Part | Location | Observed stack |
 |---|---|---|
 | Desktop UI | `apps/desktop/src` (`modules/{balance,capture,cloud,collab,editor,export,history,integrations,licensing,marketplace,redaction,settings,style-suggestion,team,text-extraction}`, `db/`, `tauri/commands.ts`, `integrations/observability.ts`) | React 19, Vite, React Router, Zustand, Zod, `@tauri-apps/plugin-sql` (SQL from the WebView), PostHog, Sentry, i18n, Playwright + wdio native E2E |
-| Desktop Rust | `apps/desktop/src-tauri/src` (`commands/`, `capture/`, `overlay*.rs`, `ocr/`, `classification/`, `image_processing/`, `redaction/`, `shortcuts.rs`, `tray.rs`) | Tauri 2 (`withGlobalTauri`, `macOSPrivateApi`, asset protocol), ~41 commands, plugins sql/fs/opener/deep-link/updater/process/clipboard/global-shortcut/autostart/dialog, xcap + ScreenCaptureKit, Vision / Windows OCR / `tesseract` CLI, tract-tflite, imagequant/webp/gif/openh264/mp4, capabilities `default.json` (window `main`) and `overlay.json` (window `capture-overlay`), deep-link scheme `snapglow`, updater on GitHub releases (minisign) |
+| Desktop Rust | `apps/desktop/src-tauri/src` (`commands/`, `capture/`, `overlay*.rs`, `ocr/`, `classification/`, `image_processing/`, `redaction/`, `shortcuts.rs`, `tray.rs`) | Tauri 2 (`withGlobalTauri`, `macOSPrivateApi`, asset protocol), ~41 commands, plugins sql/fs/opener/deep-link/updater/process/clipboard/global-shortcut/autostart/dialog, xcap + ScreenCaptureKit, Vision / Windows OCR / `tesseract` CLI, tract-tflite, imagequant/webp/gif/openh264/mp4, capabilities `default.json` (window `main`) and `overlay.json` (window `capture-overlay`), deep-link scheme `xcreener`, updater on GitHub releases (minisign) |
 | Web | `apps/web/src` (`routes/{s,e,c,blog,help,marketplace,auth}`, `affiliates.tsx`, `redeem.tsx`, `sitemap.xml.ts`) | TanStack Start + Nitro, TanStack Query, Tailwind 4, Sentry, PostHog, t3-env |
 | API | `apps/api/src` (`app.ts`, `env.ts`, `routes/`, `plugins/{auth,api-key-auth,workspace-auth,collab-ws,stripe-webhook,openapi-docs}`, `services/{storage,redis,render,collab-room,collab-ops,notifications,auth0-management}`, `db/schema.ts`), `drizzle/` migrations 0000-0007, `openapi/public.yaml` | Fastify 5, `@fastify/{helmet,cors,multipart,websocket,swagger-ui}`, jose (Auth0 JWKS), API keys (SHA-256), Drizzle + postgres.js, ioredis (rate limits), S3 SDK (MinIO locally), Stripe, Rewardful, Resend/SMTP, OAuth integrations (Slack, Notion, Linear, GitHub, Atlassian, MS Teams), `@napi-rs/canvas` server rendering, k6 load tests |
-| Mobile | `apps/mobile` (`app/`, `app.config.ts`, EAS) | Expo SDK 56, Expo Router, Skia, share intent, media library, AsyncStorage, scheme `snapglow` |
+| Mobile | `apps/mobile` (`app/`, `app.config.ts`, EAS) | Expo SDK 56, Expo Router, Skia, share intent, media library, AsyncStorage, scheme `xcreener` |
 | Plugins | `apps/vscode-extension`, `apps/figma-plugin`, `apps/notion-embed` | VS Code `SecretStorage` API key, Figma plugin (`code.ts` + `ui.ts`), standalone Node server for Notion OAuth/embeds |
 | Packages | `packages/{api-core,cloud-core,collab-core,editor-core,integrations-core,marketplace-core,ocr-core,plugin-core,redaction-core,render-core,style-suggestion-core,sync-core,team-core,sdk,ui,ui-native,design-tokens,i18n,typescript-config,biome-config}` | Shared domain logic used by desktop, web, mobile, API, and plugins |
 | Tooling | `tools/style-classifier` | Python dataset/model tooling for the style classifier |
@@ -70,12 +70,12 @@ mise run lint
 mise run typecheck
 mise run test
 mise run i18n:check
-pnpm --filter @snapglow/api test        # needs Postgres + Redis (mise run api:infra)
-pnpm --filter @snapglow/desktop test:e2e
+pnpm --filter @xcreener/api test        # needs Postgres + Redis (mise run api:infra)
+pnpm --filter @xcreener/desktop test:e2e
 (cd apps/desktop/src-tauri && cargo clippy --all-targets -- -D warnings && cargo test)
 
 # Local stack
-mise run api:infra && pnpm --filter @snapglow/api db:migrate
+mise run api:infra && pnpm --filter @xcreener/api db:migrate
 mise run dev:api            # :8787
 mise run load:api           # k6 baseline, localhost only
 
@@ -86,15 +86,15 @@ pnpm outdated -r
 bash apps/api/scripts/security-scan.sh       # pnpm audit + optional ZAP baseline on localhost
 
 # Bundles
-pnpm --filter @snapglow/desktop build && du -sh apps/desktop/dist/assets/* | sort -h | tail
-pnpm --filter @snapglow/web build
+pnpm --filter @xcreener/desktop build && du -sh apps/desktop/dist/assets/* | sort -h | tail
+pnpm --filter @xcreener/web build
 ```
 
 If a tool is missing (gitleaks, osv-scanner, cargo-audit, cargo-deny, trivy, k6, semgrep), say so and give the command; do not install globally without consent.
 
 ## Procedure
 
-Follow the steps in order. Per-step detail is in [references/checklist.md](references/checklist.md); SnapGlow-specific leads to check first are in `docs/internal/audits/snapglow-hotspots.md` (gitignored, so only on the maintainer's machine; skip this if it is missing).
+Follow the steps in order. Per-step detail is in [references/checklist.md](references/checklist.md); Xcreener-specific leads to check first are in `docs/internal/audits/xcreener-hotspots.md` (gitignored, so only on the maintainer's machine; skip this if it is missing).
 
 1. Repository discovery and inventory of actual versions (lockfiles included).
 2. Architecture and data flow mapping (logical DFD), including capture → edit → share/sync/collab.

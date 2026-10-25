@@ -51,7 +51,7 @@ export async function sendToConfluencePage(input: {
       },
       body: JSON.stringify({
         fileName: input.filename,
-        comment: input.caption ?? 'SnapGlow export',
+        comment: input.caption ?? 'Xcreener export',
         contentType: input.blob.type || 'image/png',
         content: base64,
       }),

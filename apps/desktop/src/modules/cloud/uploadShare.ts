@@ -1,4 +1,4 @@
-import type { CreateShareResponse, ShareExpiry } from '@snapglow/cloud-core';
+import type { CreateShareResponse, ShareExpiry } from '@xcreener/cloud-core';
 import { getWorkspaceHeaders } from '@/modules/team/headers';
 import { getValidAccessToken } from './auth';
 import { getApiUrl } from './config';
@@ -10,7 +10,7 @@ export async function uploadShare(
 ): Promise<CreateShareResponse> {
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
-    throw new Error('Sign in to SnapGlow cloud before sharing');
+    throw new Error('Sign in to Xcreener cloud before sharing');
   }
 
   const formData = new FormData();
@@ -38,7 +38,7 @@ export async function uploadShare(
 export async function revokeShare(token: string): Promise<void> {
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
-    throw new Error('Sign in to SnapGlow cloud before revoking a link');
+    throw new Error('Sign in to Xcreener cloud before revoking a link');
   }
 
   const response = await fetch(`${getApiUrl()}/v1/shares/${encodeURIComponent(token)}`, {

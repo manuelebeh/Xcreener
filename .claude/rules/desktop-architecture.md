@@ -5,7 +5,7 @@ paths:
 
 # Desktop Architecture - Modules / App / Shared
 
-The SnapGlow desktop frontend uses a **module-first** architecture: domain modules, an app shell, shared types, Tauri IPC wrappers, and local SQLite.
+The Xcreener desktop frontend uses a **module-first** architecture: domain modules, an app shell, shared types, Tauri IPC wrappers, and local SQLite.
 
 ## Directory Structure
 

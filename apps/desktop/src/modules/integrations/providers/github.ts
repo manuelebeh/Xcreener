@@ -62,7 +62,7 @@ export async function sendToGitHubIssue(input: {
 }): Promise<string> {
   const buffer = await input.blob.arrayBuffer();
   const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-  const body = `${input.title ?? 'SnapGlow export'}\n\n![${input.filename}](data:${input.blob.type};base64,${base64})`;
+  const body = `${input.title ?? 'Xcreener export'}\n\n![${input.filename}](data:${input.blob.type};base64,${base64})`;
 
   if (input.issueNumber) {
     const response = await fetch(

@@ -12,7 +12,7 @@ Users with multiple devices need captures and settings synchronized when cloud l
 
 ### Sync model
 
-- **`@snapglow/sync-core`** — cursors, settings merge (LWW per key), DTOs
+- **`@xcreener/sync-core`** — cursors, settings merge (LWW per key), DTOs
 - **Library pull:** `GET /v1/sync/library?since=` returns items updated after cursor
 - **Settings:** `GET/PUT /v1/users/me/settings` with per-key JSON + `updatedAt`
 - **Soft delete:** `library_items.deleted_at` + `sync_version` increment

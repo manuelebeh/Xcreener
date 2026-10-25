@@ -47,17 +47,17 @@ jobs:
       - name: Require entitlement public key
         shell: bash
         env:
-          SNAPGLOW_ENTITLEMENT_PUBLIC_KEY: ${{ vars.SNAPGLOW_ENTITLEMENT_PUBLIC_KEY }}
+          XCREENER_ENTITLEMENT_PUBLIC_KEY: ${{ vars.XCREENER_ENTITLEMENT_PUBLIC_KEY }}
         run: |
-          if [ -z "$SNAPGLOW_ENTITLEMENT_PUBLIC_KEY" ]; then
-            echo "::error::Set the SNAPGLOW_ENTITLEMENT_PUBLIC_KEY repository variable (apps/api/scripts/generate-entitlement-keys.ts)."
+          if [ -z "$XCREENER_ENTITLEMENT_PUBLIC_KEY" ]; then
+            echo "::error::Set the XCREENER_ENTITLEMENT_PUBLIC_KEY repository variable (apps/api/scripts/generate-entitlement-keys.ts)."
             exit 1
           fi
 
       - name: Build app (no bundle, no signing)
         env:
-          SNAPGLOW_ENTITLEMENT_PUBLIC_KEY: ${{ vars.SNAPGLOW_ENTITLEMENT_PUBLIC_KEY }}
-        run: mise exec -- pnpm --filter @snapglow/desktop tauri build --no-bundle --ci --target ${{ matrix.target }}
+          XCREENER_ENTITLEMENT_PUBLIC_KEY: ${{ vars.XCREENER_ENTITLEMENT_PUBLIC_KEY }}
+        run: mise exec -- pnpm --filter @xcreener/desktop tauri build --no-bundle --ci --target ${{ matrix.target }}
 
       # The frontend is embedded in the binary; dist/ only satisfies the CLI's
       # frontendDist check in the bundle job. Paths are kept relative to apps/desktop.
@@ -67,8 +67,8 @@ jobs:
           name: binary-${{ matrix.target }}
           path: |
             apps/desktop/dist
-            apps/desktop/src-tauri/target/${{ matrix.target }}/release/snapglow-desktop
-            apps/desktop/src-tauri/target/${{ matrix.target }}/release/snapglow-desktop.exe
+            apps/desktop/src-tauri/target/${{ matrix.target }}/release/xcreener-desktop
+            apps/desktop/src-tauri/target/${{ matrix.target }}/release/xcreener-desktop.exe
           if-no-files-found: error
           retention-days: 1
 
@@ -119,11 +119,11 @@ jobs:
           # WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           # WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
         run: |
-          chmod +x "target/${{ matrix.target }}/release/snapglow-desktop" 2>/dev/null || true
+          chmod +x "target/${{ matrix.target }}/release/xcreener-desktop" 2>/dev/null || true
           cargo tauri bundle --ci --target ${{ matrix.target }} \
             --config '{"bundle":{"createUpdaterArtifacts":true}}'
 
-      # Both macOS targets produce SnapGlow.app.tar.gz: give each a unique release name.
+      # Both macOS targets produce Xcreener.app.tar.gz: give each a unique release name.
       - name: Collect release files
         shell: bash
         run: |
@@ -131,8 +131,8 @@ jobs:
           mkdir -p out
           if [ "${{ runner.os }}" = "macOS" ]; then
             cp "$bundle"/dmg/*.dmg out/
-            cp "$bundle/macos/SnapGlow.app.tar.gz" "out/SnapGlow_${{ matrix.updater }}.app.tar.gz"
-            cp "$bundle/macos/SnapGlow.app.tar.gz.sig" "out/SnapGlow_${{ matrix.updater }}.app.tar.gz.sig"
+            cp "$bundle/macos/Xcreener.app.tar.gz" "out/Xcreener_${{ matrix.updater }}.app.tar.gz"
+            cp "$bundle/macos/Xcreener.app.tar.gz.sig" "out/Xcreener_${{ matrix.updater }}.app.tar.gz.sig"
           else
             cp "$bundle"/msi/*.msi "$bundle"/msi/*.msi.sig out/
             cp "$bundle"/nsis/*-setup.exe "$bundle"/nsis/*-setup.exe.sig out/
@@ -186,8 +186,8 @@ jobs:
           jq -n \
             --arg version "${TAG#v}" \
             --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-            --argjson arm "$(entry SnapGlow_darwin-aarch64.app.tar.gz)" \
-            --argjson intel "$(entry SnapGlow_darwin-x86_64.app.tar.gz)" \
+            --argjson arm "$(entry Xcreener_darwin-aarch64.app.tar.gz)" \
+            --argjson intel "$(entry Xcreener_darwin-x86_64.app.tar.gz)" \
             --argjson win "$(entry "$setup")" \
             '{version: $version, pub_date: $date, platforms: {"darwin-aarch64": $arm, "darwin-x86_64": $intel, "windows-x86_64": $win}}' \
             > latest.json
@@ -201,5 +201,5 @@ jobs:
           gh release create "$TAG" out/* \
             --repo "${{ github.repository }}" \
             --draft \
-            --title "SnapGlow $TAG" \
+            --title "Xcreener $TAG" \
             --notes "See the assets to download and install this version."

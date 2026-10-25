@@ -88,7 +88,7 @@ function resolveNativeDriverArgs() {
 /** On failure, replay the session request by hand so the driver's own error message reaches the log. */
 async function probeSessionCreation() {
   const ext = process.platform === 'win32' ? '.exe' : '';
-  const application = process.env.TAURI_APP_PATH ?? path.join(tauriDir, 'target', 'debug', `snapglow-desktop${ext}`);
+  const application = process.env.TAURI_APP_PATH ?? path.join(tauriDir, 'target', 'debug', `xcreener-desktop${ext}`);
 
   try {
     const response = await fetch(`http://127.0.0.1:${driverPort}/session`, {
@@ -108,7 +108,7 @@ async function probeSessionCreation() {
 async function smokeLaunchApp() {
   const ext = process.platform === 'win32' ? '.exe' : '';
   const application =
-    process.env.TAURI_APP_PATH ?? path.join(tauriDir, 'target', 'debug', `snapglow-desktop${ext}`);
+    process.env.TAURI_APP_PATH ?? path.join(tauriDir, 'target', 'debug', `xcreener-desktop${ext}`);
   const [command, args] =
     process.platform === 'linux' ? ['xvfb-run', ['-a', application]] : [application, []];
 

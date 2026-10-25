@@ -1,1 +1,1 @@
-export { createAnnotationFromDrag, createTextAnnotation } from '@snapglow/editor-core';
+export { createAnnotationFromDrag, createTextAnnotation } from '@xcreener/editor-core';

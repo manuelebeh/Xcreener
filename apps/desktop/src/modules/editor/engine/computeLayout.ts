@@ -3,5 +3,5 @@ export {
   autoPadding,
   computeLayout as computeLayoutCore,
   zoomTransformAtPointer,
-} from '@snapglow/editor-core';
-export { computeLayout } from '@snapglow/render-core';
+} from '@xcreener/editor-core';
+export { computeLayout } from '@xcreener/render-core';

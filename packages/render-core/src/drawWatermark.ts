@@ -1,4 +1,4 @@
-import type { WatermarkConfig, WatermarkPosition } from '@snapglow/editor-core';
+import type { WatermarkConfig, WatermarkPosition } from '@xcreener/editor-core';
 
 const WATERMARK_PADDING = 16;
 const WATERMARK_FONT = '600 14px "IBM Plex Sans", system-ui, sans-serif';

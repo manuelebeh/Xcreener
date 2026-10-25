@@ -4,7 +4,7 @@ import {
   slugifyTemplateTitle,
   type TemplateListingResponse,
   type TemplateListResponse,
-} from '@snapglow/marketplace-core';
+} from '@xcreener/marketplace-core';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

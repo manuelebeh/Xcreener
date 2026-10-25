@@ -3,7 +3,7 @@ import {
   type UsagePeriod,
   usagePeriodDays,
   type WorkspaceUsageResponse,
-} from '@snapglow/team-core';
+} from '@xcreener/team-core';
 import { and, eq, gte, sql } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type { FastifyInstance } from 'fastify';

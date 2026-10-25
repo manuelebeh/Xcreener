@@ -26,4 +26,4 @@ Deploy the Action before the API version that requires `email_verified` (FINDING
 | `create:organizations` | `POST /v1/workspaces/:id/sso/enable` |
 | `delete:users` | `DELETE /v1/users/me` (account deletion also removes the Auth0 identity) |
 
-Without the secrets, account deletion still erases SnapGlow data and answers `identityDeleted: false`; the person can sign in again and gets an empty account.
+Without the secrets, account deletion still erases Xcreener data and answers `identityDeleted: false`; the person can sign in again and gets an empty account.

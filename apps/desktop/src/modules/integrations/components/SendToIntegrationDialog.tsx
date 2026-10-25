@@ -1,5 +1,5 @@
-import type { IntegrationProvider } from '@snapglow/integrations-core';
-import { Button, Input, Label, Select } from '@snapglow/ui';
+import type { IntegrationProvider } from '@xcreener/integrations-core';
+import { Button, Input, Label, Select } from '@xcreener/ui';
 import { useCallback, useEffect, useState } from 'react';
 import {
   listConfluencePages,

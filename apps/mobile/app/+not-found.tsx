@@ -1,4 +1,4 @@
-import { Button, useTheme } from '@snapglow/ui-native';
+import { Button, useTheme } from '@xcreener/ui-native';
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 

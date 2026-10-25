@@ -9,7 +9,7 @@ import type {
   WorkspaceResponse,
   WorkspaceRole,
   WorkspaceUsageResponse,
-} from '@snapglow/team-core';
+} from '@xcreener/team-core';
 import { getValidAccessToken } from '@/modules/cloud/auth';
 import { getApiUrl } from '@/modules/cloud/config';
 import { getWorkspaceHeaders } from './headers';
@@ -17,7 +17,7 @@ import { getWorkspaceHeaders } from './headers';
 export async function teamFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
-    throw new Error('Sign in to SnapGlow cloud to manage teams');
+    throw new Error('Sign in to Xcreener cloud to manage teams');
   }
 
   const headers = new Headers(init.headers);
@@ -151,7 +151,7 @@ export async function updateBrandKit(
 export async function uploadBrandKitLogo(workspaceId: string, file: File): Promise<BrandKitConfig> {
   const accessToken = await getValidAccessToken();
   if (!accessToken) {
-    throw new Error('Sign in to SnapGlow cloud to manage brand kit');
+    throw new Error('Sign in to Xcreener cloud to manage brand kit');
   }
 
   const formData = new FormData();

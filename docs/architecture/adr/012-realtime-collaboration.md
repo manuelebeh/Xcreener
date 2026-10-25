@@ -12,7 +12,7 @@ Sprint 3.1–3.2 delivered workspaces, roles, and billing (ADR-011). Phase 3 col
 
 ### Shared package
 
-- **`@snapglow/collab-core`** — WebSocket message types, document/comment/notification DTOs, mention parsing, participant colors
+- **`@xcreener/collab-core`** — WebSocket message types, document/comment/notification DTOs, mention parsing, participant colors
 
 ### Data model (Postgres `0003_collab.sql`)
 

@@ -1,6 +1,6 @@
 /* Desktop shell styles. Theme: ./theme.css (neutral chrome, blue accent, system fonts). See DESIGN.md. */
 
-@import '@snapglow/ui/styles.css';
+@import '@xcreener/ui/styles.css';
 @import './theme.css';
 
 html,

@@ -5,7 +5,7 @@ primary_target: "src/main.tsx"
 related_targets: []
 ---
 
-# Surface brief: SnapGlow desktop (whole app)
+# Surface brief: Xcreener desktop (whole app)
 
 Mode: Operate. Scope: main window (editor, library, settings) and capture overlay, phased. Phase 1: theme, shell, editor.
 Audience and job: capturers and creators; quick pass or long polish. Constraint: stay close to category standards so users keep their habits.

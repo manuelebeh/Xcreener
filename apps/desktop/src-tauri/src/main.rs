@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    snapglow_desktop_lib::run()
+    xcreener_desktop_lib::run()
 }

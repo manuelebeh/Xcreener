@@ -1,5 +1,5 @@
-import type { WorkspaceRole } from '@snapglow/team-core';
-import { Button, Input } from '@snapglow/ui';
+import type { WorkspaceRole } from '@xcreener/team-core';
+import { Button, Input } from '@xcreener/ui';
 import { useState } from 'react';
 import { useTeamStore } from '../store';
 import { RoleSelect } from './RoleSelect';

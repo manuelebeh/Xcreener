@@ -1,4 +1,4 @@
-import type { AnnotationOp } from '@snapglow/collab-core';
+import type { AnnotationOp } from '@xcreener/collab-core';
 import type { Annotation } from '@/modules/editor/annotations/types';
 import { cloneAnnotations } from '@/modules/editor/annotations/utils';
 import { getPresetById } from '@/modules/editor/engine/presets';

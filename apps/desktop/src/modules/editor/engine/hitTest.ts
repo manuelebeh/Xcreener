@@ -3,4 +3,4 @@ export {
   hitTestAnnotation,
   hitTestHandle,
   hitTestSingleAnnotation,
-} from '@snapglow/editor-core';
+} from '@xcreener/editor-core';

@@ -1,4 +1,4 @@
-import type { LayoutRect, ShadowConfig } from '@snapglow/editor-core';
+import type { LayoutRect, ShadowConfig } from '@xcreener/editor-core';
 
 function roundRectPath(ctx: CanvasRenderingContext2D, rect: LayoutRect, radius: number): void {
   const r = Math.min(radius, rect.width / 2, rect.height / 2);

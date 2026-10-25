@@ -18,7 +18,7 @@ export function captureTestEvent(): void {
   const analyticsEnabled = useSettingsStore.getState().analyticsEnabled;
   if (!isAnalyticsActive(analyticsEnabled) || !posthog.__loaded) {
     if (import.meta.env.DEV) {
-      console.info('[SnapGlow] Skipped test event - analytics not active');
+      console.info('[Xcreener] Skipped test event - analytics not active');
     }
     return;
   }

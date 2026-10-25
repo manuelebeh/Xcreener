@@ -1,5 +1,5 @@
-import type { CollabServerMessage, ParticipantPresence } from '@snapglow/collab-core';
-import { COLLAB_PRESENCE_TTL_SECONDS } from '@snapglow/collab-core';
+import type { CollabServerMessage, ParticipantPresence } from '@xcreener/collab-core';
+import { COLLAB_PRESENCE_TTL_SECONDS } from '@xcreener/collab-core';
 import type Redis from 'ioredis';
 import { getRedis } from './redis';
 

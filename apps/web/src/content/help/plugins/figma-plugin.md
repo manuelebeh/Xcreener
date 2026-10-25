@@ -7,7 +7,7 @@ order: 2
 
 # Figma plugin
 
-The SnapGlow Figma plugin connects design frames with the public capture API.
+The Xcreener Figma plugin connects design frames with the public capture API.
 
 ## Setup
 
@@ -17,7 +17,7 @@ The SnapGlow Figma plugin connects design frames with the public capture API.
 
 ## Import
 
-Select frames in Figma and import them as SnapGlow captures for beautify and export.
+Select frames in Figma and import them as Xcreener captures for beautify and export.
 
 ## Export
 

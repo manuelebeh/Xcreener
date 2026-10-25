@@ -1,4 +1,4 @@
-import { isBillableRole } from '@snapglow/team-core';
+import { isBillableRole } from '@xcreener/team-core';
 import { eq } from 'drizzle-orm';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import type Stripe from 'stripe';
