@@ -1,4 +1,5 @@
 import type { DetectionKind, SensitiveRegion } from '@snapglow/redaction-core';
+import type { BlurMode } from '@/modules/editor/annotations/types';
 
 export type RedactionStatus = 'idle' | 'scanning' | 'ready' | 'error';
 
@@ -18,3 +19,20 @@ export const DETECTION_KIND_COLORS: Record<DetectionKind, string> = {
 export function detectionColor(kind: DetectionKind | string): string {
   return DETECTION_KIND_COLORS[kind as DetectionKind] ?? 'rgba(148, 163, 184, 0.35)';
 }
+
+export interface RedactionStyle {
+  mode: BlurMode;
+  /** Fill color of the `solid` mode. */
+  color: string;
+}
+
+/** What the user picks in the panel: several detector kinds share one toggle. */
+export const REDACTION_CATEGORIES: { id: string; label: string; kinds: DetectionKind[] }[] = [
+  { id: 'email', label: 'Email addresses', kinds: ['email'] },
+  { id: 'phone', label: 'Phone numbers', kinds: ['phone'] },
+  { id: 'card', label: 'Credit cards', kinds: ['card'] },
+  { id: 'secret', label: 'API keys & passwords', kinds: ['api_key', 'password'] },
+  { id: 'url', label: 'URLs', kinds: ['url'] },
+];
+
+export const DEFAULT_REDACTION_STYLE: RedactionStyle = { mode: 'gaussian', color: '#000000' };
