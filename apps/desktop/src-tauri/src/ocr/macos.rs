@@ -26,23 +26,14 @@ impl OcrEngine for MacOcrEngine {
         let _guard = VISION_LOCK
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner());
-        let data = NSData::with_bytes(png_bytes);
-        let options = NSDictionary::<objc2_vision::VNImageOption, AnyObject>::new();
-        let handler = VNImageRequestHandler::initWithData_options(
-            VNImageRequestHandler::alloc(),
-            &data,
-            &options,
-        );
-
-        let request = VNRecognizeTextRequest::new();
-        request.setRecognitionLevel(VNRequestTextRecognitionLevel::Accurate);
-
-        let request_super: Retained<VNRequest> = request.clone().into_super().into_super();
-        let requests = NSArray::from_retained_slice(&[request_super]);
-
-        handler
-            .performRequests_error(&requests)
-            .map_err(|error| error.localizedDescription().to_string())?;
+        // Accurate needs its model compiled into the system cache on first use. When
+        // that fails (e.g. a full disk), Vision reports CRImageReaderError 1; the
+        // fast model still works, so fall back to it before giving up.
+        let request = perform_text_request(png_bytes, VNRequestTextRecognitionLevel::Accurate)
+            .or_else(|accurate_error| {
+                perform_text_request(png_bytes, VNRequestTextRecognitionLevel::Fast)
+                    .map_err(|_| accurate_error)
+            })?;
 
         let observations = request.results();
         let Some(observations) = observations else {
@@ -84,4 +75,29 @@ impl OcrEngine for MacOcrEngine {
 
         Ok(lines)
     }
+}
+
+fn perform_text_request(
+    png_bytes: &[u8],
+    level: VNRequestTextRecognitionLevel,
+) -> Result<Retained<VNRecognizeTextRequest>, String> {
+    let data = NSData::with_bytes(png_bytes);
+    let options = NSDictionary::<objc2_vision::VNImageOption, AnyObject>::new();
+    let handler = VNImageRequestHandler::initWithData_options(
+        VNImageRequestHandler::alloc(),
+        &data,
+        &options,
+    );
+
+    let request = VNRecognizeTextRequest::new();
+    request.setRecognitionLevel(level);
+
+    let request_super: Retained<VNRequest> = request.clone().into_super().into_super();
+    let requests = NSArray::from_retained_slice(&[request_super]);
+
+    handler
+        .performRequests_error(&requests)
+        .map_err(|error| error.localizedDescription().to_string())?;
+
+    Ok(request)
 }
