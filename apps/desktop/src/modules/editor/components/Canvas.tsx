@@ -18,9 +18,11 @@ import {
 } from '../hooks/useAnnotationInteraction';
 import { useBeautifyRender } from '../hooks/useBeautifyRender';
 import { useEditorShortcuts } from '../hooks/useEditorShortcuts';
+import { useViewZoomShortcuts } from '../hooks/useViewZoomShortcuts';
 import { useEditorStore } from '../store';
 import type { RenderInput } from '../types';
 import { TextEditorOverlay } from './TextEditorOverlay';
+import { ZoomMenu } from './ZoomMenu';
 
 /** Stage padding (p-8) around the preview, subtracted from the measured stage size. */
 const STAGE_PADDING = 64;
@@ -33,6 +35,7 @@ export function Canvas() {
   const shadow = useEditorStore((s) => s.shadow);
   const selectedPresetId = useEditorStore((s) => s.selectedPresetId);
   const transform = useEditorStore((s) => s.transform);
+  const viewZoom = useEditorStore((s) => s.viewZoom);
   const customPresets = useEditorStore((s) => s.customPresets);
   const annotations = useEditorStore((s) => s.annotations);
   const selectedAnnotationId = useEditorStore((s) => s.selectedAnnotationId);
@@ -130,6 +133,13 @@ export function Canvas() {
       return { width: 0, height: 0 };
     }
 
+    if (viewZoom !== null) {
+      return {
+        width: Math.round(layout.canvasWidth * viewZoom),
+        height: Math.round(layout.canvasHeight * viewZoom),
+      };
+    }
+
     const fitted = fitPreviewSize(
       layout.canvasWidth,
       layout.canvasHeight,
@@ -142,7 +152,7 @@ export function Canvas() {
       return { width: Math.round(layout.canvasWidth), height: Math.round(layout.canvasHeight) };
     }
     return fitted;
-  }, [layout, containerSize]);
+  }, [layout, containerSize, viewZoom]);
 
   const displayScale = useMemo(() => {
     if (!layout || displaySize.width <= 0) {
@@ -213,6 +223,7 @@ export function Canvas() {
     enabled: canvasMounted,
   });
   useEditorShortcuts();
+  useViewZoomShortcuts(displayScale);
 
   const exportLabel = layout
     ? `${layout.canvasWidth} × ${layout.canvasHeight}px · final render`
@@ -224,12 +235,12 @@ export function Canvas() {
     <section className="flex h-full min-h-0 w-full flex-col" aria-label="Export preview">
       <div
         ref={containerRef}
-        className="app-stage flex min-h-0 flex-1 items-center justify-center p-8"
+        className="app-stage flex min-h-0 flex-1 overflow-auto p-8"
         data-testid="canvas-preview-stage"
       >
         {screenshot && layout && displaySize.width > 0 ? (
           <div
-            className="relative shrink-0 overflow-hidden shadow-[0_8px_30px_rgb(0_0_0/0.22)] ring-1 ring-black/10"
+            className="relative m-auto shrink-0 overflow-hidden shadow-[0_8px_30px_rgb(0_0_0/0.22)] ring-1 ring-black/10"
             style={{
               width: displaySize.width,
               height: displaySize.height,
@@ -257,9 +268,9 @@ export function Canvas() {
             <TextLayer displayScale={displayScale} />
           </div>
         ) : screenshot ? (
-          <p className="text-sm text-muted">Preparing preview…</p>
+          <p className="m-auto text-sm text-muted">Preparing preview…</p>
         ) : (
-          <p className="text-sm text-muted" data-testid="canvas-empty-state">
+          <p className="m-auto text-sm text-muted" data-testid="canvas-empty-state">
             Capture a screenshot to start beautifying
           </p>
         )}
@@ -268,9 +279,12 @@ export function Canvas() {
       <div className="flex h-7 shrink-0 items-center justify-between gap-2 border-t border-border bg-background px-3">
         <p className="text-xs text-muted">Export preview</p>
         {layout ? (
-          <p className="text-xs text-muted tabular-nums" data-testid="canvas-export-meta">
-            {presetLabel} · {exportLabel} · Fit {Math.round(displayScale * 100)}%
-          </p>
+          <div className="flex items-center gap-1">
+            <p className="text-xs text-muted tabular-nums" data-testid="canvas-export-meta">
+              {presetLabel} · {exportLabel} ·
+            </p>
+            <ZoomMenu scale={displayScale} />
+          </div>
         ) : null}
       </div>
     </section>
