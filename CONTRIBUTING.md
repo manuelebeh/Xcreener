@@ -20,4 +20,4 @@ The SnapGlow name and logo are not covered by the code licenses: see [TRADEMARKS
 
 ## Security issues
 
-Do not open a public issue for a vulnerability. Use [GitHub private vulnerability reporting](../../security/advisories/new) instead.
+Do not open a public issue for a vulnerability. Use [GitHub private vulnerability reporting](../../security/advisories/new) or write to hello@emmanuelebeh.dev instead.
