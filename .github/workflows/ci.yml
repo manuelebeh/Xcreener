@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: ci-${{ github.ref }}
-  # Every commit on main keeps its own verdict (trunk-based): only PR runs get superseded.
+  # Every commit on main keeps its own verdict: only PR runs get superseded.
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
