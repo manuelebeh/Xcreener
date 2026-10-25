@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-compress-export-bytes-command"
+description = "Enables the compress_export_bytes_command command without any pre-configured scope."
+commands.allow = ["compress_export_bytes_command"]
+
+[[permission]]
+identifier = "deny-compress-export-bytes-command"
+description = "Denies the compress_export_bytes_command command without any pre-configured scope."
+commands.deny = ["compress_export_bytes_command"]

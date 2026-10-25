@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-take-overlay-preview"
+description = "Enables the take_overlay_preview command without any pre-configured scope."
+commands.allow = ["take_overlay_preview"]
+
+[[permission]]
+identifier = "deny-take-overlay-preview"
+description = "Denies the take_overlay_preview command without any pre-configured scope."
+commands.deny = ["take_overlay_preview"]

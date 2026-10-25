@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-capture-native-command"
+description = "Enables the capture_native_command command without any pre-configured scope."
+commands.allow = ["capture_native_command"]
+
+[[permission]]
+identifier = "deny-capture-native-command"
+description = "Denies the capture_native_command command without any pre-configured scope."
+commands.deny = ["capture_native_command"]

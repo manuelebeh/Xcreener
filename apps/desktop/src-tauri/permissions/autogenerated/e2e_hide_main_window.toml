@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-e2e-hide-main-window"
+description = "Enables the e2e_hide_main_window command without any pre-configured scope."
+commands.allow = ["e2e_hide_main_window"]
+
+[[permission]]
+identifier = "deny-e2e-hide-main-window"
+description = "Denies the e2e_hide_main_window command without any pre-configured scope."
+commands.deny = ["e2e_hide_main_window"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-stash-capture-image"
+description = "Enables the stash_capture_image command without any pre-configured scope."
+commands.allow = ["stash_capture_image"]
+
+[[permission]]
+identifier = "deny-stash-capture-image"
+description = "Denies the stash_capture_image command without any pre-configured scope."
+commands.deny = ["stash_capture_image"]
