@@ -1,10 +1,11 @@
 # 2026-10-24 platform audit, FINDING-009: keep npm, Cargo and pinned Action SHAs current.
+# Monthly: each update PR runs the full native matrix. Security updates are not tied to this schedule.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 10
     # Expo SDK pins these: bump them with `expo install` during an SDK upgrade, not one by one.
     ignore:
@@ -23,7 +24,7 @@ updates:
   - package-ecosystem: cargo
     directory: /apps/desktop/src-tauri
     schedule:
-      interval: weekly
+      interval: monthly
     open-pull-requests-limit: 5
     groups:
       cargo-minor-and-patch:
@@ -32,7 +33,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     groups:
       actions:
         patterns: ['*']
