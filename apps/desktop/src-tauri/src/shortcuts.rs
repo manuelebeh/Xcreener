@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
 
-pub const DEFAULT_CAPTURE_SHORTCUT: &str = "CmdOrControl+Shift+KeyS";
+pub const DEFAULT_CAPTURE_SHORTCUT: &str = "CmdOrControl+Shift+Digit2";
 
 pub struct CaptureShortcutState(pub Mutex<String>);
 

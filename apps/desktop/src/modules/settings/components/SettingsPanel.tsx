@@ -65,7 +65,7 @@ export function SettingsPanel() {
   async function handleShortcutSave() {
     const normalized = normalizeCaptureShortcut(shortcutDraft);
     if (!isValidCaptureShortcut(normalized)) {
-      setShortcutError('Use Tauri format, e.g. CmdOrControl+Shift+KeyS');
+      setShortcutError('Use Tauri format, e.g. CmdOrControl+Shift+Digit2');
       setShortcutSaved(false);
       return;
     }
@@ -191,7 +191,7 @@ export function SettingsPanel() {
       <SettingsGroup title="Capture">
         <SettingsRow
           label="Global capture shortcut"
-          hint="Tauri format: modifiers + key (e.g. CmdOrControl+Shift+KeyS)"
+          hint="Tauri format: modifiers + key (e.g. CmdOrControl+Shift+Digit2)"
           htmlFor="capture-shortcut"
           footer={
             <>
@@ -218,7 +218,7 @@ export function SettingsPanel() {
                 setShortcutError(null);
               }}
               className="font-mono text-xs"
-              placeholder="CmdOrControl+Shift+KeyS"
+              placeholder="CmdOrControl+Shift+Digit2"
               aria-invalid={shortcutError ? true : undefined}
               aria-describedby={
                 shortcutError

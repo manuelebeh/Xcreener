@@ -9,7 +9,7 @@ Social screenshots need consistent padding and backgrounds. Here's a fast workfl
 
 ## 1. Capture the region
 
-Use `CmdOrControl+Shift+S` (customizable) to capture any window or zone.
+Use `CmdOrControl+Shift+2` (customizable) to capture any window or zone.
 
 ## 2. Pick a social preset
 
