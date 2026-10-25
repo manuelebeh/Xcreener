@@ -1,6 +1,7 @@
 {
   "name": "@snapglow/figma-plugin",
   "version": "0.1.0",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build": "esbuild src/code.ts --bundle --outfile=dist/code.js --format=iife --target=es2017 && esbuild src/ui.ts --bundle --outfile=dist/ui.js --format=iife --target=es2017 && node scripts/inline-ui.mjs",

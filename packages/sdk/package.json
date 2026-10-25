@@ -1,6 +1,7 @@
 {
   "name": "@snapglow/sdk",
   "version": "0.1.0-beta.1",
+  "license": "MIT",
   "private": false,
   "type": "module",
   "description": "Official SnapGlow REST API client",

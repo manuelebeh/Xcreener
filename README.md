@@ -71,4 +71,12 @@ Start at [`docs/README.md`](docs/README.md).
 
 ## License
 
-Private. See the repository owner.
+The product is licensed under the [GNU AGPL v3](LICENSE): `apps/desktop`, `apps/api`, `apps/web`, `apps/mobile` and the packages they are built from.
+
+Code meant to be embedded in other projects is [MIT](packages/sdk/LICENSE). Each of these directories has its own `LICENSE` file:
+
+- `packages/sdk`, `packages/api-core`, `packages/collab-core`, `packages/editor-core`, `packages/plugin-core`
+- `apps/vscode-extension`, `apps/figma-plugin`, `apps/notion-embed`
+- `packages/biome-config`, `packages/typescript-config`
+
+The SnapGlow name and logo are not covered by these licenses: see [TRADEMARKS.md](TRADEMARKS.md). Contributions require the [CLA](CLA.md), see [CONTRIBUTING.md](CONTRIBUTING.md).
