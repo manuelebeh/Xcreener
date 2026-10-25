@@ -193,7 +193,7 @@ export function HistoryView() {
         <div className="px-6 py-20 text-center" data-testid="history-empty">
           <p className="text-base font-semibold text-foreground">No captures yet</p>
           <p className="mt-1 text-sm text-muted">
-            Use Cmd+Shift+S (or Ctrl+Shift+S) to capture your first screenshot.
+            Use Cmd+Shift+2 (or Ctrl+Shift+2) to capture your first screenshot.
           </p>
         </div>
       ) : null}

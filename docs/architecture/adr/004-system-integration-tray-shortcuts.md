@@ -20,7 +20,7 @@ SnapGlow runs as a menu-bar / system-tray utility. Users expect show/hide from t
 ### Global shortcuts (`src-tauri/src/shortcuts.rs`)
 
 - Plugin: `tauri-plugin-global-shortcut`.
-- Default: `CmdOrControl+Shift+KeyS` (`DEFAULT_CAPTURE_SHORTCUT`).
+- Default: `CmdOrControl+Shift+Digit2` (`DEFAULT_CAPTURE_SHORTCUT`).
 - State: `CaptureShortcutState` mutex holds current shortcut string.
 - Registration: unregister previous → register new on change via `update_capture_shortcut` command.
 - On press: `overlay::open_capture_overlay` (fenêtre `capture-overlay` + snapshot preview).
