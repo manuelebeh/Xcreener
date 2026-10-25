@@ -1,6 +1,7 @@
 {
   "name": "@snapglow/web",
   "private": true,
+  "license": "AGPL-3.0-only",
   "type": "module",
   "imports": {
     "#/*": "./src/*"
