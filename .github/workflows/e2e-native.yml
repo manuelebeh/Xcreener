@@ -13,25 +13,46 @@ on:
   push:
     branches: [main]
     paths: *native-paths
+  # Windows and macOS bill at 2x and 10x: they run nightly, push and PR runs check Linux only.
+  schedule:
+    - cron: '0 3 * * *'
   workflow_dispatch:
 
 concurrency:
   group: e2e-native-${{ github.ref }}
-  cancel-in-progress: true
+  # Every commit on main keeps its own verdict (trunk-based): only PR runs get superseded.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
 jobs:
+  # The nightly run is skipped when nothing native changed in the last day.
+  changed:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+
+      - id: check
+        run: |
+          if [ "$GITHUB_EVENT_NAME" != schedule ] || [ -n "$(git log --since=25.hours --format=%H -- \
+            apps/desktop packages package.json pnpm-lock.yaml mise.toml .github/workflows/e2e-native.yml)" ]; then
+            echo run=true >> "$GITHUB_OUTPUT"
+          fi
+
   native-e2e-webdriver:
     name: WebDriver (${{ matrix.os }})
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # 24.04: PipeWire 1.0 headers match libspa 0.9 (xcap). jammy 0.3.48 breaks the build.
-          - os: ubuntu-24.04
-          - os: windows-latest
+        # 24.04: PipeWire 1.0 headers match libspa 0.9 (xcap). jammy 0.3.48 breaks the build.
+        os: ${{ fromJSON((github.event_name == 'pull_request' || github.event_name == 'push') && '["ubuntu-24.04"]' || '["ubuntu-24.04", "windows-latest"]') }}
 
     runs-on: ${{ matrix.os }}
     env:
@@ -118,8 +139,8 @@ jobs:
 
   native-e2e-macos:
     name: macOS (Rust + build)
-    # macOS minutes bill at 10x: check on main, not on every PR push.
-    if: github.event_name != 'pull_request'
+    needs: changed
+    if: needs.changed.outputs.run == 'true' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
