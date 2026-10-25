@@ -1,8 +1,7 @@
 name: Build
 
+# Manual only: Native E2E already compiles the app on main. Run this when you need installers.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
