@@ -3,8 +3,16 @@ name: Native E2E
 on:
   pull_request:
     branches: [main]
+    paths: &native-paths
+      - 'apps/desktop/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'mise.toml'
+      - '.github/workflows/e2e-native.yml'
   push:
     branches: [main]
+    paths: *native-paths
   workflow_dispatch:
 
 concurrency:
@@ -40,6 +48,11 @@ jobs:
       - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
         with:
           install: true
+
+      # Also caches ~/.cargo/bin, so the msedgedriver-tool and tauri-driver installs below are no-ops on a hit.
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: apps/desktop/src-tauri
 
       - name: Install Linux WebDriver dependencies
         if: runner.os == 'Linux'
@@ -105,6 +118,8 @@ jobs:
 
   native-e2e-macos:
     name: macOS (Rust + build)
+    # macOS minutes bill at 10x: check on main, not on every PR push.
+    if: github.event_name != 'pull_request'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -112,6 +127,10 @@ jobs:
       - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
         with:
           install: true
+
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: apps/desktop/src-tauri
 
       - name: Install dependencies
         run: mise run install
