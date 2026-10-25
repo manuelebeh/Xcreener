@@ -38,6 +38,21 @@ function applyPixelateBlur(
   ctx.putImageData(imageData, sx, sy);
 }
 
+function applySolidFill(
+  ctx: CanvasRenderingContext2D,
+  annotation: BlurAnnotation,
+  rect: { x: number; y: number; width: number; height: number },
+  pixelRatio: number
+): void {
+  const { sx, sy, sw, sh } = getBlurDeviceRect(rect, pixelRatio);
+  ctx.save();
+  // The rect is in device pixels (like putImageData); drop the pixel-ratio transform.
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = annotation.color ?? '#000000';
+  ctx.fillRect(sx, sy, sw, sh);
+  ctx.restore();
+}
+
 export function drawBlurMasks(
   ctx: CanvasRenderingContext2D,
   annotations: Annotation[],
@@ -65,6 +80,8 @@ export function drawBlurMasks(
 
     if (annotation.mode === 'gaussian') {
       applyGaussianBlur(ctx, annotation, rect, pixelRatio);
+    } else if (annotation.mode === 'solid') {
+      applySolidFill(ctx, annotation, rect, pixelRatio);
     } else {
       applyPixelateBlur(ctx, annotation, rect, pixelRatio);
     }

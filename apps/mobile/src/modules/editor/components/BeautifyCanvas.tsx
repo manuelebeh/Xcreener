@@ -294,30 +294,48 @@ function SceneContent({ input, image }: { input: RenderInput; image: SkImage }) 
         />
       </Group>
 
-      {blurAnnotations.map((annotation) => (
-        <BackdropFilter
-          key={annotation.id}
-          filter={
-            annotation.mode === 'gaussian' ? (
-              <Blur blur={Math.max(1, annotation.intensity * 0.45)} />
-            ) : (
-              <Blur blur={Math.max(1, annotation.intensity)} />
-            )
-          }
-          clip={{
-            rect: {
-              x: annotation.x,
-              y: annotation.y,
-              width: annotation.width,
-              height: annotation.height,
-            },
-            rx: 0,
-            ry: 0,
-          }}
-        >
-          <Fill color="transparent" />
-        </BackdropFilter>
-      ))}
+      {blurAnnotations.map((annotation) =>
+        annotation.mode === 'solid' ? (
+          <Group
+            key={annotation.id}
+            clip={{
+              rect: {
+                x: annotation.x,
+                y: annotation.y,
+                width: annotation.width,
+                height: annotation.height,
+              },
+              rx: 0,
+              ry: 0,
+            }}
+          >
+            <Fill color={annotation.color ?? '#000000'} />
+          </Group>
+        ) : (
+          <BackdropFilter
+            key={annotation.id}
+            filter={
+              annotation.mode === 'gaussian' ? (
+                <Blur blur={Math.max(1, annotation.intensity * 0.45)} />
+              ) : (
+                <Blur blur={Math.max(1, annotation.intensity)} />
+              )
+            }
+            clip={{
+              rect: {
+                x: annotation.x,
+                y: annotation.y,
+                width: annotation.width,
+                height: annotation.height,
+              },
+              rx: 0,
+              ry: 0,
+            }}
+          >
+            <Fill color="transparent" />
+          </BackdropFilter>
+        )
+      )}
 
       {vectorAnnotations.map((annotation) => (
         <AnnotationLayer key={annotation.id} annotation={annotation} />
