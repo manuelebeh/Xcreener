@@ -6,6 +6,7 @@ const MIGRATIONS: &[(i64, &str)] = &[
     (1, include_str!("../../../src/db/migrations/001_init.sql")),
     (2, include_str!("../../../src/db/migrations/002_library_ocr.sql")),
     (3, include_str!("../../../src/db/migrations/003_capture_uid.sql")),
+    (4, include_str!("../../../src/db/migrations/004_capture_shortcut_default.sql")),
 ];
 
 /// Splits a migration file into statements. A trigger body holds its own semicolons, so a
@@ -165,12 +166,12 @@ mod tests {
     fn migrates_an_empty_database() {
         let mut conn = Connection::open_in_memory().unwrap();
         apply(&mut conn).unwrap();
-        assert_eq!(latest_version(&conn), 3);
+        assert_eq!(latest_version(&conn), 4);
         assert!(column_exists(&conn, "captures", "uid").unwrap());
         assert!(table_exists(&conn, "captures_fts").unwrap());
 
         apply(&mut conn).unwrap();
-        assert_eq!(latest_version(&conn), 3);
+        assert_eq!(latest_version(&conn), 4);
     }
 
     #[test]
@@ -186,7 +187,7 @@ mod tests {
 
         apply(&mut conn).unwrap();
 
-        assert_eq!(latest_version(&conn), 3);
+        assert_eq!(latest_version(&conn), 4);
         let uid: Option<String> = conn
             .query_row("SELECT uid FROM captures", [], |row| row.get(0))
             .unwrap();
@@ -197,10 +198,44 @@ mod tests {
     fn skips_a_column_left_by_an_interrupted_run() {
         let mut conn = Connection::open_in_memory().unwrap();
         apply(&mut conn).unwrap();
-        conn.execute("DELETE FROM _schema_migrations WHERE version = 3", [])
+        conn.execute("DELETE FROM _schema_migrations WHERE version >= 3", [])
             .unwrap();
 
         apply(&mut conn).unwrap();
-        assert_eq!(latest_version(&conn), 3);
+        assert_eq!(latest_version(&conn), 4);
+    }
+
+    #[test]
+    fn moves_only_the_old_default_capture_shortcut() {
+        let mut conn = Connection::open_in_memory().unwrap();
+        apply(&mut conn).unwrap();
+        let shortcut = |conn: &Connection| -> String {
+            conn.query_row(
+                "SELECT value FROM settings WHERE key = 'captureShortcut'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap()
+        };
+
+        conn.execute(
+            "INSERT INTO settings (key, value) VALUES ('captureShortcut', 'CmdOrControl+Shift+KeyS')",
+            [],
+        )
+        .unwrap();
+        conn.execute("DELETE FROM _schema_migrations WHERE version = 4", [])
+            .unwrap();
+        apply(&mut conn).unwrap();
+        assert_eq!(shortcut(&conn), "CmdOrControl+Shift+Digit2");
+
+        conn.execute(
+            "UPDATE settings SET value = 'Alt+KeyX' WHERE key = 'captureShortcut'",
+            [],
+        )
+        .unwrap();
+        conn.execute("DELETE FROM _schema_migrations WHERE version = 4", [])
+            .unwrap();
+        apply(&mut conn).unwrap();
+        assert_eq!(shortcut(&conn), "Alt+KeyX");
     }
 }
