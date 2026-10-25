@@ -22,9 +22,9 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
           install: true
 
@@ -40,7 +40,7 @@ jobs:
 
       # Unsigned smoke builds only. Apple/Windows signing lives in release.yml
       # once certs are provisioned (see docs/guides/release-signing.md).
-      - uses: tauri-apps/tauri-action@84b9d35b5fc46c1e45415bdb6144030364f7ebc5 # v0
+      - uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Optional here: without it, smoke builds treat every account as free.
@@ -50,7 +50,7 @@ jobs:
           args: ${{ matrix.args }}
 
       - name: Upload unsigned artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: snapglow-${{ matrix.platform }}-${{ matrix.args || 'default' }}
           # `--target` builds land in target/<triple>/release, default builds in target/release.
