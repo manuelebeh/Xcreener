@@ -14,7 +14,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@snapglow/integrations-core": "workspace:*",
     "@snapglow/sdk": "workspace:*"
   },
   "devDependencies": {
