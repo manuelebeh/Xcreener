@@ -1,9 +1,5 @@
-import { Button } from '@snapglow/ui';
 import { NavLink } from 'react-router-dom';
-import { useCaptureStore } from '@/modules/capture';
 import { NotificationsBell } from '@/modules/collab/components/NotificationsBell';
-import { isTauriRuntime } from '@/shared/lib/tauri';
-import { startCapture as invokeStartCapture } from '@/tauri/commands';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Editor', end: true },
@@ -19,14 +15,6 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
       ? 'bg-surface text-foreground shadow-[0_0_0_0.5px_var(--sg-color-border),0_1px_2px_rgb(0_0_0/0.12)]'
       : 'text-muted hover:text-foreground',
   ].join(' ');
-
-async function startCapture() {
-  try {
-    await invokeStartCapture();
-  } catch (error) {
-    useCaptureStore.getState().setError(error instanceof Error ? error.message : String(error));
-  }
-}
 
 export function AppTopNav() {
   return (
@@ -47,11 +35,6 @@ export function AppTopNav() {
       </nav>
 
       <div className="flex items-center justify-end gap-1">
-        {isTauriRuntime() ? (
-          <Button type="button" size="sm" variant="secondary" onClick={() => void startCapture()}>
-            New capture
-          </Button>
-        ) : null}
         <NotificationsBell />
       </div>
     </header>
