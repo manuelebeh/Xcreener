@@ -466,9 +466,6 @@ importers:
 
   apps/notion-embed:
     dependencies:
-      '@snapglow/integrations-core':
-        specifier: workspace:*
-        version: link:../../packages/integrations-core
       '@snapglow/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
