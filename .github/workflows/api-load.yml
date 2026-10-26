@@ -85,7 +85,8 @@ jobs:
           S3_BUCKET: xcreener-shares
           S3_ACCESS_KEY: minioadmin
           S3_SECRET_KEY: minioadmin
-          API_RATE_LIMIT_GENERAL: '2000'
+          # The baseline sends ~2700 keyed requests a minute; the limit must stay above that.
+          API_RATE_LIMIT_GENERAL: '20000'
           PORT: '8787'
         run: pnpm exec tsx src/index.ts &
 
