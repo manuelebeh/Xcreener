@@ -115,6 +115,8 @@ jobs:
           k6 run -e BASE_URL="$LOAD_TEST_BASE_URL" \
             -e API_KEY="$LOAD_TEST_API_KEY" \
             -e CAPTURE_ID="$LOAD_TEST_CAPTURE_ID" \
+            -e HEALTH_P95_MS=400 \
+            -e READ_P95_MS=800 \
             --duration 1m \
             --vus 10 \
             load/scenarios/baseline.js

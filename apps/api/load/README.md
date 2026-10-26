@@ -50,7 +50,7 @@ k6 run -e BASE_URL="$LOAD_TEST_BASE_URL" \
   load/scenarios/baseline.js
 ```
 
-**Pass criteria:** `http_req_failed < 1%`, `http_req_duration{p(95)} < 500ms` on read routes.
+**Pass criteria:** `http_req_failed < 1%`, p95 under 200 ms on `/health` and under 500 ms on read routes. Override the limits with `-e HEALTH_P95_MS=...` and `-e READ_P95_MS=...`; the CI job uses 400 and 800 because the runner is shared with the API and its services.
 
 Or via mise:
 

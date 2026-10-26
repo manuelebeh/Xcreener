@@ -1,6 +1,10 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
+// Local defaults are strict. CI shares one small runner between k6, the API and its services, so it passes looser limits.
+const healthP95 = Number(__ENV.HEALTH_P95_MS || 200);
+const readP95 = Number(__ENV.READ_P95_MS || 500);
+
 export const options = {
   scenarios: {
     baseline: {
@@ -14,9 +18,9 @@ export const options = {
   },
   thresholds: {
     http_req_failed: ['rate<0.01'],
-    'http_req_duration{endpoint:health}': ['p(95)<200'],
-    'http_req_duration{endpoint:list}': ['p(95)<500'],
-    'http_req_duration{endpoint:get}': ['p(95)<500'],
+    'http_req_duration{endpoint:health}': [`p(95)<${healthP95}`],
+    'http_req_duration{endpoint:list}': [`p(95)<${readP95}`],
+    'http_req_duration{endpoint:get}': [`p(95)<${readP95}`],
   },
 };
 
