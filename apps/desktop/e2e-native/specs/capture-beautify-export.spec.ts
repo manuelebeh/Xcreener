@@ -32,36 +32,13 @@ describe('Xcreener capture → beautify → export', () => {
         { timeout: 15_000, interval: 250 }
       );
     } catch {
-      const windowVisible = await tauriInvoke('e2e_is_main_window_visible').catch(String);
-      const roundTrip = await browser
-        .executeAsync((done) => {
-          window.__xcreenerE2E
-            ?.e2eEventRoundTrip()
-            .then(done, (error: unknown) => done(String(error)));
-        })
-        .catch(String);
-      await browser.pause(5_000);
-      const pendingSlot = await browser
-        .executeAsync((done) => {
-          window.__xcreenerE2E?.e2eTakePendingCapture().then(done);
-        })
-        .catch(String);
       const state = await browser.execute(() => ({
         bridge: Boolean(window.__xcreenerE2E),
         captureError: window.__xcreenerE2E?.e2eCaptureError() ?? null,
-        hasScreenshotLater:
-          window.__xcreenerE2E?.e2eCaptureTrace().some((step) => step.includes('screenshot set')) ??
-          false,
-        trace: window.__xcreenerE2E?.e2eCaptureTrace() ?? null,
-        pageErrors: window.__xcreenerE2E?.e2ePageErrors() ?? null,
-        visibility: document.visibilityState,
-        hasFocus: document.hasFocus(),
         path: window.location.pathname,
-        text: document.body.innerText.slice(0, 120),
+        text: document.body.innerText.slice(0, 300),
       }));
-      throw new Error(
-        `Expected editor to receive injected screenshot: ${JSON.stringify({ windowVisible, roundTrip, pendingSlot, ...state })}`
-      );
+      throw new Error(`Expected editor to receive injected screenshot: ${JSON.stringify(state)}`);
     }
 
     const emptyState = await $('[data-testid="canvas-empty-state"]');

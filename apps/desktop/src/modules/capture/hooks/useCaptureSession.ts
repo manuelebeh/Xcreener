@@ -19,7 +19,7 @@ import {
   takeRecordingThumbnail,
 } from '@/tauri/commands';
 import { useCaptureStore } from '../store';
-import { traceCapture } from '../utils/sessionTrace';
+import { markCaptureImageListenerReady } from '../utils/listenerReady';
 
 export function useCaptureSession() {
   const navigate = useNavigate();
@@ -46,18 +46,12 @@ export function useCaptureSession() {
       unlistenProgress = fn;
     });
 
-    traceCapture('effect: registering listeners');
     void listen<CaptureImagePayload>('capture-image', async (event) => {
       try {
-        traceCapture(`capture-image received ${event.payload.width}x${event.payload.height}`);
         setCaptureProgress(null);
-        const raw = await takeCaptureImage();
-        traceCapture(`bytes taken: ${raw.byteLength}`);
-        const bytes = new Uint8Array(raw);
+        const bytes = new Uint8Array(await takeCaptureImage());
         const bitmap = await bytesToImageBitmap(bytes);
-        traceCapture(`bitmap decoded ${bitmap.width}x${bitmap.height}`);
         setScreenshot(bitmap);
-        traceCapture('screenshot set');
         persistCapture({
           bytes,
           width: event.payload.width,
@@ -68,20 +62,16 @@ export function useCaptureSession() {
         navigate('/');
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        traceCapture(`capture-image failed: ${message}`);
         setError(message);
       }
-    }).then(
-      (fn) => {
-        traceCapture('capture-image listener registered');
-        if (cancelled) {
-          fn();
-          return;
-        }
-        unlistenImage = fn;
-      },
-      (error) => traceCapture(`capture-image listen rejected: ${String(error)}`)
-    );
+    }).then((fn) => {
+      if (cancelled) {
+        fn();
+        return;
+      }
+      unlistenImage = fn;
+      markCaptureImageListenerReady();
+    });
 
     void listen<CaptureRecordingCompletePayload>('capture-recording-complete', async (event) => {
       try {
@@ -136,7 +126,6 @@ export function useCaptureSession() {
     });
 
     return () => {
-      traceCapture('effect: cleanup');
       cancelled = true;
       unlistenImage?.();
       unlistenError?.();
