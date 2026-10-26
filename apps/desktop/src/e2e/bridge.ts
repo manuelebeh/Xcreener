@@ -16,6 +16,10 @@ export function e2eCaptureError(): string | null {
   return useCaptureStore.getState().error;
 }
 
+export function e2eCaptureListenerReady(): boolean {
+  return getCaptureTrace().some((step) => step.includes('capture-image listener registered'));
+}
+
 export function e2eCaptureTrace(): string[] {
   return getCaptureTrace();
 }
@@ -81,6 +85,7 @@ export async function e2eExportToPath(
 export interface XcreenerE2EBridge {
   e2eEditorHasScreenshot: typeof e2eEditorHasScreenshot;
   e2eCaptureError: typeof e2eCaptureError;
+  e2eCaptureListenerReady: typeof e2eCaptureListenerReady;
   e2eCaptureTrace: typeof e2eCaptureTrace;
   e2ePageErrors: typeof e2ePageErrors;
   e2eEventRoundTrip: typeof e2eEventRoundTrip;
@@ -110,6 +115,7 @@ export function registerE2EBridge(): void {
   window.__xcreenerE2E = {
     e2eEditorHasScreenshot,
     e2eCaptureError,
+    e2eCaptureListenerReady,
     e2eCaptureTrace,
     e2ePageErrors,
     e2eEventRoundTrip,

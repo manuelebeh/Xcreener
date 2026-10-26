@@ -14,6 +14,11 @@ describe('Xcreener capture → beautify → export', () => {
   });
 
   it('injects a screenshot, applies a preset, and exports PNG', async () => {
+    // The event is fire-and-forget: injecting before React registers its listener loses it.
+    await browser.waitUntil(
+      async () => browser.execute(() => window.__xcreenerE2E?.e2eCaptureListenerReady() ?? false),
+      { timeout: 15_000, interval: 100, timeoutMsg: 'capture-image listener was never registered' }
+    );
     await tauriInvokeRaw('e2e_inject_screenshot', sampleBytes, { width: '800', height: '600' });
 
     try {
