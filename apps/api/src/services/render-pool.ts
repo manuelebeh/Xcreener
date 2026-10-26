@@ -14,7 +14,8 @@ export class RenderUnavailableError extends Error {
 }
 
 export interface RenderPool {
-  render(options: RenderExportOptions): Promise<RenderExportResult>;
+  /** `timeoutMs` overrides the pool limit for this render. */
+  render(options: RenderExportOptions, timeoutMs?: number): Promise<RenderExportResult>;
   close(): Promise<void>;
 }
 
@@ -35,8 +36,8 @@ export function createRenderPool(options: { maxThreads: number; timeoutMs: numbe
   });
 
   return {
-    async render(renderOptions) {
-      const timeout = AbortSignal.timeout(options.timeoutMs);
+    async render(renderOptions, timeoutMs = options.timeoutMs) {
+      const timeout = AbortSignal.timeout(timeoutMs);
       let outcome: RenderWorkerResult;
       try {
         // Piscina terminates the worker when a running task is aborted.

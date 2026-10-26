@@ -57,7 +57,8 @@ describe('render pool', () => {
     const slowPool = createRenderPool({ maxThreads: 1, timeoutMs: 50 });
     try {
       await expect(slowPool.render(largeExport())).rejects.toBeInstanceOf(RenderUnavailableError);
-      const pending = slowPool.render(largeExport(0));
+      // A cold worker (tsx loader) can take longer than the 50 ms limit on a busy runner.
+      const pending = slowPool.render(largeExport(0), 30_000);
       await expect(pending).resolves.toMatchObject({ width: 200 });
     } finally {
       await slowPool.close();
