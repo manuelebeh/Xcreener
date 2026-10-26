@@ -1,3 +1,4 @@
+import { emit, listen } from '@tauri-apps/api/event';
 import { writeFile } from '@tauri-apps/plugin-fs';
 import { useCaptureStore } from '@/modules/capture/store';
 import { getCaptureTrace } from '@/modules/capture/utils/sessionTrace';
@@ -16,6 +17,26 @@ export function e2eCaptureError(): string | null {
 
 export function e2eCaptureTrace(): string[] {
   return getCaptureTrace();
+}
+
+/** Emits an event from the page and waits for it to come back, which proves Rust to webview delivery works. */
+export async function e2eEventRoundTrip(timeoutMs = 3000): Promise<string> {
+  const startedAt = Date.now();
+  let received = false;
+  const unlisten = await listen('e2e-ping', () => {
+    received = true;
+  });
+  try {
+    await emit('e2e-ping');
+    while (!received && Date.now() - startedAt < timeoutMs) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    return received
+      ? `received after ${Date.now() - startedAt}ms`
+      : `not received in ${timeoutMs}ms`;
+  } finally {
+    unlisten();
+  }
 }
 
 const pageErrors: string[] = [];
@@ -51,6 +72,7 @@ export interface XcreenerE2EBridge {
   e2eCaptureError: typeof e2eCaptureError;
   e2eCaptureTrace: typeof e2eCaptureTrace;
   e2ePageErrors: typeof e2ePageErrors;
+  e2eEventRoundTrip: typeof e2eEventRoundTrip;
   e2eExportToPath: typeof e2eExportToPath;
 }
 
@@ -76,6 +98,7 @@ export function registerE2EBridge(): void {
     e2eCaptureError,
     e2eCaptureTrace,
     e2ePageErrors,
+    e2eEventRoundTrip,
     e2eExportToPath,
   };
 }
