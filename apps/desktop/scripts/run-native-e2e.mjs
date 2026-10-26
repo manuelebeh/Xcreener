@@ -161,7 +161,12 @@ async function runWebDriverSuite() {
     );
   }
 
-  const driver = spawn('tauri-driver', nativeDriverArgs, {
+  // tauri-driver launches the app, so the virtual display must wrap the driver, not wdio.
+  const [driverCommand, driverArgs] =
+    process.platform === 'linux'
+      ? ['xvfb-run', ['-a', 'tauri-driver', ...nativeDriverArgs]]
+      : ['tauri-driver', nativeDriverArgs];
+  const driver = spawn(driverCommand, driverArgs, {
     cwd: desktopDir,
     stdio: ['ignore', 'pipe', 'pipe'],
     shell: process.platform === 'win32',
@@ -183,12 +188,7 @@ async function runWebDriverSuite() {
 
   try {
     await waitForDriver();
-    const wdioArgs = ['run', configPath];
-    if (process.platform === 'linux') {
-      await run('xvfb-run', ['-a', wdioBin, ...wdioArgs]);
-      return;
-    }
-    await run(wdioBin, wdioArgs);
+    await run(wdioBin, ['run', configPath]);
   } catch (error) {
     if (driverOutput.trim()) {
       console.error(driverOutput.trim());
