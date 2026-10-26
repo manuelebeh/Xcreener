@@ -38,8 +38,20 @@ pub static RECORDING_THUMBNAIL: ImageSlot = ImageSlot::new();
 pub fn body_bytes(request: &Request<'_>) -> Result<Vec<u8>, String> {
     match request.body() {
         InvokeBody::Raw(bytes) => Ok(bytes.clone()),
-        InvokeBody::Json(_) => Err("Expected raw image bytes".into()),
+        // Tauri falls back to a JSON number array when the webview cannot use the raw IPC
+        // protocol (seen under WebDriver on Linux): slower, but still the same bytes.
+        InvokeBody::Json(value) => {
+            json_bytes(value).ok_or_else(|| "Expected raw image bytes".into())
+        }
     }
+}
+
+fn json_bytes(value: &serde_json::Value) -> Option<Vec<u8>> {
+    value
+        .as_array()?
+        .iter()
+        .map(|item| item.as_u64().and_then(|byte| u8::try_from(byte).ok()))
+        .collect()
 }
 
 pub fn header<'a>(request: &'a Request<'_>, name: &str) -> Result<&'a str, String> {
@@ -69,4 +81,22 @@ pub fn take_overlay_preview() -> Result<Response, String> {
 #[tauri::command]
 pub fn take_recording_thumbnail() -> Result<Response, String> {
     RECORDING_THUMBNAIL.take("No recording thumbnail is waiting")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::json_bytes;
+    use serde_json::json;
+
+    #[test]
+    fn reads_a_json_byte_array() {
+        assert_eq!(json_bytes(&json!([0, 137, 255])), Some(vec![0, 137, 255]));
+    }
+
+    #[test]
+    fn rejects_values_that_are_not_bytes() {
+        assert_eq!(json_bytes(&json!([256])), None);
+        assert_eq!(json_bytes(&json!("png")), None);
+        assert_eq!(json_bytes(&json!([1, "a"])), None);
+    }
 }
