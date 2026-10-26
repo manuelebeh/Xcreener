@@ -136,6 +136,8 @@ jobs:
         env:
           # Inherited by msedgedriver → app so WebView2 initializes for session create.
           TAURI_WEBVIEW_AUTOMATION: "true"
+          # Registers the window.__xcreenerE2E bridge in the production bundle the tests drive.
+          VITE_E2E: "true"
 
   native-e2e-macos:
     name: macOS (Rust + build)

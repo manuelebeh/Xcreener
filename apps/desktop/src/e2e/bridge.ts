@@ -42,7 +42,8 @@ declare global {
 }
 
 export function registerE2EBridge(): void {
-  if (!import.meta.env.DEV) {
+  // The native E2E build is a production bundle (`tauri build --debug`), so it opts in with VITE_E2E.
+  if (!import.meta.env.DEV && import.meta.env.VITE_E2E !== 'true') {
     return;
   }
 
