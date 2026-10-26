@@ -35,7 +35,10 @@ export async function tauriInvokeRaw(
       if (!internals?.invoke) {
         throw new Error('Tauri invoke is not available in this webview');
       }
-      return internals.invoke(cmd, new Uint8Array(body), { headers: invokeHeaders });
+      // Drop the response: the driver cannot serialize a raw-body invoke result.
+      return internals
+        .invoke(cmd, new Uint8Array(body), { headers: invokeHeaders })
+        .then(() => null);
     },
     command,
     bytes,
