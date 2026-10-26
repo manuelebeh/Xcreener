@@ -16,19 +16,24 @@ describe('Xcreener capture → beautify → export', () => {
   it('injects a screenshot, applies a preset, and exports PNG', async () => {
     await tauriInvokeRaw('e2e_inject_screenshot', sampleBytes, { width: '800', height: '600' });
 
-    await browser.waitUntil(
-      async () => {
-        const hasScreenshot = await browser.execute(async () => {
-          return window.__xcreenerE2E?.e2eEditorHasScreenshot() ?? false;
-        });
-        return hasScreenshot === true;
-      },
-      {
-        timeout: 15_000,
-        interval: 250,
-        timeoutMsg: 'Expected editor to receive injected screenshot',
-      }
-    );
+    try {
+      await browser.waitUntil(
+        async () => {
+          const hasScreenshot = await browser.execute(async () => {
+            return window.__xcreenerE2E?.e2eEditorHasScreenshot() ?? false;
+          });
+          return hasScreenshot === true;
+        },
+        { timeout: 15_000, interval: 250 }
+      );
+    } catch {
+      const state = await browser.execute(() => ({
+        bridge: Boolean(window.__xcreenerE2E),
+        path: window.location.pathname,
+        text: document.body.innerText.slice(0, 300),
+      }));
+      throw new Error(`Expected editor to receive injected screenshot: ${JSON.stringify(state)}`);
+    }
 
     const emptyState = await $('[data-testid="canvas-empty-state"]');
     await expect(emptyState).not.toBeDisplayed();
