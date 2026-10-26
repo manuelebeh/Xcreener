@@ -22,26 +22,33 @@ export async function tauriInvoke(command: string, args?: Record<string, unknown
   );
 }
 
-/** Sends `bytes` as a raw invoke body. WebDriver arguments are JSON, so the array becomes a Uint8Array in the page. */
+/**
+ * Sends `bytes` as a raw invoke body. WebDriver arguments are JSON, so the array becomes a Uint8Array in the page.
+ * Runs async and reports a rejection as text: the driver cannot parse a rejected promise returned from a sync script.
+ */
 export async function tauriInvokeRaw(
   command: string,
   bytes: number[],
   headers: Record<string, string> = {}
 ) {
-  return browser.execute(
-    (cmd, body, invokeHeaders) => {
+  const failure = await browser.executeAsync(
+    (cmd, body, invokeHeaders, done) => {
       const internals = (window as Window & { __TAURI_INTERNALS__?: { invoke: TauriInvoke } })
         .__TAURI_INTERNALS__;
       if (!internals?.invoke) {
-        throw new Error('Tauri invoke is not available in this webview');
+        done('Tauri invoke is not available in this webview');
+        return;
       }
-      // Drop the response: the driver cannot serialize a raw-body invoke result.
-      return internals
+      internals
         .invoke(cmd, new Uint8Array(body), { headers: invokeHeaders })
-        .then(() => null);
+        .then(() => done(null))
+        .catch((error: unknown) => done(String(error)));
     },
     command,
     bytes,
     headers
   );
+  if (failure) {
+    throw new Error(`${command} failed: ${failure}`);
+  }
 }
