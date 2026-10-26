@@ -6,6 +6,7 @@ import { useEditorStore } from '@/modules/editor/store';
 import { buildRenderInputFromStore } from '@/modules/export/hooks/useExportRender';
 import { exportRenderInput } from '@/modules/export/utils/canvasExport';
 import type { ExportFormat } from '@/modules/export/utils/formats';
+import { takeCaptureImage } from '@/tauri/commands';
 
 export async function e2eEditorHasScreenshot(): Promise<boolean> {
   return useEditorStore.getState().screenshot !== null;
@@ -36,6 +37,16 @@ export async function e2eEventRoundTrip(timeoutMs = 3000): Promise<string> {
       : `not received in ${timeoutMs}ms`;
   } finally {
     unlisten();
+  }
+}
+
+/** Reads the capture slot directly: bytes mean the inject command ran and only the event was lost. */
+export async function e2eTakePendingCapture(): Promise<string> {
+  try {
+    const raw = await takeCaptureImage();
+    return `slot held ${raw.byteLength} bytes`;
+  } catch (error) {
+    return `slot empty: ${String(error)}`;
   }
 }
 
@@ -73,6 +84,7 @@ export interface XcreenerE2EBridge {
   e2eCaptureTrace: typeof e2eCaptureTrace;
   e2ePageErrors: typeof e2ePageErrors;
   e2eEventRoundTrip: typeof e2eEventRoundTrip;
+  e2eTakePendingCapture: typeof e2eTakePendingCapture;
   e2eExportToPath: typeof e2eExportToPath;
 }
 
@@ -99,6 +111,7 @@ export function registerE2EBridge(): void {
     e2eCaptureTrace,
     e2ePageErrors,
     e2eEventRoundTrip,
+    e2eTakePendingCapture,
     e2eExportToPath,
   };
 }

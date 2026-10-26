@@ -36,6 +36,11 @@ describe('Xcreener capture → beautify → export', () => {
         })
         .catch(String);
       await browser.pause(5_000);
+      const pendingSlot = await browser
+        .executeAsync((done) => {
+          window.__xcreenerE2E?.e2eTakePendingCapture().then(done);
+        })
+        .catch(String);
       const state = await browser.execute(() => ({
         bridge: Boolean(window.__xcreenerE2E),
         captureError: window.__xcreenerE2E?.e2eCaptureError() ?? null,
@@ -50,7 +55,7 @@ describe('Xcreener capture → beautify → export', () => {
         text: document.body.innerText.slice(0, 120),
       }));
       throw new Error(
-        `Expected editor to receive injected screenshot: ${JSON.stringify({ windowVisible, roundTrip, ...state })}`
+        `Expected editor to receive injected screenshot: ${JSON.stringify({ windowVisible, roundTrip, pendingSlot, ...state })}`
       );
     }
 
