@@ -11,7 +11,7 @@ describe('Xcreener native integration', () => {
     await settingsLink.waitForDisplayed();
     await settingsLink.click();
 
-    const heading = await $('h2');
+    const heading = await $('h1');
     await heading.waitForDisplayed();
     await expect(heading).toHaveText('Settings');
     await expect(await $('label[for="capture-shortcut"]')).toBeDisplayed();
