@@ -50,6 +50,9 @@ pub fn e2e_inject_screenshot(app: AppHandle, request: Request<'_>) -> Result<(),
 
     crate::tray::show_main_window(&app);
     raw_ipc::PENDING_CAPTURE.set(png_bytes);
+    // Lets the native E2E tell a lost `capture-image` from Rust events not reaching the webview at all.
+    app.emit("e2e-rust-ping", ())
+        .map_err(|error| error.to_string())?;
     app.emit("capture-image", CaptureImagePayload { width, height })
         .map_err(|error| error.to_string())
 }

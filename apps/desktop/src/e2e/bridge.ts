@@ -1,7 +1,7 @@
 import { emit, listen } from '@tauri-apps/api/event';
 import { writeFile } from '@tauri-apps/plugin-fs';
 import { useCaptureStore } from '@/modules/capture/store';
-import { getCaptureTrace } from '@/modules/capture/utils/sessionTrace';
+import { getCaptureTrace, traceCapture } from '@/modules/capture/utils/sessionTrace';
 import { useEditorStore } from '@/modules/editor/store';
 import { buildRenderInputFromStore } from '@/modules/export/hooks/useExportRender';
 import { exportRenderInput } from '@/modules/export/utils/canvasExport';
@@ -104,6 +104,8 @@ export function registerE2EBridge(): void {
   window.addEventListener('unhandledrejection', (event) =>
     pageErrors.push(`unhandledrejection: ${String(event.reason)}`)
   );
+
+  void listen('e2e-rust-ping', () => traceCapture('e2e-rust-ping received from Rust'));
 
   window.__xcreenerE2E = {
     e2eEditorHasScreenshot,
