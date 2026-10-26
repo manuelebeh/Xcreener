@@ -1,4 +1,5 @@
 import { writeFile } from '@tauri-apps/plugin-fs';
+import { useCaptureStore } from '@/modules/capture/store';
 import { useEditorStore } from '@/modules/editor/store';
 import { buildRenderInputFromStore } from '@/modules/export/hooks/useExportRender';
 import { exportRenderInput } from '@/modules/export/utils/canvasExport';
@@ -6,6 +7,10 @@ import type { ExportFormat } from '@/modules/export/utils/formats';
 
 export async function e2eEditorHasScreenshot(): Promise<boolean> {
   return useEditorStore.getState().screenshot !== null;
+}
+
+export function e2eCaptureError(): string | null {
+  return useCaptureStore.getState().error;
 }
 
 export async function e2eExportToPath(
@@ -32,6 +37,7 @@ export async function e2eExportToPath(
 
 export interface XcreenerE2EBridge {
   e2eEditorHasScreenshot: typeof e2eEditorHasScreenshot;
+  e2eCaptureError: typeof e2eCaptureError;
   e2eExportToPath: typeof e2eExportToPath;
 }
 
@@ -49,6 +55,7 @@ export function registerE2EBridge(): void {
 
   window.__xcreenerE2E = {
     e2eEditorHasScreenshot,
+    e2eCaptureError,
     e2eExportToPath,
   };
 }

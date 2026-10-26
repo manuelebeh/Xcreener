@@ -29,6 +29,7 @@ describe('Xcreener capture → beautify → export', () => {
     } catch {
       const state = await browser.execute(() => ({
         bridge: Boolean(window.__xcreenerE2E),
+        captureError: window.__xcreenerE2E?.e2eCaptureError() ?? null,
         path: window.location.pathname,
         text: document.body.innerText.slice(0, 300),
       }));
