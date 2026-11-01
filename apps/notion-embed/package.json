@@ -22,7 +22,7 @@
     "@types/node": "^22.10.2",
     "esbuild": "^0.25.0",
     "tsx": "^4.20.3",
-    "typescript": "^6.0.2",
+    "typescript": "^7.0.2",
     "vitest": "^3.2.4"
   }
 }
