@@ -52,7 +52,7 @@
   "devDependencies": {
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
-    "@types/node": "^22.10.2",
+    "@types/node": "^26.6.6",
     "@types/ws": "^8.18.1",
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.4",

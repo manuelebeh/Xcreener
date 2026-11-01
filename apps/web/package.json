@@ -51,7 +51,7 @@
     "@xcreener/typescript-config": "workspace:*",
     "@tanstack/devtools-vite": "0.8.5",
     "@tanstack/router-cli": "^1.132.0",
-    "@types/node": "^22.10.2",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.1",
