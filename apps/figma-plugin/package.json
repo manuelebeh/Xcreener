@@ -19,7 +19,7 @@
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
     "esbuild": "^0.25.0",
-    "typescript": "^6.0.2",
+    "typescript": "^7.0.2",
     "vitest": "^3.2.4"
   }
 }

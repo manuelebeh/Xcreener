@@ -29,7 +29,7 @@
     "@types/react": "^19.1.13",
     "react": "^19.1.1",
     "tsx": "^4.20.5",
-    "typescript": "^6.0.2",
+    "typescript": "^7.0.2",
     "vitest": "^3.2.4"
   }
 }
