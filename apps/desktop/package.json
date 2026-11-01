@@ -23,7 +23,7 @@
     "@fontsource/ibm-plex-mono": "^5.2.5",
     "@fontsource/ibm-plex-sans": "^5.2.5",
     "@posthog/react": "^1.11.3",
-    "@sentry/react": "^10.42.0",
+    "@sentry/react": "^11.10.0",
     "@xcreener/api-core": "workspace:*",
     "@xcreener/cloud-core": "workspace:*",
     "@xcreener/collab-core": "workspace:*",
