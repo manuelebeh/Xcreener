@@ -19,7 +19,7 @@
     "@types/node": "^22.10.2",
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
-    "typescript": "^6.0.2",
+    "typescript": "^7.0.2",
     "vitest": "^5.1.0"
   },
   "dependencies": {
