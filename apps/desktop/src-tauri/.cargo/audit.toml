@@ -13,7 +13,11 @@ ignore = [
   "RUSTSEC-2023-0071",
   # zip 4 via tauri-plugin-updater, Windows only: extracts the update archive after its minisign
   # signature is verified, so a malicious archive already requires the updater key. Fixed in zip 9.
+  # (same reasoning covers 0429 symlink abort, 0545 AES tag check, 0548 stream reader names.)
   "RUSTSEC-2026-0367",
   "RUSTSEC-2026-0368",
   "RUSTSEC-2026-0369",
+  "RUSTSEC-2026-0429",
+  "RUSTSEC-2026-0545",
+  "RUSTSEC-2026-0548",
 ]
