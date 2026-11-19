@@ -50,7 +50,7 @@
     "zod": "^4.6.6"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "^26.6.6",
     "@types/ws": "^8.18.1",
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
