@@ -146,18 +146,13 @@ async function syncWorkspaceSubscription(
   }
   const customerId =
     typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
-  await updateWorkspacePlan(
-    tx,
-    workspaceId,
-    PAID_STATUSES.has(status) ? paidPlan : 'free',
-    {
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subscription.id,
-      status,
-      seatCount: subscription.items.data[0]?.quantity ?? 1,
-      currentPeriodEnd: subscriptionPeriodEnd(subscription),
-    }
-  );
+  await updateWorkspacePlan(tx, workspaceId, PAID_STATUSES.has(status) ? paidPlan : 'free', {
+    stripeCustomerId: customerId,
+    stripeSubscriptionId: subscription.id,
+    status,
+    seatCount: subscription.items.data[0]?.quantity ?? 1,
+    currentPeriodEnd: subscriptionPeriodEnd(subscription),
+  });
 }
 
 /**
