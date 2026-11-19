@@ -2,6 +2,7 @@
   "extends": "@xcreener/typescript-config/base.json",
   "compilerOptions": {
     "rootDir": "src",
+    "types": ["node"],
     "outDir": "dist"
   },
   "include": ["src"]
