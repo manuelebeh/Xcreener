@@ -123,6 +123,10 @@ function subscriptionPeriodEnd(subscription: Stripe.Subscription): Date | null {
   return end ? new Date(end * 1000) : null;
 }
 
+function isKnownStatus(status: string): status is SubscriptionStatus {
+  return (schema.subscriptionStatusEnum.enumValues as readonly string[]).includes(status);
+}
+
 /** Writes plan and subscription from a Stripe subscription. The plan is paid only while the status allows it. */
 async function syncWorkspaceSubscription(
   tx: Transaction,
@@ -130,6 +134,11 @@ async function syncWorkspaceSubscription(
   subscription: Stripe.Subscription,
   fallbackPlan?: WorkspacePlan
 ): Promise<void> {
+  // Stripe types the status as open-ended; the DB enum only holds the known values.
+  const status = subscription.status;
+  if (!isKnownStatus(status)) {
+    return;
+  }
   const priceId = subscription.items.data[0]?.price.id ?? '';
   const paidPlan = planFromPriceId(priceId) ?? fallbackPlan;
   if (!paidPlan) {
@@ -140,11 +149,11 @@ async function syncWorkspaceSubscription(
   await updateWorkspacePlan(
     tx,
     workspaceId,
-    PAID_STATUSES.has(subscription.status) ? paidPlan : 'free',
+    PAID_STATUSES.has(status) ? paidPlan : 'free',
     {
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscription.id,
-      status: subscription.status,
+      status,
       seatCount: subscription.items.data[0]?.quantity ?? 1,
       currentPeriodEnd: subscriptionPeriodEnd(subscription),
     }

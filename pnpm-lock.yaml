@@ -130,8 +130,8 @@ importers:
         specifier: ^3.4.7
         version: 3.4.9
       stripe:
-        specifier: ^18.5.0
-        version: 18.5.0(@types/node@22.19.21)
+        specifier: ^23.2.0
+        version: 23.2.0(@types/node@22.19.21)
       yaml:
         specifier: ^2.8.1
         version: 2.9.0
@@ -9838,11 +9838,11 @@ packages:
   strip-literal@3.1.0:
     resolution: {integrity: sha512-8r3mkIM/2+PpjHoOtiAW8Rg3jJLHaV7xPwG+YRGrv6FP0wwk/toTpATxWYOW0BKdWwl82VT2tFYi5DlROa0Mxg==}
 
-  stripe@18.5.0:
-    resolution: {integrity: sha512-Hp+wFiEQtCB0LlNgcFh5uVyKznpDjzyUZ+CNVEf+I3fhlYvh7rZruIg+jOwzJRCpy0ZTPMjlzm7J2/M2N6d+DA==}
-    engines: {node: '>=12.*'}
+  stripe@23.2.0:
+    resolution: {integrity: sha512-0W0J4yA9qFO2rnF61v8Y62OiO2SmAR+Cv04VJaFUMpCxiq8lG5bxEYbeSMSpMDR9ofFZGd+Z/iUIgSFbOolmUw==}
+    engines: {node: '>=20'}
     peerDependencies:
-      '@types/node': '>=12.x.x'
+      '@types/node': '>=20'
     peerDependenciesMeta:
       '@types/node':
         optional: true
@@ -14349,7 +14349,9 @@ snapshots:
       metro-runtime: 0.84.6
     transitivePeerDependencies:
       - '@babel/core'
+      - bufferutil
       - supports-color
+      - utf-8-validate
     optional: true
 
   '@react-native/metro-config@0.85.3(@babel/core@7.29.7)':
@@ -14360,9 +14362,7 @@ snapshots:
       metro-runtime: 0.84.6
     transitivePeerDependencies:
       - '@babel/core'
-      - bufferutil
       - supports-color
-      - utf-8-validate
 
   '@react-native/normalize-colors@0.74.89':
     optional: true
@@ -21203,9 +21203,7 @@ snapshots:
     dependencies:
       js-tokens: 9.0.1
 
-  stripe@18.5.0(@types/node@22.19.21):
-    dependencies:
-      qs: 6.17.1
+  stripe@23.2.0(@types/node@22.19.21):
     optionalDependencies:
       '@types/node': 22.19.21
 
