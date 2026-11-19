@@ -987,8 +987,8 @@ importers:
         version: 2.1.1
     devDependencies:
       '@storybook/addon-a11y':
-        specifier: ^8.6.14
-        version: 8.6.18(storybook@8.6.18(prettier@3.9.10))
+        specifier: ^10.6.7
+        version: 10.6.7(storybook@8.6.18(prettier@3.9.10))
       '@storybook/addon-essentials':
         specifier: ^8.6.14
         version: 8.6.14(@types/react@19.2.17)(storybook@8.6.18(prettier@3.9.10))
@@ -4476,10 +4476,10 @@ packages:
     peerDependencies:
       solid-js: ^1.6.12
 
-  '@storybook/addon-a11y@8.6.18':
-    resolution: {integrity: sha512-LFvudttdIfDTNWprA8/N1vbiWbJRrNscyt2OP9Qwi85E1d3LKLy+e8AWiqY08gpy2OUYujK7AjxfpKtNeddrxw==}
+  '@storybook/addon-a11y@10.6.7':
+    resolution: {integrity: sha512-ARd+bjfOYoICe00+svRgFsCVqV7RbN+wgi8yfRhk31kESR7NnTMBGiZD8vWv/r3xqul/Ddr1uR6mUK4lpH7sqw==}
     peerDependencies:
-      storybook: ^8.6.18
+      storybook: ^10.6.7
 
   '@storybook/addon-actions@8.6.14':
     resolution: {integrity: sha512-mDQxylxGGCQSK7tJPkD144J8jWh9IU9ziJMHfB84PKpI/V5ZgqMDnpr2bssTrUaGDqU5e1/z8KcRF+Melhs9pQ==}
@@ -4510,11 +4510,6 @@ packages:
     resolution: {integrity: sha512-4H19OJlapkofiE9tM6K/vsepf4ir9jMm9T+zw5L85blJZxhKZIbJ6FO0TCG9PDc4iPt3L6+aq5B0X29s9zicNQ==}
     peerDependencies:
       storybook: ^8.6.14
-
-  '@storybook/addon-highlight@8.6.18':
-    resolution: {integrity: sha512-wTFJ1DPM0C8gK6nGTJxH75byayQj7BPAz02fME4AOmT6clrBpVl1zSTFTkXaSr+k4xOfeMR/xNUfVskaXz6T9w==}
-    peerDependencies:
-      storybook: ^8.6.18
 
   '@storybook/addon-measure@8.6.14':
     resolution: {integrity: sha512-1Tlyb72NX8aAqm6I6OICsUuGOP6hgnXcuFlXucyhKomPa6j3Eu2vKu561t/f0oGtAK2nO93Z70kVaEh5X+vaGw==}
@@ -5765,8 +5760,8 @@ packages:
   avvio@9.2.0:
     resolution: {integrity: sha512-2t/sy01ArdHHE0vRH5Hsay+RtCZt3dLPji7W7/MMOCEgze5b7SNDC4j5H6FnVgPkI1MTNFGzHdHrVXDDl7QSSQ==}
 
-  axe-core@4.12.1:
-    resolution: {integrity: sha512-s7iGf5GaVMxEG0ENN9x+xTr7GFZCb1ZP/1uATUpCEK2X78nDB3RwbtFCo9pGAf9ru+VwoQ464DkaLEeRM08wJA==}
+  axe-core@4.14.1:
+    resolution: {integrity: sha512-FHfa+lmNjQZfJz1q8wKqIDwC6DExcHt/pkjNQb09a3NPjCKg2rhu5qb2S4r76ASyFNNtuFooJpZe37OgudVGtQ==}
     engines: {node: '>=4'}
 
   azure-devops-node-api@12.5.0:
@@ -14853,12 +14848,10 @@ snapshots:
     dependencies:
       solid-js: 1.9.17
 
-  '@storybook/addon-a11y@8.6.18(storybook@8.6.18(prettier@3.9.10))':
+  '@storybook/addon-a11y@10.6.7(storybook@8.6.18(prettier@3.9.10))':
     dependencies:
-      '@storybook/addon-highlight': 8.6.18(storybook@8.6.18(prettier@3.9.10))
       '@storybook/global': 5.0.0
-      '@storybook/test': 8.6.18(storybook@8.6.18(prettier@3.9.10))
-      axe-core: 4.12.1
+      axe-core: 4.14.1
       storybook: 8.6.18(prettier@3.9.10)
 
   '@storybook/addon-actions@8.6.14(storybook@8.6.18(prettier@3.9.10))':
@@ -14914,11 +14907,6 @@ snapshots:
       - '@types/react'
 
   '@storybook/addon-highlight@8.6.14(storybook@8.6.18(prettier@3.9.10))':
-    dependencies:
-      '@storybook/global': 5.0.0
-      storybook: 8.6.18(prettier@3.9.10)
-
-  '@storybook/addon-highlight@8.6.18(storybook@8.6.18(prettier@3.9.10))':
     dependencies:
       '@storybook/global': 5.0.0
       storybook: 8.6.18(prettier@3.9.10)
@@ -15008,6 +14996,7 @@ snapshots:
       '@storybook/global': 5.0.0
       '@vitest/utils': 2.1.9
       storybook: 8.6.18(prettier@3.9.10)
+    optional: true
 
   '@storybook/manager-api@8.6.18(storybook@8.6.18(prettier@3.9.10))':
     dependencies:
@@ -15101,6 +15090,7 @@ snapshots:
       '@vitest/expect': 2.0.5
       '@vitest/spy': 2.0.5
       storybook: 8.6.18(prettier@3.9.10)
+    optional: true
 
   '@storybook/theming@8.6.18(storybook@8.6.18(prettier@3.9.10))':
     dependencies:
@@ -15702,7 +15692,7 @@ snapshots:
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.29.7
-      '@babel/runtime': 7.29.7
+      '@babel/runtime': 7.29.14
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -15719,6 +15709,7 @@ snapshots:
       dom-accessibility-api: 0.6.3
       lodash: 4.18.1
       redent: 3.0.0
+    optional: true
 
   '@testing-library/jest-dom@6.9.1':
     dependencies:
@@ -15732,6 +15723,7 @@ snapshots:
   '@testing-library/user-event@14.5.2(@testing-library/dom@10.4.0)':
     dependencies:
       '@testing-library/dom': 10.4.0
+    optional: true
 
   '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.0)':
     dependencies:
@@ -15938,6 +15930,7 @@ snapshots:
       '@vitest/utils': 2.0.5
       chai: 5.3.3
       tinyrainbow: 1.2.0
+    optional: true
 
   '@vitest/expect@3.2.6':
     dependencies:
@@ -15974,6 +15967,7 @@ snapshots:
   '@vitest/pretty-format@2.0.5':
     dependencies:
       tinyrainbow: 1.2.0
+    optional: true
 
   '@vitest/pretty-format@2.1.9':
     dependencies:
@@ -16015,6 +16009,7 @@ snapshots:
   '@vitest/spy@2.0.5':
     dependencies:
       tinyspy: 3.0.2
+    optional: true
 
   '@vitest/spy@3.2.6':
     dependencies:
@@ -16026,12 +16021,14 @@ snapshots:
       estree-walker: 3.0.3
       loupe: 3.2.1
       tinyrainbow: 1.2.0
+    optional: true
 
   '@vitest/utils@2.1.9':
     dependencies:
       '@vitest/pretty-format': 2.1.9
       loupe: 3.2.1
       tinyrainbow: 1.2.0
+    optional: true
 
   '@vitest/utils@3.2.6':
     dependencies:
@@ -16464,7 +16461,7 @@ snapshots:
       '@fastify/error': 4.2.0
       fastq: 1.20.1
 
-  axe-core@4.12.1: {}
+  axe-core@4.14.1: {}
 
   azure-devops-node-api@12.5.0:
     dependencies:
@@ -16809,6 +16806,7 @@ snapshots:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
+    optional: true
 
   chalk@4.1.2:
     dependencies:
@@ -21187,7 +21185,8 @@ snapshots:
 
   tinyrainbow@3.1.0: {}
 
-  tinyspy@3.0.2: {}
+  tinyspy@3.0.2:
+    optional: true
 
   tinyspy@4.0.4: {}
 
