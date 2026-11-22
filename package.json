@@ -14,7 +14,7 @@
     "@biomejs/biome": "^2.6.8",
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
-    "lint-staged": "^16.4.0",
+    "lint-staged": "^17.6.1",
     "turbo": "^2.11.13"
   },
   "packageManager": "pnpm@9.15.9",
