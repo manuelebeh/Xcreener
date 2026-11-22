@@ -2,7 +2,7 @@ use crate::capture::record::encode_gif::CapturedFrame;
 use crate::capture::CaptureError;
 use bytes::Bytes;
 use image::RgbaImage;
-use openh264::encoder::{Encoder, EncoderConfig, FrameType};
+use openh264::encoder::{BitRate, Encoder, EncoderConfig, FrameRate, FrameType};
 use openh264::formats::{RgbSliceU8, YUVBuffer};
 use openh264::OpenH264API;
 use std::path::Path;
@@ -177,12 +177,12 @@ fn encode_mp4_cfr(
     }
 
     let config = EncoderConfig::new()
-        .set_bitrate_bps(4_000_000)
-        .max_frame_rate(fps as f32)
+        .bitrate(BitRate::from_bps(4_000_000))
+        .max_frame_rate(FrameRate::from_hz(fps as f32))
         // Never let the encoder drop ("skip") a frame: a skipped frame emits an empty
         // bitstream, and dropping it from the stream breaks the P-frame reference chain,
         // freezing playback until the end. We want one encoded NAL per grid frame.
-        .enable_skip_frame(false);
+        .skip_frames(false);
     let api = OpenH264API::from_source();
     let mut encoder = Encoder::with_api_config(api, config)
         .map_err(|error| CaptureError::Backend(error.to_string()))?;

@@ -20,7 +20,7 @@
     "@types/node": "^22.20.5",
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
-    "esbuild": "^0.25.12",
+    "esbuild": "^0.28.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.1.1"
