@@ -10,7 +10,6 @@ use crate::capture::types::Rect;
 use crate::capture::{find_monitor_for_region, list_monitors, CaptureError, MonitorInfo};
 use image::RgbaImage;
 use screencapturekit::cg::CGRect;
-use screencapturekit::cm::CMSampleBufferExt;
 use screencapturekit::cm::CMTime;
 use screencapturekit::cv::CVPixelBufferLockFlags;
 use screencapturekit::prelude::*;
@@ -80,7 +79,7 @@ impl SCStreamOutputTrait for RegionFrameHandler {
             return;
         }
 
-        let Some(pixel_buffer) = sample.image_buffer() else {
+        let Some(pixel_buffer) = sample.pixel_buffer() else {
             return;
         };
 
@@ -98,7 +97,12 @@ impl SCStreamOutputTrait for RegionFrameHandler {
             return;
         }
 
-        let rgba = bgra_buffer_to_rgba(guard.as_slice(), width, height, guard.bytes_per_row());
+        // SAFETY: `guard` holds a read-only lock on the pixel buffer until the end of this
+        // function, and `bytes` is fully copied into `rgba` before the guard is dropped.
+        let Some(bytes) = (unsafe { guard.as_slice() }) else {
+            return;
+        };
+        let rgba = bgra_buffer_to_rgba(bytes, width, height, guard.bytes_per_row());
         self.write_frame(&rgba);
     }
 }
@@ -171,7 +175,8 @@ pub fn run_region_recording(
     let filter = SCContentFilter::create()
         .with_display(&display)
         .with_excluding_windows(&[])
-        .build();
+        .build()
+        .map_err(map_sck_error)?;
 
     let scale = monitor.scale_factor.max(1.0);
     let output_width = (region.width as f64 * scale).round().max(1.0) as u32;
@@ -198,8 +203,10 @@ pub fn run_region_recording(
         writes_in_flight: Arc::clone(&writes_in_flight),
     };
 
-    let mut stream = SCStream::new(&filter, &config);
-    stream.add_output_handler(handler, SCStreamOutputType::Screen);
+    let mut stream = SCStream::new(&filter, &config).map_err(map_sck_error)?;
+    stream
+        .add_output_handler(handler, SCStreamOutputType::Screen)
+        .map_err(map_sck_error)?;
     stream.start_capture().map_err(map_sck_error)?;
 
     emit_recording_progress(&app, started_at, max_duration_secs);
