@@ -15,11 +15,11 @@
     "@xcreener/sdk": "workspace:*"
   },
   "devDependencies": {
-    "@figma/plugin-typings": "^1.119.0",
+    "@figma/plugin-typings": "^1.143.0",
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.12",
     "typescript": "^7.0.2",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   }
 }

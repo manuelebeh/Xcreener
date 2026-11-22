@@ -15,10 +15,10 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.20.5",
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
     "typescript": "^7.0.2",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   }
 }

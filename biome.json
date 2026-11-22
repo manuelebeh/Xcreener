@@ -12,5 +12,17 @@
       "!**/target",
       "!**/routeTree.gen.ts"
     ]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["apps/mobile/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noReactNativeRawText": "off"
+          }
+        }
+      }
+    }
+  ]
 }
