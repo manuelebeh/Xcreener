@@ -23,7 +23,7 @@
     "@fontsource/ibm-plex-mono": "^5.2.5",
     "@fontsource/ibm-plex-sans": "^5.2.5",
     "@posthog/react": "^1.11.3",
-    "@sentry/react": "^10.42.0",
+    "@sentry/react": "^11.13.0",
     "@xcreener/api-core": "workspace:*",
     "@xcreener/cloud-core": "workspace:*",
     "@xcreener/collab-core": "workspace:*",
@@ -72,7 +72,7 @@
     "tailwindcss": "^4.1.11",
     "tsx": "^4",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4",
-    "vitest": "^3.2.4"
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
   }
 }

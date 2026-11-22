@@ -27,6 +27,7 @@
     "@fastify/swagger-ui": "^6.1.2",
     "@fastify/websocket": "^11.3.4",
     "@napi-rs/canvas": "^0.1.80",
+    "@t3-oss/env-core": "^0.13.10",
     "@xcreener/api-core": "workspace:*",
     "@xcreener/cloud-core": "workspace:*",
     "@xcreener/collab-core": "workspace:*",
@@ -36,7 +37,6 @@
     "@xcreener/render-core": "workspace:*",
     "@xcreener/sync-core": "workspace:*",
     "@xcreener/team-core": "workspace:*",
-    "@t3-oss/env-core": "^0.13.10",
     "drizzle-orm": "^0.45.4",
     "fastify": "^5.12.6",
     "image-size": "^2.0.4",
@@ -45,20 +45,20 @@
     "nanoid": "^5.1.16",
     "piscina": "^5.3.2",
     "postgres": "^3.4.7",
-    "stripe": "^18.5.0",
+    "stripe": "^23.2.0",
     "yaml": "^2.8.1",
     "zod": "^4.6.6"
   },
   "devDependencies": {
-    "@xcreener/biome-config": "workspace:*",
-    "@xcreener/typescript-config": "workspace:*",
     "@types/node": "^22.10.2",
     "@types/ws": "^8.18.1",
+    "@xcreener/biome-config": "workspace:*",
+    "@xcreener/typescript-config": "workspace:*",
     "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.4",
     "esbuild": "0.28.1",
     "tsx": "^4.20.5",
-    "typescript": "^6.0.2",
-    "vitest": "^3.2.4"
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
   }
 }
