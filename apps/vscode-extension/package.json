@@ -70,7 +70,7 @@
     "@vscode/vsce": "^3.9.2",
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
-    "esbuild": "^0.25.12",
+    "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
     "vitest": "^5.1.1"
   }

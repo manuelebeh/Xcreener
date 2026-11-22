@@ -25,7 +25,7 @@
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
     "react": "^19.3.1",
-    "react-native": "^0.85.3",
+    "react-native": "^0.88.1",
     "typescript": "^7.0.2"
   }
 }
