@@ -15,6 +15,11 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: '@react-native*'
         update-types: ['version-update:semver-major']
+      # Must stay <= engines.vscode (vsce package fails otherwise): raise both together.
+      - dependency-name: '@types/vscode'
+      # Node 22 is the runtime; newer type majors describe APIs it does not have.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     groups:
       wdio:
         patterns: ['@wdio/*']
