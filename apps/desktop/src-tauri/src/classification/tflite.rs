@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
 use tract_tflite::prelude::*;
 
@@ -7,7 +7,7 @@ use crate::classification::preprocess::{self, INPUT_SIZE};
 use crate::classification::types::{ClassificationResult, ContentClass};
 
 type RunnableClassifier =
-    RunnableModel<TypedFact, Box<dyn TypedOp>, Graph<TypedFact, Box<dyn TypedOp>>>;
+    Arc<RunnableModel<TypedFact, Box<dyn TypedOp>>>;
 
 static MODEL: OnceLock<Option<RunnableClassifier>> = OnceLock::new();
 
@@ -48,7 +48,7 @@ pub fn classify(image: &image::DynamicImage) -> Option<ClassificationResult> {
     )
     .ok()?;
     let outputs = model.run(tvec!(input.into())).ok()?;
-    let logits = outputs[0].to_array_view::<f32>().ok()?;
+    let logits = outputs[0].to_plain_array_view::<f32>().ok()?;
     let scores: Vec<f32> = logits.iter().copied().collect();
     let probabilities = softmax(&scores);
 
