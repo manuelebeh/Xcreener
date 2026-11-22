@@ -15,6 +15,9 @@ updates:
       - dependency-name: 'react-native*'
       - dependency-name: '@react-native*'
       - dependency-name: '@shopify/react-native-skia'
+      # apps/mobile pins react to the version Expo's React Native renderer was built for.
+      - dependency-name: 'react'
+      - dependency-name: '@types/react'
       # Must stay <= engines.vscode (vsce package fails otherwise): raise both together.
       - dependency-name: '@types/vscode'
       # Node 22 is the runtime; newer type majors describe APIs it does not have.
