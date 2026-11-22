@@ -60,7 +60,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.100",
+    "@napi-rs/canvas": "^1.1.1",
     "@xcreener/plugin-core": "workspace:*",
     "@xcreener/sdk": "workspace:*"
   },
