@@ -15,6 +15,10 @@ updates:
         update-types: ['version-update:semver-major']
       - dependency-name: '@react-native*'
         update-types: ['version-update:semver-major']
+      # Expo SDK 56 pins exact versions of these (0.x minors are breaking): move them with `expo install`.
+      - dependency-name: 'react-native*'
+      - dependency-name: '@react-native*'
+      - dependency-name: '@shopify/react-native-skia'
       # Must stay <= engines.vscode (vsce package fails otherwise): raise both together.
       - dependency-name: '@types/vscode'
       # Node 22 is the runtime; newer type majors describe APIs it does not have.
