@@ -37,7 +37,7 @@
     "expo-splash-screen": "~56.0.16",
     "expo-status-bar": "~56.0.4",
     "expo-web-browser": "~56.0.6",
-    "react": "19.2.3",
+    "react": "19.3.1",
     "react-native": "0.85.3",
     "react-native-gesture-handler": "~2.31.2",
     "react-native-reanimated": "4.3.1",
@@ -48,7 +48,7 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
-    "@types/react": "~19.2.18",
+    "@types/react": "~19.3.0",
     "@xcreener/biome-config": "workspace:*",
     "@xcreener/typescript-config": "workspace:*",
     "typescript": "~6.0.3"
