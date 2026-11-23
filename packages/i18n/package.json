@@ -16,7 +16,7 @@
     "check:missing-keys": "tsx scripts/check-missing-keys.ts"
   },
   "dependencies": {
-    "i18next": "^25.10.10",
+    "i18next": "^27.2.2",
     "react-i18next": "^18.0.3"
   },
   "peerDependencies": {
