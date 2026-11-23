@@ -49,7 +49,8 @@ describe('Xcreener capture → beautify → export', () => {
 
     const presetBar = await $('[data-testid="preset-bar"]');
     await presetBar.waitForDisplayed();
-    const presetButton = await presetBar.$('button[aria-pressed="false"]');
+    // wdio 10 makes $() strict: several presets are unpressed, so pick the first one explicitly.
+    const [presetButton] = await presetBar.$$('button[aria-pressed="false"]');
     await presetButton.click();
 
     const exportMeta = await $('[data-testid="canvas-export-meta"]');
