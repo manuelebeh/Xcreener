@@ -1,4 +1,4 @@
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, mkdtempSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -58,6 +58,19 @@ export const config = {
   mochaOpts: {
     ui: 'bdd',
     timeout: 120_000,
+  },
+  // WebView2 occasionally fails to start on Windows runners ("DevToolsActivePort file doesn't exist").
+  // A retry with a fresh user-data folder (see beforeSession) clears it.
+  specFileRetries: 2,
+  specFileRetriesDelay: 5,
+  beforeSession(
+    _config: unknown,
+    capabilities: { 'tauri:options'?: { webviewOptions?: { userDataFolder: string } } }
+  ) {
+    const webviewOptions = capabilities['tauri:options']?.webviewOptions;
+    if (webviewOptions) {
+      webviewOptions.userDataFolder = mkdtempSync(path.join(os.tmpdir(), 'xcreener-e2e-webview-'));
+    }
   },
   waitforTimeout: 15_000,
   connectionRetryTimeout: 180_000,

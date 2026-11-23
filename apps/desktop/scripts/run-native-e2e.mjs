@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -143,7 +143,8 @@ async function smokeLaunchApp() {
   if (!exit) {
     try {
       if (process.platform === 'win32') {
-        child.kill();
+        // Kill the whole tree so no WebView2 process outlives the smoke launch.
+        spawnSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' });
       } else {
         process.kill(-child.pid);
       }
